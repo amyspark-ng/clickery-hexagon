@@ -1,0 +1,10 @@
+{
+    "compilerOptions": {
+        "allowJs": true,
+        "types": [
+        "./node_modules/kaboom/dist/global.d.ts"
+        ],
+        "declaration": true,
+        "emitDeclarationOnly": true,
+    }
+}

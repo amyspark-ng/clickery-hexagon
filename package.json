@@ -1,0 +1,13 @@
+{
+  "name": "deno-kaboom-template",
+  "description": "An example app created with Deno",
+  "type": "module",
+  "scripts": {
+    "build": "esbuild --bundle src/main.js --outfile=www/game.js",
+    "dev": "esbuild --bundle src/main.js --outfile=www/game.js --servedir=./www"
+  },
+  "dependencies": {
+    "esbuild": "^0.20.2",
+    "kaboom": "^3000.1.17"
+  }
+}
