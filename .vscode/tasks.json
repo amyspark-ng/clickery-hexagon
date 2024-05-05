@@ -3,19 +3,28 @@
 	"tasks": [
 		{
 			// Needs 7zip
-			"label": "— Build Kaboom",
+			"label": "— Run Kaboom",
 			"type": "shell",
-			"command": "pnpm build ; 7z a -tzip ./build.zip ./www",
+			"command": "pnpm dev",
 			"group": {
 				"kind": "build",
 			}
+		},
+		{
+			// Needs 7zip
+			"label": "— Build Kaboom",
+			"type": "shell",
+			"command": "pnpm build ; 7z a -tzip ./build.zip ./www",
+			// "group": {
+			// 	"kind": "build",
+			// }
 		},
 		{
 			// This runs the pnpm build and then runs the butler to send it to itch.io
 			// Needs 7zip
 			"label": "— Deliver kaboom to Itch.io",
 			"type": "shell",
-			"command": "pnpm build ; 7z a -tzip ./build.zip ./www ; butler push build.zip amyspark-ng/test-project:html5 --userversion 1.0",
+			"command": "pnpm build ; 7z a -tzip ./build.zip ./www ; butler push build.zip amyspark-ng/clickery-hexagon:html5 --userversion 1.0",
 		},
 	]
 }
