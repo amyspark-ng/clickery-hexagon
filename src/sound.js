@@ -1,11 +1,11 @@
 
 import { GameState } from "./GameState.js"
-import { gamescene, panderitoIndex } from "./scenes/game/gamescene.js";
+import { panderitoIndex } from "./scenes/game/gamescene.js";
 
 export let sfx;
 export function playSfx(sound = "clickPress", tune = 0) {
 	sfx = play(sound, {
-		volume: GameState.sfxVolindex.volume,
+		volume: GameState.sfx.volume,
 		detune: tune
 	})
 }
@@ -13,13 +13,13 @@ export function playSfx(sound = "clickPress", tune = 0) {
 export let music;
 export function playMusic(sound = "clickRelease", tune = 0, looping = true) {
 	music = play(sound, {
-		volume: GameState.musicVolIndex.volume,
+		volume: GameState.music.volume,
 		detune: tune,
 		loop: looping,
 	})
 }
 
-let bars;
+let volElements;
 
 export function volumeManager() {
 	let barXPosition = -110
@@ -29,9 +29,9 @@ export function volumeManager() {
 	sfx = play("")
 	music = play("")
 	
-	for (let i = 0; i < get("volElement").length; i++) {
-		destroy(get("volElement")[i])
-	}
+	// for (let i = 0; i < get("volElement").length; i++) {
+	// 	destroy(get("volElement")[i])
+	// }
 
 	let bg = add([
 		rect(width() / 6, 80),
@@ -43,31 +43,32 @@ export function volumeManager() {
 		z(999999999),
 		"volElement",
 		{
-			verPosition: 0,
 			isUp: true,
+			isActuallyUp: true,
 			up() {
-				if (this.isUp == false) {
+				if (!this.isUp) {
 					this.isUp = true
 					tween(this.pos.y, -this.height, 0.35, (p) => this.pos.y = p, easings.easeInQuint)
-				
-					wait(2, () => {
-						if (this.isUp == true) bg.hidden = true
+					wait(0.36, () => {
+						this.isActuallyUp = true
 					})
 				}
 			},
 			down() {
-				this.isUp = false
-				tween(this.pos.y, this.verPosition, 0.35, (p) => this.pos.y = p, easings.easeOutQuint)
-			
-				wait(2, () => {
-					if (seconds < 0) this.up()
-				})
+				if (this.isUp) {
+					this.isUp = false
+					this.isActuallyUp = false
+					get("volElement", { recursive: true }).forEach(element => {
+						element.hidden = false
+					});
+					tween(this.pos.y, 0, 0.35, (p) => this.pos.y = p, easings.easeOutQuint)
+				}
 			},
 		}
 	])
 
-	bg.pos.y = -bg.height
-
+	bg.up()
+	
 	let volumeText = bg.add([
 		text("VOLUME", {
 			font: 'emulogic',
@@ -92,7 +93,6 @@ export function volumeManager() {
 			rect(10, bg.height - 10),
 			opacity(1),
 			anchor("center"),
-			// stay(),
 			z(99999999999),
 			"volElement",
 			"bar",
@@ -100,40 +100,44 @@ export function volumeManager() {
 	}
 
 	bars = volumeText.get("bar", { recursive: true })
-
 	let speaker = volumeText.add([
 		sprite("speakers"),
 		opacity(1),
-		pos(-40, -110)
+		pos(-40, -110),
+		"volElement",
 	])
 
 	speaker.frame = 1
 
-	// bg.hidden = true
+	volElements = get("volElement", { recursive: true }) 
+
 	let gameManager = add([
 		stay(),
 		{
 			canChange: true,
 			update() {
-				GameState.volumeIndex.volume = parseFloat(GameState.volumeIndex.volume.toFixed(1))
-				GameState.sfxVolindex.volume = parseFloat(GameState.sfxVolindex.volume.toFixed(1))
-				GameState.musicVolIndex = parseFloat(GameState.musicVolIndex.toFixed(1))
+				GameState.volume = parseFloat(GameState.volume.toFixed(1))
+				GameState.sfx.volume = parseFloat(GameState.sfx.volume.toFixed(1))
+				GameState.music.volume = parseFloat(GameState.music.volume.toFixed(1))
 
-				volume(GameState.volumeIndex)
+				volume(GameState.volume)
 
-				if (seconds > 0) {
-					seconds -= dt()
-				}
-				
+				if (seconds > 0) seconds -= dt()
+
 				else {
 					bg.up()
+					if (bg.isActuallyUp) {
+						volElements.forEach(element => {
+							element.hidden = true
+						});
+					}
 				}
-
+				
 				if (isKeyPressed("-")) {
 					bg.down()
 					
-					if (GameState.volumeIndex > 0) {
-						GameState.volumeIndex -= 0.1
+					if (GameState.volume > 0) {
+						GameState.volume -= 0.1
 						tune -= 25
 						bars.forEach(element => {
 							element.hidden = false
@@ -141,7 +145,7 @@ export function volumeManager() {
 						speaker.hidden = true
 					}
 
-					if (GameState.volumeIndex == 0) {
+					if (GameState.volume == 0) {
 						bars.forEach(element => {
 							element.hidden = true
 						});
@@ -156,14 +160,14 @@ export function volumeManager() {
 				
 				else if (isKeyPressed("+")) {
 					bg.down()
-					if (GameState.volumeIndex <= 0.9) {
-						GameState.volumeIndex += 0.1
+					if (GameState.volume <= 0.9) {
+						GameState.volume += 0.1
 						tune += 25
 						play("volumeChange", { detune: tune })
 					}
 
 					// else play("whistle")
-					else play("volumeChange", { detune: tune })
+					else play("volumeChange", { detune: tune, volume: 5 })
 
 					seconds = 1.5
 					bars.forEach(element => {
@@ -175,14 +179,16 @@ export function volumeManager() {
 
 				else if (isKeyPressed("n") && panderitoIndex != 3) {
 					bg.down()
-					if (!GameState.sfxVolindex.muted) {
-						GameState.sfxVolindex.volume = 0
-						GameState.sfxVolindex.muted = true
+					if (!GameState.sfx.muted) {
+						GameState.sfx.volume = 0
+						GameState.sfx.muted = true
 						speaker.frame = 0
 					}
 					
+					// unmuted
 					else {
-						GameState.sfxVolindex.volume = GameState.volumeIndex
+						GameState.sfx.volume = GameState.volume
+						GameState.sfx.muted = false
 						speaker.frame = 1
 					} 
 
@@ -196,13 +202,16 @@ export function volumeManager() {
 
 				else if (isKeyPressed("m")) {
 					bg.down()
-					if (!GameState.volumeIndex.muted) {
-						GameState.musicVolIndex = -0
+					if (!GameState.music.muted) {
+						GameState.music.volume = 0
+						GameState.music.muted = true
 						speaker.frame = 0
 					}
 					
+					// unmuted
 					else {
-						GameState.musicVolIndex = GameState.volumeIndex
+						GameState.music.volume = GameState.volume
+						GameState.music.muted = false
 						speaker.frame = 1
 					}
 
@@ -216,17 +225,19 @@ export function volumeManager() {
 
 				for(let i = 0; i < bars.length; i++) {
 					bars[i].opacity = 0.1
+					bars[i].fullOp = 0.1
 				}
-			
-				for(let i = 0; i < GameState.volumeIndex * 10; i++) {
+				
+				for(let i = 0; i < Math.round(GameState.volume * 10); i++) {
 					bars[i].opacity = 1
+					bars[i].fullOp = 1
 				}
 
-				if (GameState.sfxVolindex != 0) GameState.sfxVolindex = GameState.volumeIndex
-				if (Object.is(GameState.musicVolIndex, -0) == false) GameState.musicVolIndex = GameState.volumeIndex
+				if (!GameState.sfx.muted) GameState.sfx.volume = GameState.volume; else GameState.sfx.volume = 0
+				if (!GameState.music.muted) GameState.music.volume = GameState.volume; else GameState.music.volume = 0
 			
-				sfx.volume = GameState.sfxVolindex
-				music.volume = GameState.musicVolIndex
+				sfx.volume = GameState.sfx.volume
+				music.volume = GameState.music.volume
 			}
 		}
 	])

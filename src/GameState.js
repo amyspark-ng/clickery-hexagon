@@ -78,9 +78,9 @@ export let GameState = {
 	// timeplayed
 	// max cookies per second gained
 
-	sfxVolindex: new VolumeData(1, false),
-	musicVolIndex: new VolumeData(1, false),
-	volumeIndex: 1,
+	sfx: new VolumeData(1, false),
+	music: new VolumeData(1, false),
+	volume: 1,
 
 	save(anim = true) {
 		if (anim) {

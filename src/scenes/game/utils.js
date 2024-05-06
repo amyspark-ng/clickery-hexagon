@@ -144,9 +144,9 @@ export function debugTexts() {
 				timeUntilAutoLoopEnds: ${GameState.timeUntilAutoLoopEnds}
 				autoLoopTime: ${autoLoopTime.toFixed(4)}
 				excessTime: ${excessTime.toFixed(4)}
-				volumeIndex: ${GameState.volumeIndex}
-				sfxVolindex: ${GameState.sfxVolindex}
-				musicVolindex: ${GameState.musicVolIndex}
+				masterVolume: ${GameState.volume}
+				sfx: ${GameState.sfx.volume}
+				music: ${GameState.music.volume}
 				`.trim()
 			}
 		}

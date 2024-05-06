@@ -6,7 +6,7 @@ export function loadAssets() {
 	loadRoot("./assets/")
 	loadBean()
 	
-	loadSound("volumeChange", "sounds/volumeChange.wav")
+	loadSound("volumeChange", "sounds/volumeChange.mp3")
 	loadSound("whistle", "sounds/whistle.mp3")
 	
 	loadSprite("bg", "sprites/bg.png")
@@ -147,8 +147,8 @@ export function loadAssets() {
 	
 	loadSound("hoverElement", "sounds/hoverElement.mp3")
 
-	loadSound("clickerTheme", "sounds/clicker.wav")
-	loadSound("menuTheme", "sounds/menu.wav")
+	loadSound("clickerTheme", "sounds/clicker.mp3")
+	loadSound("menuTheme", "sounds/menu.mp3")
 
 	loadFont("apl386", "https://kaboomjs.com/examples/fonts/apl386.ttf", {
 		outline: 4,
