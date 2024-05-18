@@ -1,6 +1,7 @@
 import kaboom from "kaboom";
 import "kaboom/global";
 
+import { drawLoadScreen, customScreens } from "./scenes/game/utils.js";
 import { loadAssets } from "./loader.js"
 import { GameState } from "./GameState.js"
 
@@ -17,13 +18,18 @@ export const k = kaboom({
 	// letterbox: true,
 });
 
+loadAssets()
+onLoading(drawLoadScreen)
+onLoad(() => {
+	console.log("finished loading!!!!")
+})
+customScreens()
+
 GameState.load()
 
 setCursor("none")
 
 export let kanvas = document.getElementById("kanva")
 export let gl = kanvas.getContext("2d")
-
-loadAssets()
 
 go("focuscene")

@@ -1,8 +1,9 @@
 import { GameState } from "../../GameState";
-import { isHoveringUpgrade, storeOpen } from "./store";
 import { autoLoopTime, excessTime, scorePerAutoClick } from "./gamescene";
 import { autoClick, autoScorePerSecond, hexagon } from "./addHexagon";
 import { trail } from "../../plugins/trail";
+import { isHoveringUpgrade, storeOpen } from "./windows/winStore";
+import { isHoveringWindow } from "./windows/WindowsMenu";
 
 const clamp = (val, min, max) => Math.min(Math.max(val, min), max)
 
@@ -46,6 +47,10 @@ export function formatNumber(number = 0, short = true, isPrice = false) {
 	return valueToReturn;
 }
 
+export function formatMusicTime(timeInSeconds) {
+	return `${Math.floor(timeInSeconds / 60)}:${Math.floor(timeInSeconds % 60) < 10 ? '0' + Math.floor(timeInSeconds % 60) : Math.floor(timeInSeconds % 60)}`
+}
+
 export function percentage(number, percentageTo) {
 	return Math.round((number * percentageTo) / 100)
 }
@@ -69,6 +74,30 @@ export function changeValueBasedOnAnother(value, maxValue, determiningValue, max
 	value = rate + (determiningValue / (maxDetValue / maxValue))
 	value = Math.min(value, maxValue)
 	return value;
+}
+
+function getRandomElementDifferentFrom(arr, element) {
+    // Step 1: Filter the array to exclude the specified element
+    const filteredArray = arr.filter(item => item !== element);
+
+    // Step 2: Select a random element from the filtered array
+    if (filteredArray.length === 0) {
+        throw new Error('No different elements available');
+    }
+    const randomIndex = Math.floor(Math.random() * filteredArray.length);
+    return filteredArray[randomIndex];
+}
+
+export function isCloserTo0Or360(angle) {
+    // Normalize the angle to be within [0, 360)
+    const normalizedAngle = ((angle % 360) + 360) % 360;
+
+    // Calculate the differences
+    const diffTo0 = Math.abs(normalizedAngle - 0);
+    const diffTo360 = Math.abs(normalizedAngle - 360);
+
+    // Compare differences
+    return diffTo0 <= diffTo360 ? true : false;
 }
 
 // definetely not chatgpt again
@@ -222,10 +251,42 @@ export function addBackground() {
 		"u_aspect": width() / height()
     })))
 
-	gameBg.onMousePress("right", () => {
-		if (!hexagon.isHovering()) {
-			gameBg.tintColor = BLUE
-		}
+	// gameBg.onMousePress("right", () => {
+	// 	if (!hexagon.isHovering()) {
+	// 		gameBg.tintColor = BLUE
+	// 	}
+	// })
+}
+
+export function customScreens() {
+	onError(() => {
+		drawRect({
+			width: width(),
+			height: height(),
+			color: RED,
+			z: 1,
+		})
+
+		drawText({
+			text: "error",
+			pos: vec2(width() / 2, height() / 2),
+			size: 50
+		})
+
+		console.log("error")
+	})
+}
+
+export function drawLoadScreen() {
+	drawRect({
+		width: width(),
+		height: height(),
+		color: BLACK,
+	})
+	
+	drawRect({
+		width: 100,
+		height: 100
 	})
 }
 
@@ -234,7 +295,7 @@ export function addMouse() {
 	mouse = add([
 		sprite("cursors"),
 		pos(mousePos()),
-		area(),
+		// area(),
 		scale(),
 		color(WHITE),
 		anchor("center"),
@@ -243,6 +304,16 @@ export function addMouse() {
 			start: false,
 			clicking: false,
 			speed: 5000, // 5000 is the optimal for actual mouse movement
+			grabbing: false,
+			grab() {
+				this.grabbing = true
+				mouse.play("grab")
+			},
+
+			release() {
+				this.grabbing = false
+			},
+			
 			update() {
 				if (this.start) {
 					this.moveTo(mousePos(), this.speed)
@@ -254,44 +325,66 @@ export function addMouse() {
 		}
 	])
 	
-	// mouse.use(trail("cursors", 2, 1, WHITE, 1, 0.5, 1, 0.5))
-	
 	onHoverUpdate("hoverObj", (obj) => {
 		if (obj.is("hexagon")) {
-			if (!storeOpen) {
-				if (mouse.clicking) mouse.play("grab")
-				else mouse.play("point")
+			if (!isHoveringWindow) {
+				if (!mouse.grabbing) {
+					mouse.play("point")
+				}
 			}
 		}
 
 		else if (obj.is("storeElement")) {
-			if (!isHoveringUpgrade) {
-				if (GameState.score >= obj.price) mouse.play("point")
-				else mouse.play("cursor")
+			if (!isHoveringWindow && obj.winParent.is("active")) {
+				if (!isHoveringUpgrade) {
+					if (GameState.score >= obj.price) {
+						mouse.play("point")
+					}
+					else {
+						mouse.play("cursor") 
+					}
+				}
 			}
 		}
 	
 		else if (obj.is("upgrade")) {
-			if (GameState.score >= obj.price) mouse.play("point")
-			else mouse.play("cursor")
+			if (!isHoveringWindow && obj.winParent.is("active")) {
+				if (GameState.score >= obj.price) {
+					mouse.play("point")
+				}
+				else {
+					mouse.play("cursor") 
+				}
+			}
 		}
 	
-		else {
+		else if (obj.is("xButton") || obj.is("musicButton")) {
 			mouse.play("point")
+		}
+
+		else {
+			if (!isHoveringWindow) {
+				mouse.play("point")
+			}
 		}
 	})
 
 	onHoverEnd("hoverObj", () => {
-		mouse.play("cursor")
-		mouse.clicking = false
+		if (!mouse.grabbing) {
+			mouse.play("cursor")
+		}
 	})
 
-	onHoverUpdate("glass", (obj) => {
-		if (!storeOpen) mouse.play("check")
+	onHoverUpdate("glass", () => {
+		if (!isHoveringWindow) {
+			if (!storeOpen) mouse.play("check")
+		}
 	})
 
 	onHoverEnd("glass", () => {
-		mouse.play("cursor")
+		if (!mouse.grabbing) {
+			mouse.play("cursor")
+		}
 	})
 }
 
@@ -563,4 +656,13 @@ export function saveAnim() {
 			destroy(floppy)
 		})
 	})
+}
+
+export function bop(obj) {
+	if (obj.defScale) {
+		tween(obj.scale, obj.defScale.sub(0.1), 0.15, (p) => obj.scale = p, easings.easeOutQuint).then(() => {
+			tween(obj.scale, obj.defScale, 0.15, (p) => obj.scale = p, easings.easeOutQuint)
+		})
+	}
+	else debug.log("this object does not have defScale :(")
 }

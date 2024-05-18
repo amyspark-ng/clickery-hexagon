@@ -1,9 +1,10 @@
 import { GameState } from "../../GameState"
 import { actualScorePerSecond, addHexagon, autoClick, autoScorePerSecond, hexagon } from "./addHexagon.js"
-import { storeStuff } from "./store.js"
 import { uiCounters } from "./uiCounter"
 import { addBackground, addMouse, debugFunctions, debugTexts, formatNumber, getPrice, mouse, percentage } from "./utils"
-import { music, playMusic } from "../../sound"
+import { musicHandler, playMusic } from "../../sound"
+import { folderObjManaging as folderObjManaging, unlockWindow, windowsDefinition } from "./windows/WindowsMenu"
+import { songs } from "./windows/winMusic"
 
 export let scorePerClick = 1
 export let scorePerAutoClick = 1
@@ -33,13 +34,16 @@ export function gamescene() {
 		addMouse()
 		addHexagon()
 		uiCounters()
-		storeStuff()
+		folderObjManaging()
+		windowsDefinition()
+
 		debugTexts()
 
 		setGravity(1600)
 
-		playMusic("clickerTheme", 0, true)
-
+		playMusic(GameState.music.favoriteIdx == null ? "clicker.wav" : Object.keys(songs)[GameState.music.favoriteIdx])
+		if (GameState.music.muted) musicHandler.paused = true
+		
 		// wait 60 seconds
 		wait(60, () => {
 			loop(60, () => {
@@ -70,7 +74,7 @@ export function gamescene() {
 			}
 
 			// debug
-			if (isKeyPressed("h")) { GameState.timeUntilAutoLoopEnds--; debug.log(GameState.timeUntilAutoLoopEnds) } 
+			// if (isKeyPressed("h")) { GameState.timeUntilAutoLoopEnds--; debug.log(GameState.timeUntilAutoLoopEnds) } 
 		
 			// other stuff
 			// debug.log(GameState.clicksUpgrades)
@@ -221,10 +225,10 @@ export function gamescene() {
 						} 
 
 						// 120 being the seconds outside screen you have to be to get a "pop up"
-						if ((totalTimeOutsideTab / 1000) > 1) {
-							debug.log(`You were out for: ${totalTimeOutsideTab / 1000}`)
-							debug.log(`And made: ${gainedScore}, cool!`)
-							debug.log("Excess time:" + excessTime)
+						if ((totalTimeOutsideTab / 1000) > 2) {
+							// debug.log(`You were out for: ${totalTimeOutsideTab / 1000}`)
+							// debug.log(`And made: ${gainedScore}, cool!`)
+							// debug.log("Excess time:" + excessTime)
 						}
 
 						tween(GameState.score, GameState.score + gainedScore, 0.25, (p) => GameState.score = p, easings.easeOutQuint)

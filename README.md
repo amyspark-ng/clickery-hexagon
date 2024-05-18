@@ -1,15 +1,7 @@
-- To start project do:
+# Clickery Hexagon
 
-`git clone https://github.com/amyspark-ng/kaboomdeno-template`
+Clicker game made in Kaboom.js
 
-`pnpm install`
+(keys.js goes in src root)
 
-- Run with:
-
-`pnpm dev`
-
-This template was created by [lajbel](https://lajbel.github.io/), but was costumized to my needs, very thanks you lajbel from github.
-
-<p align="center">
-  <img src="www/assets/sprites/osaka.png" />
-</p>
+To build:

@@ -1,10 +1,10 @@
 
 import { GameState } from "../../GameState.js";
 import { scorePerAutoClick, scorePerClick } from "./gamescene.js";
-import { storeOpen } from "./store.js";
 import { scoreText, spsText } from "./uiCounter.js";
-import { addPlusScoreText, mouse, formatNumber, changeValueBasedOnAnother, gameBg } from "./utils.js";
+import { addPlusScoreText, mouse, formatNumber, changeValueBasedOnAnother, gameBg, bop } from "./utils.js";
 import { playSfx } from "../../sound.js";
+import { isHoveringWindow } from "./windows/WindowsMenu.js";
 
 let hoverRotSpeedIncrease = 0.01 * 0.25
 let maxRotSpeed = 10
@@ -189,6 +189,7 @@ export function addHexagon() {
 					this.isBeingClicked = true
 					mouse.clicking = true
 				
+					mouse.grab()
 					// add([
 					// 	sprite("pinch"),
 					// 	pos(mouse.pos.x, mouse.pos.y - 35),
@@ -219,6 +220,7 @@ export function addHexagon() {
 					timeTilClick = constTimeTilClick
 					
 					clicksPerSecond++
+					mouse.release()
 				}
 
 				// debug.log("CPS: " + clicksPerSecond)
@@ -235,8 +237,8 @@ export function addHexagon() {
 				})
 			},
 
-			hoverStart() {
-				if (hexagon.canClick && !storeOpen) {
+			startHover() {
+				if (hexagon.canClick) {
 					tween(
 						hexagon.pos.y,
 						hexagon.verPosition - 10,
@@ -253,11 +255,13 @@ export function addHexagon() {
 					);
 		
 					hexagon.rotationSpeed += hoverRotSpeedIncrease
+					mouse.play("point")
+					// playSfx("hoverhex", rand(-10, 10))
 				}
 			},
 
-			hoverEnd() {
-				if (hexagon.canClick && !storeOpen) {
+			endHover() {
+				if (hexagon.canClick) {
 					tween(
 						hexagon.pos.y,
 						hexagon.verPosition,
@@ -265,39 +269,37 @@ export function addHexagon() {
 						(p) => hexagon.pos.y = p,
 						easings.easeOutCubic,
 					);
-					tween(
-						vec2(!storeOpen ? 1 : 1.01),
-						vec2(1),
-						0.35,
-						(p) => hexagon.scale = p,
-						easings.easeOutBounce,
-					);
+
 					hexagon.isBeingClicked = false
 					hexagon.rotationSpeed = 0
+					if (!isHoveringWindow) mouse.play("cursor")
+					// playSfx("unhoverhex", rand(-10, 10))
 				}
 			}
 		}
 	])
 
 	hexagon.onHover(() => {
-		hexagon.hoverStart()
+		if (!isHoveringWindow) {
+			hexagon.startHover()
+		}
 	})
 
 	hexagon.onHoverEnd(() => {
-		hexagon.hoverEnd()
+		hexagon.endHover()
 	});
 
 	hexagon.onMousePress("left", () => {
 		if (hexagon.isHovering()) {
-			if (hexagon.canClick && timeTilClick < 0 && !storeOpen) {
+			if (hexagon.canClick && timeTilClick < 0 && !isHoveringWindow) {
 				hexagon.clickPress(true)
 			}
 		}
 	})
 	
 	hexagon.onMouseRelease("left", () => {
-		if (hexagon.isHovering()) {
-			if (hexagon.canClick && hexagon.isBeingClicked && !isWaitingToClick && !storeOpen) {
+		if (hexagon.isHovering() && !isHoveringWindow) {
+			if (hexagon.canClick && hexagon.isBeingClicked && !isWaitingToClick && !isHoveringWindow) {
 				hexagon.clickRelease(true)
 				addPlusScoreText(mouse.pos, scorePerClick)
 				GameState.addScore(scorePerClick)

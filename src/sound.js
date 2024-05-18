@@ -2,32 +2,69 @@
 import { GameState } from "./GameState.js"
 import { panderitoIndex } from "./scenes/game/gamescene.js";
 
-export let sfx;
+export let sfxHandler;
 export function playSfx(sound = "clickPress", tune = 0) {
-	sfx = play(sound, {
+	sfxHandler = play(sound, {
 		volume: GameState.sfx.volume,
 		detune: tune
 	})
 }
 
-export let music;
-export function playMusic(sound = "clickRelease", tune = 0, looping = true) {
-	music = play(sound, {
+export let musicHandler;
+export function playMusic(sound = "clickRelease") {
+	musicHandler.stop()
+	musicHandler = play(sound, {
 		volume: GameState.music.volume,
-		detune: tune,
-		loop: looping,
+		detune: 0,
+		loop: true,	
 	})
 }
 
+
 let volElements;
+
+// takes 1.25 seconds
+export function scratchSong() {
+	musicHandler.winding = true
+	tween(musicHandler.detune, rand(-100, -150), 0.25, (p) => musicHandler.detune = p, easings.easeInQuint).then(() => {
+		tween(musicHandler.detune, rand(100, 150), 0.25, (p) => musicHandler.detune = p, easings.easeInQuint)
+	})
+	tween(musicHandler.speed, rand(0.25, 0.5), 0.25, (p) => musicHandler.speed = p, easings.easeInQuint)
+	tween(musicHandler.volume, rand(0.1, 0.5), 0.5, (p) => musicHandler.volume = p, easings.easeInQuint).then(() => {
+		musicHandler.stop()
+	})
+}
+
+export function espMute() {
+	tween(musicHandler.volume, 0, 0.25, (p) => musicHandler.volume = p, easings.easeOutQuint).onEnd(() => {
+		GameState.music.muted = true
+		musicHandler.paused = true
+	})
+	tween(musicHandler.detune, -100, 0.25, (p) => musicHandler.detune = p, easings.easeOutQuint)
+}
+
+export function espUnmute() {
+	GameState.music.muted = false
+	musicHandler.paused = false
+	tween(musicHandler.volume, GameState.music.volume, 0.25, (p) => musicHandler.volume = p, easings.easeOutQuint)
+	tween(musicHandler.detune, 0, 0.25, (p) => musicHandler.detune = p, easings.easeOutQuint)
+}
+
+export function manageMute() {
+	GameState.music.muted = !GameState.music.muted 
+	musicHandler.paused = !musicHandler.paused 
+}
 
 export function volumeManager() {
 	let barXPosition = -110
 	let seconds = 0
 	let tune = 0
 
-	sfx = play("")
-	music = play("")
+	sfxHandler = play("clickPress", { volume: 0 })
+	musicHandler = play("clickRelease", { volume: 0 })
+	musicHandler.winding = true
+	musicHandler.currentTime = 0 // time()
+	musicHandler.totalTime = 0 // duration()
 	
 	// for (let i = 0; i < get("volElement").length; i++) {
 	// 	destroy(get("volElement")[i])
@@ -35,7 +72,7 @@ export function volumeManager() {
 
 	let bg = add([
 		rect(width() / 6, 80),
-		pos(width() / 2, 0),
+		pos(width() / 2, -80),
 		anchor("top"),
 		color(BLACK),
 		opacity(0.5),
@@ -160,6 +197,7 @@ export function volumeManager() {
 				
 				else if (isKeyPressed("+")) {
 					bg.down()
+
 					if (GameState.volume <= 0.9) {
 						GameState.volume += 0.1
 						tune += 25
@@ -202,19 +240,9 @@ export function volumeManager() {
 
 				else if (isKeyPressed("m")) {
 					bg.down()
-					if (!GameState.music.muted) {
-						GameState.music.volume = 0
-						GameState.music.muted = true
-						speaker.frame = 0
-					}
-					
-					// unmuted
-					else {
-						GameState.music.volume = GameState.volume
-						GameState.music.muted = false
-						speaker.frame = 1
-					}
-
+					manageMute()
+					if (GameState.music.muted) speaker.frame = 0
+					else speaker.frame = 1
 					bars.forEach(element => {
 						element.hidden = true
 					});
@@ -236,8 +264,8 @@ export function volumeManager() {
 				if (!GameState.sfx.muted) GameState.sfx.volume = GameState.volume; else GameState.sfx.volume = 0
 				if (!GameState.music.muted) GameState.music.volume = GameState.volume; else GameState.music.volume = 0
 			
-				sfx.volume = GameState.sfx.volume
-				music.volume = GameState.music.volume
+				sfxHandler.volume = GameState.sfx.volume
+				if (!musicHandler.winding) musicHandler.volume = GameState.music.volume
 			}
 		}
 	])

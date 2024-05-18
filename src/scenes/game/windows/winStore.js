@@ -1,12 +1,7 @@
-import { GameState } from "../../GameState";
-import { hexagon } from "./addHexagon";
-import { addFlyingText, addPlusPercentageScore, addToolTip, changeValueBasedOnAnother, endToolTip, formatNumber, gameBg, getPrice, mouse } from "./utils";
-import { playSfx } from "../../sound";
-// import { trail } from "../../plugins/trail";
-
-let opaque;
-let storeObj
-let storeBg
+import { GameState } from "../../../GameState";
+import { hexagon } from "../addHexagon";
+import { addFlyingText, addPlusPercentageScore, addToolTip, changeValueBasedOnAnother, endToolTip, formatNumber, gameBg, getPrice, mouse } from "../utils";
+import { playSfx } from "../../../sound";
 
 let cursorsElement;
 let multipliersElement;
@@ -74,7 +69,7 @@ function addStoreElement(parent, settings = {
 	percentageIncrease: 15,
 	position: center(),
 	variable: GameState.cursors
-}) 
+}, winParent) 
 {	
 	// add a parent background object
 	const btn = parent.add([
@@ -98,6 +93,7 @@ function addStoreElement(parent, settings = {
 			basePrice: settings.basePrice,
 			percentageIncrease: settings.percentageIncrease,
 			variable: settings.variable,
+			winParent: winParent,
 			hoverStart() {
 				wait(0.01, () => {
 					if (isHoveringUpgrade == false) {
@@ -150,33 +146,37 @@ function addStoreElement(parent, settings = {
 		pos(-60, 0),
 		{
 			update() {
-				if (isKeyDown("shift")) amountBeingBought = 10
-				else if (isKeyDown("control")) amountBeingBought = 100
-				else amountBeingBought = 1
-
-				if (btn.is("ClicksElement")) {
-					btn.price = getPrice(btn.basePrice, btn.percentageIncrease, GameState.clickers - 1, amountBeingBought)
-					this.text = `${btn.price}\n${GameState.clickers}`
+				if (winParent.is("active")) {
+					if (isKeyDown("shift")) amountBeingBought = 10
+					else if (isKeyDown("control")) amountBeingBought = 100
+					else amountBeingBought = 1
 				}
 
-				else if (btn.is("CursorsElement")) {
-					btn.price = getPrice(btn.basePrice, btn.percentageIncrease, GameState.cursors, amountBeingBought)
-					this.text = `${btn.price}\n${GameState.cursors}`
-				}
-
-				else if (btn.is("PowerUpElement")) {
-					btn.price = getPrice(btn.basePrice, btn.percentageIncrease, GameState.powerupsBought)
-					this.text = `${btn.price}\n${GameState.powerupsBought}`
-				}
-
-				if (GameState.score >= btn.price) {
-					// GREEN
-					this.color = rgb(44, 209, 47)
-				}
-
-				else {
-					// RED
-					this.color = rgb(209, 61, 44)
+				if (winParent.is("active")) {
+					if (btn.is("ClicksElement")) {
+						btn.price = getPrice(btn.basePrice, btn.percentageIncrease, GameState.clickers - 1, amountBeingBought)
+						this.text = `${btn.price}\n${GameState.clickers}`
+					}
+	
+					else if (btn.is("CursorsElement")) {
+						btn.price = getPrice(btn.basePrice, btn.percentageIncrease, GameState.cursors, amountBeingBought)
+						this.text = `${btn.price}\n${GameState.cursors}`
+					}
+	
+					else if (btn.is("PowerUpElement")) {
+						btn.price = getPrice(btn.basePrice, btn.percentageIncrease, GameState.powerupsBought)
+						this.text = `${btn.price}\n${GameState.powerupsBought}`
+					}
+	
+					if (GameState.score >= btn.price) {
+						// GREEN
+						this.color = rgb(44, 209, 47)
+					}
+	
+					else {
+						// RED
+						this.color = rgb(209, 61, 44)
+					}
 				}
 			}
 		}
@@ -199,29 +199,31 @@ function addStoreElement(parent, settings = {
 	let timesBoughtWhileHolding = 0
 
 	btn.onMouseDown(() => {
-		if (btn.isHovering()) {
-			if (isHoveringUpgrade == false) {
-				if (checkPrice(btn.price)) {
-					if (timesBoughtWhileHolding == 0) {
-						timeUntilAnotherBuy = 1
-					}
+		if (winParent.is("active")) {
+			if (btn.isHovering()) {
+				if (isHoveringUpgrade == false) {
+					if (checkPrice(btn.price)) {
+						if (timesBoughtWhileHolding == 0) {
+							timeUntilAnotherBuy = 1
+						}
+			
+						timer += dt()
+			
+						timeUntilAnotherBuy = 1 / (timesBoughtWhileHolding)
+						timeUntilAnotherBuy = clamp(timeUntilAnotherBuy, 0.05, 1)
+			
+						if (timesBoughtWhileHolding == 0) {
+							timesBoughtWhileHolding = 1
+							btn.buy(amountBeingBought)
+							debug.log(btn.price)
+						}
 		
-					timer += dt()
-		
-					timeUntilAnotherBuy = 1 / (timesBoughtWhileHolding)
-					timeUntilAnotherBuy = clamp(timeUntilAnotherBuy, 0.05, 1)
-		
-					if (timesBoughtWhileHolding == 0) {
-						timesBoughtWhileHolding = 1
-						btn.buy(amountBeingBought)
-						debug.log(btn.price)
-					}
-	
-					if (timer > timeUntilAnotherBuy) {
-						timer = 0
-						timesBoughtWhileHolding++	
-						btn.buy(amountBeingBought)
-						debug.log(btn.price)
+						if (timer > timeUntilAnotherBuy) {
+							timer = 0
+							timesBoughtWhileHolding++	
+							btn.buy(amountBeingBought)
+							debug.log(btn.price)
+						}
 					}
 				}
 			}
@@ -229,17 +231,23 @@ function addStoreElement(parent, settings = {
 	})
 
 	btn.onMouseRelease(() => {
-		timer = 0
-		timesBoughtWhileHolding = 0
-		timeUntilAnotherBuy = 2.25
+		if (winParent.is("active")) {
+			timer = 0
+			timesBoughtWhileHolding = 0
+			timeUntilAnotherBuy = 2.25
+		}
 	}) 
 
 	btn.onHover(() => {
-		btn.hoverStart()
+		if (winParent.is("active")) {
+			btn.hoverStart()
+		}
 	})
 
 	btn.onHoverEnd(() => {
-		btn.hoverEnd()
+		if (winParent.is("active")) {
+			btn.hoverEnd()
+		}
 	})
 
 	return btn
@@ -372,7 +380,7 @@ function buyUpgrade(upgrade) {
 	}
 } 
 
-function addUpgrades(element) {
+function addUpgrades(element, winParent) {
 	let posX = 0;
 	let posY = -45;
 	let type = ""
@@ -412,13 +420,13 @@ function addUpgrades(element) {
 			sprite(uSprite),
 			anchor("center"),
 			opacity(1),
-			scale(),
+			scale(1),
 			color(WHITE),
 			area( { scale: vec2(0.8, 1) }),
 			"upgrade",
 			"store",
 			"hoverObj",
-			// z(9999999),
+			z(parent.z + 1),
 			{
 				basePrice: 0,
 				price: 0,
@@ -429,6 +437,7 @@ function addUpgrades(element) {
 				freq: 0,
 				bought: false,
 				type: type, // "k_" ex
+				winParent: winParent,
 			}
 		])
 
@@ -515,264 +524,99 @@ function addUpgrades(element) {
 		})
 	
 		upgrade.onHover(() => {
-			debug.log(upgrade.type + upgrade.idx + ` + ${upgrade.frame}`)
-			if (element.up == true) {
-				element.hoverEnd()
+			if (winParent.is("active")) {
+				debug.log(upgrade.type + upgrade.idx + ` + ${upgrade.frame}`)
+				if (element.up == true) {
+					element.hoverEnd()
+				}
+	
+				if (upgrade.idx == 0 || upgrade.idx == 1) {
+							   // obj,    obj.text,  tS !left, down, xD,  yD, sP xS,yS
+					addToolTip(upgrade, upgrade.text, 19, false, true, 0, 20, 1, 2, 1)
+				}
+				
+				else if (upgrade.idx == 3 || upgrade.idx == 4 || upgrade.idx == 5) {
+					addToolTip(upgrade, upgrade.text, 20, false, true, 0, 20, 1, 2.1, 1)
+				}
+				
+				else if (upgrade.idx == 6 || upgrade.idx == 8) {
+					addToolTip(upgrade, upgrade.text, 20, false, true, 0, 20, 1, 2.15, 1)
+				}
+				
+				else if (upgrade.idx == 9 || upgrade.idx == 10 || upgrade.idx == 11) {
+					addToolTip(upgrade, upgrade.text, 20, false, true, 0, 20, 1, 2.18, 1)
+				}
+				
+				else if (upgrade.idx > 11) {
+					addToolTip(upgrade, upgrade.text, 20, false, false, 0, 20, 1, 2.18, 1)
+				}
+	
+				else {
+					addToolTip(upgrade, upgrade.text, 20, false, true, 0, 20, 1, 2, 1)
+				}
+				
+				upgrade.add([
+					rect(upgrade.width, upgrade.height),
+					color(WHITE),
+					anchor("center"),
+					pos(),
+					opacity(0.5),
+					"select",
+				])
+	
+				playSfx("hoverElement", 100 * upgrade.idx / 4)
 			}
-
-			if (upgrade.idx == 0 || upgrade.idx == 1) {
-				           // obj,    obj.text,  tS !left, down, xD,  yD, sP xS,yS
-				addToolTip(upgrade, upgrade.text, 19, false, true, 0, 20, 1, 2, 1)
-			}
-			
-			else if (upgrade.idx == 3 || upgrade.idx == 4 || upgrade.idx == 5) {
-				addToolTip(upgrade, upgrade.text, 20, false, true, 0, 20, 1, 2.1, 1)
-			}
-			
-			else if (upgrade.idx == 6 || upgrade.idx == 8) {
-				addToolTip(upgrade, upgrade.text, 20, false, true, 0, 20, 1, 2.15, 1)
-			}
-			
-			else if (upgrade.idx == 9 || upgrade.idx == 10 || upgrade.idx == 11) {
-				addToolTip(upgrade, upgrade.text, 20, false, true, 0, 20, 1, 2.18, 1)
-			}
-			
-			else if (upgrade.idx > 11) {
-				addToolTip(upgrade, upgrade.text, 20, false, false, 0, 20, 1, 2.18, 1)
-			}
-
-			else {
-				addToolTip(upgrade, upgrade.text, 20, false, true, 0, 20, 1, 2, 1)
-			}
-			
-			upgrade.add([
-				rect(upgrade.width, upgrade.height),
-				color(WHITE),
-				anchor("center"),
-				pos(),
-				opacity(0.5),
-				"select",
-			])
-
-			playSfx("hoverElement", 100 * upgrade.idx / 4)
 		})
 
 		upgrade.onHoverEnd(() => {
-			if (element.up == false) {
-				element.hoverStart()
+			if (winParent.is("active")) {
+				if (element.up == false) {
+					element.hoverStart()
+				}
+				destroy(get("select", { recursive: true })[0])
+	
+				endToolTip()
 			}
-			destroy(get("select", { recursive: true })[0])
-
-			endToolTip()
 		})
 
 		upgrade.onClick(() => {
-			buyUpgrade(upgrade)
+			if (winParent.is("active")) {
+				buyUpgrade(upgrade)
+			}
 		})
 	}
 }
 
 export let storeOpen = false
 
-export function storeStuff() {
-	opaque = add([
-		rect(width() + 10, height() + 10),
-		pos(center()),
-		color(BLACK),
-		anchor("center"),
-		opacity(0),
-		z(5),
-		"opaqueStore",
-		"store",
-	])
-	
-	storeObj = add([
-		rect(56, 56, { radius: 10 }),
-		pos(width() - 40, height() - 40),
-		area(),
-		color(rgb(170, 170, 170)),
-		outline(3.5, BLACK),
-		z(6),
-		anchor("center"),
-		"hoverObj",
-		{
-			verPosition: height() - 40,
-			manage() {
-				storeOpen = !storeOpen
-
-				tween(
-					0,
-					-12,
-					0.1,
-					(p) => this.angle = p,
-					easings.easeinoutback,
-				);
-				wait(0.1, () => {
-					tween(
-						0,
-						12,
-						0.1,
-						(p) => this.angle = p,
-						easings.easeinoutback,
-					);
-
-					wait(0.1, () => {
-						tween(
-							this.angle,
-							0,
-							0.1,
-							(p) => this.angle = p,
-							easings.easeinoutback,
-						);
-					});
-				});
-				
-				// open
-				if (storeOpen) {
-					mouse.play("cursor")
-					
-					get("store", { recursive: true }).forEach(element => {
-						element.hidden = false
-					});
-					
-					// opaque
-					tween(opaque.opacity, 0.5, 0.25, (p) => opaque.opacity = p);
-					
-					// storeUI
-					tween(
-						width(),
-						width() - 384,
-						0.15,
-						(p) => storeBg.pos.x = p,
-						easings.easeOutBack,
-					);
-					
-					tween(storeObj.color, WHITE, 0.15, (p) => storeObj.color = p);
-				}
-				
-				// closed
-				else {
-					// huh???? so cool
-					if (!hexagon.isHovering()) {
-						hexagon.hoverEnd()
-					}
-
-					else {
-						hexagon.hoverStart()
-					}
-
-					wait(1, () => {
-						if (storeOpen == false) {
-							get("store", { recursive: true }).forEach(element => {
-								element.hidden = true
-							});
-						}
-					})
-					
-					// opaque
-					tween(opaque.opacity, 0, 0.25, (p) => opaque.opacity = p);
-
-					// storeUI
-					tween(
-						width() - 384,
-						width(),
-						0.15,
-						(p) => storeBg.pos.x = p,
-						easings.easeOutBack,
-					);
-				
-					mouse.play("cursor")
-					endToolTip()
-
-					tween(storeObj.color, rgb(170, 170, 170), 0.15, (p) => storeObj.color = p);
-				}
-			}
-		}
-	])
-
-	storeBg = add([
-		// rect(384 + 100, height() + 50),
-		sprite("storebg"),
-		pos(width(), -10),
-		anchor("topleft"),
-		z(5),
-		"storeBg",
-		"store",
-	]);
-
-	storeObj.onHover(() => {
-		tween(
-			vec2(1),
-			vec2(1.09),
-			0.35,
-			(p) => storeObj.scale = p,
-			easings.easeOutQuart,
-		);
-
-		tween(
-			storeObj.pos.y,
-			storeObj.verPosition - 5,
-			0.35,
-			(p) => storeObj.pos.y = p,
-			easings.easeOutQuart,
-		);
-	})
-
-	storeObj.onHoverEnd(() => {
-		tween(
-			vec2(1.09),
-			vec2(1),
-			0.35,
-			(p) => storeObj.scale = p,
-			easings.easeOutQuart,
-		);
-	
-		tween(
-			storeObj.pos.y,
-			storeObj.verPosition,
-			0.35,
-			(p) => storeObj.pos.y = p,
-			easings.easeOutQuart,
-		);
-	})
-
-	storeObj.onMousePress("left", () => {
-		if (storeObj.isHovering()) {
-			storeObj.manage()
-		}
-	})
-	
-	onKeyPress("space", () => {
-		storeObj.manage()
-	})
-
-	multipliersElement = addStoreElement(storeBg, {
+export function storeWinContent(winParent) {
+	multipliersElement = addStoreElement(winParent, {
 		name: 'Clicks',
 		basePrice: 25,
 		percentageIncrease: 15,
-		position: vec2(192, 75),
-	})
+		position: vec2(0, -180),
+	}, winParent)
 
-	cursorsElement = addStoreElement(storeBg, {
+	cursorsElement = addStoreElement(winParent, {
 		name: 'Cursors',
 		basePrice: 100,
 		percentageIncrease: 25,
-		position: vec2(192, 200),
-	})
+		position: vec2(0, (-180 + 108) + 10),
+	}, winParent)
 
-	powerupsElement = addStoreElement(storeBg, {
+	powerupsElement = addStoreElement(winParent, {
 		name: 'PowerUp',
 		basePrice: 100,
 		percentageIncrease: 25,
-		position: vec2(192, 325),
-	})
+		position: vec2(0, -18 + 108 + 10),
+	}, winParent)
 
 	storeElements = [multipliersElement, cursorsElement, powerupsElement]
 
 	// upgrades stuff
-	addUpgrades(multipliersElement)
-	addUpgrades(cursorsElement)
-	addUpgrades(storeBg)
+	addUpgrades(multipliersElement, winParent)
+	addUpgrades(cursorsElement, winParent)
+	addUpgrades(winParent, winParent)
 
 	let allStoreElements = get("store", { recursive: true })
 	
@@ -788,34 +632,20 @@ export function storeStuff() {
 				storeTune = 0
 			}
 		}
-
-		if (storeTimer < 4) {
-			storeTimer += dt()
-		}
-		
-		// debug.log(isHoveringUpgrade)
-		// debug.log(storePitchSeconds)
-		allStoreElements.forEach(element => {
-			element.paused = !storeOpen
-		});
-
-		// if (storeTimer < 3) {
-		// 	storeTimer += dt()
-		// }
 	})
 
 	// IT WORKS LOL!!!!!!!!!
-	onCharInput((ch) => {
-		if (storeOpen) {
-			let n = parseInt(ch)
-			// is a number
-			if (!isNaN(n)) {
-				// that number is above 0 and below 3
-				if (n > 0 && n < 4) {
-					let gotElement = storeElements[n - 1]
-					gotElement.buy(amountBeingBought)
-				}
-			}
-		}
-	})
+	// winParent.onCharInput((ch) => {
+	// 	if (storeOpen) {
+	// 		let n = parseInt(ch)
+	// 		// is a number
+	// 		if (!isNaN(n)) {
+	// 			// that number is above 0 and below 3
+	// 			if (n > 0 && n < 4) {
+	// 				let gotElement = storeElements[n - 1]
+	// 				gotElement.buy(amountBeingBought)
+	// 			}
+	// 		}
+	// 	}
+	// })
 }

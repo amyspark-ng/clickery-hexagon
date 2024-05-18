@@ -2,11 +2,30 @@ import { saveAnim } from "./scenes/game/utils"
 
 // lajbel you genius
 class VolumeData {
-	constructor(defaultVolume = 1, muted = false) {
+	constructor(defaultVolume = 1, muted = false, favoriteIdx = null) {
 		this.volume = defaultVolume;
 		this.muted = muted;
+		this.favoriteIdx = favoriteIdx // this is exclusively for music
 	}
 }
+
+// 
+export class savedWindowData {
+	constructor(key, idx, xPosition, unlocked, lastPos) {
+		this.key = key
+		this.idx = idx
+		this.xPosition = xPosition
+		this.unlocked = unlocked
+		this.lastPos = lastPos
+	}
+}
+
+// class medalData {
+// 	constructor(name, ng_id,  = 1, muted = false) {
+// 		this.volume = defaultVolume;
+// 		this.muted = muted;
+// 	}
+// }
 
 export let GameState = {
 	score: 0,
@@ -66,6 +85,9 @@ export let GameState = {
 		}
 	},
 
+	// order doesn't affect idx
+	unlockedWindows: ["aboutWin"],
+
 	// medals: {
 	// 	start: new medalData("It starts", 3484, false, "itstarts")
 	// },
@@ -79,15 +101,15 @@ export let GameState = {
 	// max cookies per second gained
 
 	sfx: new VolumeData(1, false),
-	music: new VolumeData(1, false),
+	music: new VolumeData(0.1, false),
 	volume: 1,
 
 	save(anim = true) {
 		if (anim) {
 			setData("hexagon-save", this)
 			saveAnim()
+			
 		}
-
 		else {
 			setData("hexagon-save", this)
 		}

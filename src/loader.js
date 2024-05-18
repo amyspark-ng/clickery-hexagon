@@ -140,6 +140,35 @@ export function loadAssets() {
 
 	loadSprite("osaka", "sprites/osaka.png")
 
+	loadSprite("storeWin", "sprites/windows/storeWin.png")
+	loadSprite("musicWin", "sprites/windows/musicWin.png")
+	loadSprite("musicWinElements", "sprites/windows/musicWinElements.png", {
+		sliceX: 3,
+		sliceY: 1,
+		anims: {
+			"discs": {
+				from: 0,
+				to: 2,
+			} 
+		}
+	})
+	loadSprite("aboutWin", "sprites/windows/aboutWin.png")
+	
+	// loadSpriteAtlas("musicWinElements", "sprites/windows/musicWinElements.png", {
+	// 	"defaultdisc": {
+	// 		x: 0,
+	// 		y: 0,
+	// 		width: 50,
+	// 		height: 50,
+	// 	},
+	// 	"kitflip": {
+	// 		x: 51,
+	// 		y: 0,
+	// 		width: 50,
+	// 		height: 50,
+	// 	}
+	// })
+
 	loadSound("clickPress", "sounds/click_press.mp3")
 	loadSound("clickRelease", "sounds/click_release.mp3")
 
@@ -147,8 +176,25 @@ export function loadAssets() {
 	
 	loadSound("hoverElement", "sounds/hoverElement.mp3")
 
-	loadSound("clickerTheme", "sounds/clicker.mp3")
-	loadSound("menuTheme", "sounds/menu.mp3")
+	loadSound("hoverMiniButton", "sounds/hoverMiniButton.wav")
+	loadSound("openWin", "sounds/win_open.wav")
+	loadSound("closeWin", "sounds/win_close.wav")
+
+	loadSound("hoverhex", "sounds/sfx/hoverhex.wav")
+	loadSound("unhoverhex", "sounds/sfx/unhoverhex.wav")
+	loadSound("fold", "sounds/sfx/fold.wav")
+
+	loadSound("clicker.wav", "sounds/music/clicker.ogg")
+	loadSound("menu.wav", "sounds/music/menu.ogg")
+	loadSound("whatttt.wav", "sounds/music/whatttt.ogg")
+	loadSound("simple.wav", "sounds/music/simple.ogg")
+	loadSound("jazz.wav", "sounds/music/jazz.ogg")
+	loadSound("sweet.wav", "sounds/music/sweet.ogg")
+	
+	loadSound("ok_instrumental", "sounds/music/ok_instrumental.ogg")
+	loadSound("magic", "sounds/music/magic.ogg")
+	loadSound("watchout", "sounds/music/watchout.ogg")
+	loadSound("catnip", "sounds/music/catnip.ogg")
 
 	loadFont("apl386", "https://kaboomjs.com/examples/fonts/apl386.ttf", {
 		outline: 4,
@@ -192,6 +238,17 @@ export function loadAssets() {
 		vec4 col1 = vec4(u_color1 / 255.0, 1.0);
 		vec4 col2 = vec4(u_color2 / 255.0, 1.0);
 		return (isEven) ? col1 : col2;
+	}
+	`)
+
+	loadShader("saturate", null, `
+	uniform float whiteness;
+	uniform vec2 u_pos;
+	uniform vec2 u_size;
+
+	vec4 frag(vec2 pos, vec2 uv, vec4 color, sampler2D tex) {
+		vec4 c = def_frag();
+		return c + vec4(mix(vec3(0), vec3(1), whiteness), 0);
 	}
 	`)
 	

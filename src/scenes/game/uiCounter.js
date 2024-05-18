@@ -1,16 +1,15 @@
 import { GameState } from "../../GameState.js";
 import { actualScorePerSecond } from "./addHexagon.js";
-import { storeOpen } from "./store.js";
 
 import { formatNumber } from "./utils.js";
+import { isHoveringWindow } from "./windows/WindowsMenu.js";
+import { storeOpen } from "./windows/winStore.js";
 
 export let scoreText;
 export let spsText;
 export let totalText;
 
-let cursorsText;
-let multiplierText;
-let buildingsText;
+export let buildingsText;
 
 let floatTextLoop;
 
@@ -34,7 +33,7 @@ export function uiCounters() {
 	])
 
 	scoreText.onHover(() => {
-		if (!storeOpen) tween(totalText.opacity, 1, 0.15, (p) => totalText.opacity = p)
+		if (!isHoveringWindow) tween(totalText.opacity, 1, 0.15, (p) => totalText.opacity = p)
 	})
 	
 	scoreText.onHoverEnd(() => {
@@ -97,6 +96,7 @@ export function uiCounters() {
 		pos(10, height() - 55),
 		{
 			update() {
+				this.pos.y = wave((height() - 55) - 8, (height() - 55) + 8, time() / 2)
 				this.text = `${GameState.cursors}<\n${GameState.clickers}x`
 			}
 		}
@@ -115,14 +115,14 @@ export function uiCounters() {
 	// 	}
 	// ])
 
-	loop(4, () => {
-		// tween(multiplierText.pos.y, multiplierText.pos.y + 8, 2, (p) => multiplierText.pos.y = p, )
-		// tween(cursorsText.pos.y, cursorsText.pos.y + 8, 2, (p) => cursorsText.pos.y = p, )
-		tween(buildingsText.pos.y, buildingsText.pos.y + 8, 2, (p) => buildingsText.pos.y = p, )
-		wait(2, () => {
-			tween(buildingsText.pos.y, buildingsText.pos.y - 8, 2, (p) => buildingsText.pos.y = p, )
-			// tween(multiplierText.pos.y, multiplierText.pos.y - 8, 2, (p) => multiplierText.pos.y = p, )
-			// tween(cursorsText.pos.y, cursorsText.pos.y - 8, 2, (p) => cursorsText.pos.y = p, )
-		})
-	})
+	// loop(4, () => {
+	// 	// tween(multiplierText.pos.y, multiplierText.pos.y + 8, 2, (p) => multiplierText.pos.y = p, )
+	// 	// tween(cursorsText.pos.y, cursorsText.pos.y + 8, 2, (p) => cursorsText.pos.y = p, )
+	// 	tween(buildingsText.pos.y, buildingsText.pos.y + 8, 2, (p) => buildingsText.pos.y = p, )
+	// 	wait(2, () => {
+	// 		tween(buildingsText.pos.y, buildingsText.pos.y - 8, 2, (p) => buildingsText.pos.y = p, )
+	// 		// tween(multiplierText.pos.y, multiplierText.pos.y - 8, 2, (p) => multiplierText.pos.y = p, )
+	// 		// tween(cursorsText.pos.y, cursorsText.pos.y - 8, 2, (p) => cursorsText.pos.y = p, )
+	// 	})
+	// })
 }
