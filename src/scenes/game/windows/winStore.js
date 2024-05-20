@@ -527,7 +527,7 @@ function addUpgrades(element, winParent) {
 	
 		upgrade.onHover(() => {
 			if (winParent.is("active") && !isDraggingWindow) {
-				debug.log(upgrade.type + upgrade.idx + ` + ${upgrade.frame}`)
+				// debug.log(upgrade.type + upgrade.idx + ` + ${upgrade.frame}`)
 				if (element.up == true) {
 					element.hoverEnd()
 				}

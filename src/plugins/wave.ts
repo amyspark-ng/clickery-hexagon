@@ -3,6 +3,8 @@ import { GameState } from "../GameState"
 // A custom component for waving
 export interface WaveCompOpt {
 	wave_tweenSpeed?: number,
+	wave_startTweenSpeed: number,
+	wave_endTweenSpeed: number,
 	minAmplitude?: number,
 	maxAmplitude?: number,
 	wave_speed?: number,
@@ -16,6 +18,8 @@ export function waver(WaveCompOpt: WaveCompOpt) {
 		require: [ "pos" ],
 		amplitude: 0,
 		wave_tweenSpeed: WaveCompOpt.wave_tweenSpeed || 0.32,
+		wave_startTweenSpeed: WaveCompOpt.wave_tweenSpeed || 0.32,
+		wave_endTweenSpeed: WaveCompOpt.wave_tweenSpeed || 0.32,
 		minAmplitude: WaveCompOpt.minAmplitude || 0,
 		maxAmplitude: WaveCompOpt.maxAmplitude || 50,
 		wave_verPosition: 0,

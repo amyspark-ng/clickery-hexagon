@@ -10,11 +10,21 @@ let lastSoundPos;
 let draggingTune;
 
 function deactivateAllSliders() {
-	get("slider", { recursive: true }).forEach(otherSliders => {
-		if (otherSliders.is("wave")) {
-			otherSliders.stopWave()
-		}
-	});
+	// get("slider", { recursive: true }).forEach(otherSliders => {
+	// 	if (otherSliders.is("wave")) {
+	// 		otherSliders.stopWave()
+	// 	}
+	// });
+	get("sliderButton", { recursive: true }).forEach(sliderbuttons => {
+		sliderbuttons.unuse("outline")
+	})
+}
+
+function typeToColor(type) {
+	if (type == "r") return rgb(255, 0, 0)
+	else if (type == "g") return rgb(0, 255, 0)
+	else if (type == "b") return rgb(0, 0, 255)
+	else return rgb(22, 22, 22)
 }
 
 function GetbuttonPosBasedOnValue(coloredObj, type = "r", theOneBehind) {
@@ -56,6 +66,7 @@ function addRgbSlider(winParent, posToAdd = vec2(0), coloredObj, type = "r") {
 		color(WHITE),
 		area(),
 		anchor("center"),
+		z(),
 		"slider",
 		type + "slider",
 	])
@@ -81,6 +92,7 @@ function addRgbSlider(winParent, posToAdd = vec2(0), coloredObj, type = "r") {
 		anchor("center"),
 		area({ scale: vec2(3.5, 1) }),
 		drag(),
+		color(typeToColor(type)),
 		"hoverObj",
 		"sliderButton",
 		"slider",
@@ -98,7 +110,6 @@ function addRgbSlider(winParent, posToAdd = vec2(0), coloredObj, type = "r") {
 					sliderInfo.value = map(this.pos.x, getSides(theOneBehind).left, getSides(theOneBehind).right, 0, 1)
 					sliderInfo.value = clamp(sliderInfo.value, 0, 1)
 				}
-				this.color = rgb(type == "r" ? sliderInfo.value : 0, type == "g" ? sliderInfo.value : 0, type == "b" ? sliderInfo.value : 0)
 				this.pos.x = clamp(this.pos.x, getSides(theOneBehind).left, getSides(theOneBehind).right)
 				if (isMousePressed("left")) {
 					if (curDraggin) {
@@ -129,15 +140,11 @@ function addRgbSlider(winParent, posToAdd = vec2(0), coloredObj, type = "r") {
 
 	sliderButton.onClick(() => {
 		deactivateAllSliders()
-		get(type + "slider", { recursive: true }).forEach((sliderObj) => {
-			if (!sliderObj.is("wave")) sliderObj.use(waver({ maxAmplitude: 5, minAmplitude: 0, wave_speed: 1.5 }))
-			sliderObj.startWave()
-		})
+		sliderButton.use(outline(5, type != "a" ? typeToColor(type).darken(100) : typeToColor(type).lighten(100)))
 		sliderButton.active = true
 	})
 
 	sliderButton.onDrag(() => {
-		// Remove the object and re-add it, so it'll be drawn on top
 		readd(sliderButton)
 		sliderButton.dragging = true
 		playSfx("clickPress")
@@ -146,7 +153,7 @@ function addRgbSlider(winParent, posToAdd = vec2(0), coloredObj, type = "r") {
 
 	sliderButton.onMouseMove(() => {
 		if (sliderButton.dragging) {
-			if (mousePos().x > lastSoundPos + 25 || mousePos().x < lastSoundPos - 25) {
+			if (mousePos().x > lastSoundPos + 50 || mousePos().x < lastSoundPos - 50) {
 				if (mousePos().x > getSides(winParent).left && mousePos().x < getSides(winParent).right) {
 					sliderButton.draggingTune = getDraggingTune(sliderButton.pos.x, theOneBehind)
 					lastSoundPos = mousePos().x
@@ -165,15 +172,19 @@ function addRgbSlider(winParent, posToAdd = vec2(0), coloredObj, type = "r") {
 		rect(0, 25),
 		pos(getSides(theOneBehind).left, theOneBehind.pos.y),
 		anchor("left"),
+		color(typeToColor(type)),
+		z(sliderButton.z - 1),
 		"slider",
 		type + "slider",
 		{
 			update() {
-				this.color = sliderButton.color
 				this.width = map(sliderButton.pos.x, getSides(theOneBehind).left, getSides(theOneBehind).right, 0, theOneBehind.width)
 			}
 		}
 	])
+
+	theOneBehind.z = sliderButton.z - 2
+	currentBar.z = sliderButton.z - 1
 
 	textValue = winParent.add([
 		text(sliderInfo.value, {

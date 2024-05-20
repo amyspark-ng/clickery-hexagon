@@ -13,6 +13,7 @@ export let isHoveringWindow = false;
 
 let folderObj;
 let folded = true;
+let timeSinceFold = 0;
 
 let miniButtons = [];
 let buttonSpacing = 75;
@@ -52,7 +53,6 @@ export function windowsDefinition() {
 }
 
 export function addMinibutton(i, xPosition) {
-	let unlocked = true
 	let quad;
 	getSprite("bean").then(quady => {
 		quad = quady
@@ -65,31 +65,30 @@ export function addMinibutton(i, xPosition) {
 		pos(folderObj.pos.x, folderObj.pos.y),
 		anchor("center"),
 		area({ scale: vec2(0) }),
-		scale(),
+		scale(1),
+		rotate(0),
 		z(folderObj.z - 1),
-		unlocked ? "hoverObj" : "",
+		"hoverObj",
 		"minibutton",
 		{
 			idx: i,
 			verPosition: folderObj.pos.y,
 			defScale: vec2(1),
-			window: unlocked ? get(`${Object.keys(infoForWindows)[i]}`, { recursive: true })[0] ? get(`${Object.keys(infoForWindows)[i]}`, { recursive: true })[0] : null : undefined,
+			window: get(`${Object.keys(infoForWindows)[i]}`, { recursive: true })[0],
 			windowInfo: infoForWindows[Object.keys(infoForWindows)[i]],
 			whiteness: 0,
 			// for these 2 it will do yPos even if locked
 			startHover() {
-				if (isHoveringWindow) return
+				if (isDraggingWindow) return
 				tween(miniButton.pos.y, miniButton.verPosition - 5, 0.32, (p) => miniButton.pos.y = p, easings.easeOutQuint)
-				if (!unlocked) return
-				playSfx("hoverMiniButton", 100 * miniButton.windowInfo.idx / 4)
 				tween(miniButton.scale, vec2(1.05), 0.32, (p) => miniButton.scale = p, easings.easeOutQuint)
 				miniButton.defScale = vec2(1.05)
+				playSfx("hoverMiniButton", 100 * miniButton.windowInfo.idx / 4)
 			},
 
 			endHover() {
-				if (isHoveringWindow) return
+				if (isDraggingWindow) return
 				tween(miniButton.pos.y, miniButton.verPosition, 0.32, (p) => miniButton.pos.y = p, easings.easeOutQuint)
-				if (!unlocked) return
 				tween(miniButton.angle, 0, 0.32, (p) => miniButton.angle = p, easings.easeOutQuint)
 				tween(miniButton.scale, vec2(1), 0.32, (p) => miniButton.scale = p, easings.easeOutQuint)
 				miniButton.defScale = vec2(1.05)
@@ -111,7 +110,6 @@ export function addMinibutton(i, xPosition) {
 			},
 
 			update() {
-				if (!unlocked) return
 				if (this.isHovering() && !isHoveringWindow && !isDraggingWindow && !folded) {
 					// animate it spinning it
 					this.angle = wave(-9, 9, time() * 3)
@@ -125,6 +123,7 @@ export function addMinibutton(i, xPosition) {
 
 	// animate them
 	tween(miniButton.pos.x, xPosition, 0.32, (p) => miniButton.pos.x = p, easings.easeOutQuint).then(() => {
+		if (timeSinceFold < 0.25) return
 		miniButton.area.scale = vec2(1.2)
 	})
 
@@ -134,22 +133,23 @@ export function addMinibutton(i, xPosition) {
 		"u_size": vec2(quad.w, quad.h),
 	})))
 
+	// if unfolded will not run
 	miniButton.onHover(() => {
-		// if unfolded will nto run
-		if (!folded && !isHoveringWindow && !isDraggingWindow) {
+		if (timeSinceFold < 0.25) return
+		if (!folded && !isHoveringWindow) {
 			miniButton.startHover()
 		}
 	})
 	
 	miniButton.onHoverEnd(() => {
-		// if unfolded will nto run
+		if (timeSinceFold < 0.25) return
 		if (!folded) {
 			miniButton.endHover()
 		}
 	})
 
 	miniButton.onClick(() => {
-		if(!unlocked) return
+		if (isHoveringWindow || isDraggingWindow) return
 		miniButton.manageRespectiveWindow(miniButton)
 		bop(miniButton)
 	})
@@ -220,6 +220,15 @@ export function openWindow(name = "") {
 				return condition;
 			},
 
+			isMouseInPreciseRange() {
+				let condition = 
+				(mousePos().y >= getSides(this).top - 5) && 
+				(mousePos().y <= getSides(this).bottom - 5) &&
+				(mousePos().x <= getSides(this).right - 5) &&
+				(mousePos().x >= getSides(this).left - 5)
+				return condition;
+			},
+
 			isMouseInGeneralRange() {
 				let condition = 
 				(mousePos().y >= getSides(this).top - 10) && 
@@ -287,7 +296,7 @@ export function openWindow(name = "") {
 		mouse.play("cursor")
 		windowObj.close()
 		if (!windowObj.showable) return
-		if (get("window").length == 1) {
+		if (get("window").length == 0) {
 			folderObj.fold()
 		}
 	})
@@ -350,10 +359,9 @@ export function openWindow(name = "") {
 }
 
 export function folderObjManaging() {
-	onMousePress("middle", () => {
-		unlockWindow("storeWin")
-	})
-
+	// onMousePress("middle", () => {
+	// 	unlockWindow("storeWin")
+	// })
 	onKeyPress("h", () => {
 		unlockWindow("musicWin")
 	})
@@ -371,22 +379,23 @@ export function folderObjManaging() {
 			defScale: vec2(2),
 			unfold() {
 				folded = false
+				timeSinceFold = 0
 
 				// Sort the unlockedWindows array based on the order in infoForWindows
 				GameState.unlockedWindows.sort((a, b) => infoForWindows[a].idx - infoForWindows[b].idx);
 
 				// Initial x position for the buttons
 				let initialX = folderObj.pos.x;
-
+				playSfx("fold", rand(-50, 50))
+				
 				// Iterate over the sorted unlockedWindows array to create buttons
+				if (get("minibutton").length > 0) return
 				GameState.unlockedWindows.forEach((key, index) => {
 					if (!infoForWindows[key].showable) return;
 					let xPos = initialX - buttonSpacing * index - 75;
 					let i = infoForWindows[key].idx;
 					addMinibutton(i, xPos);
 				});
-				
-				playSfx("fold", rand(-50, 50))
 			},
 			
 			fold() {
@@ -415,10 +424,11 @@ export function folderObjManaging() {
 
 			update() {
 				if (isKeyPressed("space") || (isMousePressed("left") && this.isHovering())) {
-					if (isHoveringWindow) return
 					this.manageFold()
 					bop(this)
 				}
+
+				if (timeSinceFold < 0.25) timeSinceFold += dt()
 			}
 		}
 	])
@@ -431,13 +441,11 @@ export function folderObjManaging() {
 			if (key == infoForWindows[hotWindowInfo].hotkey) {
 				// if unlockedwindows contains that window corresponding to the hotkey
 				if (GameState.unlockedWindows.includes(hotWindowInfo)) {
-					// there's only one window open
 				if (folded) folderObj.unfold()
+					// if there's only one window and key is the same as the window open, i should fold
 					if (get("window").length == 1 && key == get("window")[0].miniButton.windowInfo.hotkey) {
-						// if the key is the same as the window open, i should fold it
 						if (!folded) folderObj.fold()
 					}
-	
 					// manages the window and boops the button
 					miniButtons[infoForWindows[hotWindowInfo].idx].manageRespectiveWindow(miniButtons[infoForWindows[hotWindowInfo].idx])
 					bop(miniButtons[infoForWindows[hotWindowInfo].idx])

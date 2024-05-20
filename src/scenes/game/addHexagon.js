@@ -282,13 +282,14 @@ export function addHexagon() {
 	])
 
 	hexagon.onHover(() => {
-		if (!isHoveringWindow && !isDraggingWindow) {
+		// if no window has a mouse in precise range
+		if (!get("window").some(window => window.isMouseInPreciseRange()) && !isDraggingWindow) {
 			hexagon.startHover()
 		}
 	})
 
 	hexagon.onHoverEnd(() => {
-		if (!isHoveringWindow && !isDraggingWindow)
+		if (!get("window").some(window => window.isMouseInPreciseRange()) && !isDraggingWindow)
 		hexagon.endHover()
 	});
 

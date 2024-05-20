@@ -8,13 +8,9 @@
 - Loading screen isn't working
 - Do general unlocking stuff, like when you first start the game, also the start transition, so cool stuff
 ## Windows
+- Window elements get the window active on every other window except color window, for some reason
+^ Window elements shouldn't even click when the window is active, it should turn active but not execute the function 
 - If hasn't unlocked folderObj i think GameState.unlockedWindows should be null
-- Clicking several times on folderObj opens the minibuttons, why the fuck
-^ ACTUALLY HUGE FUCKING DEAL DON'T IGNORE
-- Dragging window through miniButtons causes bad value tweening error, why??
-- Add start tweening speed and end tweening speed instead of a single one, why not?
-- Place window in a corner of the hexagon and try to hover stuff, what the fuck is happeninggggg!!!
-- Test window waving
 ### Store
 - Why do upgrades not work correctly with winParent opacity?? 
 - Misc upgrades do not show up on winParent why??
@@ -22,12 +18,8 @@
 ### Music
 - Change vynil to cd, looks better
 - progress bar stutters when playing back
-- If window waving the music window speicifcally should wave at the speed of the song that is currently playing
 ### Color
-- Do the whole key system i guess??????
 - Windows don't turn active when pressing buttons or clicking sliders
-- Defaults are working weird....... (related to getSides probably)
-- If hexColorWin and bgColorWin are on at the same time and you click one of the sliders both ex rSlider will get active (waving animation)
 
 # Bookmarks!!!!!!!!!
 - Saving this for the window not being active stuff opacity

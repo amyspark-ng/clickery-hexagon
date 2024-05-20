@@ -9,17 +9,6 @@ class VolumeData {
 	}
 }
 
-// 
-export class savedWindowData {
-	constructor(key, idx, xPosition, unlocked, lastPos) {
-		this.key = key
-		this.idx = idx
-		this.xPosition = xPosition
-		this.unlocked = unlocked
-		this.lastPos = lastPos
-	}
-}
-
 // class medalData {
 // 	constructor(name, ng_id,  = 1, muted = false) {
 // 		this.volume = defaultVolume;

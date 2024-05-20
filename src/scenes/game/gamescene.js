@@ -54,9 +54,14 @@ export function gamescene() {
 		onUpdate(() => {
 			debugFunctions()
 			
-			// debug.log("spac: " + scorePerAutoClick)
-			// debug.log("asps: " + autoScorePerSecond)
-			
+			if (GameState.score > 50) {
+				if (!GameState.unlockedWindows.includes("storeWin")) unlockWindow("storeWin")
+			}
+
+			if (GameState.score > 100) {
+				if (!GameState.unlockedWindows.includes("musicWin")) unlockWindow("musicWin")
+			}
+
 			// allowed i guess
 			GameState.score = Math.round(GameState.score)
 			// auto loop stuff
