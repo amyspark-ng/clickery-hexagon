@@ -2,6 +2,7 @@ import { GameState } from "../../../GameState";
 import { hexagon } from "../addHexagon";
 import { addFlyingText, addPlusPercentageScore, addToolTip, changeValueBasedOnAnother, endToolTip, formatNumber, gameBg, getPrice, mouse } from "../utils";
 import { playSfx } from "../../../sound";
+import { isDraggingWindow } from "./WindowsMenu";
 
 let cursorsElement;
 let multipliersElement;
@@ -110,9 +111,10 @@ function addStoreElement(parent, settings = {
 					this.up = false
 					tween(this.pos.y, this.verPosition, 0.1, (p) => this.pos.y = p)
 				}
-				// this.unuse(outlineshaderfknlnfl)
+			// this.unuse(outlineshaderfknlnfl)
 			},
 			buy(amount) {
+				if (winParent.dragging) return
 				if (this.is("ClicksElement")) GameState.clickers += amount
 				else if (this.is("CursorsElement")) GameState.cursors += amount
 
@@ -146,13 +148,13 @@ function addStoreElement(parent, settings = {
 		pos(-60, 0),
 		{
 			update() {
-				if (winParent.is("active")) {
+				if (winParent.is("active") && !isDraggingWindow) {
 					if (isKeyDown("shift")) amountBeingBought = 10
 					else if (isKeyDown("control")) amountBeingBought = 100
 					else amountBeingBought = 1
 				}
 
-				if (winParent.is("active")) {
+				if (winParent.is("active") && !isDraggingWindow) {
 					if (btn.is("ClicksElement")) {
 						btn.price = getPrice(btn.basePrice, btn.percentageIncrease, GameState.clickers - 1, amountBeingBought)
 						this.text = `${btn.price}\n${GameState.clickers}`
@@ -199,7 +201,7 @@ function addStoreElement(parent, settings = {
 	let timesBoughtWhileHolding = 0
 
 	btn.onMouseDown(() => {
-		if (winParent.is("active")) {
+		if (winParent.is("active") && !isDraggingWindow) {
 			if (btn.isHovering()) {
 				if (isHoveringUpgrade == false) {
 					if (checkPrice(btn.price)) {
@@ -231,7 +233,7 @@ function addStoreElement(parent, settings = {
 	})
 
 	btn.onMouseRelease(() => {
-		if (winParent.is("active")) {
+		if (winParent.is("active") && !isDraggingWindow) {
 			timer = 0
 			timesBoughtWhileHolding = 0
 			timeUntilAnotherBuy = 2.25
@@ -239,13 +241,13 @@ function addStoreElement(parent, settings = {
 	}) 
 
 	btn.onHover(() => {
-		if (winParent.is("active")) {
+		if (winParent.is("active") && !isDraggingWindow) {
 			btn.hoverStart()
 		}
 	})
 
 	btn.onHoverEnd(() => {
-		if (winParent.is("active")) {
+		if (winParent.is("active") && !isDraggingWindow) {
 			btn.hoverEnd()
 		}
 	})
@@ -254,26 +256,26 @@ function addStoreElement(parent, settings = {
 }
 
 function getFrame(upgrade) {
-    // Determine which spritesheet the upgrade belongs to based on its index
-    if (upgrade.type == "u_") {
-        // For the second spritesheet
-        if (upgrade.bought) {
-            return (upgrade.idx - 12) * 3;  // First frame of each animation
-        } else if (checkPrice(GameState.score, upgrade.price)) {
-            return (upgrade.idx - 12) * 3 + 2;  // Third frame of each animation
-        } else {
-            return (upgrade.idx - 12) * 3 + 1;  // Second frame of each animation
-        }
-    } else {
-        // For the original spritesheet
-        if (upgrade.bought) {
-            return upgrade.idx * 3;  // First frame of each animation
-        } else if (checkPrice(GameState.score, upgrade.price)) {
-            return upgrade.idx * 3 + 2;  // Third frame of each animation
-        } else {
-            return upgrade.idx * 3 + 1;  // Second frame of each animation
-        }
-    }
+	// Determine which spritesheet the upgrade belongs to based on its index
+	if (upgrade.type == "u_") {
+		// For the second spritesheet
+		if (upgrade.bought) {
+			return (upgrade.idx - 12) * 3;  // First frame of each animation
+		} else if (checkPrice(GameState.score, upgrade.price)) {
+			return (upgrade.idx - 12) * 3 + 2;  // Third frame of each animation
+		} else {
+			return (upgrade.idx - 12) * 3 + 1;  // Second frame of each animation
+		}
+	} else {
+		// For the original spritesheet
+		if (upgrade.bought) {
+			return upgrade.idx * 3;  // First frame of each animation
+		} else if (checkPrice(GameState.score, upgrade.price)) {
+			return upgrade.idx * 3 + 2;  // Third frame of each animation
+		} else {
+			return upgrade.idx * 3 + 1;  // Second frame of each animation
+		}
+	}
 }
 
 function buyUpgrade(upgrade) {
@@ -524,7 +526,7 @@ function addUpgrades(element, winParent) {
 		})
 	
 		upgrade.onHover(() => {
-			if (winParent.is("active")) {
+			if (winParent.is("active") && !isDraggingWindow) {
 				debug.log(upgrade.type + upgrade.idx + ` + ${upgrade.frame}`)
 				if (element.up == true) {
 					element.hoverEnd()
@@ -569,7 +571,7 @@ function addUpgrades(element, winParent) {
 		})
 
 		upgrade.onHoverEnd(() => {
-			if (winParent.is("active")) {
+			if (winParent.is("active") && !isDraggingWindow) {
 				if (element.up == false) {
 					element.hoverStart()
 				}

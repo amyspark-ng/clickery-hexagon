@@ -2,9 +2,9 @@
 import { GameState } from "../../GameState.js";
 import { scorePerAutoClick, scorePerClick } from "./gamescene.js";
 import { scoreText, spsText } from "./uiCounter.js";
-import { addPlusScoreText, mouse, formatNumber, changeValueBasedOnAnother, gameBg, bop } from "./utils.js";
+import { addPlusScoreText, mouse, formatNumber, changeValueBasedOnAnother, gameBg, bop, arrayToColor } from "./utils.js";
 import { playSfx } from "../../sound.js";
-import { isHoveringWindow } from "./windows/WindowsMenu.js";
+import { isDraggingWindow, isHoveringWindow, manageWindow, openWindow } from "./windows/WindowsMenu.js";
 
 let hoverRotSpeedIncrease = 0.01 * 0.25
 let maxRotSpeed = 10
@@ -124,6 +124,7 @@ export function addHexagon() {
 		anchor("center"),
 		rotate(0),
 		scale(),
+		color(arrayToColor(GameState.hexColor)),
 		area({
 			shape: new Polygon([
 				vec2(406, 118),
@@ -140,6 +141,7 @@ export function addHexagon() {
 		"hexagon",
 		"hoverObj",
 		{
+			defScale: vec2(1),
 			verPosition: center().y + 55,
 			canClick: true,
 			isBeingClicked: false,
@@ -272,7 +274,7 @@ export function addHexagon() {
 
 					hexagon.isBeingClicked = false
 					hexagon.rotationSpeed = 0
-					if (!isHoveringWindow) mouse.play("cursor")
+					if ((!isHoveringWindow && !isDraggingWindow)) mouse.play("cursor")
 					// playSfx("unhoverhex", rand(-10, 10))
 				}
 			}
@@ -280,26 +282,27 @@ export function addHexagon() {
 	])
 
 	hexagon.onHover(() => {
-		if (!isHoveringWindow) {
+		if (!isHoveringWindow && !isDraggingWindow) {
 			hexagon.startHover()
 		}
 	})
 
 	hexagon.onHoverEnd(() => {
+		if (!isHoveringWindow && !isDraggingWindow)
 		hexagon.endHover()
 	});
 
 	hexagon.onMousePress("left", () => {
 		if (hexagon.isHovering()) {
-			if (hexagon.canClick && timeTilClick < 0 && !isHoveringWindow) {
+			if (hexagon.canClick && timeTilClick < 0 && (!isHoveringWindow && !isDraggingWindow)) {
 				hexagon.clickPress(true)
 			}
 		}
 	})
 	
 	hexagon.onMouseRelease("left", () => {
-		if (hexagon.isHovering() && !isHoveringWindow) {
-			if (hexagon.canClick && hexagon.isBeingClicked && !isWaitingToClick && !isHoveringWindow) {
+		if (hexagon.isHovering()) {
+			if (hexagon.canClick && hexagon.isBeingClicked && !isWaitingToClick && (!isHoveringWindow && !isDraggingWindow)) {
 				hexagon.clickRelease(true)
 				addPlusScoreText(mouse.pos, scorePerClick)
 				GameState.addScore(scorePerClick)
@@ -308,8 +311,8 @@ export function addHexagon() {
 	})
 
 	hexagon.onMousePress("right", () => {
-		if (hexagon.canClick && hexagon.isHovering()) {
-			hexagon.color = BLUE
+		if (hexagon.isHovering()) {
+			manageWindow("hexColorWin")
 		}
 	})
 

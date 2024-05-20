@@ -53,6 +53,12 @@ export function espUnmute() {
 export function manageMute() {
 	GameState.music.muted = !GameState.music.muted 
 	musicHandler.paused = !musicHandler.paused 
+	if (GameState.music.muted) {
+		get("bpmChange", { recursive: true }).forEach(bpmChange => { bpmChange.stopWave() });
+	}
+	else {
+		get("bpmChange", { recursive: true }).forEach(bpmChange => { bpmChange.startWave() });
+	}
 }
 
 export function volumeManager() {

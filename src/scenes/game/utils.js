@@ -3,7 +3,7 @@ import { autoLoopTime, excessTime, scorePerAutoClick } from "./gamescene";
 import { autoClick, autoScorePerSecond, hexagon } from "./addHexagon";
 import { trail } from "../../plugins/trail";
 import { isHoveringUpgrade, storeOpen } from "./windows/winStore";
-import { isHoveringWindow } from "./windows/WindowsMenu";
+import { isDraggingWindow, isHoveringWindow, manageWindow, openWindow } from "./windows/WindowsMenu";
 
 const clamp = (val, min, max) => Math.min(Math.max(val, min), max)
 
@@ -88,18 +88,6 @@ function getRandomElementDifferentFrom(arr, element) {
     return filteredArray[randomIndex];
 }
 
-export function isCloserTo0Or360(angle) {
-    // Normalize the angle to be within [0, 360)
-    const normalizedAngle = ((angle % 360) + 360) % 360;
-
-    // Calculate the differences
-    const diffTo0 = Math.abs(normalizedAngle - 0);
-    const diffTo360 = Math.abs(normalizedAngle - 360);
-
-    // Compare differences
-    return diffTo0 <= diffTo360 ? true : false;
-}
-
 // definetely not chatgpt again
 export function timeOutSideOfWindowManaging() {
 	let isTabActive = true; // Variable to track if the tab is currently active
@@ -159,6 +147,31 @@ export function blendColors(color1, color2, blendFactor) {
     return blendedColor;
 }
 
+export function arrayToColor(arr) {
+	return rgb(arr[0], arr[1], arr[2])
+}
+
+export function colorToArray(color) {
+	return [color.r, color.g, color.b]
+}
+
+export function getSides(obj) {
+	return {
+		get left() {
+		  return obj.pos.x - obj.width * 0.5 
+		},
+		get right() {
+		  return obj.pos.x + obj.width * 0.5 
+		},
+		get top() {
+		  return obj.pos.y - obj.height * 0.5 
+		},
+		get bottom() {
+		  return obj.pos.y + obj.height * 0.5 
+		}
+	}
+}
+
 export function debugTexts() {
 	let texty = add([
 		text("", {
@@ -197,9 +210,9 @@ export function debugFunctions() {
 		}
 
 		else if (isKeyPressed("tab")) {
-			debug.inspect = !debug.inspect
-			get("debugText")[0].hidden = !debug.inspect
-			get("debugText")[0].paused = !debug.inspect
+			// debug.inspect = !debug.inspect
+			// get("debugText")[0].hidden = !debug.inspect
+			// get("debugText")[0].paused = !debug.inspect
 		}
 
 		else if (isKeyPressed("b")) {
@@ -231,13 +244,14 @@ export function addBackground() {
 		color(),
 		z(0),
 		{
+			defScale: vec2(1),
 			speed: 0.1,
 			movAngle: 5,
 			uScale: 2,
 			col1D: rgb(128, 128, 128),
 			col2D: rgb(190, 190, 190),
-			tintColor: BLACK,
-			blendFactor: 0.55,
+			tintColor: arrayToColor(GameState.bgColor),
+			blendFactor: GameState.bgColor[3],
 		}
 	])
 
@@ -251,11 +265,11 @@ export function addBackground() {
 		"u_aspect": width() / height()
     })))
 
-	// gameBg.onMousePress("right", () => {
-	// 	if (!hexagon.isHovering()) {
-	// 		gameBg.tintColor = BLUE
-	// 	}
-	// })
+	gameBg.onMousePress("right", () => {
+		if (!hexagon.isHovering() && gameBg.isHovering() && !isHoveringWindow && !isDraggingWindow) {
+			manageWindow("bgColorWin")
+		}
+	})
 }
 
 export function customScreens() {
@@ -295,10 +309,9 @@ export function addMouse() {
 	mouse = add([
 		sprite("cursors"),
 		pos(mousePos()),
-		// area(),
 		scale(),
 		color(WHITE),
-		anchor("center"),
+		anchor(vec2(-0.4, -0.5)),
 		z(100),
 		{
 			start: false,
@@ -327,7 +340,7 @@ export function addMouse() {
 	
 	onHoverUpdate("hoverObj", (obj) => {
 		if (obj.is("hexagon")) {
-			if (!isHoveringWindow) {
+			if (!isHoveringWindow && !isDraggingWindow) {
 				if (!mouse.grabbing) {
 					mouse.play("point")
 				}
@@ -335,7 +348,7 @@ export function addMouse() {
 		}
 
 		else if (obj.is("storeElement")) {
-			if (!isHoveringWindow && obj.winParent.is("active")) {
+			if ((!isHoveringWindow && !isDraggingWindow) && obj.winParent.is("active")) {
 				if (!isHoveringUpgrade) {
 					if (GameState.score >= obj.price) {
 						mouse.play("point")
@@ -348,7 +361,7 @@ export function addMouse() {
 		}
 	
 		else if (obj.is("upgrade")) {
-			if (!isHoveringWindow && obj.winParent.is("active")) {
+			if ((!isHoveringWindow && !isDraggingWindow )&& obj.winParent.is("active")) {
 				if (GameState.score >= obj.price) {
 					mouse.play("point")
 				}
@@ -358,12 +371,12 @@ export function addMouse() {
 			}
 		}
 	
-		else if (obj.is("xButton") || obj.is("musicButton")) {
+		else if (obj.is("xButton") || obj.is("musicButton") || obj.is("sliderButton")) {
 			mouse.play("point")
 		}
 
 		else {
-			if (!isHoveringWindow) {
+			if (!isHoveringWindow && !isDraggingWindow) {
 				mouse.play("point")
 			}
 		}
@@ -376,7 +389,7 @@ export function addMouse() {
 	})
 
 	onHoverUpdate("glass", () => {
-		if (!isHoveringWindow) {
+		if (!isHoveringWindow && !isDraggingWindow) {
 			if (!storeOpen) mouse.play("check")
 		}
 	})
@@ -659,7 +672,7 @@ export function saveAnim() {
 }
 
 export function bop(obj) {
-	if (obj.defScale) {
+	if (obj.defScale || obj.is("scale")) {
 		tween(obj.scale, obj.defScale.sub(0.1), 0.15, (p) => obj.scale = p, easings.easeOutQuint).then(() => {
 			tween(obj.scale, obj.defScale, 0.15, (p) => obj.scale = p, easings.easeOutQuint)
 		})

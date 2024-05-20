@@ -1,7 +1,7 @@
 // Keep track of the current draggin item
 export let curDraggin = null
 
-export function setCurDraggin(value) {
+export function setCurDraggin(value = null) {
 	curDraggin = value
 }
 
@@ -25,8 +25,8 @@ export function drag() {
 		// "update" is a lifecycle method gets called every frame the obj is in scene
 		update() {
 			if (curDraggin === this) {
-				this.pos = mousePos().sub(offset)
-				// should i clamp it?
+				if (this.is("sliderButton")) this.pos.x = mousePos().x - (offset.x)
+				else this.pos = mousePos().sub(offset) 
 				this.trigger("dragUpdate")
 			}
 		},
@@ -40,5 +40,4 @@ export function drag() {
 			return this.on("dragEnd", action)
 		},
 	}
-
 }

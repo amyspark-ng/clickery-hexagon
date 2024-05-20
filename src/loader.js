@@ -6,16 +6,12 @@ export function loadAssets() {
 	loadRoot("./assets/")
 	loadBean()
 	
-	loadSound("volumeChange", "sounds/volumeChange.mp3")
-	loadSound("whistle", "sounds/whistle.mp3")
-	
-	loadSprite("bg", "sprites/bg.png")
+	loadSprite("osaka", "sprites/osaka.png")
 	loadSprite("hexagon", "sprites/hexagon.png")
 	loadSprite("floppy", "sprites/floppy.png")
 
 	loadSprite("panderito", "sprites/panderito.png")
 	
-	loadSprite("storebg", "sprites/store/storebg.png")
 	loadSprite("speakers", "sprites/speakers.png", {
 		sliceX: 2,
 		sliceY: 1,
@@ -54,8 +50,6 @@ export function loadAssets() {
 			unlocked: 1,
 		}
 	})
-
-	loadSprite("pinch", "sprites/pinch.png")
 
 	loadSprite("upgrades", "sprites/upgrades.png", {
 		sliceX: 18,
@@ -138,8 +132,15 @@ export function loadAssets() {
 
 	loadSprite("tooltip", "sprites/tooltip.png")
 
-	loadSprite("osaka", "sprites/osaka.png")
-
+	loadSprite("folderIcons", "sprites/windows/folderIcons.png", {
+		sliceX: 3,
+		sliceY: 1,
+		anims: {
+			"store": 0,
+			"music": 1,
+			"credits": 2,
+		}
+	})
 	loadSprite("storeWin", "sprites/windows/storeWin.png")
 	loadSprite("musicWin", "sprites/windows/musicWin.png")
 	loadSprite("musicWinElements", "sprites/windows/musicWinElements.png", {
@@ -153,49 +154,37 @@ export function loadAssets() {
 		}
 	})
 	loadSprite("aboutWin", "sprites/windows/aboutWin.png")
+	loadSprite("hexColorWin", "sprites/windows/hexColorWin.png")
+	loadSprite("bgColorWin", "sprites/windows/bgColorWin.png")
 	
-	// loadSpriteAtlas("musicWinElements", "sprites/windows/musicWinElements.png", {
-	// 	"defaultdisc": {
-	// 		x: 0,
-	// 		y: 0,
-	// 		width: 50,
-	// 		height: 50,
-	// 	},
-	// 	"kitflip": {
-	// 		x: 51,
-	// 		y: 0,
-	// 		width: 50,
-	// 		height: 50,
-	// 	}
-	// })
+	// #REGION SOUNDS
+	loadSound("volumeChange", "sounds/volumeChange.mp3")
+	loadSound("whistle", "sounds/whistle.mp3")
 
 	loadSound("clickPress", "sounds/click_press.mp3")
 	loadSound("clickRelease", "sounds/click_release.mp3")
-
 	loadSound("kaching", "sounds/kaching.mp3")
-	
 	loadSound("hoverElement", "sounds/hoverElement.mp3")
-
 	loadSound("hoverMiniButton", "sounds/hoverMiniButton.wav")
 	loadSound("openWin", "sounds/win_open.wav")
 	loadSound("closeWin", "sounds/win_close.wav")
-
 	loadSound("hoverhex", "sounds/sfx/hoverhex.wav")
 	loadSound("unhoverhex", "sounds/sfx/unhoverhex.wav")
 	loadSound("fold", "sounds/sfx/fold.wav")
 
+	// music
 	loadSound("clicker.wav", "sounds/music/clicker.ogg")
 	loadSound("menu.wav", "sounds/music/menu.ogg")
 	loadSound("whatttt.wav", "sounds/music/whatttt.ogg")
 	loadSound("simple.wav", "sounds/music/simple.ogg")
 	loadSound("jazz.wav", "sounds/music/jazz.ogg")
 	loadSound("sweet.wav", "sounds/music/sweet.ogg")
-	
 	loadSound("ok_instrumental", "sounds/music/ok_instrumental.ogg")
 	loadSound("magic", "sounds/music/magic.ogg")
 	loadSound("watchout", "sounds/music/watchout.ogg")
 	loadSound("catnip", "sounds/music/catnip.ogg")
 
+	// # REGION Other stuff
 	loadFont("apl386", "https://kaboomjs.com/examples/fonts/apl386.ttf", {
 		outline: 4,
 		filter: "linear",

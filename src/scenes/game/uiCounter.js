@@ -2,7 +2,7 @@ import { GameState } from "../../GameState.js";
 import { actualScorePerSecond } from "./addHexagon.js";
 
 import { formatNumber } from "./utils.js";
-import { isHoveringWindow } from "./windows/WindowsMenu.js";
+import { isDraggingWindow, isHoveringWindow } from "./windows/WindowsMenu.js";
 import { storeOpen } from "./windows/winStore.js";
 
 export let scoreText;
@@ -33,7 +33,7 @@ export function uiCounters() {
 	])
 
 	scoreText.onHover(() => {
-		if (!isHoveringWindow) tween(totalText.opacity, 1, 0.15, (p) => totalText.opacity = p)
+		if (!isHoveringWindow && !isDraggingWindow) tween(totalText.opacity, 1, 0.15, (p) => totalText.opacity = p)
 	})
 	
 	scoreText.onHoverEnd(() => {

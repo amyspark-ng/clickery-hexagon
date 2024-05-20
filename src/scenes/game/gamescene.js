@@ -3,7 +3,7 @@ import { actualScorePerSecond, addHexagon, autoClick, autoScorePerSecond, hexago
 import { uiCounters } from "./uiCounter"
 import { addBackground, addMouse, debugFunctions, debugTexts, formatNumber, getPrice, mouse, percentage } from "./utils"
 import { musicHandler, playMusic } from "../../sound"
-import { folderObjManaging as folderObjManaging, unlockWindow, windowsDefinition } from "./windows/WindowsMenu"
+import { folderObjManaging as folderObjManaging, openWindow, unlockWindow, windowsDefinition } from "./windows/WindowsMenu"
 import { songs } from "./windows/winMusic"
 
 export let scorePerClick = 1
