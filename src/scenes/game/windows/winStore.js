@@ -1,6 +1,5 @@
 import { GameState } from "../../../GameState";
-import { hexagon } from "../addHexagon";
-import { addFlyingText, addPlusPercentageScore, addToolTip, changeValueBasedOnAnother, endToolTip, formatNumber, gameBg, getPrice, mouse } from "../utils";
+import { addPlusPercentageScore, addToolTip, endToolTip, formatNumber, getPrice } from "../utils";
 import { playSfx } from "../../../sound";
 import { isDraggingWindow } from "./WindowsMenu";
 
@@ -148,13 +147,13 @@ function addStoreElement(parent, settings = {
 		pos(-60, 0),
 		{
 			update() {
-				if (winParent.is("active") && !isDraggingWindow) {
+				if (!isDraggingWindow) {
 					if (isKeyDown("shift")) amountBeingBought = 10
 					else if (isKeyDown("control")) amountBeingBought = 100
 					else amountBeingBought = 1
 				}
 
-				if (winParent.is("active") && !isDraggingWindow) {
+				if (!isDraggingWindow) {
 					if (btn.is("ClicksElement")) {
 						btn.price = getPrice(btn.basePrice, btn.percentageIncrease, GameState.clickers - 1, amountBeingBought)
 						this.text = `${btn.price}\n${GameState.clickers}`
@@ -201,7 +200,7 @@ function addStoreElement(parent, settings = {
 	let timesBoughtWhileHolding = 0
 
 	btn.onMouseDown(() => {
-		if (winParent.is("active") && !isDraggingWindow) {
+		if (!isDraggingWindow) {
 			if (btn.isHovering()) {
 				if (isHoveringUpgrade == false) {
 					if (checkPrice(btn.price)) {
@@ -233,7 +232,7 @@ function addStoreElement(parent, settings = {
 	})
 
 	btn.onMouseRelease(() => {
-		if (winParent.is("active") && !isDraggingWindow) {
+		if (!isDraggingWindow) {
 			timer = 0
 			timesBoughtWhileHolding = 0
 			timeUntilAnotherBuy = 2.25
@@ -241,13 +240,13 @@ function addStoreElement(parent, settings = {
 	}) 
 
 	btn.onHover(() => {
-		if (winParent.is("active") && !isDraggingWindow) {
+		if (!isDraggingWindow) {
 			btn.hoverStart()
 		}
 	})
 
 	btn.onHoverEnd(() => {
-		if (winParent.is("active") && !isDraggingWindow) {
+		if (!isDraggingWindow) {
 			btn.hoverEnd()
 		}
 	})
@@ -428,7 +427,8 @@ function addUpgrades(element, winParent) {
 			"upgrade",
 			"store",
 			"hoverObj",
-			z(parent.z + 1),
+			"winButton",
+			z(element.z + 1),
 			{
 				basePrice: 0,
 				price: 0,
@@ -526,7 +526,7 @@ function addUpgrades(element, winParent) {
 		})
 	
 		upgrade.onHover(() => {
-			if (winParent.is("active") && !isDraggingWindow) {
+			if (!isDraggingWindow) {
 				// debug.log(upgrade.type + upgrade.idx + ` + ${upgrade.frame}`)
 				if (element.up == true) {
 					element.hoverEnd()
@@ -571,7 +571,7 @@ function addUpgrades(element, winParent) {
 		})
 
 		upgrade.onHoverEnd(() => {
-			if (winParent.is("active") && !isDraggingWindow) {
+			if (!isDraggingWindow) {
 				if (element.up == false) {
 					element.hoverStart()
 				}
@@ -582,7 +582,7 @@ function addUpgrades(element, winParent) {
 		})
 
 		upgrade.onClick(() => {
-			if (winParent.is("active")) {
+			if (!isDraggingWindow) {
 				buyUpgrade(upgrade)
 			}
 		})

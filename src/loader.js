@@ -7,8 +7,9 @@ export function loadAssets() {
 	loadBean()
 	
 	loadSprite("osaka", "sprites/osaka.png")
-	loadSprite("hexagon", "sprites/hexagon.png")
 	loadSprite("floppy", "sprites/floppy.png")
+
+	loadSprite("hexagon", "sprites/hexagon.png")
 
 	loadSprite("panderito", "sprites/panderito.png")
 	
@@ -141,18 +142,32 @@ export function loadAssets() {
 			"credits": 2,
 		}
 	})
+	// loadSprite("storeWin", "sprites/windows/storeWin.png", {
+	// 	slicex: 2,
+	// 	sliceY: 1,
+	// 	anims: {
+	// 		"active": 0,
+	// 		"inactive": 1,
+	// 	}
+	// })
 	loadSprite("storeWin", "sprites/windows/storeWin.png")
 	loadSprite("musicWin", "sprites/windows/musicWin.png")
-	loadSprite("musicWinElements", "sprites/windows/musicWinElements.png", {
-		sliceX: 3,
-		sliceY: 1,
-		anims: {
-			"discs": {
-				from: 0,
-				to: 2,
-			} 
+	loadSpriteAtlas("sprites/windows/musicWinElements.png", {
+		"discs": {
+			"x": 0,
+			"y": 0,
+			"width": 50 * 3,
+			"height": 50,
+			"sliceX": 3,
+			"sliceY": 1,
+			"anims": {
+				"defaultCover": 0,
+				"catnipCover": 1,
+				"okCover": 2,
+			}
 		}
 	})
+
 	loadSprite("aboutWin", "sprites/windows/aboutWin.png")
 	loadSprite("hexColorWin", "sprites/windows/hexColorWin.png")
 	loadSprite("bgColorWin", "sprites/windows/bgColorWin.png")
@@ -163,6 +178,7 @@ export function loadAssets() {
 
 	loadSound("clickPress", "sounds/click_press.mp3")
 	loadSound("clickRelease", "sounds/click_release.mp3")
+	loadSound("clickButton", "sounds/sfx/generalClick.ogg")
 	loadSound("kaching", "sounds/kaching.mp3")
 	loadSound("hoverElement", "sounds/hoverElement.mp3")
 	loadSound("hoverMiniButton", "sounds/hoverMiniButton.wav")
@@ -230,6 +246,7 @@ export function loadAssets() {
 	}
 	`)
 
+	// made by MF
 	loadShader("saturate", null, `
 	uniform float whiteness;
 	uniform vec2 u_pos;
@@ -240,7 +257,7 @@ export function loadAssets() {
 		return c + vec4(mix(vec3(0), vec3(1), whiteness), 0);
 	}
 	`)
-	
+
 	// scenes
 	focuscene()
 	introscene()

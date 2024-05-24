@@ -1,13 +1,15 @@
 import { GameState } from "../../GameState"
 import { actualScorePerSecond, addHexagon, autoClick, autoScorePerSecond, hexagon } from "./addHexagon.js"
 import { uiCounters } from "./uiCounter"
-import { addBackground, addMouse, debugFunctions, debugTexts, formatNumber, getPrice, mouse, percentage } from "./utils"
+import { addBackground, addMouse, addToast, debugFunctions, debugTexts, formatNumber, getPrice, mouse, percentage } from "./utils"
 import { musicHandler, playMusic } from "../../sound"
 import { folderObjManaging as folderObjManaging, openWindow, unlockWindow, windowsDefinition } from "./windows/WindowsMenu"
 import { songs } from "./windows/winMusic"
+import { curDraggin, setCurDraggin } from "../../plugins/drag"
 
 export let scorePerClick = 1
 export let scorePerAutoClick = 1
+export let scoreNeededToAscend = 1000000
 
 // debug
 let cameraScale = 1
@@ -51,7 +53,15 @@ export function gamescene() {
 			})
 		})
 
+		onKeyPress("j", () => {
+			addToast({ title: "This is a title", body: "This is a body", color: GREEN })
+		})
+		onKeyPress("k", () => {
+			addToast({ title: "Unlocked store window", body: "This is a body", color: BLUE })
+		})
+
 		onUpdate(() => {
+			GameState.score = clamp(GameState.score, 0, Infinity)
 			debugFunctions()
 			
 			if (GameState.score > 50) {
@@ -99,7 +109,7 @@ export function gamescene() {
 				panderitoIndex = 0	
 			}
 		
-			if (panderitoIndex == 9) {
+			if (panderitoIndex == panderitoLetters.length) {
 				GameState.personalization.panderitoMode = !GameState.personalization.panderitoMode
 				panderitoIndex = 0
 
@@ -255,5 +265,14 @@ export function gamescene() {
 				event.preventDefault();
 			}
 		}, false);
-	})	
+
+		document.getElementById("kanva").addEventListener("onmouseout", (event) => {
+			debug.log("onmouseout")
+			if (curDraggin) {
+				curDraggin.trigger("dragEnd")
+				setCurDraggin(null)
+				mouse.release()
+			}
+		}, false);
+	})
 }

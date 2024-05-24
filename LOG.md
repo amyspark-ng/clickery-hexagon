@@ -1,27 +1,37 @@
 # [Issues](#issues)
 # [Bookmarks](#bookmarks)
+# [Ideas](#ideas)
 # [TODO](#to-do)
 
 # Issues!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ## General
+- Remember putting all of this on the TODO.md
+
+- Tweak smallest and biggest and scaleIncrease
 - Format actual working numbers
 - Loading screen isn't working
 - Do general unlocking stuff, like when you first start the game, also the start transition, so cool stuff
+^ If you click it opens the statsWindow
+- Random chance of +1 making something funny
+- Make pinch animation
+- Rework tooltips
 ## Windows
-- Window elements get the window active on every other window except color window, for some reason
-^ Window elements shouldn't even click when the window is active, it should turn active but not execute the function 
 - If hasn't unlocked folderObj i think GameState.unlockedWindows should be null
+- If you take the mouse out of the screen and the window is picked when you go back it still is picked
+- Overlapping headers work very weird
+^ Simply re work the entire active system, what the shit
+- Corner window bug with hexagon still happening
+- Minibuttons hover/click when there's a window in front of them (ocasionally)
+^ Related to the window being active, hmmmmm idk
 ### Store
-- Why do upgrades not work correctly with winParent opacity?? 
 - Misc upgrades do not show up on winParent why??
 ^ Are they even getting added?
 ### Music
 - Change vynil to cd, looks better
-- progress bar stutters when playing back
+- Should say paused instead of muted, confusing!!
 ### Color
-- Windows don't turn active when pressing buttons or clicking sliders
 
-# Bookmarks!!!!!!!!!
+# Bookmarks
 - Saving this for the window not being active stuff opacity
 https://kaboomjs.com/play?example=add&code=eJx9UlFr2zAQfvevOPIkUc9OCn1Jt4etW2FQCFvbwRhjyJJsa3UkI8lJw%2Bh%2F70lO4rgOE8by3X2%2B%2B%2B7uy3P4KITSFVRsLcEUfyX3DrwBx62UOknyHO49sx4YPLHCmHVEJv03oRFwZ5jAuGut8hKYc9JDaRE6610uLyTTWaurWQpb5WvwtQQdKs5CZJY0mOE%2BYknvSWGWT36mI1xVG%2Bd3I2Tv2mMTbrRDIgV8gDV7kjdMb5gjWyV8TWgKtVRV7Qnte1gNrRcShGVbDUpHoqVFpkVXltLuc4puvd5hWiYE%2BZUAntYcM0MOl0P2YNE0YhxnjSSLvRVKGE3KYm%2F%2Fi%2B9wulYwbJCeuMLJc18rl2ElrLyR%2FPI%2FBbPAzDItyLvFPIXFHPsdmfRc6kgQk0fkPLtCZHY1IF%2FS42cgPyFYFhn3z1nVZLyRzJLBvlndrb7%2F%2BfR4e%2FsFr68P9HpImvTv37iG0lggDYpHIYn5NV7vkSveFxeHWnHy2TD3ONdT4dCBZNjJoenY9ekU9o6%2BOyz%2BEkTwgFMAfDC%2FFKgDzjqH%2B286Vwe3Nrh6oyXsAscgDnRupHXK6OQtM64sP1l3IIM15zR2irU%2B4wgn8hoLKuLfquPs6IPz8ce3jgkyDoQTZbKEg%2FAn8V45y6OCpggvn5dhvXhPg6ZlXPndEoJiJtGyUe3PJXjbyVHshZ6RwCvPoDf1
 
@@ -33,6 +43,11 @@ https://kaplay.lajbel.com/?code=eJx9UstOwzAQvOcr9lZbjdqUUoRUygUhrhUHDiAOqb1JrTh2
 
 - Saving this for drawing hexagon
 https://kaplay.lajbel.com/?code=eJy9U01PwzAMvfdX%2BJhs076QEOoYEhIScEDakQlxyFpvLZR4StPRCvHfcdKPddsdH5Lo2S9%2BdpxPtSH6EjIItoWObEoaYqO%2Bn7BUO9JCwk8AbBHp3EKE2qJ5hSVMFxfw%2Bhw2Kk6LnNHZdLqAyQTu44%2BCcZtg61M5aMQY46DH21tHens%2FSUEZmRb2%2BJYMiAwtpD4vb7dwzdtw2Go%2BspXeZchhL8om49UzTOAKBpAuzsJKDmlLHLYSBzUrolz4a%2BQ5q%2BpY6wtWnuoLFpc33hd5Ig4YzUU5gkrKpiZn3KdH1GiUxbZqVyqqKIEDGotlL79z15eZ3UZ0Dmc%2B%2FzYjMsIfjdKxe2iWNpvfsFJe5ehfKB1DNm34rct1g7airHKDdnyyPeUh%2BN7UXRVyzE3qzlVPAbcydMsRocJmqcYQrCmwN3MN3hs4r4P1sBbSD6xEsOrlXTM7J3%2BAg2TwBzQo3pc%3D
+
+# Ideas
+- Add achievement for making the hexagon black and the bg white (bad apple)
+- Achievements be toasts, if you click on them you can open the medals window (if unlocked)
+- Could also add the welcome back to toasts
 
 # TO-DO
 - > Arte: 

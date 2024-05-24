@@ -4,17 +4,12 @@ import { waver } from "../../../plugins/wave";
 import { playSfx } from "../../../sound";
 import { hexagon } from "../addHexagon";
 import { bop, gameBg, getSides, mouse } from "../utils";
+import { deactivateAllWindows } from "./WindowsMenu";
 
-let theOneBehind;
 let lastSoundPos;
 let draggingTune;
 
 function deactivateAllSliders() {
-	// get("slider", { recursive: true }).forEach(otherSliders => {
-	// 	if (otherSliders.is("wave")) {
-	// 		otherSliders.stopWave()
-	// 	}
-	// });
 	get("sliderButton", { recursive: true }).forEach(sliderbuttons => {
 		sliderbuttons.unuse("outline")
 	})
@@ -31,17 +26,12 @@ function GetbuttonPosBasedOnValue(coloredObj, type = "r", theOneBehind) {
 	let xPos;
 	
 	if (coloredObj.is("hexagon")) {
-		if (type == "r") xPos = map(coloredObj.color.r, 0, 255, getSides(theOneBehind).left, getSides(theOneBehind).right);
-		else if (type == "g") xPos = map(coloredObj.color.g, 0, 255, getSides(theOneBehind).left, getSides(theOneBehind).right);
-		else if (type == "b") xPos = map(coloredObj.color.b, 0, 255, getSides(theOneBehind).left, getSides(theOneBehind).right);
+		xPos = map(coloredObj.color[type], 0, 255, getSides(theOneBehind).left, getSides(theOneBehind).right);
 	}
 
 	else {
-		if (type == "r") xPos = map(coloredObj.tintColor.r, 0, 255, getSides(theOneBehind).left, getSides(theOneBehind).right)
-		else if (type == "g") xPos = map(coloredObj.tintColor.g, 0, 255, getSides(theOneBehind).left, getSides(theOneBehind).right);
-		else if (type == "b") xPos = map(coloredObj.tintColor.b, 0, 255, getSides(theOneBehind).left, getSides(theOneBehind).right);
-		else if (type == "b") xPos = map(coloredObj.tintColor.b, 0, 255, getSides(theOneBehind).left, getSides(theOneBehind).right);
-		else if (type == "a") xPos = map(coloredObj.blendFactor, 0, 1, getSides(theOneBehind).left, getSides(theOneBehind).right);
+		if (type != "a") xPos = map(coloredObj.color[type], 0, 255, getSides(theOneBehind).left, getSides(theOneBehind).right);
+		else xPos = map(coloredObj.blendFactor, 0, 1, getSides(theOneBehind).left, getSides(theOneBehind).right);
 	}
 	return xPos;
 }
@@ -61,7 +51,7 @@ function addRgbSlider(winParent, posToAdd = vec2(0), coloredObj, type = "r") {
 	let sliderInfo = {value: 0};
 	
 	theOneBehind = winParent.add([
-		rect(300, 25),
+		rect(300, 25, { radius: 5  }),
 		pos(posToAdd),
 		color(WHITE),
 		area(),
@@ -73,7 +63,7 @@ function addRgbSlider(winParent, posToAdd = vec2(0), coloredObj, type = "r") {
 
 	theOneBehind.onClick(() => {
 		if (!sliderButton.isHovering()) {
-			// calculation pnstuff
+			// calculation stuff
 			let objectRect = theOneBehind.screenArea().bbox();
 			let distanceFromCenter = mousePos().x - objectRect.pos.x - objectRect.width / 2;
 			let relativePosition = distanceFromCenter / (objectRect.width / 2);
@@ -86,7 +76,7 @@ function addRgbSlider(winParent, posToAdd = vec2(0), coloredObj, type = "r") {
 	})
 
 	sliderButton = winParent.add([
-		rect(10, 35),
+		rect(10, 35, { radius: 2.5  }),
 		pos(GetbuttonPosBasedOnValue(coloredObj, type, theOneBehind), theOneBehind.pos.y),
 		color(BLACK),
 		anchor("center"),
@@ -95,6 +85,7 @@ function addRgbSlider(winParent, posToAdd = vec2(0), coloredObj, type = "r") {
 		color(typeToColor(type)),
 		"hoverObj",
 		"sliderButton",
+		"windowButton",
 		"slider",
 		type + "slider",
 		{
@@ -147,8 +138,12 @@ function addRgbSlider(winParent, posToAdd = vec2(0), coloredObj, type = "r") {
 	sliderButton.onDrag(() => {
 		readd(sliderButton)
 		sliderButton.dragging = true
-		playSfx("clickPress")
+		playSfx("clickButton", rand(-50, 50))
 		lastSoundPos = mousePos().x
+
+		// golly
+		deactivateAllWindows()
+		winParent.activate()
 	})
 
 	sliderButton.onMouseMove(() => {
@@ -169,7 +164,7 @@ function addRgbSlider(winParent, posToAdd = vec2(0), coloredObj, type = "r") {
 	})
 
 	currentBar = winParent.add([
-		rect(0, 25),
+		rect(0, 25, { radius: 5  }),
 		pos(getSides(theOneBehind).left, theOneBehind.pos.y),
 		anchor("left"),
 		color(typeToColor(type)),
@@ -227,82 +222,26 @@ function addRgbSlider(winParent, posToAdd = vec2(0), coloredObj, type = "r") {
 	return sliderInfo;
 }
 
-export function hexColorWinContent(winParent) {
-	let rSlider = addRgbSlider(winParent, vec2(-25, -80), hexagon, "r")
-	let gSlider = addRgbSlider(winParent, vec2(-25, rSlider.bg.pos.y + 50), hexagon, "g")
-	let bSlider = addRgbSlider(winParent, vec2(-25, gSlider.bg.pos.y + 50), hexagon, "b")
-
-	let sliders = [rSlider, gSlider, bSlider]
-
-	let defaultBut = winParent.add([
-		rect(40, 40),
-		color(WHITE),
-		outline(5, BLACK),
-		pos(-60, 80),
-		area(),
-		anchor("center"),
-		scale(1),
-		{
-			defScale: vec2(1),
-		}
-	])
-
-	let randomButton = winParent.add([
-		rect(40, 40),
-		color(WHITE),
-		outline(5, BLACK),
-		pos(0, 80),
-		area(),
-		anchor("center"),
-		scale(1),
-		{
-			defScale: vec2(1),
-		}
-	])
-
-	hexagon.onUpdate(() => {
-		hexagon.color.r = rSlider.value
-		hexagon.color.g = gSlider.value
-		hexagon.color.b = bSlider.value
-		GameState.hexColor = [rSlider.value, gSlider.value, bSlider.value]
-	})
-
-	defaultBut.onClick(() => {
-		bop(defaultBut)
-		sliders.forEach(slider => {
-			tween(slider.button.pos.x, getSides(slider.bg).right, 0.2, (p) => slider.button.pos.x = p, easings.easeOutQuint)
-		})
-	})
-
-	randomButton.onClick(() => {
-		bop(randomButton)
-		sliders.forEach(slider => {
-			tween(slider.button.pos.x, rand(getSides(slider.bg).left, getSides(slider.bg).right), 0.2, (p) => slider.button.pos.x = p, easings.easeOutQuint)
-		})
-	})
-
-	winParent.onClick(() => {
-		if (!get("slider", { recursive: true }).some(sliderObj => {if(sliderObj.is("area")) return sliderObj.isHovering()})) {
-			deactivateAllSliders()
-		}
-	})
-}
-
-export function bgColorWinContent(winParent) {
-	let rSlider = addRgbSlider(winParent, vec2(-15, -80), gameBg, "r")
-	let gSlider = addRgbSlider(winParent, vec2(-15, rSlider.bg.pos.y + 50), gameBg, "g")
-	let bSlider = addRgbSlider(winParent, vec2(-15, gSlider.bg.pos.y + 50), gameBg, "b")
-	let aSlider = addRgbSlider(winParent, vec2(-15, bSlider.bg.pos.y + 50), gameBg, "a")
-
-	let sliders = [rSlider, gSlider, bSlider, aSlider]
+export function colorWinContent(winParent, winType = "hexColorWin") {
+	let rSlider = addRgbSlider(winParent, vec2(-25, -80), winType == "hexColorWin" ? hexagon : gameBg, "r")
+	let gSlider = addRgbSlider(winParent, vec2(-25, rSlider.bg.pos.y + 50), winType == "hexColorWin" ? hexagon : gameBg, "g")
+	let bSlider = addRgbSlider(winParent, vec2(-25, gSlider.bg.pos.y + 50), winType == "hexColorWin" ? hexagon : gameBg, "b")
+	let aSlider;
+	if (winType == "bgColorWin") aSlider = addRgbSlider(winParent, vec2(-25, bSlider.bg.pos.y + 50), gameBg, "a")
+	
+	let sliders;
+	if (winType == "hexColorWin") sliders = [rSlider, gSlider, bSlider]
+	else sliders = [rSlider, gSlider, bSlider, aSlider]
 
 	let defaultButton = winParent.add([
 		rect(40, 40),
 		color(WHITE),
 		outline(5, BLACK),
-		pos(-60, 100),
+		pos(-60, sliders[sliders.length - 1].bg.pos.y + 60),
 		area(),
+		anchor("center"),
 		scale(1),
+		"windowButton",
 		{
 			defScale: vec2(1),
 		}
@@ -312,20 +251,52 @@ export function bgColorWinContent(winParent) {
 		rect(40, 40),
 		color(WHITE),
 		outline(5, BLACK),
-		pos(0, 100),
+		pos(0, defaultButton.pos.y),
 		area(),
+		anchor("center"),
 		scale(1),
+		"windowButton",
 		{
 			defScale: vec2(1),
 		}
 	])
 
-	gameBg.onUpdate(() => {
-		gameBg.tintColor.r = rSlider.value
-		gameBg.tintColor.g = gSlider.value
-		gameBg.tintColor.b = bSlider.value
-		gameBg.blendFactor = aSlider.value
-		GameState.bgColor = [rSlider.value, gSlider.value, bSlider.value, aSlider.value]
+	if (winType == "hexColorWin") {
+		hexagon.onUpdate(() => {
+			hexagon.color.r = rSlider.value
+			hexagon.color.g = gSlider.value
+			hexagon.color.b = bSlider.value
+			GameState.hexColor = [rSlider.value, gSlider.value, bSlider.value]
+		})
+	}
+
+	else {
+		gameBg.onUpdate(() => {
+			gameBg.onUpdate(() => {
+				gameBg.tintColor.r = rSlider.value
+				gameBg.tintColor.g = gSlider.value
+				gameBg.tintColor.b = bSlider.value
+				gameBg.blendFactor = aSlider.value
+				GameState.bgColor = [rSlider.value, gSlider.value, bSlider.value, aSlider.value]
+			})
+		})
+	}
+
+	defaultButton.onClick(() => {
+		bop(defaultButton)
+		if (winType == "hexColorWin") {
+			sliders.forEach(slider => {
+				tween(slider.button.pos.x, getSides(slider.bg).right, 0.2, (p) => slider.button.pos.x = p, easings.easeOutQuint)
+			})
+		}
+
+		else {
+			let excludedSliders = [rSlider, gSlider, bSlider]
+			excludedSliders.forEach(slider => {
+				tween(slider.button.pos.x, getSides(slider.bg).left, 0.2, (p) => slider.button.pos.x = p, easings.easeOutQuint)
+			})
+			tween(aSlider.button.pos.x, aSlider.bg.pos.x + 16, 0.2, (p) => aSlider.button.pos.x = p, easings.easeOutQuint)
+		}
 	})
 
 	randomButton.onClick(() => {
@@ -333,14 +304,6 @@ export function bgColorWinContent(winParent) {
 		sliders.forEach(slider => {
 			tween(slider.button.pos.x, rand(getSides(slider.bg).left, getSides(slider.bg).right), 0.2, (p) => slider.button.pos.x = p, easings.easeOutQuint)
 		})
-	})
-
-	defaultButton.onClick(() => {
-		bop(defaultButton)
-		sliders.slice(0, -1).forEach(slider => {
-			tween(slider.button.pos.x, getSides(slider.bg).left, 0.2, (p) => slider.button.pos.x = p, easings.easeOutQuint)
-		})
-		tween(aSlider.button.pos.x, aSlider.bg.pos.x + 16, 0.2, (p) => aSlider.button.pos.x = p, easings.easeOutQuint)
 	})
 
 	winParent.onClick(() => {

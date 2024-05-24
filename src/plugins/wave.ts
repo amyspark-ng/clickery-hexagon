@@ -36,7 +36,6 @@ export function waver(WaveCompOpt: WaveCompOpt) {
 		},
 		stopWave() {
 			if (!this.isWaving) return
-			this.trigger("waveStop")
 			tween(this.amplitude, this.minAmplitude, this.wave_tweenSpeed, v => this.amplitude = v)
 			tween(this.pos.y, this.wave_verPosition, this.wave_tweenSpeed, v => this.pos.y = v)
 			this.isWaving = false

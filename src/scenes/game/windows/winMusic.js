@@ -1,19 +1,19 @@
 import { GameState } from "../../../GameState";
 import { waver } from "../../../plugins/wave";
-import { espMute, espUnmute, manageMute, musicHandler, playMusic, scratchSong } from "../../../sound";
+import { espMute, espUnmute, musicHandler, playMusic, playSfx, scratchSong } from "../../../sound";
 import { bop, formatMusicTime } from "../utils";
 
 export let songs = {
-	"clicker.wav": { name: "clicker.wav", idx: 0, speed: 2.5, coverIdx: 0, duration: 61},
-	"menu.wav": { name: "menu.wav", idx: 1, speed: 1.6, coverIdx: 0, duration: 36 },
-	"whatttt.wav": { name: "whatttt.wav", idx: 2, speed: 2, coverIdx: 0, duration: 51},
-	"simple.wav": { name: "simple.wav", idx: 3, speed: 1.3, coverIdx: 0, duration: 99},
-	"jazz.wav": { name: "jazz.wav", idx: 4, speed: 2.1, coverIdx: 0, duration: 43},
-	"sweet.wav": { name: "sweet.wav", idx: 5, speed: 2.5, coverIdx: 0, duration: 46},
-	"ok_instrumental": { name: "ok (Inst)", idx: 6, speed: 2, coverIdx: 2, duration: 102},
-	"magic": { name: "magic.", idx: 7, speed: 1, coverIdx: 0, duration: 46},
-	"watchout": { name: "Watch out!", idx: 8, speed: 2.4, coverIdx: 0, duration: 49,},
-	"catnip": { name: "catnip", idx: 9, speed: 2.1, coverIdx: 1, duration: 67},
+	"clicker.wav": { name: "clicker.wav", idx: 0, speed: 2.5, cover: "defaultCover", duration: 61},
+	"menu.wav": { name: "menu.wav", idx: 1, speed: 1.6, cover: "defaultCover", duration: 36 },
+	"whatttt.wav": { name: "whatttt.wav", idx: 2, speed: 2, cover: "defaultCover", duration: 51},
+	"simple.wav": { name: "simple.wav", idx: 3, speed: 1.3, cover: "defaultCover", duration: 99},
+	"jazz.wav": { name: "jazz.wav", idx: 4, speed: 2.1, cover: "defaultCover", duration: 43},
+	"sweet.wav": { name: "sweet.wav", idx: 5, speed: 2.5, cover: "defaultCover", duration: 46},
+	"ok_instrumental": { name: "ok (Inst)", idx: 6, speed: 2, cover: "okCover", duration: 102},
+	"magic": { name: "magic.", idx: 7, speed: 1, cover: "defaultCover", duration: 46},
+	"watchout": { name: "Watch out!", idx: 8, speed: 2.4, cover: "defaultCover", duration: 49,},
+	"catnip": { name: "catnip", idx: 9, speed: 2.1, cover: "catnipCover", duration: 67},
 }
 
 export let currentSongIdx = 0
@@ -21,13 +21,19 @@ export let currentSongIdx = 0
 export let progressBar;
 export let timeText;
 
-let timeSinceSkip = 0;
+export let timeSinceSkip = 0;
 let skipping = false;
+
+export function setTimeSinceSkip(value) {
+	timeSinceSkip = value
+}
 
 export function musicWinContent(winParent) {
 	currentSongIdx = GameState.music.favoriteIdx == null ? 0 : GameState.music.favoriteIdx
 	let disc = winParent.add([
-		sprite("musicWinElements"),
+		sprite("discs", {
+			anim: "defaultCover"
+		}),
 		pos(-150, -20),
 		rotate(),
 		area(),
@@ -35,7 +41,7 @@ export function musicWinContent(winParent) {
 		scale(),
 		"hoverObj",
 		"bpmChange",
-		"musicButton",
+		"windowButton",
 		{
 			defScale: vec2(1),
 			verPosition: -20,
@@ -47,7 +53,7 @@ export function musicWinContent(winParent) {
 		}
 	])
 
-	disc.frame = 0
+	disc.play(songs[Object.keys(songs)[currentSongIdx]].cover)
 
 	disc.onClick(() => {
 		bop(disc)
@@ -65,6 +71,8 @@ export function musicWinContent(winParent) {
 				element.startWave()
 			})
 		}
+
+		playSfx("clickButton", rand(-100, 100))
 	})
 
 	let nowPlaying = winParent.add([
@@ -80,19 +88,24 @@ export function musicWinContent(winParent) {
 		anchor("left"),
 		{
 			update() {
-				if (timeSinceSkip < 5) timeSinceSkip += dt()
 				this.text = `${songs[Object.keys(songs)[currentSongIdx]].idx + 1}. ${songs[Object.keys(songs)[currentSongIdx]].name} ${GameState.music.muted ? "(MUTED)" : ""}\nby Enysmo`
 			}
 		}
 	])
 
 	let theOneBehind = winParent.add([
-		rect(winParent.width - 50, 10),
+		rect(winParent.width - 50, 10, { radius: 20 }),
 		pos(0, 25),
 		area(),
-		color(rgb(100, 100, 100)),
+		color(),
 		area(),
+		opacity(1),
 		anchor("center"),
+		{
+			update() {
+				this.color = progressBar.color.darken(150)
+			}
+		}
 	])
 
 	timeText = winParent.add([
@@ -133,7 +146,7 @@ export function musicWinContent(winParent) {
 	})
 
 	progressBar = winParent.add([
-		rect(1, 10),
+		rect(1, 10, { radius: 10 }),
 		pos(theOneBehind.pos.x - theOneBehind.width / 2, theOneBehind.pos.y),
 		color(WHITE),
 		anchor("left"),
@@ -155,20 +168,7 @@ export function musicWinContent(winParent) {
 		}
 	])
 
-	let skipButton = winParent.add([
-		text(">", {
-			size: 40
-		}),
-		pos(30, 30),
-		area(),
-		scale(),
-		"hoverObj",
-		"musicButton",
-		"playlist",
-		{
-			defScale: vec2(1),
-		}
-	])
+	// theOneBehind.color = progressBar.color
 
 	let backButton = winParent.add([
 		text("<", {
@@ -179,7 +179,22 @@ export function musicWinContent(winParent) {
 		scale(),
 		"hoverObj",
 		"musicButton",
-		"playlist",
+		"windowButton",
+		{
+			defScale: vec2(1),
+		}
+	])
+
+	let skipButton = winParent.add([
+		text(">", {
+			size: 40
+		}),
+		pos(30, 30),
+		area(),
+		scale(),
+		"hoverObj",
+		"musicButton",
+		"windowButton",
 		{
 			defScale: vec2(1),
 		}
@@ -187,12 +202,13 @@ export function musicWinContent(winParent) {
 
 	// each tim you click it waits one seonc, if the time since the skip is greater than 1 it plays the song
 	// if the time since the skip is less than 1 it does nothing
-	get("playlist", { recursive: true }).forEach(mBtn => mBtn.onClick(() => {
+	get("musicButton", { recursive: true }).forEach(mBtn => mBtn.onClick(() => {
 		if (skipping == false) {
 			skipping = true
 			get("bpmChange", { recursive: true }).forEach(element => { element.stopWave() });
 		}
 		scratchSong()
+		musicHandler.winding = true
 		tween(progressBar.width, 0, 0.5, (p) => progressBar.width = p, easings.easeOutQuint)
 		tween(musicHandler.currentTime, 0, 0.5, (p) => musicHandler.currentTime = p, easings.easeOutQuint)
 
@@ -202,22 +218,26 @@ export function musicWinContent(winParent) {
 				musicHandler.winding = true
 				tween(progressBar.width, 0, 0.2, p => progressBar.width = p, easings.easeOutQuint)
 			}
-
+			
 			else {
 				currentSongIdx--
 				tween(disc.angle, disc.angle - rand(75, 100), 0.5, (p) => disc.angle = p, easings.easeOutQuint)
 				if (currentSongIdx < 0) currentSongIdx = Object.keys(songs).length - 1
 			}
+
+			playSfx("clickButton", rand(-50, 150))
 		}
 		
 		else {
 			currentSongIdx++
 			tween(disc.angle, disc.angle + rand(75, 100), 0.5, (p) => disc.angle = p, easings.easeOutQuint)
 			if (currentSongIdx >= Object.keys(songs).length) currentSongIdx = 0
+			playSfx("clickButton", rand(-150, 50))
 		}
 
 		tween(musicHandler.totalTime, songs[Object.keys(songs)[currentSongIdx]].duration, 0.5, (p) => musicHandler.totalTime = p, easings.easeOutQuint)
-		disc.frame = songs[Object.keys(songs)[currentSongIdx]].coverIdx
+		disc.play("defaultCover")
+		disc.play(songs[Object.keys(songs)[currentSongIdx]].cover)
 		GameState.music.favoriteIdx = currentSongIdx
 		bop(mBtn)
 		

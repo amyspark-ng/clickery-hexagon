@@ -1,10 +1,12 @@
 
 import { GameState } from "../../GameState.js";
-import { scorePerAutoClick, scorePerClick } from "./gamescene.js";
+import { gamescene, scoreNeededToAscend, scorePerAutoClick, scorePerClick } from "./gamescene.js";
 import { scoreText, spsText } from "./uiCounter.js";
 import { addPlusScoreText, mouse, formatNumber, changeValueBasedOnAnother, gameBg, bop, arrayToColor } from "./utils.js";
 import { playSfx } from "../../sound.js";
 import { isDraggingWindow, isHoveringWindow, manageWindow, openWindow } from "./windows/WindowsMenu.js";
+import { waver } from "../../plugins/wave.js";
+import { trail } from "../../plugins/trail.js";
 
 let hoverRotSpeedIncrease = 0.01 * 0.25
 let maxRotSpeed = 10
@@ -138,20 +140,32 @@ export function addHexagon() {
 			scale: GameState.personalization.panderitoMode ? vec2(0.5, 1) : vec2(1.08, 1.08) 
 		}),		
 		z(2),
+		waver({ maxAmplitude: 5, wave_speed: 1 }),
 		"hexagon",
 		"hoverObj",
 		{
+			smallestScale: 0.985,
+			biggestScale: 1.0015,
 			defScale: vec2(1),
-			verPosition: center().y + 55,
+			scaleIncrease: 1,
+			stretchScaleIncrease: 1,
 			canClick: true,
 			isBeingClicked: false,
 			rotationSpeed: 0.01,
+			clickPressTween: null,
+			stretched: true,
 			update() {
 				if (this.isHovering()) maxRotSpeed = 13
 				else maxRotSpeed = 10
-				hexagon.rotationSpeed = changeValueBasedOnAnother(hexagon.rotationSpeed, maxRotSpeed, GameState.score, 1000000, 0.01)
+				this.rotationSpeed = map(GameState.score, 0, scoreNeededToAscend, 0.01, maxRotSpeed)
+				this.rotationSpeed = clamp(this.rotationSpeed, 0.01, maxRotSpeed)
+				this.wave_speed = map(GameState.score, 0, scoreNeededToAscend, 1, 2)
+				this.wave_speed = clamp(this.wave_speed, 1, 2)
 				this.angle += this.rotationSpeed
-			
+				
+				this.scale.x = wave((this.smallestScale * this.scaleIncrease), (this.biggestScale * this.scaleIncrease), time() * 1.15)
+				this.scale.y = wave((this.smallestScale * this.scaleIncrease) * this.stretchScaleIncrease, (this.biggestScale * this.scaleIncrease) * this.stretchScaleIncrease, time() * 1.15)
+
 				if (this.angle >= 360) {
 					this.angle = 0
 				}
@@ -179,41 +193,21 @@ export function addHexagon() {
 			},
 			
 			clickPress(manual = true) {
-				tween(
-					vec2(1.01),
-					vec2(0.97),
-					0.35,
-					(p) => this.scale = p,
-					easings.easeOutBounce,
-				);
-				
+				this.clickPressTween = tween(this.scaleIncrease, 0.98, 0.35, (p) => this.scaleIncrease = p, easings.easeOutQuint)
+
 				if (manual) {
 					this.isBeingClicked = true
 					mouse.clicking = true
-				
 					mouse.grab()
-					// add([
-					// 	sprite("pinch"),
-					// 	pos(mouse.pos.x, mouse.pos.y - 35),
-					// 	anchor("center"),
-					// 	color(BLACK),
-					// 	z(101),
-					// ])
 				}
 
 				playSfx("clickPress", rand(-50, 50))
-				tween(scoreText.scale, vec2(1.025), 0.32, (p) => scoreText.scale = p, easings.easeOutBounce)
 			},
 
 			clickRelease(manual = true) {
-				tween(
-					vec2(0.97),
-					vec2(1.01),
-					0.35,
-					(p) => this.scale = p,
-					easings.easeOutBounce,
-				);
-				
+				this.clickPressTween.cancel()
+				tween(this.scaleIncrease, this.isHovering() ? 1.05: 1, 0.35, (p) => this.scaleIncrease = p, easings.easeOutQuint)
+
 				// manual is true, so this is if it isn't manual
 				if (manual) {
 					mouse.clicking = false
@@ -225,61 +219,45 @@ export function addHexagon() {
 					mouse.release()
 				}
 
-				// debug.log("CPS: " + clicksPerSecond)
-				// debug.log("SPS: " + scorePerSecond)
-				// debug.log("SPC: " + scorePerClick)
 				playSfx("clickRelease", rand(-50, 50))
-			
-				tween(scoreText.scale, vec2(1), 0.32, (p) => scoreText.scale = p, easings.easeOutBounce)
-			
-				tween(scoreText.angle, choose([scoreText.angle - 1, scoreText.angle + 1]), 0.32, (p) => scoreText.angle = p, easings.easeOutQuad)
-				
-				wait(0.32, () => {
-					tween(scoreText.angle, 0, 0.1, (p) => scoreText.angle = p, easings.easeOutBounce)
-				})
 			},
 
 			startHover() {
-				if (hexagon.canClick) {
-					tween(
-						hexagon.pos.y,
-						hexagon.verPosition - 10,
-						0.35,
-						(p) => hexagon.pos.y = p,
-						easings.easeOutCubic,
-					);
-					tween(
-						hexagon.scale,
-						vec2(1.01, 1.01),
-						0.35,
-						(p) => hexagon.scale = p,
-						easings.easeOutBounce,
-					);
-		
-					hexagon.rotationSpeed += hoverRotSpeedIncrease
+				if (this.canClick) {
+					tween(this.scaleIncrease, 1.05, 0.35, (p) => this.scaleIncrease = p, easings.easeOutCubic);
+					this.rotationSpeed += hoverRotSpeedIncrease
 					mouse.play("point")
-					// playSfx("hoverhex", rand(-10, 10))
 				}
+
+				// this.play("hovered")
+
+				// if (!this.is("shader")) {
+				// 	this.use(shader("outline", {
+				// 		"u_color": WHITE,
+				// 		"u_inside": 0,
+				// 		"u_thickness": 10,
+				// 	}))
+				// }
 			},
 
 			endHover() {
-				if (hexagon.canClick) {
-					tween(
-						hexagon.pos.y,
-						hexagon.verPosition,
-						0.35,
-						(p) => hexagon.pos.y = p,
-						easings.easeOutCubic,
-					);
-
-					hexagon.isBeingClicked = false
-					hexagon.rotationSpeed = 0
+				if (this.canClick) {
+					tween(this.scaleIncrease, 1, 0.35, (p) => this.scaleIncrease = p, easings.easeOutCubic);
+					this.isBeingClicked = false
+					this.rotationSpeed = 0
 					if ((!isHoveringWindow && !isDraggingWindow)) mouse.play("cursor")
-					// playSfx("unhoverhex", rand(-10, 10))
 				}
+
+				// this.play("regular")
+
+				// if (this.is("shader")) {
+				// 	this.unuse("shader")
+				// }
 			}
 		}
 	])
+
+	hexagon.startWave()
 
 	hexagon.onHover(() => {
 		// if no window has a mouse in precise range
@@ -307,6 +285,9 @@ export function addHexagon() {
 				hexagon.clickRelease(true)
 				addPlusScoreText(mouse.pos, scorePerClick)
 				GameState.addScore(scorePerClick)
+				tween(scoreText.scale, scoreText.defScale.add(vec2(0.05, 0.05)), 0.2, (p) => scoreText.scale = p, easings.easeOutQuint).onEnd(() => {
+					tween(scoreText.scale, scoreText.defScale, 0.2, (p) => scoreText.scale = p, easings.easeOutElastic)
+				})
 			}
 		}
 	})
@@ -317,13 +298,9 @@ export function addHexagon() {
 		}
 	})
 
-	hexagon.onUpdate(() => {
-		// if (isKeyDown("left")) {
-		// 	gameBg.blendFactor -= 0.01
-		// }
-		
-		// else if (isKeyDown("right")) {
-		// 	gameBg.blendFactor += 0.01
-		// }
+	loop(2.5, () => {
+		hexagon.stretched = !hexagon.stretched
+		if (hexagon.stretched) tween(hexagon.stretchScaleIncrease, 0.98, 2, (p) => hexagon.stretchScaleIncrease = p, easings.linear)
+		else tween(hexagon.stretchScaleIncrease, 1.01, 2, (p) => hexagon.stretchScaleIncrease = p, easings.linear)
 	})
 }

@@ -5,8 +5,6 @@ import { trail } from "../../plugins/trail";
 import { isHoveringUpgrade, storeOpen } from "./windows/winStore";
 import { isDraggingWindow, isHoveringWindow, manageWindow, openWindow } from "./windows/WindowsMenu";
 
-const clamp = (val, min, max) => Math.min(Math.max(val, min), max)
-
 // definetely not chatgpt
 export function formatNumber(number = 0, short = true, isPrice = false) {
 	let valueToReturn;
@@ -311,7 +309,7 @@ export function addMouse() {
 		pos(mousePos()),
 		scale(),
 		color(WHITE),
-		anchor(vec2(-0.4, -0.5)),
+		anchor(vec2(-0.5, -0.65)),
 		z(100),
 		{
 			start: false,
@@ -325,6 +323,20 @@ export function addMouse() {
 
 			release() {
 				this.grabbing = false
+			},
+
+			pinch() {
+				// debug.log("pinch")
+				// for (let i = 0; i < 1; i++) {
+				// 	let circ = add([
+				// 		circle(1),
+				// 		scale(0),
+				// 		anchor("center"),
+				// 		pos(this.pos),
+				// 		// rotate(90 * (i + 1)),
+				// 	])
+				// 	tween(circ.radius, 20, 0.1, (p) => circ.radius = p, easings.easeOutQuint)
+				// }
 			},
 			
 			update() {
@@ -347,8 +359,14 @@ export function addMouse() {
 			}
 		}
 
+		else if (obj.is("xButton") || obj.is("windowButton")) {
+			if (!isDraggingWindow) {
+				mouse.play("point")
+			}
+		}
+
 		else if (obj.is("storeElement")) {
-			if ((!isHoveringWindow && !isDraggingWindow) && obj.winParent.is("active")) {
+			if (!isDraggingWindow) {
 				if (!isHoveringUpgrade) {
 					if (GameState.score >= obj.price) {
 						mouse.play("point")
@@ -361,7 +379,7 @@ export function addMouse() {
 		}
 	
 		else if (obj.is("upgrade")) {
-			if ((!isHoveringWindow && !isDraggingWindow )&& obj.winParent.is("active")) {
+			if (!isDraggingWindow) {
 				if (GameState.score >= obj.price) {
 					mouse.play("point")
 				}
@@ -371,10 +389,6 @@ export function addMouse() {
 			}
 		}
 	
-		else if (obj.is("xButton") || obj.is("musicButton") || obj.is("sliderButton")) {
-			mouse.play("point")
-		}
-
 		else {
 			if (!isHoveringWindow && !isDraggingWindow) {
 				mouse.play("point")
@@ -503,6 +517,97 @@ export function addToolTip(obj, textToAdd = "cooltext\nverycool", textSize = 20,
 	}
 }
 
+let maxLogs = 3;
+let toastQueue = [];
+
+export function addToast(opt = { icon: "none", title: "Title", body: "Body", color: WHITE }) {
+    let logs = get("toast", { recursive: true });
+
+    function actuallyAddToast(idx, opt) {
+        let toastBg = add([
+            rect(200, 100),
+            pos(-200, idx * 150),
+            anchor("topleft"),
+            color(BLACK.lighten(100)),
+			area(),
+            "toast",
+            {
+				running: true,
+                timeLeft: 2,
+                index: idx,
+                update() {
+                    this.timeLeft = map(toastProgressBar.width, 0, toastBg.width, 2, 0);
+                },
+				close() {
+					tween(toastBg.pos.x, -toastBg.width, 0.8, (p) => (toastBg.pos.x = p), easings.easeOutQuint).onEnd(() => {
+						destroy(toastBg);
+						processQueue();
+					});
+				},
+            },
+        ]);
+
+		toastBg.onClick(() => {
+			toastBg.running = true
+			toastBg.close()
+			if (opt.title == "This is a title") {  }
+			else if (opt.title == "Unlocked store window") openWindow("storeWin")
+		})
+
+        // Add content to the toast
+        toastBg.add([
+            text(opt.title, { size: 24 }),
+            pos(10, 10),
+        ]);
+
+        let toastProgressBar = toastBg.add([
+            rect(toastBg.width, 10),
+            pos(0, toastBg.height),
+			color(opt.color)
+        ]);
+
+        tween(toastBg.pos.x, 0, 0.5, (p) => (toastBg.pos.x = p), easings.easeOutQuint);
+        tween(toastProgressBar.width, 0, 2, (p) => (toastProgressBar.width = p), easings.linear).onEnd(() => {
+			if (toastBg.running) toastBg.close() 
+		});
+    }
+
+    function processQueue() {
+        let logs = get("toast", { recursive: true });
+        while (toastQueue.length > 0 && logs.length < maxLogs) {
+            let nextToast = toastQueue.shift();
+            let availableIndex = getAvailableIndex(logs);
+            if (availableIndex !== -1) {
+                actuallyAddToast(availableIndex, nextToast);
+                logs = get("toast", { recursive: true }); // update logs after adding a toast
+            }
+        }
+    }
+
+    function getAvailableIndex(logs) {
+        let occupiedIndices = logs.map(log => log.index);
+        for (let i = 0; i < maxLogs; i++) {
+            if (!occupiedIndices.includes(i)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    logs = get("toast", { recursive: true }); // Update logs
+
+    if (logs.length >= maxLogs) {
+        toastQueue.push(opt);
+    } else {
+        let availableIndex = getAvailableIndex(logs);
+        if (availableIndex !== -1) {
+            actuallyAddToast(availableIndex, opt);
+        }
+    }
+
+    processQueue(); // Ensure the queue is processed if there are available slots
+}
+
 export function endToolTip(speed = 1) {
 	get("tooltip").forEach(element => {
 		tween(element.opacity, 0, 0.05 / speed, (p) => element.opacity = p)
@@ -602,15 +707,18 @@ export function addPlusScoreText(posToAdd, amount, size = [40, 50]) {
 	// tween(plusScoreText.pos.y, plusScoreText.pos.y - 50, 1, (p) => plusScoreText.pos.y = p, )
 	// tween(1, 0, 1, (p) => plusScoreText.opacity = p, )
 
-	plusScoreText.pos.x = choose([
-		rand(posToAdd.x - 50, posToAdd.x - 40),
-		rand(posToAdd.x + 50, posToAdd.x + 40),
-	])
+	// plusScoreText.pos.x = choose([
+	// 	rand(posToAdd.x - 50, posToAdd.x - 40),
+	// 	rand(posToAdd.x + 50, posToAdd.x + 40),
+	// ])
 
-	plusScoreText.pos.y = choose([
-		rand(posToAdd.y - 10, posToAdd.y - 10),
-		rand(posToAdd.y + 10, posToAdd.y + 10),
-	])
+	// plusScoreText.pos.y = choose([
+	// 	rand(posToAdd.y - 10, posToAdd.y - 10),
+	// 	rand(posToAdd.y + 10, posToAdd.y + 10),
+	// ])
+
+	plusScoreText.pos.x = posToAdd.x + 2
+	plusScoreText.pos.y = posToAdd.y - 18
 
 	// animate plusscoretext
 	tween(
@@ -624,12 +732,6 @@ export function addPlusScoreText(posToAdd, amount, size = [40, 50]) {
 		0,
 		0.25,
 		(p) => plusScoreText.opacity = p,
-	);
-	tween(
-		plusScoreText.angle,
-		rand(-10, 10),
-		0.25,
-		(p) => plusScoreText.angle = p,
 	);
 
 	wait(0.25, () => {
