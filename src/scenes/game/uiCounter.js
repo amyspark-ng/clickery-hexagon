@@ -3,7 +3,7 @@ import { waver } from "../../plugins/wave.js";
 import { actualScorePerSecond } from "./addHexagon.js";
 
 import { formatNumber } from "./utils.js";
-import { isDraggingWindow, isHoveringWindow } from "./windows/WindowsMenu.js";
+import { isDraggingWindow, isGenerallyHoveringWindow } from "./windows/WindowsMenu.js";
 import { storeOpen } from "./windows/winStore.js";
 
 export let scoreText;

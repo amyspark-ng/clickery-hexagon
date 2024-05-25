@@ -36,14 +36,10 @@ export function musicWinContent(winParent) {
 		}),
 		pos(-150, -20),
 		rotate(),
-		area(),
 		anchor("center"),
 		scale(),
-		"hoverObj",
 		"bpmChange",
-		"windowButton",
 		{
-			defScale: vec2(1),
 			verPosition: -20,
 			update() {
 				if (musicHandler.winding || GameState.music.muted || skipping) return
@@ -54,26 +50,6 @@ export function musicWinContent(winParent) {
 	])
 
 	disc.play(songs[Object.keys(songs)[currentSongIdx]].cover)
-
-	disc.onClick(() => {
-		bop(disc)
-		
-		if (!GameState.music.muted) {
-			espMute()
-			get("bpmChange", { recursive: true }).forEach(element => {
-				element.stopWave()
-			})
-		}
-
-		else {
-			espUnmute()
-			get("bpmChange", { recursive: true }).forEach(element => {
-				element.startWave()
-			})
-		}
-
-		playSfx("clickButton", rand(-100, 100))
-	})
 
 	let nowPlaying = winParent.add([
 		pos(-50, -25),
@@ -88,7 +64,7 @@ export function musicWinContent(winParent) {
 		anchor("left"),
 		{
 			update() {
-				this.text = `${songs[Object.keys(songs)[currentSongIdx]].idx + 1}. ${songs[Object.keys(songs)[currentSongIdx]].name} ${GameState.music.muted ? "(MUTED)" : ""}\nby Enysmo`
+				this.text = `${songs[Object.keys(songs)[currentSongIdx]].idx + 1}. ${songs[Object.keys(songs)[currentSongIdx]].name} ${GameState.music.muted ? "(PAUSED)" : ""}\nby Enysmo`
 			}
 		}
 	])
@@ -98,7 +74,7 @@ export function musicWinContent(winParent) {
 		pos(0, 25),
 		area(),
 		color(),
-		area(),
+		area({ scale: vec2(1, 1.25) }),
 		opacity(1),
 		anchor("center"),
 		{
@@ -174,9 +150,26 @@ export function musicWinContent(winParent) {
 		text("<", {
 			size: 40
 		}),
-		pos(-30, 30),
+		pos(-30, 60),
 		area(),
 		scale(),
+		anchor("center"),
+		"hoverObj",
+		"musicButton",
+		"windowButton",
+		{
+			defScale: vec2(1),
+		}
+	])
+
+	let pauseButton = winParent.add([
+		text("||", {
+			size: 40
+		}),
+		pos(15, 60),
+		area(),
+		scale(),
+		anchor("center"),
 		"hoverObj",
 		"musicButton",
 		"windowButton",
@@ -189,9 +182,10 @@ export function musicWinContent(winParent) {
 		text(">", {
 			size: 40
 		}),
-		pos(30, 30),
+		pos(60, 60),
 		area(),
 		scale(),
+		anchor("center"),
 		"hoverObj",
 		"musicButton",
 		"windowButton",
@@ -203,63 +197,79 @@ export function musicWinContent(winParent) {
 	// each tim you click it waits one seonc, if the time since the skip is greater than 1 it plays the song
 	// if the time since the skip is less than 1 it does nothing
 	get("musicButton", { recursive: true }).forEach(mBtn => mBtn.onClick(() => {
-		if (skipping == false) {
-			skipping = true
-			get("bpmChange", { recursive: true }).forEach(element => { element.stopWave() });
-		}
-		scratchSong()
-		musicHandler.winding = true
-		tween(progressBar.width, 0, 0.5, (p) => progressBar.width = p, easings.easeOutQuint)
-		tween(musicHandler.currentTime, 0, 0.5, (p) => musicHandler.currentTime = p, easings.easeOutQuint)
-
-		if (mBtn.text == "<") {
-			if (musicHandler.currentTime > 2) {
-				musicHandler.seek(0)
-				musicHandler.winding = true
-				tween(progressBar.width, 0, 0.2, p => progressBar.width = p, easings.easeOutQuint)
+		if (mBtn.text != "||") {
+			if (skipping == false) {
+				skipping = true
+				get("bpmChange", { recursive: true }).forEach(element => { element.stopWave() });
+			}
+			scratchSong()
+			tween(progressBar.width, 0, 0.5, (p) => progressBar.width = p, easings.easeOutQuint)
+			tween(musicHandler.currentTime, 0, 0.5, (p) => musicHandler.currentTime = p, easings.easeOutQuint)
+			musicHandler.winding = true
+	
+			if (mBtn.text == "<") {
+				if (musicHandler.currentTime > 2) {
+					musicHandler.seek(0)
+					musicHandler.winding = true
+					tween(progressBar.width, 0, 0.2, p => progressBar.width = p, easings.easeOutQuint)
+				}
+				
+				else {
+					currentSongIdx--
+					tween(disc.angle, disc.angle - rand(75, 100), 0.5, (p) => disc.angle = p, easings.easeOutQuint)
+					if (currentSongIdx < 0) currentSongIdx = Object.keys(songs).length - 1
+				}
+	
+				playSfx("clickButton", rand(-50, 150))
 			}
 			
-			else {
-				currentSongIdx--
-				tween(disc.angle, disc.angle - rand(75, 100), 0.5, (p) => disc.angle = p, easings.easeOutQuint)
-				if (currentSongIdx < 0) currentSongIdx = Object.keys(songs).length - 1
+			else if (mBtn.text == ">") {
+				currentSongIdx++
+				tween(disc.angle, disc.angle + rand(75, 100), 0.5, (p) => disc.angle = p, easings.easeOutQuint)
+				if (currentSongIdx >= Object.keys(songs).length) currentSongIdx = 0
+				playSfx("clickButton", rand(-150, 50))
 			}
-
-			playSfx("clickButton", rand(-50, 150))
+	
+			tween(musicHandler.totalTime, songs[Object.keys(songs)[currentSongIdx]].duration, 0.5, (p) => musicHandler.totalTime = p, easings.easeOutQuint)
+			disc.play(songs[Object.keys(songs)[currentSongIdx]].cover)
+			GameState.music.favoriteIdx = currentSongIdx
+			timeSinceSkip = 0
+	
+			wait(1, () => {
+				if (timeSinceSkip > 1) {
+					playMusic(Object.keys(songs)[currentSongIdx])
+					skipping = false
+					musicHandler.winding = false
+					if (GameState.music.muted) {
+						musicHandler.paused = true
+						get("bpmChange", { recursive: true }).forEach(element => { element.stopWave() });
+					}
+					else {
+						get("bpmChange", { recursive: true }).forEach(element => { element.startWave() });
+					}
+				}
+			})
 		}
-		
+
 		else {
-			currentSongIdx++
-			tween(disc.angle, disc.angle + rand(75, 100), 0.5, (p) => disc.angle = p, easings.easeOutQuint)
-			if (currentSongIdx >= Object.keys(songs).length) currentSongIdx = 0
-			playSfx("clickButton", rand(-150, 50))
-		}
-
-		tween(musicHandler.totalTime, songs[Object.keys(songs)[currentSongIdx]].duration, 0.5, (p) => musicHandler.totalTime = p, easings.easeOutQuint)
-		disc.play("defaultCover")
-		disc.play(songs[Object.keys(songs)[currentSongIdx]].cover)
-		GameState.music.favoriteIdx = currentSongIdx
-		bop(mBtn)
-		
-		timeSinceSkip = 0
-
-		wait(1, () => {
-			if (timeSinceSkip > 1) {
-				playMusic(Object.keys(songs)[currentSongIdx])
-				skipping = false
-				musicHandler.winding = false
-				if (progressBar.width > 0) {
-					// musicHandler.seek(getSecondsInSong(theOneBehind))
-				}
-				if (GameState.music.muted) {
-					musicHandler.paused = true
-					get("bpmChange", { recursive: true }).forEach(element => { element.stopWave() });
-				}
-				else {
-					get("bpmChange", { recursive: true }).forEach(element => { element.startWave() });
-				}
+			if (!GameState.music.muted) {
+				espMute()
+				get("bpmChange", { recursive: true }).forEach(element => {
+					element.stopWave()
+				})
 			}
-		})
+	
+			else {
+				espUnmute()
+				get("bpmChange", { recursive: true }).forEach(element => {
+					element.startWave()
+				})
+			}
+	
+			playSfx("clickButton", rand(-100, 100))
+		}
+		
+		bop(mBtn)
 	}))
 
 	get("bpmChange", { recursive: true }).forEach(bpmChange => {

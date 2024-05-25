@@ -11,24 +11,18 @@
 - Format actual working numbers
 - Loading screen isn't working
 - Do general unlocking stuff, like when you first start the game, also the start transition, so cool stuff
-^ If you click it opens the statsWindow
 - Random chance of +1 making something funny
 - Make pinch animation
 - Rework tooltips
 ## Windows
 - If hasn't unlocked folderObj i think GameState.unlockedWindows should be null
-- If you take the mouse out of the screen and the window is picked when you go back it still is picked
-- Overlapping headers work very weird
-^ Simply re work the entire active system, what the shit
-- Corner window bug with hexagon still happening
-- Minibuttons hover/click when there's a window in front of them (ocasionally)
-^ Related to the window being active, hmmmmm idk
+- Can hover stuff while hovering another window
+
 ### Store
-- Misc upgrades do not show up on winParent why??
-^ Are they even getting added?
+
 ### Music
 - Change vynil to cd, looks better
-- Should say paused instead of muted, confusing!!
+- play bar stutters when going back
 ### Color
 
 # Bookmarks

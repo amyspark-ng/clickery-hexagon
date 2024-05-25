@@ -1,9 +1,9 @@
 import { GameState } from "../../GameState"
 import { actualScorePerSecond, addHexagon, autoClick, autoScorePerSecond, hexagon } from "./addHexagon.js"
 import { uiCounters } from "./uiCounter"
-import { addBackground, addMouse, addToast, debugFunctions, debugTexts, formatNumber, getPrice, mouse, percentage } from "./utils"
+import { addBackground, addMouse, addToast, debugFunctions, debugTexts, mouse, percentage } from "./utils"
 import { musicHandler, playMusic } from "../../sound"
-import { folderObjManaging as folderObjManaging, openWindow, unlockWindow, windowsDefinition } from "./windows/WindowsMenu"
+import { folderObjManaging, unlockWindow, windowsDefinition } from "./windows/WindowsMenu"
 import { songs } from "./windows/winMusic"
 import { curDraggin, setCurDraggin } from "../../plugins/drag"
 
@@ -266,8 +266,7 @@ export function gamescene() {
 			}
 		}, false);
 
-		document.getElementById("kanva").addEventListener("onmouseout", (event) => {
-			debug.log("onmouseout")
+		document.getElementById("kanva").addEventListener("mouseout", (event) => {
 			if (curDraggin) {
 				curDraggin.trigger("dragEnd")
 				setCurDraggin(null)

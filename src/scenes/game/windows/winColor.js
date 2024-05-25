@@ -15,7 +15,7 @@ function deactivateAllSliders() {
 	})
 }
 
-function typeToColor(type) {
+function typeToSliderColor(type) {
 	if (type == "r") return rgb(255, 0, 0)
 	else if (type == "g") return rgb(0, 255, 0)
 	else if (type == "b") return rgb(0, 0, 255)
@@ -30,7 +30,7 @@ function GetbuttonPosBasedOnValue(coloredObj, type = "r", theOneBehind) {
 	}
 
 	else {
-		if (type != "a") xPos = map(coloredObj.color[type], 0, 255, getSides(theOneBehind).left, getSides(theOneBehind).right);
+		if (type != "a") xPos = map(coloredObj.tintColor[type], 0, 255, getSides(theOneBehind).left, getSides(theOneBehind).right)
 		else xPos = map(coloredObj.blendFactor, 0, 1, getSides(theOneBehind).left, getSides(theOneBehind).right);
 	}
 	return xPos;
@@ -82,7 +82,7 @@ function addRgbSlider(winParent, posToAdd = vec2(0), coloredObj, type = "r") {
 		anchor("center"),
 		area({ scale: vec2(3.5, 1) }),
 		drag(),
-		color(typeToColor(type)),
+		color(typeToSliderColor(type)),
 		"hoverObj",
 		"sliderButton",
 		"windowButton",
@@ -131,7 +131,7 @@ function addRgbSlider(winParent, posToAdd = vec2(0), coloredObj, type = "r") {
 
 	sliderButton.onClick(() => {
 		deactivateAllSliders()
-		sliderButton.use(outline(5, type != "a" ? typeToColor(type).darken(100) : typeToColor(type).lighten(100)))
+		sliderButton.use(outline(5, type != "a" ? typeToSliderColor(type).darken(100) : typeToSliderColor(type).lighten(100)))
 		sliderButton.active = true
 	})
 
@@ -167,7 +167,7 @@ function addRgbSlider(winParent, posToAdd = vec2(0), coloredObj, type = "r") {
 		rect(0, 25, { radius: 5  }),
 		pos(getSides(theOneBehind).left, theOneBehind.pos.y),
 		anchor("left"),
-		color(typeToColor(type)),
+		color(typeToSliderColor(type)),
 		z(sliderButton.z - 1),
 		"slider",
 		type + "slider",
@@ -272,13 +272,11 @@ export function colorWinContent(winParent, winType = "hexColorWin") {
 
 	else {
 		gameBg.onUpdate(() => {
-			gameBg.onUpdate(() => {
-				gameBg.tintColor.r = rSlider.value
-				gameBg.tintColor.g = gSlider.value
-				gameBg.tintColor.b = bSlider.value
-				gameBg.blendFactor = aSlider.value
-				GameState.bgColor = [rSlider.value, gSlider.value, bSlider.value, aSlider.value]
-			})
+			gameBg.tintColor.r = rSlider.value
+			gameBg.tintColor.g = gSlider.value
+			gameBg.tintColor.b = bSlider.value
+			gameBg.blendFactor = aSlider.value
+			GameState.bgColor = [rSlider.value, gSlider.value, bSlider.value, aSlider.value]
 		})
 	}
 

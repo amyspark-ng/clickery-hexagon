@@ -8,8 +8,10 @@ import { musicWinContent, setTimeSinceSkip, timeSinceSkip } from "./winMusic.js"
 import { colorWinContent } from "./winColor.js";
 
 let infoForWindows = {};
+export let isGenerallyHoveringWindow = false;
+export let isPreciselyHoveringWindow = false;
+export let isInClickingRangeOfWindow = false;
 export let isDraggingWindow = false;
-export let isHoveringWindow = false;
 
 let folderObj;
 let folded = true;
@@ -110,7 +112,7 @@ export function addMinibutton(i, xPosition) {
 			},
 
 			update() {
-				if (this.isHovering() && !isHoveringWindow && !isDraggingWindow && !folded) {
+				if (this.isHovering() && !isGenerallyHoveringWindow && !isDraggingWindow && !folded) {
 					// animate it spinning it
 					this.angle = wave(-9, 9, time() * 3)
 				}
@@ -137,7 +139,7 @@ export function addMinibutton(i, xPosition) {
 	// if unfolded will not run
 	miniButton.onHover(() => {
 		if (timeSinceFold < 0.25) return
-		if (!folded && !isHoveringWindow) {
+		if (!folded && !isGenerallyHoveringWindow) {
 			miniButton.startHover()
 		}
 	})
@@ -150,7 +152,7 @@ export function addMinibutton(i, xPosition) {
 	})
 
 	miniButton.onClick(() => {
-		if (isHoveringWindow || isDraggingWindow) return
+		if (isGenerallyHoveringWindow || isDraggingWindow) return
 		miniButton.manageRespectiveWindow(miniButton)
 		bop(miniButton)
 	})
@@ -179,6 +181,10 @@ export function openWindow(name = "") {
 			dragging: false,
 			showable: infoForWindows[name].showable,
 			close() {
+				folderObj.trigger("winClose")
+				this.removeAll()
+				playSfx("closeWin", rand(0.8, 1.2))
+
 				this.unuse("window")
 				this.unuse("active")
 				tween(this.scale, vec2(0.9), 0.32, (p) => this.scale = p, easings.easeOutQuint)
@@ -186,10 +192,6 @@ export function openWindow(name = "") {
 					// destroying it doesn't trigger onHoverEnd
 					destroy(this)
 				})
-
-				folderObj.trigger("winClose")
-				this.removeAll()
-				playSfx("closeWin", rand(0.8, 1.2))
 
 				infoForWindows[name].lastPos = this.pos
 				if (!this.showable || folded || !GameState.unlockedWindows.includes(name)) return
@@ -238,42 +240,6 @@ export function openWindow(name = "") {
 				(mousePos().x >= getSides(this).left - 10)
 				return condition;
 			},
-
-			update() {
-				if (isMousePressed("left")) {
-					if (!xButton.isHovering()) {
-						if (curDraggin) {
-							return
-						}
-		
-						if (this.isMouseInGeneralRange()) {
-							if (this.is("active")) {
-								if (this.isMouseInClickingRange()) {
-									if (this.is)
-									mouse.grab()
-									this.pick()
-								}
-							}
-						
-							else {
-								deactivateAllWindows()
-								// so buttons can not get clicked if window is inactive
-								wait(0.05, () => {
-									this.activate()
-								})
-							}
-						}
-					}
-				}
-
-				if (isMouseReleased("left")) {
-					if (curDraggin) {
-						curDraggin.trigger("dragEnd")
-						setCurDraggin(null)
-						mouse.release()
-					}
-				}
-			}
 		}
 	])
 
@@ -282,7 +248,7 @@ export function openWindow(name = "") {
 		color(WHITE),
 		pos(-windowObj.width / 2, -windowObj.height / 2),
 		z(windowObj.z + 1),
-		area({ scale: vec2(1.2) }),
+		area({ scale: vec2(1.8, 1.1), offset: vec2(-10, 0)}),
 		"xButton",
 		"hoverObj",
 	])
@@ -290,19 +256,26 @@ export function openWindow(name = "") {
 	xButton.pos.x += windowObj.width - xButton.width - 5
 
 	xButton.onHover(() => {
+		if (isDraggingWindow) return
 		xButton.color = RED
 	})
 
 	xButton.onHoverEnd(() => {
+		if (isDraggingWindow) return
 		xButton.color = WHITE
 	})
 
 	xButton.onClick(() => {
-		mouse.play("cursor")
-		windowObj.close()
-		if (!windowObj.showable) return
-		if (get("window").length == 0) {
-			folderObj.fold()
+		if (!isDraggingWindow) {
+			windowObj.close()
+			if (windowObj.showable) {
+				if (get("window").length == 0) {
+					folderObj.fold()
+				}
+			}
+			if (!get("*", { recursive: true }).some(element => element.is("hoverObj") && element.isHovering())) {
+				mouse.play("cursor")
+			}
 		}
 	})
 
@@ -311,7 +284,7 @@ export function openWindow(name = "") {
 			hexagon.endHover()
 		}
 
-		if (!get("window").some(window => window.dragging)) mouse.play("cursor")
+		if (!isDraggingWindow && mouse.play("cursor"))
 
 		if (!windowObj.showable) return
 		get("minibutton").forEach(minibuttonHoverEndCheck => {
@@ -322,16 +295,49 @@ export function openWindow(name = "") {
 	})
 
 	windowObj.onHoverEnd(() => {
-		if (hexagon.isHovering() && !isHoveringWindow && !isDraggingWindow ) {
+		// debug.log("end hover")
+		if (hexagon.isHovering() && !isDraggingWindow) {
 			hexagon.startHover()
+			// debug.log("start hex hover")
 		}
 
 		if (!windowObj.showable) return
 		get("minibutton").forEach(minibuttonHoverEndCheck => {
-			if (minibuttonHoverEndCheck.isHovering() && !isDraggingWindow && !isHoveringWindow) {
+			if (minibuttonHoverEndCheck.isHovering() && !isDraggingWindow && !isGenerallyHoveringWindow) {
 				minibuttonHoverEndCheck.startHover()
 			}
 		});
+	})
+
+	windowObj.onMousePress(() => {
+		// if has been closed don't do anything
+		if (!windowObj.is("window")) return
+
+		if (!xButton.isHovering()) {
+			if (curDraggin) {
+				return
+			}
+
+			if (windowObj.isMouseInGeneralRange()) {
+				if (windowObj.isMouseInClickingRange()) {
+					mouse.grab()
+					windowObj.pick()
+				}
+
+				if (!windowObj.is("active")) {
+					deactivateAllWindows()
+					windowObj.activate()
+				}
+			}
+		}
+	})
+
+	windowObj.onMouseRelease(() => {
+		if (curDraggin) {
+			curDraggin.trigger("dragEnd")
+			setCurDraggin(null)
+			mouse.release()
+		}
 	})
 
 	windowObj.onDrag(() => {
@@ -466,50 +472,28 @@ export function folderObjManaging() {
 	})
 
 	folderObj.on("winClose", () => {
-		isHoveringWindow = get("window", { recursive: true }).some((window) => window.isHovering())
+		if (hexagon.isHovering()) {
+			hexagon.startHover()
+		}
+
+		isGenerallyHoveringWindow = get("window", { recursive: true }).some((window) => window.isMouseInGeneralRange())
+		isPreciselyHoveringWindow = get("window", { recursive: true }).some((window) => window.isMouseInPreciseRange())
 		wait(0.05, () => {
 			// gets the topmost window
 			let allWindows = get("window", { recursive: true })
 			if (allWindows.length > 0) allWindows[clamp(allWindows.length - 1, 0, allWindows.length)].activate()
 		})
-		if (!isHoveringWindow || !isDraggingWindow || !get("*").some((e) => e.isHovering())) mouse.play("cursor")
 	})
 
 	folderObj.onUpdate(() => {
 		if (!get("window").length > 0) return
 		// if any window is being hovered on
 		get("window").some((window) => {
-			isHoveringWindow = window.isMouseInGeneralRange()
+			isGenerallyHoveringWindow = window.isMouseInGeneralRange()
+			isPreciselyHoveringWindow = window.isMouseInPreciseRange()
+			isInClickingRangeOfWindow = window.isMouseInClickingRange()
 			isDraggingWindow = window.dragging
 		})
-	})
-
-	folderObj.onMousePress("left", () => {
-		if (!get("xButton").forEach(xButton => xButton.isHovering())) {
-			if (curDraggin) {
-				return
-			}
-
-			// Loop all "bean"s in reverse, so we pick the topmost one
-			for (const pickedWindow of get("window").reverse()) {
-				// If mouse is pressed and mouse position is inside, we pick
-				if (pickedWindow.isMouseInGeneralRange()) {
-					if (pickedWindow.isMouseInClickingRange()) {
-						mouse.grab()
-						pickedWindow.pick()
-						break
-					}
-	
-					if (!pickedWindow.is("active")) {
-						deactivateAllWindows()
-						wait(0.05, () => {
-							debug.log("activate")
-							pickedWindow.activate()
-						})
-					}
-				}
-			}
-		}
 	})
 }
 

@@ -3,7 +3,7 @@ import { autoLoopTime, excessTime, scorePerAutoClick } from "./gamescene";
 import { autoClick, autoScorePerSecond, hexagon } from "./addHexagon";
 import { trail } from "../../plugins/trail";
 import { isHoveringUpgrade, storeOpen } from "./windows/winStore";
-import { isDraggingWindow, isHoveringWindow, manageWindow, openWindow } from "./windows/WindowsMenu";
+import { isDraggingWindow, isGenerallyHoveringWindow, isPreciselyHoveringWindow, manageWindow, openWindow } from "./windows/WindowsMenu";
 
 // definetely not chatgpt
 export function formatNumber(number = 0, short = true, isPrice = false) {
@@ -264,7 +264,7 @@ export function addBackground() {
     })))
 
 	gameBg.onMousePress("right", () => {
-		if (!hexagon.isHovering() && gameBg.isHovering() && !isHoveringWindow && !isDraggingWindow) {
+		if (!hexagon.isHovering() && gameBg.isHovering() && !isGenerallyHoveringWindow && !isDraggingWindow) {
 			manageWindow("bgColorWin")
 		}
 	})
@@ -352,7 +352,7 @@ export function addMouse() {
 	
 	onHoverUpdate("hoverObj", (obj) => {
 		if (obj.is("hexagon")) {
-			if (!isHoveringWindow && !isDraggingWindow) {
+			if (!isPreciselyHoveringWindow && !isDraggingWindow) {
 				if (!mouse.grabbing) {
 					mouse.play("point")
 				}
@@ -390,7 +390,7 @@ export function addMouse() {
 		}
 	
 		else {
-			if (!isHoveringWindow && !isDraggingWindow) {
+			if (!isGenerallyHoveringWindow && !isDraggingWindow) {
 				mouse.play("point")
 			}
 		}
@@ -403,7 +403,7 @@ export function addMouse() {
 	})
 
 	onHoverUpdate("glass", () => {
-		if (!isHoveringWindow && !isDraggingWindow) {
+		if (!isGenerallyHoveringWindow && !isDraggingWindow) {
 			if (!storeOpen) mouse.play("check")
 		}
 	})
@@ -454,6 +454,7 @@ export function addToolTip(obj, textToAdd = "cooltext\nverycool", textSize = 20,
 		scale(),
 		opacity(0),
 		anchor("left"),
+		z(tooltip.z + 1),
 		"tooltip",
 		"tooltiptext",
 	])

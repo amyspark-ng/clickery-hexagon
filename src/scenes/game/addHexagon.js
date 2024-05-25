@@ -4,7 +4,7 @@ import { gamescene, scoreNeededToAscend, scorePerAutoClick, scorePerClick } from
 import { scoreText, spsText } from "./uiCounter.js";
 import { addPlusScoreText, mouse, formatNumber, changeValueBasedOnAnother, gameBg, bop, arrayToColor } from "./utils.js";
 import { playSfx } from "../../sound.js";
-import { isDraggingWindow, isHoveringWindow, manageWindow, openWindow } from "./windows/WindowsMenu.js";
+import { isDraggingWindow, isGenerallyHoveringWindow, isPreciselyHoveringWindow, manageWindow, openWindow } from "./windows/WindowsMenu.js";
 import { waver } from "../../plugins/wave.js";
 import { trail } from "../../plugins/trail.js";
 
@@ -245,7 +245,7 @@ export function addHexagon() {
 					tween(this.scaleIncrease, 1, 0.35, (p) => this.scaleIncrease = p, easings.easeOutCubic);
 					this.isBeingClicked = false
 					this.rotationSpeed = 0
-					if ((!isHoveringWindow && !isDraggingWindow)) mouse.play("cursor")
+					if ((!isGenerallyHoveringWindow && !isDraggingWindow)) mouse.play("cursor")
 				}
 
 				// this.play("regular")
@@ -261,19 +261,19 @@ export function addHexagon() {
 
 	hexagon.onHover(() => {
 		// if no window has a mouse in precise range
-		if (!get("window").some(window => window.isMouseInPreciseRange()) && !isDraggingWindow) {
+		if (!isGenerallyHoveringWindow && !isDraggingWindow) {
 			hexagon.startHover()
 		}
 	})
 
 	hexagon.onHoverEnd(() => {
-		if (!get("window").some(window => window.isMouseInPreciseRange()) && !isDraggingWindow)
+		if (!isPreciselyHoveringWindow && !isDraggingWindow)
 		hexagon.endHover()
 	});
 
 	hexagon.onMousePress("left", () => {
 		if (hexagon.isHovering()) {
-			if (hexagon.canClick && timeTilClick < 0 && (!isHoveringWindow && !isDraggingWindow)) {
+			if (hexagon.canClick && timeTilClick < 0 && (!isPreciselyHoveringWindow && !isDraggingWindow)) {
 				hexagon.clickPress(true)
 			}
 		}
@@ -281,7 +281,7 @@ export function addHexagon() {
 	
 	hexagon.onMouseRelease("left", () => {
 		if (hexagon.isHovering()) {
-			if (hexagon.canClick && hexagon.isBeingClicked && !isWaitingToClick && (!isHoveringWindow && !isDraggingWindow)) {
+			if (hexagon.canClick && hexagon.isBeingClicked && !isWaitingToClick && (!get("window").some(w => w.isMouseInPreciseRange()) && !isDraggingWindow)) {
 				hexagon.clickRelease(true)
 				addPlusScoreText(mouse.pos, scorePerClick)
 				GameState.addScore(scorePerClick)

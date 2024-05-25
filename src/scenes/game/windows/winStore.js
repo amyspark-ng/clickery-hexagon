@@ -1,5 +1,5 @@
 import { GameState } from "../../../GameState";
-import { addPlusPercentageScore, addToolTip, endToolTip, formatNumber, getPrice } from "../utils";
+import { addPlusPercentageScore, addToolTip, endToolTip, formatNumber, getPrice, getSides } from "../utils";
 import { playSfx } from "../../../sound";
 import { isDraggingWindow } from "./WindowsMenu";
 
@@ -13,8 +13,6 @@ let amountBeingBought = 1
 let hasBoughtRecently = false
 let storePitchSeconds = 0
 let storeTune = 0
-
-let storeTimer = 0 // optimization
 
 export let isHoveringUpgrade = false
 
@@ -399,11 +397,11 @@ function addUpgrades(element, winParent) {
 		amount = 6
 	}
 	
-	else if (element.is("storeBg")) {
+	else if (element.is("window")) {
 		type = "u_"
 		uSprite = "mupgrades"
 		amount = 4
-		posX = -90
+		posX = 0
 	}
 
 	for(let i = 0; i < amount; i++) {
@@ -412,12 +410,11 @@ function addUpgrades(element, winParent) {
 			if (i != 0 && i != 3) posX += 52
 		}
 		else {
-			posX += 92
-			posY = 425
+			posX += 80
 		}
 		
 		let upgrade = element.add([
-			pos(posX + 45, posY + 20),
+			pos(!element.is("window") ? vec2(posX + 45, posY + 20) : vec2((-element.width / 2 - 10) + posX, element.height / 2 - 80)),
 			sprite(uSprite),
 			anchor("center"),
 			opacity(1),
@@ -610,7 +607,7 @@ export function storeWinContent(winParent) {
 		name: 'PowerUp',
 		basePrice: 100,
 		percentageIncrease: 25,
-		position: vec2(0, -18 + 108 + 10),
+		position: vec2(0, cursorsElement.pos.y + 108 + 10),
 	}, winParent)
 
 	storeElements = [multipliersElement, cursorsElement, powerupsElement]
