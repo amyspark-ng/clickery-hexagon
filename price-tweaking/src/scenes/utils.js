@@ -1,3 +1,32 @@
+import { GameState } from "../main"
+
+export function save(thingToSave, valueToSave) {
+	if (thingToSave == "storeElements") {
+		GameState.storeElements = valueToSave
+		setData("storeElements", GameState.storeElements)
+	}
+
+	else {
+		GameState.upgradePriceData = valueToSave
+		setData("upgradePriceData", GameState.upgradePriceData)
+	}
+
+	let savedText = add([
+		text("Buy-data saved"),
+		pos(width(), height() + 50),
+		color(rgb(154, 255, 150)),
+		anchor("right"),
+		opacity(1),
+	])
+
+	tween(savedText.pos.y, height() - 25, 0.5, (p) => savedText.pos.y = p, easings.easeOutQuint)
+	wait(2, () => {
+		tween(savedText.opacity, 0, 0.25, (p) => savedText.opacity = p, easings.easeOutQuint).onEnd(() => {
+			destroy(savedText)
+		})
+	})
+}
+
 export function blendColors(color1, color2, blendFactor) {
     // Extract RGB components from color structures
     const rgb1 = [color1.r, color1.g, color1.b];
@@ -42,6 +71,7 @@ export function addBackground() {
 		stay(),
 		color(),
 		z(0),
+		"bg",
 		{
 			defScale: vec2(1),
 			speed: 0.1,

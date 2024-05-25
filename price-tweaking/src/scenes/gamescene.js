@@ -1,8 +1,9 @@
 import { GameState } from "../main.js";
 import { volumeManager } from "../plugins/volumebar.js";
-import { addBackground, bop, getPrice } from "./utils.js";
+import { upgradePriceData } from "./upgradescene.js";
+import { addBackground, bop, getPrice, save } from "./utils.js";
 
-class variablesClass {
+class storeElementClass {
 	constructor() {
 		this.amountToBuy = 1;
 		this.clickers = {
@@ -23,7 +24,7 @@ class variablesClass {
 	}
 }
 
-let variables = new variablesClass()
+let storeElements = new storeElementClass()
 
 export function addElement(name = "clickers") {
 	let mainElement = add([
@@ -45,27 +46,27 @@ export function addElement(name = "clickers") {
 
 	mainElement.onMousePress("left", (() => {
 		if (mainElement.isHovering()) {
-			variables[name].objectAmount += variables.amountToBuy
+			storeElements[name].objectAmount += storeElements.amountToBuy
 			bop(mainElement, 0.05)
-			play("kaching", { detune: 2 * variables[name].objectAmount })
+			play("kaching", { detune: 2 * storeElements[name].objectAmount })
 		}
 	}))
 	
 	mainElement.onMousePress("right", (() => {
 		if (mainElement.isHovering()) {
-			variables[name].objectAmount -= variables.amountToBuy
+			storeElements[name].objectAmount -= storeElements.amountToBuy
 			bop(mainElement, 0.05)
-			play("kaching", { detune: 2 * variables[name].objectAmount })
+			play("kaching", { detune: 2 * storeElements[name].objectAmount })
 		}
 	}))
 
 	mainElement.add([
-		text(`${name}: ${variables[name].objectAmount}`),
+		text(`${name}: ${storeElements[name].objectAmount}`),
 		color(BLACK),
 		anchor("center"),
 		{
 			update() {
-				this.text = `${name}: ${variables[name].objectAmount}`
+				this.text = `${name}: ${storeElements[name].objectAmount}`
 			}
 		}
 	])
@@ -77,7 +78,7 @@ export function addElement(name = "clickers") {
 		pos(0, 20),
 		{
 			update() {
-				this.text = `The price for the next is: $${getPrice(variables[name].basePrice, variables[name].percentageIncrease, variables[name].objectAmount, variables.amountToBuy)}`
+				this.text = `The price for the next is: $${getPrice(storeElements[name].basePrice, storeElements[name].percentageIncrease, storeElements[name].objectAmount, storeElements.amountToBuy)}`
 			}
 		}
 	])
@@ -96,29 +97,29 @@ export function addElement(name = "clickers") {
 
 	basePriceBox.onMousePress("left", (() => {
 		if (basePriceBox.isHovering()) {
-			variables[name].basePrice++ 
+			storeElements[name].basePrice++ 
 			bop(basePriceBox, 0.05)
-			play("generalClick", { detune: 30 * variables[name].basePrice})
+			play("generalClick", { detune: 30 * storeElements[name].basePrice})
 		}
 	}))
 	
 	basePriceBox.onMousePress("right", (() => {
 		if (basePriceBox.isHovering()) {
-			variables[name].basePrice-- 
+			storeElements[name].basePrice-- 
 			bop(basePriceBox, 0.05)
-			play("generalClick", { detune: 30 * variables[name].basePrice})
+			play("generalClick", { detune: 30 * storeElements[name].basePrice})
 		}
 	}))
 
 	basePriceBox.add([
-		text(variables[name].basePrice, {
+		text(storeElements[name].basePrice, {
 			size: 20,
 		}),
 		anchor("center"),
 		color(BLACK),
 		{
 			update() {
-				this.text = "$" + variables[name].basePrice
+				this.text = "$" + storeElements[name].basePrice
 			}
 		}
 	])
@@ -146,29 +147,29 @@ export function addElement(name = "clickers") {
 
 	percentageIncreaseBox.onMousePress("left", (() => {
 		if (percentageIncreaseBox.isHovering()) {
-			variables[name].percentageIncrease++ 
+			storeElements[name].percentageIncrease++ 
 			bop(percentageIncreaseBox, 0.05)
-			play("generalClick", { detune: 30 * variables[name].basePrice})
+			play("generalClick", { detune: 30 * storeElements[name].basePrice})
 		}
 	}))
 	
 	percentageIncreaseBox.onMousePress("right", (() => {
 		if (percentageIncreaseBox.isHovering()) {
-			variables[name].percentageIncrease--
+			storeElements[name].percentageIncrease--
 			bop(percentageIncreaseBox, 0.05)
-			play("generalClick", { detune: 30 * variables[name].basePrice})
+			play("generalClick", { detune: 30 * storeElements[name].basePrice})
 		}
 	}))
 
 	percentageIncreaseBox.add([
-		text(variables[name].percentageIncrease, {
+		text(storeElements[name].percentageIncrease, {
 			size: 20,
 		}),
 		anchor("center"),
 		color(BLACK),
 		{
 			update() {
-				this.text = variables[name].percentageIncrease + "%"
+				this.text = storeElements[name].percentageIncrease + "%"
 			}
 		}
 	])
@@ -187,9 +188,45 @@ export function gamescene() {
 	return scene("gamescene", () => {
 		// put in the first scene that the game starts in
 		volumeManager()
-
-		if (get("bg").length == 0) addBackground()
 		
+		setCursor("default")
+		if (get("bg").length == 0) addBackground()
+		if (get("arrow").length == 0) {
+			let arrow = add([
+				text("->", {
+					size: 40,
+				}),
+				pos(width() - 50, 35),
+				color(WHITE),
+				anchor("center"),
+				stay(),
+				area(),
+				"arrow",
+				{
+					scene: "gamescene",
+					update() {
+						if (!get("element").length == 0) {this.scene = "gamescene"; this.text = "->"} 
+						else {this.scene = "upgradescene"; this.text = "<-"}
+					
+						if (this.isHovering() && isMousePressed("left")) {
+							if (this.scene == "gamescene") {
+								save("storeElements", storeElements)
+								go("upgradescene")
+							}
+			
+							else {
+								save("upgradePriceData", upgradePriceData)
+								go("gamescene")
+							}
+
+							play("generalClick")
+							bop(this)
+						}
+					}
+				}
+			])
+		}
+
 		add([
 			text("Left Click -> Buy+\nRight Click -> Decrease-", {
 				size: 20
@@ -198,36 +235,20 @@ export function gamescene() {
 			color(WHITE),
 		])
 
-		variables = getData("variables", variables)
+		storeElements = getData("storeElements", storeElements)
 
 		addElement("clickers")
 		addElement("cursors")
 		addElement("powerups")
 	
 		onKeyPress("c", () => {
-			GameState.variables = variables
-			setData("variables", GameState.variables)
-
-			let savedText = add([
-				text("Buy-data saved"),
-				pos(width(), height() + 50),
-				color(rgb(154, 255, 150)),
-				anchor("right"),
-				opacity(1),
-			])
-
-			tween(savedText.pos.y, height() - 25, 0.5, (p) => savedText.pos.y = p, easings.easeOutQuint)
-			wait(2, () => {
-				tween(savedText.opacity, 0, 0.25, (p) => savedText.opacity = p, easings.easeOutQuint).onEnd(() => {
-					destroy(savedText)
-				})
-			})
+			save("storeElements", storeElements)
 		})
 
 		onKeyPress("v", () => {
-			variables = new variablesClass()
-			GameState.variables = variables
-			setData("variables", GameState.variables)
+			storeElements = new storeElementClass()
+			GameState.storeElements = storeElements
+			setData("storeElements", GameState.storeElements)
 			
 			let savedText = add([
 				text("Buy-data deleted"),
@@ -246,9 +267,9 @@ export function gamescene() {
 		})
 
 		onKeyPress("b", () => {
-			variables.clickers.objectAmount = 1000000
-			variables.cursors.objectAmount = 50000
-			variables.powerups.objectAmount = 100
+			storeElements.clickers.objectAmount = 1000000
+			storeElements.cursors.objectAmount = 50000
+			storeElements.powerups.objectAmount = 100
 
 			let savedText = add([
 				text("Buy-data cheated"),
@@ -267,6 +288,7 @@ export function gamescene() {
 		})
 
 		onKeyPress("right", () => {
+			save("storeElements", storeElements)
 			go("upgradescene")
 		})
 	})

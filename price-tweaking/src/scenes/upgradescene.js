@@ -1,23 +1,29 @@
-import { bop } from "./utils"
+import { bop, save } from "./utils"
 
-let upgradePriceData = {
-	"u_0": 10,
-	"u_1": 30,
-	"u_2": 100,
-	"u_3": 300,
-	"u_4": 1000,
-	"u_5": 3000,
-	"u_6": 10000,
-	"u_7": 30000,
-	"u_8": 100000,
-	"u_9": 300000,
-	"u_10": 1000000,
-	"u_11": 3000000,
-	"u_12": 10000000,
-	"u_13": 30000000,
-	"u_14": 100000000,
-	"u_15": 300000000,
+class upgradeClass {
+	constructor() {
+		this.upgrades = {
+			"u_0": 10,
+			"u_1": 30,
+			"u_2": 100,
+			"u_3": 300,
+			"u_4": 1000,
+			"u_5": 3000,
+			"u_6": 10000,
+			"u_7": 30000,
+			"u_8": 100000,
+			"u_9": 300000,
+			"u_10": 1000000,
+			"u_11": 3000000,
+			"u_12": 10000000,
+			"u_13": 30000000,
+			"u_14": 100000000,
+			"u_15": 300000000,
+		}
+	}
 }
+
+export let upgradePriceData = new upgradeClass()
 
 function deactivateAllTextboxes() {
 	get("upgrade", { recursive: true }).forEach((obj) => {
@@ -69,17 +75,12 @@ export function addUpgrade(type, idx) {
 					if (this.textObj.text[this.textObj.text.length - 1] == "$") return
 					this.textObj.text = this.textObj.text.slice(0, -1)
 				})
-
-				bg.onKeyPress("enter", () => {
-					if (!get("clickable").some((obj) => obj.isHovering()) && get("textbox").length > 0) {
-						deactivateAllTextboxes()
-					}
-				})
 			},
 
 			closeTextBox() {
 				if (!this.active) return
-				upgradePriceData["u_" + this.idx] = this.textObj.text.replace("$", "")
+				if (this.textObj.text[this.textObj.text.length - 1] == "$") return
+				upgradePriceData.upgrades["u_" + this.idx] = parseInt(this.textObj.text.replace("$", ""))
 				this.textObj.color = WHITE
 				destroy(get("textbox")[0])
 				this.active = false
@@ -122,7 +123,7 @@ export function addUpgrade(type, idx) {
 			upgrade: upgrade,
 			update() {
 				// u referring to upgrade not to misc upgrade
-				if (!upgrade.active) this.text = "$" + upgradePriceData["u_" + idx] 
+				if (!upgrade.active) this.text = "$" + upgradePriceData.upgrades["u_" + idx]
 			}
 		}
 	])
@@ -133,6 +134,10 @@ export function addUpgrade(type, idx) {
 export function upgradescene() {
 	return scene("upgradescene", () => {
 		
+		upgradePriceData = getData("upgradePriceData", upgradePriceData)
+
+		setCursor("default")
+
 		for(let i = 0; i < 16; i++) {
 			let type = "k_";
 
@@ -157,18 +162,28 @@ export function upgradescene() {
 
 		onClick("clickable", (obj) => {
 			if (obj.is("upgrade")) {
-				bop(obj, 0.05)
-				play("generalClick", { detune: 10 * obj.idx })
-				obj.addTextBox()
+				if (obj.active) obj.closeTextBox()
+				else obj.addTextBox()
 			}
-
+			
 			else {
-				obj.upgrade.addTextBox()
+				if (obj.upgrade.active) obj.upgrade.closeTextBox()
+				else obj.upgrade.addTextBox()
 			}
+	
+			bop(obj, 0.05)
+			play("generalClick", { detune: obj.is("upgrade") ? 10 * obj.idx : 10 * obj.upgrade.idx })
 		})
 
 		onKeyPress("left", () => {
+			save("upgradePriceData", upgradePriceData)
 			go("gamescene")
+		})
+
+		onKeyPress("enter", () => {
+			if (get("textbox").length > 0) {
+				deactivateAllTextboxes()
+			}
 		})
 	})
 }
