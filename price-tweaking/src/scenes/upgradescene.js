@@ -26,8 +26,8 @@ class upgradeClass {
 export let upgradePriceData = new upgradeClass()
 
 function deactivateAllTextboxes() {
-	get("upgrade", { recursive: true }).forEach((obj) => {
-		obj.closeTextBox()		
+	get("upgrade").forEach(upgrade => {
+		if (upgrade.active) upgrade.closeTextBox()
 	})
 }
 
@@ -78,7 +78,6 @@ export function addUpgrade(type, idx) {
 			},
 
 			closeTextBox() {
-				if (!this.active) return
 				if (this.textObj.text[this.textObj.text.length - 1] == "$") return
 				upgradePriceData.upgrades["u_" + this.idx] = parseInt(this.textObj.text.replace("$", ""))
 				this.textObj.color = WHITE

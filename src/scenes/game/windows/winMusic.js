@@ -157,9 +157,6 @@ export function musicWinContent(winParent) {
 		"hoverObj",
 		"musicButton",
 		"windowButton",
-		{
-			defScale: vec2(1),
-		}
 	])
 
 	let pauseButton = winParent.add([
@@ -173,9 +170,6 @@ export function musicWinContent(winParent) {
 		"hoverObj",
 		"musicButton",
 		"windowButton",
-		{
-			defScale: vec2(1),
-		}
 	])
 
 	let skipButton = winParent.add([
@@ -189,9 +183,6 @@ export function musicWinContent(winParent) {
 		"hoverObj",
 		"musicButton",
 		"windowButton",
-		{
-			defScale: vec2(1),
-		}
 	])
 
 	// each tim you click it waits one seonc, if the time since the skip is greater than 1 it plays the song

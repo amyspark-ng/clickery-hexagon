@@ -7,17 +7,17 @@ class storeElementClass {
 	constructor() {
 		this.amountToBuy = 1;
 		this.clickers = {
-			objectAmount: 1,
-			basePrice: 22,
+			objectAmount: 0,
+			basePrice: 25,
 			percentageIncrease: 15,
 		};
 		this.cursors = {
-			objectAmount: 1,
+			objectAmount: 0,
 			basePrice: 40,
 			percentageIncrease: 15,
 		};
 		this.powerups = {
-			objectAmount: 1,
+			objectAmount: 0,
 			basePrice: 60,
 			percentageIncrease: 15,
 		};
@@ -66,7 +66,7 @@ export function addElement(name = "clickers") {
 		anchor("center"),
 		{
 			update() {
-				this.text = `${name}: ${storeElements[name].objectAmount}`
+				this.text = `${name}: ${name == "clickers" ? storeElements[name].objectAmount + 1 : storeElements[name].objectAmount}`
 			}
 		}
 	])
@@ -97,7 +97,7 @@ export function addElement(name = "clickers") {
 
 	basePriceBox.onMousePress("left", (() => {
 		if (basePriceBox.isHovering()) {
-			storeElements[name].basePrice++ 
+			storeElements[name].basePrice += storeElements.amountToBuy
 			bop(basePriceBox, 0.05)
 			play("generalClick", { detune: 30 * storeElements[name].basePrice})
 		}
@@ -105,7 +105,7 @@ export function addElement(name = "clickers") {
 	
 	basePriceBox.onMousePress("right", (() => {
 		if (basePriceBox.isHovering()) {
-			storeElements[name].basePrice-- 
+			storeElements[name].basePrice -= storeElements.amountToBuy 
 			bop(basePriceBox, 0.05)
 			play("generalClick", { detune: 30 * storeElements[name].basePrice})
 		}
@@ -147,7 +147,7 @@ export function addElement(name = "clickers") {
 
 	percentageIncreaseBox.onMousePress("left", (() => {
 		if (percentageIncreaseBox.isHovering()) {
-			storeElements[name].percentageIncrease++ 
+			storeElements[name].percentageIncrease += storeElements.amountToBuy 
 			bop(percentageIncreaseBox, 0.05)
 			play("generalClick", { detune: 30 * storeElements[name].basePrice})
 		}
@@ -155,7 +155,7 @@ export function addElement(name = "clickers") {
 	
 	percentageIncreaseBox.onMousePress("right", (() => {
 		if (percentageIncreaseBox.isHovering()) {
-			storeElements[name].percentageIncrease--
+			storeElements[name].percentageIncrease -= storeElements.amountToBuy
 			bop(percentageIncreaseBox, 0.05)
 			play("generalClick", { detune: 30 * storeElements[name].basePrice})
 		}
@@ -222,16 +222,24 @@ export function gamescene() {
 							play("generalClick")
 							bop(this)
 						}
+
+						if (isKeyDown("control")) {
+							storeElements.amountToBuy = 10
+						}
+						
+						else {
+							storeElements.amountToBuy = 1
+						}
 					}
 				}
 			])
 		}
 
 		add([
-			text("Left Click -> Buy+\nRight Click -> Decrease-", {
+			text("Control -> x10\nLeft Click -> Buy+\nRight Click -> Decrease-", {
 				size: 20
 			}),
-			pos(0, height() - 40),
+			pos(0, height() - 60),
 			color(WHITE),
 		])
 

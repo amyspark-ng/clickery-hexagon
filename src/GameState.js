@@ -20,7 +20,7 @@ export let GameState = {
 	score: 0,
 	totalScore: 0,
 	
-	clickers: 1,
+	clickers: 0,
 	clicksUpgrades: 0, // multiplier for clicks
 	clickPercentage: 0,
 

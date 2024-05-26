@@ -1,10 +1,6 @@
 import { GameState } from "../../GameState.js";
 import { waver } from "../../plugins/wave.js";
-import { actualScorePerSecond } from "./addHexagon.js";
-
 import { formatNumber } from "./utils.js";
-import { isDraggingWindow, isGenerallyHoveringWindow } from "./windows/WindowsMenu.js";
-import { storeOpen } from "./windows/winStore.js";
 
 export let scoreText;
 export let spsText;
@@ -22,13 +18,13 @@ export function uiCounters() {
 		pos(center().x, 60),
 		waver({ maxAmplitude: 5, wave_speed: 0.5 }),
 		{
-			defScale: 1,
+			defaultScale: 1,
 			update() {
 				this.text = `${formatNumber(Math.round(GameState.score), false, false)}` 
 				this.angle = wave(-2.8, 2.8, time() * 1.25)
 				this.scale.x = wave(0.95, 1.08, time() * 1.15)
 				this.scale.y = wave(0.95, 1.08, time() * 1.15)
-				this.defScale = vec2(this.scale.x, this.scale.y)
+				this.defaultScale = vec2(this.scale.x, this.scale.y)
 			}
 		}
 	])
@@ -41,11 +37,11 @@ export function uiCounters() {
 		}),
 		anchor("center"),
 		pos(0, scoreText.pos.y - 14),
+		// can't put text change here bc it would update to 0 each second
 	])
-	// can't put text change here bc it would update to 0 each second
 
 	buildingsText = add([
-		text(`${GameState.cursors}<\n${GameState.clickers}x`, {
+		text(`${GameState.cursors}<\n${GameState.clickers + 1}x`, {
 			size: 40,
 			lineSpacing: 1.5,
 		}),
@@ -54,7 +50,7 @@ export function uiCounters() {
 		waver({ maxAmplitude: 8, wave_speed: 0.8 }),
 		{
 			update() {
-				this.text = `${GameState.cursors}<\n${GameState.clickers}x`
+				this.text = `${GameState.cursors}<\n${GameState.clickers + 1}x`
 			}
 		}
 	])

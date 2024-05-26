@@ -53,10 +53,10 @@ export function getPrice(basePrice, percentageIncrease, objectAmount, amountToBu
     let priceToReturn = 0;
 
     for (let i = 0; i < amountToBuy; i++) {
-        let currentPrice = basePrice + ((basePrice * percentageIncrease) / 100) * objectAmount * (i + 1);
+        let currentPrice = basePrice * Math.pow(1 + percentageIncrease / 100, objectAmount + i);
         priceToReturn += Math.round(currentPrice);
     }
-    
+
     return priceToReturn;
 }
 

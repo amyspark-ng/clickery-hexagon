@@ -242,9 +242,6 @@ export function colorWinContent(winParent, winType = "hexColorWin") {
 		anchor("center"),
 		scale(1),
 		"windowButton",
-		{
-			defScale: vec2(1),
-		}
 	])
 
 	let randomButton = winParent.add([
@@ -256,9 +253,6 @@ export function colorWinContent(winParent, winType = "hexColorWin") {
 		anchor("center"),
 		scale(1),
 		"windowButton",
-		{
-			defScale: vec2(1),
-		}
 	])
 
 	if (winType == "hexColorWin") {

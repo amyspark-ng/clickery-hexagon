@@ -153,8 +153,8 @@ function addStoreElement(parent, settings = {
 
 				if (!isDraggingWindow) {
 					if (btn.is("ClicksElement")) {
-						btn.price = getPrice(btn.basePrice, btn.percentageIncrease, GameState.clickers - 1, amountBeingBought)
-						this.text = `${btn.price}\n${GameState.clickers}`
+						btn.price = getPrice(btn.basePrice, btn.percentageIncrease, GameState.clickers, amountBeingBought)
+						this.text = `${btn.price}\n${GameState.clickers + 1}`
 					}
 	
 					else if (btn.is("CursorsElement")) {
@@ -188,11 +188,6 @@ function addStoreElement(parent, settings = {
 		else btn.color = rgb(90, 90, 90)
 	})
 
-	onKeyPress("l", () => {
-		let FUCK = getPrice(25, 15, 1, 10)
-		debug.log(FUCK)
-	})
-	
 	let timer = 0;
 	let timeUntilAnotherBuy = 1
 	let timesBoughtWhileHolding = 0

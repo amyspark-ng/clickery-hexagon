@@ -1,15 +1,22 @@
 
 import { GameState } from "../../GameState.js";
-import { gamescene, scoreNeededToAscend, scorePerAutoClick, scorePerClick } from "./gamescene.js";
 import { scoreText, spsText } from "./uiCounter.js";
-import { addPlusScoreText, mouse, formatNumber, changeValueBasedOnAnother, gameBg, bop, arrayToColor } from "./utils.js";
+import { addPlusScoreText, mouse, formatNumber, arrayToColor } from "./utils.js";
 import { playSfx } from "../../sound.js";
-import { isDraggingWindow, isGenerallyHoveringWindow, isPreciselyHoveringWindow, manageWindow, openWindow } from "./windows/WindowsMenu.js";
+import { isDraggingWindow, isGenerallyHoveringWindow, isPreciselyHoveringWindow, manageWindow } from "./windows/WindowsMenu.js";
 import { waver } from "../../plugins/wave.js";
-import { trail } from "../../plugins/trail.js";
 
-let hoverRotSpeedIncrease = 0.01 * 0.25
-let maxRotSpeed = 10
+export let scoreVars = {
+	scorePerClick: 1,
+	scorePerAutoClick: 0,
+	autoScorePerSecond: 0, // the score per second you're getting automatically
+	actualScorePerSecond: 0, // the actual and current score per second - used in the ui
+	scoreNeededToAscend: 1000000
+}
+
+export let clickVars = {
+	clicksPerSecond: 0, // to properly calculate sps
+}
 
 export let autoScorePerSecond = 0; // the score per second you're getting automatically
 export let actualScorePerSecond = 0; // the actual and current score per second
@@ -23,6 +30,9 @@ let timeTilClick = constTimeTilClick
 let isWaitingToClick = false
 
 export let hexagon;
+
+let hoverRotSpeedIncrease = 0.01 * 0.25
+let maxRotSpeed = 10
 
 export function autoClick() {
 	let autoCursor = add([
@@ -89,8 +99,8 @@ export function autoClick() {
 				autoCursor.play("point")
 
 				hexagon.clickRelease(false)
-				addPlusScoreText(autoCursor.pos, scorePerAutoClick, [32.5, 40])
-				GameState.addScore(scorePerAutoClick)
+				addPlusScoreText(autoCursor.pos, scoreVars.scorePerAutoClick, [32.5, 40])
+				GameState.addScore(scoreVars.scorePerAutoClick)
 
 				// has done its bidding, time to roll and dissapear
 				autoCursor.use(area({ collisionIgnore: ["cursor"] }))
@@ -146,7 +156,7 @@ export function addHexagon() {
 		{
 			smallestScale: 0.985,
 			biggestScale: 1.0015,
-			defScale: vec2(1),
+			defaultScale: vec2(1),
 			scaleIncrease: 1,
 			stretchScaleIncrease: 1,
 			canClick: true,
@@ -157,9 +167,9 @@ export function addHexagon() {
 			update() {
 				if (this.isHovering()) maxRotSpeed = 13
 				else maxRotSpeed = 10
-				this.rotationSpeed = map(GameState.score, 0, scoreNeededToAscend, 0.01, maxRotSpeed)
+				this.rotationSpeed = map(GameState.score, 0, scoreVars.scoreNeededToAscend, 0.01, maxRotSpeed)
 				this.rotationSpeed = clamp(this.rotationSpeed, 0.01, maxRotSpeed)
-				this.wave_speed = map(GameState.score, 0, scoreNeededToAscend, 1, 2)
+				this.wave_speed = map(GameState.score, 0, scoreVars.scoreNeededToAscend, 1, 2)
 				this.wave_speed = clamp(this.wave_speed, 1, 2)
 				this.angle += this.rotationSpeed
 				
@@ -168,27 +178,6 @@ export function addHexagon() {
 
 				if (this.angle >= 360) {
 					this.angle = 0
-				}
-
-				// sps
-				secondTimerForClicks += dt();
-				if (secondTimerForClicks > 1) {
-					secondTimerForClicks = 0;
-					spsText.text = actualScorePerSecond + "/s"
-					clicksPerSecond = 0;
-				}
-				// this is for when you leave the game
-				autoScorePerSecond = GameState.cursors / GameState.timeUntilAutoLoopEnds
-				// the other stuff
-				actualScorePerSecond = (clicksPerSecond * scorePerClick) + autoScorePerSecond
-				actualScorePerSecond = actualScorePerSecond.toFixed(1);
-				actualScorePerSecond = formatNumber(actualScorePerSecond, true, false)
-
-				if (timeTilClick > 0) {
-					timeTilClick -= dt()
-				}
-				else if (isWaitingToClick) {
-					isWaitingToClick = false
 				}
 			},
 			
@@ -215,7 +204,7 @@ export function addHexagon() {
 					isWaitingToClick = true
 					timeTilClick = constTimeTilClick
 					
-					clicksPerSecond++
+					clickVars.clicksPerSecond++
 					mouse.release()
 				}
 
@@ -245,14 +234,7 @@ export function addHexagon() {
 					tween(this.scaleIncrease, 1, 0.35, (p) => this.scaleIncrease = p, easings.easeOutCubic);
 					this.isBeingClicked = false
 					this.rotationSpeed = 0
-					if ((!isGenerallyHoveringWindow && !isDraggingWindow)) mouse.play("cursor")
 				}
-
-				// this.play("regular")
-
-				// if (this.is("shader")) {
-				// 	this.unuse("shader")
-				// }
 			}
 		}
 	])
@@ -267,8 +249,9 @@ export function addHexagon() {
 	})
 
 	hexagon.onHoverEnd(() => {
-		if (!isPreciselyHoveringWindow && !isDraggingWindow)
-		hexagon.endHover()
+		if (!isPreciselyHoveringWindow && !isDraggingWindow) {
+			hexagon.endHover()
+		}
 	});
 
 	hexagon.onMousePress("left", () => {
@@ -283,10 +266,10 @@ export function addHexagon() {
 		if (hexagon.isHovering()) {
 			if (hexagon.canClick && hexagon.isBeingClicked && !isWaitingToClick && (!get("window").some(w => w.isMouseInPreciseRange()) && !isDraggingWindow)) {
 				hexagon.clickRelease(true)
-				addPlusScoreText(mouse.pos, scorePerClick)
-				GameState.addScore(scorePerClick)
-				tween(scoreText.scale, scoreText.defScale.add(vec2(0.05, 0.05)), 0.2, (p) => scoreText.scale = p, easings.easeOutQuint).onEnd(() => {
-					tween(scoreText.scale, scoreText.defScale, 0.2, (p) => scoreText.scale = p, easings.easeOutElastic)
+				addPlusScoreText(mouse.pos, scoreVars.scorePerClick)
+				GameState.addScore(scoreVars.scorePerClick)
+				tween(scoreText.scale, scoreText.defaultScale.add(vec2(0.05, 0.05)), 0.2, (p) => scoreText.scale = p, easings.easeOutQuint).onEnd(() => {
+					tween(scoreText.scale, scoreText.defaultScale, 0.2, (p) => scoreText.scale = p, easings.easeOutElastic)
 				})
 			}
 		}
@@ -295,6 +278,40 @@ export function addHexagon() {
 	hexagon.onMousePress("right", () => {
 		if (hexagon.isHovering()) {
 			manageWindow("hexColorWin")
+		}
+	})
+
+	// score setting stuff
+	hexagon.onUpdate(() => {
+		scoreVars.scorePerClick = GameState.clickers + 1
+		scoreVars.scorePerAutoClick = GameState.cursors
+
+		// scorePerClick = GameState.clicksUpgrades > 0 ? GameState.clickers * GameState.clicksUpgrades : GameState.clickers
+		// scorePerClick += Math.round(percentage(scorePerClick, GameState.clickPercentage))
+		// scorePerAutoClick = GameState.cursorUpgrades > 0 ? GameState.cursors * GameState.cursorUpgrades : GameState.cursors
+		// scorePerAutoClick += Math.round(percentage(scorePerAutoClick, GameState.cursorsPercentage))
+
+		// sps
+		secondTimerForClicks += dt();
+		if (secondTimerForClicks > 1) {
+			secondTimerForClicks = 0;
+			spsText.text = scoreVars.actualScorePerSecond + "/s"
+			clickVars.clicksPerSecond = 0;
+		}
+
+		// this is for when you leave the game
+		scoreVars.autoScorePerSecond = GameState.cursors / GameState.timeUntilAutoLoopEnds
+		// the other stuff
+		scoreVars.actualScorePerSecond = (clickVars.clicksPerSecond * scoreVars.scorePerClick) + scoreVars.autoScorePerSecond
+		scoreVars.actualScorePerSecond = scoreVars.actualScorePerSecond.toFixed(1);
+		scoreVars.actualScorePerSecond = formatNumber(scoreVars.actualScorePerSecond, true, false)
+
+		if (timeTilClick > 0) {
+			timeTilClick -= dt()
+		}
+
+		else if (isWaitingToClick) {
+			isWaitingToClick = false
 		}
 	})
 

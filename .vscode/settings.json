@@ -1,5 +1,6 @@
 {
-	"files.exclude": {
-		"**/price-tweaking": true
+	"search.exclude": {
+		"**/price-tweaking": true,
+		"**/www/game.js": true
 	}
 }

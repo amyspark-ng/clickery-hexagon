@@ -1,7 +1,6 @@
 import { GameState } from "../../GameState";
-import { autoLoopTime, excessTime, scorePerAutoClick } from "./gamescene";
-import { autoClick, autoScorePerSecond, hexagon } from "./addHexagon";
-import { trail } from "../../plugins/trail";
+import { autoLoopTime, excessTime } from "./gamescene";
+import { autoClick, hexagon } from "./addHexagon";
 import { isHoveringUpgrade, storeOpen } from "./windows/winStore";
 import { isDraggingWindow, isGenerallyHoveringWindow, isPreciselyHoveringWindow, manageWindow, openWindow } from "./windows/WindowsMenu";
 
@@ -57,10 +56,10 @@ export function getPrice(basePrice, percentageIncrease, objectAmount, amountToBu
     let priceToReturn = 0;
 
     for (let i = 0; i < amountToBuy; i++) {
-        let currentPrice = basePrice + ((basePrice * percentageIncrease) / 100) * objectAmount * (i + 1);
+        let currentPrice = basePrice * Math.pow(1 + percentageIncrease / 100, objectAmount + i);
         priceToReturn += Math.round(currentPrice);
     }
-    
+
     return priceToReturn;
 }
 
@@ -242,7 +241,6 @@ export function addBackground() {
 		color(),
 		z(0),
 		{
-			defScale: vec2(1),
 			speed: 0.1,
 			movAngle: 5,
 			uScale: 2,
@@ -359,13 +357,7 @@ export function addMouse() {
 			}
 		}
 
-		else if (obj.is("xButton") || obj.is("windowButton")) {
-			if (!isDraggingWindow) {
-				mouse.play("point")
-			}
-		}
-
-		else if (obj.is("storeElement")) {
+		else if (obj.is("storeElement") || obj.is("upgrade")) {
 			if (!isDraggingWindow) {
 				if (!isHoveringUpgrade) {
 					if (GameState.score >= obj.price) {
@@ -378,20 +370,15 @@ export function addMouse() {
 			}
 		}
 	
-		else if (obj.is("upgrade")) {
+		else if (obj.is("xButton") || obj.is("windowButton") || obj.is("foldButton") || obj.is("minibutton")) {
 			if (!isDraggingWindow) {
-				if (GameState.score >= obj.price) {
-					mouse.play("point")
-				}
-				else {
-					mouse.play("cursor") 
-				}
+				mouse.play("point")
 			}
 		}
-	
+
 		else {
 			if (!isGenerallyHoveringWindow && !isDraggingWindow) {
-				mouse.play("point")
+				mouse.play("cursor")
 			}
 		}
 	})
@@ -774,11 +761,11 @@ export function saveAnim() {
 	})
 }
 
-export function bop(obj) {
-	if (obj.defScale || obj.is("scale")) {
-		tween(obj.scale, obj.defScale.sub(0.1), 0.15, (p) => obj.scale = p, easings.easeOutQuint).then(() => {
-			tween(obj.scale, obj.defScale, 0.15, (p) => obj.scale = p, easings.easeOutQuint)
-		})
-	}
-	else debug.log("this object does not have defScale :(")
+export function bop(obj, howMuch = 0.1) {
+	if (!obj.is("scale")) obj.use(scale(1))
+	if (!obj.bopDefScale) obj.bopDefScale = obj.scale
+
+	tween(obj.scale, obj.bopDefScale.sub(howMuch), 0.15, (p) => obj.scale = p, easings.easeOutQuint).then(() => {
+		tween(obj.scale, obj.bopDefScale, 0.15, (p) => obj.scale = p, easings.easeOutQuint)
+	})
 }

@@ -14,9 +14,11 @@
 - Random chance of +1 making something funny
 - Make pinch animation
 - Rework tooltips
+- End reworking the scoretext animations
 ## Windows
 - If hasn't unlocked folderObj i think GameState.unlockedWindows should be null
 - Can hover stuff while hovering another window
+- Random bug where the mouse plays point when starting hovering a window sometimes from hexagon
 
 ### Store
 

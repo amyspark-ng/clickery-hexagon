@@ -75,7 +75,7 @@ export function addMinibutton(i, xPosition) {
 		{
 			idx: i,
 			verPosition: folderObj.pos.y,
-			defScale: vec2(1),
+			defaultScale: vec2(1),
 			window: get(`${Object.keys(infoForWindows)[i]}`, { recursive: true })[0],
 			windowInfo: infoForWindows[Object.keys(infoForWindows)[i]],
 			whiteness: 0,
@@ -84,7 +84,7 @@ export function addMinibutton(i, xPosition) {
 				if (isDraggingWindow) return
 				tween(miniButton.pos.y, miniButton.verPosition - 5, 0.32, (p) => miniButton.pos.y = p, easings.easeOutQuint)
 				tween(miniButton.scale, vec2(1.05), 0.32, (p) => miniButton.scale = p, easings.easeOutQuint)
-				miniButton.defScale = vec2(1.05)
+				this.defaultScale = vec2(1.05)
 				playSfx("hoverMiniButton", 100 * miniButton.windowInfo.idx / 4)
 			},
 
@@ -93,7 +93,7 @@ export function addMinibutton(i, xPosition) {
 				tween(miniButton.pos.y, miniButton.verPosition, 0.32, (p) => miniButton.pos.y = p, easings.easeOutQuint)
 				tween(miniButton.angle, 0, 0.32, (p) => miniButton.angle = p, easings.easeOutQuint)
 				tween(miniButton.scale, vec2(1), 0.32, (p) => miniButton.scale = p, easings.easeOutQuint)
-				miniButton.defScale = vec2(1.05)
+				miniButton.defaultScale = vec2(1.05)
 			},
 			
 			manageRespectiveWindow(button = this) {
@@ -284,9 +284,9 @@ export function openWindow(name = "") {
 			hexagon.endHover()
 		}
 
-		if (!isDraggingWindow && mouse.play("cursor"))
+		mouse.play("cursor")
 
-		if (!windowObj.showable) return
+		if (folded) return;
 		get("minibutton").forEach(minibuttonHoverEndCheck => {
 			if (minibuttonHoverEndCheck.isHovering()) {
 				minibuttonHoverEndCheck.endHover()
@@ -298,10 +298,9 @@ export function openWindow(name = "") {
 		// debug.log("end hover")
 		if (hexagon.isHovering() && !isDraggingWindow) {
 			hexagon.startHover()
-			// debug.log("start hex hover")
 		}
 
-		if (!windowObj.showable) return
+		if (folded) return;
 		get("minibutton").forEach(minibuttonHoverEndCheck => {
 			if (minibuttonHoverEndCheck.isHovering() && !isDraggingWindow && !isGenerallyHoveringWindow) {
 				minibuttonHoverEndCheck.startHover()
@@ -388,7 +387,7 @@ export function folderObjManaging() {
 		"hoverObj",
 		"foldButton",
 		{
-			defScale: vec2(2),
+			defaultScale: vec2(2),
 			unfold() {
 				folded = false
 				timeSinceFold = 0
@@ -476,12 +475,13 @@ export function folderObjManaging() {
 			hexagon.startHover()
 		}
 
-		isGenerallyHoveringWindow = get("window", { recursive: true }).some((window) => window.isMouseInGeneralRange())
-		isPreciselyHoveringWindow = get("window", { recursive: true }).some((window) => window.isMouseInPreciseRange())
 		wait(0.05, () => {
 			// gets the topmost window
 			let allWindows = get("window", { recursive: true })
 			if (allWindows.length > 0) allWindows[clamp(allWindows.length - 1, 0, allWindows.length)].activate()
+
+			isGenerallyHoveringWindow = get("window", { recursive: true }).some((window) => window.isMouseInGeneralRange())
+			isPreciselyHoveringWindow = get("window", { recursive: true }).some((window) => window.isMouseInPreciseRange())
 		})
 	})
 

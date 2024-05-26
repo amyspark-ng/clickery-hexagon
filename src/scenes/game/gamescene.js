@@ -1,5 +1,5 @@
 import { GameState } from "../../GameState"
-import { actualScorePerSecond, addHexagon, autoClick, autoScorePerSecond, hexagon } from "./addHexagon.js"
+import { scoreVars, addHexagon, autoClick, hexagon } from "./addHexagon.js"
 import { uiCounters } from "./uiCounter"
 import { addBackground, addMouse, addToast, debugFunctions, debugTexts, mouse, percentage } from "./utils"
 import { musicHandler, playMusic } from "../../sound"
@@ -7,27 +7,18 @@ import { folderObjManaging, unlockWindow, windowsDefinition } from "./windows/Wi
 import { songs } from "./windows/winMusic"
 import { curDraggin, setCurDraggin } from "../../plugins/drag"
 
-export let scorePerClick = 1
-export let scorePerAutoClick = 1
-export let scoreNeededToAscend = 1000000
-
 // debug
 let cameraScale = 1
 
 let panderitoLetters = "panderito".split("")
 export let panderitoIndex = 0
 
-export let autoLoopTime = 0;
-
-let clickVars = {
-	autoScorePerSecond: autoScorePerSecond,
-	actualScorePerSecond: actualScorePerSecond
-}
-
 let isTabActive = true; // Variable to track if the tab is currently active
 let totalTimeOutsideTab = 0; // Variable to store the total time the user has been outside of the tab ; Miliseconds
 let startTimeOutsideTab; // Variable to store the start time when the tab becomes inactive
 export let excessTime = 0; // Time that has passed after autoLoopTime
+
+export let autoLoopTime = 0;
 
 export function gamescene() {
 	return scene("gamescene", () => {
@@ -62,6 +53,7 @@ export function gamescene() {
 
 		onUpdate(() => {
 			GameState.score = clamp(GameState.score, 0, Infinity)
+			GameState.score = Math.round(GameState.score)
 			debugFunctions()
 			
 			if (GameState.score > 50) {
@@ -72,13 +64,9 @@ export function gamescene() {
 				if (!GameState.unlockedWindows.includes("musicWin")) unlockWindow("musicWin")
 			}
 
-			// allowed i guess
-			GameState.score = Math.round(GameState.score)
 			// auto loop stuff
 			if (GameState.cursors >= 1) {
 				autoLoopTime += dt()
-				// debug.log(`Time left til click: ${GameState.timeUntilAutoLoopEnds - autoLoopTime}`)
-				// debug.log(autoLoopTime.toFixed(1) + `/${GameState.timeUntilAutoLoopEnds}`)
 				
 				// this runs when time's up
 				if (autoLoopTime >= GameState.timeUntilAutoLoopEnds) {
@@ -90,13 +78,6 @@ export function gamescene() {
 
 			// debug
 			// if (isKeyPressed("h")) { GameState.timeUntilAutoLoopEnds--; debug.log(GameState.timeUntilAutoLoopEnds) } 
-		
-			// other stuff
-			// debug.log(GameState.clicksUpgrades)
-			scorePerClick = GameState.clicksUpgrades > 0 ? GameState.clickers * GameState.clicksUpgrades : GameState.clickers
-			scorePerClick += Math.round(percentage(scorePerClick, GameState.clickPercentage))
-			scorePerAutoClick = GameState.cursorUpgrades > 0 ? GameState.cursors * GameState.cursorUpgrades : GameState.cursors
-			scorePerAutoClick += Math.round(percentage(scorePerAutoClick, GameState.cursorsPercentage))
 		})
 
 		// panderito checkin
@@ -156,13 +137,6 @@ export function gamescene() {
 			}
 		})
 
-		// onKeyPress("x", () => {
-		// 	wait(0.5, () => {
-		// 		go("introscene")
-		// 	})
-		// 	tween(GameState.musicVolIndex, 0, 0.5, (p) => GameState.musicVolIndex = p)
-		// })
-		
 		// #region debug stuff
 		onScroll((delta)=>{
 			cameraScale = cameraScale * (1 - 0.1 * Math.sign(delta.y))
@@ -173,29 +147,60 @@ export function gamescene() {
 			cameraScale = 1
 			camScale(1)
 		})
-		// GameState.score = 999999
-		// GameState.totalScore = 999999
 
 		//#endregion
 	
 		// #region OUTSIDE OF TAB STUFF
 		// Function to handle tab visibility change
 		function handleVisibilityChange() {
-			if (GameState.cursors >= 1) {
-				if (document.hidden) {
-					// Tab becomes inactive
-					totalTimeOutsideTab = 0
-					isTabActive = false;
-					startTimeOutsideTab = performance.now(); // Store the start time when the tab becomes inactive
-				}
-				
-				else {
-					// Tab becomes active
-					if (!isTabActive) {
-						// If the tab was previously inactive, calculate the time outside the tab and update the total time
-						const timeOutsideTab = performance.now() - startTimeOutsideTab;
-						totalTimeOutsideTab += timeOutsideTab;
+			if (document.hidden) {
+				// Tab becomes inactive
+				totalTimeOutsideTab = 0
+				isTabActive = false;
+				startTimeOutsideTab = performance.now(); // Store the start time when the tab becomes inactive
+			}
+		
+			else {
+				if (!isTabActive) {
+					isTabActive = true
 					
+					// If the tab was previously inactive, calculate the time outside the tab and update the total time
+					const timeOutsideTab = performance.now() - startTimeOutsideTab;
+					totalTimeOutsideTab += timeOutsideTab;
+		
+					// 60 being the seconds outside of screen to get the zzz screen
+					if (totalTimeOutsideTab / 1000 > 1) {
+						let black = add([
+							rect(width(), height()),
+							pos(center()),
+							anchor("center"),
+							color(BLACK),
+							z(mouse.z - 2),
+							opacity(1),
+						])
+		
+						let sleepyText = add([
+							text("Z Z Z . . . ", {
+								size: 90,
+								transform: (idx) => ({
+									pos: vec2(0, wave(-4, 4, time() * 4 + idx * 0.5)),
+									scale: wave(1, 1.2, time() * 3 + idx),
+									angle: wave(-9, 9, time() * 3 + idx),
+								}),
+							}),
+							z(mouse.z - 1),
+							anchor("center"),
+							pos(center()),
+							opacity(1),
+						])
+		
+						wait(0.5, () => {
+							tween(black.opacity, 0, 0.5, (p) => black.opacity = p, )
+							tween(sleepyText.opacity, 0, 0.5, (p) => sleepyText.opacity = p, )
+						})
+					} 
+		
+					if (GameState.cursors >= 1) {
 						// what the fuck
 						autoLoopTime += totalTimeOutsideTab / 1000
 						excessTime = autoLoopTime - GameState.timeUntilAutoLoopEnds
@@ -204,53 +209,17 @@ export function gamescene() {
 							gainedScore = Math.floor(excessTime / GameState.timeUntilAutoLoopEnds); // can't add scorePerAutoClick here bc
 							excessTime -= GameState.timeUntilAutoLoopEnds * gainedScore // I use it before to shave off the extra time
 							// actual gainedScore
-							gainedScore = gainedScore * scorePerAutoClick
+							gainedScore = gainedScore * scoreVars.scorePerAutoClick
+		
+							// 120 being the seconds outside screen you have to be to get a "pop up"
+							if ((totalTimeOutsideTab / 1000) > 2) {
+								addToast({ title: `+${gainedScore} points!`, body: `Auto Click`, color: GREEN })
+							}
+				
+							tween(GameState.score, GameState.score + gainedScore, 0.25, (p) => GameState.score = p, easings.easeOutQuint)
+							tween(GameState.totalScore, GameState.totalScore + gainedScore, 0.25, (p) => GameState.totalScore = p, easings.easeOutQuint)
 						}
-	
-						// 60 being the seconds outside of screen to get the zzz screen
-						if (totalTimeOutsideTab / 1000 > 1) {
-							let black = add([
-								rect(width(), height()),
-								pos(center()),
-								anchor("center"),
-								color(BLACK),
-								z(mouse.z - 2),
-								opacity(1),
-							])
-
-							let sleepyText = add([
-								text("Z Z Z . . . ", {
-									size: 90,
-									transform: (idx) => ({
-										pos: vec2(0, wave(-4, 4, time() * 4 + idx * 0.5)),
-										scale: wave(1, 1.2, time() * 3 + idx),
-										angle: wave(-9, 9, time() * 3 + idx),
-									}),
-								}),
-								z(mouse.z - 1),
-								anchor("center"),
-								pos(center()),
-								opacity(1),
-							])
-
-							wait(0.5, () => {
-								tween(black.opacity, 0, 0.5, (p) => black.opacity = p, )
-								tween(sleepyText.opacity, 0, 0.5, (p) => sleepyText.opacity = p, )
-							})
-						} 
-
-						// 120 being the seconds outside screen you have to be to get a "pop up"
-						if ((totalTimeOutsideTab / 1000) > 2) {
-							// debug.log(`You were out for: ${totalTimeOutsideTab / 1000}`)
-							// debug.log(`And made: ${gainedScore}, cool!`)
-							// debug.log("Excess time:" + excessTime)
-						}
-
-						tween(GameState.score, GameState.score + gainedScore, 0.25, (p) => GameState.score = p, easings.easeOutQuint)
-						tween(GameState.totalScore, GameState.totalScore + gainedScore, 0.25, (p) => GameState.totalScore = p, easings.easeOutQuint)
 					}
-
-					isTabActive = true;
 				}
 			}
 		}
