@@ -6,6 +6,7 @@ import { musicHandler, playMusic } from "../../sound"
 import { folderObjManaging, unlockWindow, windowsDefinition } from "./windows/WindowsMenu"
 import { songs } from "./windows/winMusic"
 import { curDraggin, setCurDraggin } from "../../plugins/drag"
+import { k } from "../../main"
 
 // debug
 let cameraScale = 1
@@ -34,9 +35,11 @@ export function gamescene() {
 
 		setGravity(1600)
 
-		playMusic(GameState.music.favoriteIdx == null ? "clicker.wav" : Object.keys(songs)[GameState.music.favoriteIdx])
-		if (GameState.music.muted) musicHandler.paused = true
+		playMusic(GameState.settings.music.favoriteIdx == null ? "clicker.wav" : Object.keys(songs)[GameState.settings.music.favoriteIdx])
+		if (GameState.settings.music.muted) musicHandler.paused = true
 		
+		k.backgroundAudio = GameState.settings.keepAudioOnTabChange
+
 		// wait 60 seconds
 		wait(60, () => {
 			loop(60, () => {
@@ -236,10 +239,12 @@ export function gamescene() {
 		}, false);
 
 		document.getElementById("kanva").addEventListener("mouseout", (event) => {
-			if (curDraggin) {
-				curDraggin.trigger("dragEnd")
-				setCurDraggin(null)
-				mouse.release()
+			if (GameState.settings.dropDragsOnMouseOut == true) {
+				if (curDraggin) {
+					curDraggin.trigger("dragEnd")
+					setCurDraggin(null)
+					mouse.release()
+				}
 			}
 		}, false);
 	})

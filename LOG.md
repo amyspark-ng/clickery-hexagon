@@ -6,20 +6,21 @@
 # Issues!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ## General
 - Remember putting all of this on the TODO.md
-
-- Tweak smallest and biggest and scaleIncrease
 - Format actual working numbers
 - Loading screen isn't working
 - Do general unlocking stuff, like when you first start the game, also the start transition, so cool stuff
 - Random chance of +1 making something funny
 - Make pinch animation
 - Rework tooltips
-- End reworking the scoretext animations
+- Rework mouse animations syste, that sucks whole ass
 ## Windows
+- Fix minibuttons hovering animation
 - If hasn't unlocked folderObj i think GameState.unlockedWindows should be null
 - Can hover stuff while hovering another window
+^ CAN CLICK STUFF WHILE BEING BEHIND A WINDOW HOLY SHIT FIX THIS
 - Random bug where the mouse plays point when starting hovering a window sometimes from hexagon
-
+- Make it so the player doesn't have a chance to drag the window TOO low or too high because then they can't pick it up again
+- Store elements don't go darker with the unactive color because their color is being defined by score amount and price
 ### Store
 
 ### Music
@@ -44,6 +45,7 @@ https://kaplay.lajbel.com/?code=eJy9U01PwzAMvfdX%2BJhs076QEOoYEhIScEDakQlxyFpvLZ
 - Add achievement for making the hexagon black and the bg white (bad apple)
 - Achievements be toasts, if you click on them you can open the medals window (if unlocked)
 - Could also add the welcome back to toasts
+- Do the funny thing with music title in clicker.wav like deltarune did
 
 # TO-DO
 - > Arte: 

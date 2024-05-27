@@ -15,10 +15,10 @@ function deactivateAllSliders() {
 	})
 }
 
-function typeToSliderColor(type) {
-	if (type == "r") return rgb(255, 0, 0)
-	else if (type == "g") return rgb(0, 255, 0)
-	else if (type == "b") return rgb(0, 0, 255)
+function typeToColor(type) {
+	if (type == "r") return RED
+	else if (type == "g") return GREEN
+	else if (type == "b") return BLUE
 	else return rgb(22, 22, 22)
 }
 
@@ -82,7 +82,7 @@ function addRgbSlider(winParent, posToAdd = vec2(0), coloredObj, type = "r") {
 		anchor("center"),
 		area({ scale: vec2(3.5, 1) }),
 		drag(),
-		color(typeToSliderColor(type)),
+		color(typeToColor(type)),
 		"hoverObj",
 		"sliderButton",
 		"windowButton",
@@ -91,7 +91,6 @@ function addRgbSlider(winParent, posToAdd = vec2(0), coloredObj, type = "r") {
 		{
 			dragging: false,
 			draggingTune: 0,
-			active: false,
 			update() {
 				if (type != "a") { // color
 					sliderInfo.value = map(this.pos.x, getSides(theOneBehind).left, getSides(theOneBehind).right, 0, 255)
@@ -116,6 +115,8 @@ function addRgbSlider(winParent, posToAdd = vec2(0), coloredObj, type = "r") {
 							break
 						}
 					}
+
+					if (!winParent.isMouseInPreciseRange()) deactivateAllSliders()
 				}
 
 				else if (isMouseReleased("left")) {
@@ -129,21 +130,21 @@ function addRgbSlider(winParent, posToAdd = vec2(0), coloredObj, type = "r") {
 		}
 	])
 
-	sliderButton.onClick(() => {
-		deactivateAllSliders()
-		sliderButton.use(outline(5, type != "a" ? typeToSliderColor(type).darken(100) : typeToSliderColor(type).lighten(100)))
-		sliderButton.active = true
-	})
-
+	// also works as onClick
 	sliderButton.onDrag(() => {
+		deactivateAllSliders()
+		sliderButton.use(outline(5, type != "a" ? sliderButton.color.darken(100) : sliderButton.color.lighten(100)))
+
 		readd(sliderButton)
 		sliderButton.dragging = true
 		playSfx("clickButton", rand(-50, 50))
 		lastSoundPos = mousePos().x
 
 		// golly
-		deactivateAllWindows()
-		winParent.activate()
+		if (!winParent.is("active")) {
+			deactivateAllWindows()
+			winParent.activate()
+		}
 	})
 
 	sliderButton.onMouseMove(() => {
@@ -167,7 +168,7 @@ function addRgbSlider(winParent, posToAdd = vec2(0), coloredObj, type = "r") {
 		rect(0, 25, { radius: 5  }),
 		pos(getSides(theOneBehind).left, theOneBehind.pos.y),
 		anchor("left"),
-		color(typeToSliderColor(type)),
+		color(sliderButton.color),
 		z(sliderButton.z - 1),
 		"slider",
 		type + "slider",
@@ -184,6 +185,7 @@ function addRgbSlider(winParent, posToAdd = vec2(0), coloredObj, type = "r") {
 	textValue = winParent.add([
 		text(sliderInfo.value, {
 			size: 25,
+			font: "lambdao"
 		}),
 		area(),
 		"slider",
@@ -260,7 +262,7 @@ export function colorWinContent(winParent, winType = "hexColorWin") {
 			hexagon.color.r = rSlider.value
 			hexagon.color.g = gSlider.value
 			hexagon.color.b = bSlider.value
-			GameState.hexColor = [rSlider.value, gSlider.value, bSlider.value]
+			GameState.settings.hexColor = [rSlider.value, gSlider.value, bSlider.value]
 		})
 	}
 
@@ -270,7 +272,7 @@ export function colorWinContent(winParent, winType = "hexColorWin") {
 			gameBg.tintColor.g = gSlider.value
 			gameBg.tintColor.b = bSlider.value
 			gameBg.blendFactor = aSlider.value
-			GameState.bgColor = [rSlider.value, gSlider.value, bSlider.value, aSlider.value]
+			GameState.settings.bgColor = [rSlider.value, gSlider.value, bSlider.value, aSlider.value]
 		})
 	}
 

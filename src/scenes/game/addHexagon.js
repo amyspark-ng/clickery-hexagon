@@ -136,7 +136,7 @@ export function addHexagon() {
 		anchor("center"),
 		rotate(0),
 		scale(),
-		color(arrayToColor(GameState.hexColor)),
+		color(arrayToColor(GameState.settings.hexColor)),
 		area({
 			shape: new Polygon([
 				vec2(406, 118),
@@ -252,6 +252,11 @@ export function addHexagon() {
 		if (!isPreciselyHoveringWindow && !isDraggingWindow) {
 			hexagon.endHover()
 		}
+
+		if (mouse.grabbing) {
+			mouse.release()
+			mouse.play("cursor")
+		}
 	});
 
 	hexagon.onMousePress("left", () => {
@@ -268,8 +273,8 @@ export function addHexagon() {
 				hexagon.clickRelease(true)
 				addPlusScoreText(mouse.pos, scoreVars.scorePerClick)
 				GameState.addScore(scoreVars.scorePerClick)
-				tween(scoreText.scale, scoreText.defaultScale.add(vec2(0.05, 0.05)), 0.2, (p) => scoreText.scale = p, easings.easeOutQuint).onEnd(() => {
-					tween(scoreText.scale, scoreText.defaultScale, 0.2, (p) => scoreText.scale = p, easings.easeOutElastic)
+				tween(scoreText.scaleIncrease, 1.05, 0.2, (p) => scoreText.scaleIncrease = p, easings.easeOutQuint).onEnd(() => {
+					tween(scoreText.scaleIncrease, 1, 0.2, (p) => scoreText.scaleIncrease = p, easings.easeOutQuint)
 				})
 			}
 		}

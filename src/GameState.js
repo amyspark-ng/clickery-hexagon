@@ -76,8 +76,6 @@ export let GameState = {
 
 	// order doesn't affect idx
 	unlockedWindows: ["aboutWin"],
-	hexColor: [255, 255, 255],
-	bgColor: [0, 0, 0, 0.55],
 
 	// medals: {
 	// 	start: new medalData("It starts", 3484, false, "itstarts")
@@ -91,9 +89,16 @@ export let GameState = {
 	// timeplayed
 	// max cookies per second gained
 
-	sfx: new VolumeData(1, false),
-	music: new VolumeData(1, false),
-	volume: 1,
+	settings: {
+		sfx: new VolumeData(1, false),
+		music: new VolumeData(1, false),
+		volume: 1,
+		hexColor: [255, 255, 255],
+		bgColor: [0, 0, 0, 0.55],
+		keepAudioOnTabChange: true,
+		dropDragsOnMouseOut: true,
+		fullScreen: false,
+	},
 
 	save(anim = true) {
 		if (anim) {

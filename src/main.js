@@ -12,7 +12,7 @@ export const k = kaboom({
 	crisp: true,
 	canvas: document.getElementById("kanva"),
 	logMax: 10,
-	// backgroundAudio: true,
+	backgroundAudio: true,
 	// scale: 0.99,
 	// stretch: true,
 	// letterbox: true,

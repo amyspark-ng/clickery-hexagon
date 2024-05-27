@@ -48,7 +48,7 @@ export function windowsDefinition() {
 		"ascendWin": { idx: 2, name: "storeWin", icon: "store", content: emtpyWinContent, lastPos: vec2(center().x, center().y), hotkey: "3", color: WHITE, showable: true },
 		"statsWin": { idx: 3, name: "storeWin", icon: "store", content: emtpyWinContent, lastPos: vec2(center().x, center().y), hotkey: "4", color: WHITE, showable: true },
 		"medalsWin": { idx: 4, name: "storeWin", icon: "store", content: emtpyWinContent, lastPos: vec2(center().x, center().y), hotkey: "5", color: WHITE, showable: true },
-		"aboutWin": { idx: 5, name: "aboutWin", icon: "credits", content: emtpyWinContent, lastPos: vec2(center().x, center().y), hotkey: "6", color: RED, showable: true },
+		"aboutWin": { idx: 5, name: "aboutWin", icon: "question", content: emtpyWinContent, lastPos: vec2(center().x, center().y), hotkey: "6", color: RED, showable: true },
 		"hexColorWin": { idx: 6, name: "hexColorWin", icon: "store", content: colorWinContent, lastPos: vec2(208, 160), hotkey: null, color: WHITE, showable: false },
 		"bgColorWin": { idx: 7, name: "bgColorWin", icon: "store", content: colorWinContent, lastPos: vec2(1024 - 200, 200), hotkey: null, color: WHITE, showable: false },
 	}
@@ -61,8 +61,8 @@ export function addMinibutton(i, xPosition) {
 	})
 	
 	let miniButton = add([
-		sprite("folderIcons", {
-			anim: infoForWindows[Object.keys(infoForWindows)[i]].icon
+		sprite(`icon_${infoForWindows[Object.keys(infoForWindows)[i]].icon}`, {
+			anim: "regular"
 		}),
 		pos(folderObj.pos.x, folderObj.pos.y),
 		anchor("center"),
@@ -86,6 +86,7 @@ export function addMinibutton(i, xPosition) {
 				tween(miniButton.scale, vec2(1.05), 0.32, (p) => miniButton.scale = p, easings.easeOutQuint)
 				this.defaultScale = vec2(1.05)
 				playSfx("hoverMiniButton", 100 * miniButton.windowInfo.idx / 4)
+				this.play("hover")
 			},
 
 			endHover() {
@@ -94,6 +95,7 @@ export function addMinibutton(i, xPosition) {
 				tween(miniButton.angle, 0, 0.32, (p) => miniButton.angle = p, easings.easeOutQuint)
 				tween(miniButton.scale, vec2(1), 0.32, (p) => miniButton.scale = p, easings.easeOutQuint)
 				miniButton.defaultScale = vec2(1.05)
+				if (this.window == null) this.play("regular")
 			},
 			
 			manageRespectiveWindow(button = this) {
@@ -108,6 +110,7 @@ export function addMinibutton(i, xPosition) {
 					// hasn't open it
 					let theWindow = openWindow(button.windowInfo.name)
 					button.window = theWindow
+					if (!this.curAnim() == "hover") this.play("hover")
 				}
 			},
 
@@ -117,8 +120,22 @@ export function addMinibutton(i, xPosition) {
 					this.angle = wave(-9, 9, time() * 3)
 				}
 
-				if (this.window != null) this.whiteness = wave(0.01, 0.1, (time() * 3))
-				else this.whiteness = 0
+				if (this.window != null) {
+					this.whiteness = wave(0.01, 0.1, (time() * 3))
+				}
+
+				else {
+					this.whiteness = 0
+				}
+
+				if (miniButton.pos.x < folderObj.pos.x - buttonSpacing + 10) {
+					miniButton.area.scale = vec2(0.9, 1.4)
+					miniButton.area.offset = vec2(2, 4)
+				}
+				
+				else {
+					miniButton.area.scale = vec2(0)
+				}
 			}
 		}
 	])
@@ -126,8 +143,6 @@ export function addMinibutton(i, xPosition) {
 	// animate them
 	tween(miniButton.pos.x, xPosition, 0.32, (p) => miniButton.pos.x = p, easings.easeOutQuint).then(() => {
 		if (timeSinceFold < 0.25) return
-		miniButton.area.scale = vec2(0.9, 1.4)
-		miniButton.area.offset = vec2(2, 4)
 	})
 
 	miniButton.use(shader("saturate", () => ({
@@ -152,7 +167,7 @@ export function addMinibutton(i, xPosition) {
 	})
 
 	miniButton.onClick(() => {
-		if (isGenerallyHoveringWindow || isDraggingWindow) return
+		if (isPreciselyHoveringWindow || isDraggingWindow) return
 		miniButton.manageRespectiveWindow(miniButton)
 		bop(miniButton)
 	})
@@ -201,18 +216,18 @@ export function openWindow(name = "") {
 			activate() {
 				this.use("active")
 
-				this.opacity = 1
-				this.children.forEach(element => {
-					element.opacity = 1
+				this.color = this.defColor
+				windowObj.get("*", { recursive: true }).forEach((element) => {
+					element.color = element.defColor
 				});
 			},
 
 			deactivate() {
 				this.unuse("active")
-				
-				this.opacity = 0.8
-				this.children.forEach(element => {
-					element.opacity = 0.8
+
+				this.color = this.defColor.darken(150)
+				windowObj.get("*", { recursive: true }).forEach((element) => {
+					element.color = element.defColor.darken(150)
 				});
 			},
 
@@ -240,8 +255,16 @@ export function openWindow(name = "") {
 				(mousePos().x >= getSides(this).left - 10)
 				return condition;
 			},
+
+			update() {
+				this.pos.x = clamp(this.pos.x, -151, 1180)
+			}
 		}
 	])
+
+	infoForWindows[name].lastPos.x = clamp(infoForWindows[name].lastPos.x, 196, 827)
+	infoForWindows[name].lastPos.y = clamp(infoForWindows[name].lastPos.y, height() - windowObj.height / 2, -windowObj.height / 2)
+	windowObj.pos = infoForWindows[name].lastPos
 
 	let xButton = windowObj.add([
 		text("X"),
@@ -284,7 +307,7 @@ export function openWindow(name = "") {
 			hexagon.endHover()
 		}
 
-		mouse.play("cursor")
+		if (!isDraggingWindow) mouse.play("cursor")
 
 		if (folded) return;
 		get("minibutton").forEach(minibuttonHoverEndCheck => {
@@ -362,6 +385,12 @@ export function openWindow(name = "") {
 	windowObj.add(infoForWindows[name].content(windowObj, name))
 	// searches for the key
 
+	windowObj.defColor = WHITE
+	windowObj.get("*", { recursive: true }).forEach((element) => {
+		if (!element.color) element.use(color())
+		element.defColor = element.color
+	})
+
 	// animate it
 	tween(windowObj.opacity, 1, 0.32, (p) => windowObj.opacity = p, easings.easeOutQuint)
 	tween(windowObj.scale, vec2(1), 0.32, (p) => windowObj.scale = p, easings.easeOutQuint)
@@ -378,26 +407,25 @@ export function folderObjManaging() {
 	})
 
 	folderObj = add([
-		text("<"),
-		pos(width() - 25, height() - 50),
-		scale(2),
-		area({ scale: vec2(2) }),
+		sprite("folderObj"),
+		pos(width() - 40, height() - 40),
+		area({ scale: vec2(1.2) }),
 		z(4),
 		anchor("center"),
 		"hoverObj",
-		"foldButton",
+		"folderObj",
 		{
-			defaultScale: vec2(2),
+			defaultScale: vec2(1.2),
 			unfold() {
 				folded = false
 				timeSinceFold = 0
+				playSfx("fold", rand(-50, 50))
 
 				// Sort the unlockedWindows array based on the order in infoForWindows
 				GameState.unlockedWindows.sort((a, b) => infoForWindows[a].idx - infoForWindows[b].idx);
 
 				// Initial x position for the buttons
 				let initialX = folderObj.pos.x;
-				playSfx("fold", rand(-50, 50))
 				
 				// Iterate over the sorted unlockedWindows array to create buttons
 				if (get("minibutton").length > 0) return
@@ -423,11 +451,9 @@ export function folderObjManaging() {
 			},
 
 			manageFold() {
-				// is folded, should unfold
 				if (folded) {
 					folderObj.unfold()
 				}
-				// is unfolded, should fold
 				else {
 					folderObj.fold()
 				}

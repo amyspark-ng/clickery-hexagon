@@ -126,6 +126,7 @@ export function timeOutSideOfWindowManaging() {
 	}
 }
 
+// im aware kaboom has Color.mult, i like blend more
 export function blendColors(color1, color2, blendFactor) {
     // Extract RGB components from color structures
     const rgb1 = [color1.r, color1.g, color1.b];
@@ -183,9 +184,9 @@ export function debugTexts() {
 				timeUntilAutoLoopEnds: ${GameState.timeUntilAutoLoopEnds}
 				autoLoopTime: ${autoLoopTime.toFixed(4)}
 				excessTime: ${excessTime.toFixed(4)}
-				masterVolume: ${GameState.volume}
-				sfx: ${GameState.sfx.volume}
-				music: ${GameState.music.volume}
+				masterVolume: ${GameState.settings.volume}
+				sfx: ${GameState.settings.sfx.volume}
+				music: ${GameState.settings.music.volume}
 				`.trim()
 			}
 		}
@@ -246,8 +247,8 @@ export function addBackground() {
 			uScale: 2,
 			col1D: rgb(128, 128, 128),
 			col2D: rgb(190, 190, 190),
-			tintColor: arrayToColor(GameState.bgColor),
-			blendFactor: GameState.bgColor[3],
+			tintColor: arrayToColor(GameState.settings.bgColor),
+			blendFactor: GameState.settings.bgColor[3],
 		}
 	])
 
@@ -262,7 +263,7 @@ export function addBackground() {
     })))
 
 	gameBg.onMousePress("right", () => {
-		if (!hexagon.isHovering() && gameBg.isHovering() && !isGenerallyHoveringWindow && !isDraggingWindow) {
+		if (!hexagon.isHovering() && !get("folderObj")[0].isHovering() && gameBg.isHovering() && !isGenerallyHoveringWindow && !isDraggingWindow) {
 			manageWindow("bgColorWin")
 		}
 	})
@@ -370,7 +371,7 @@ export function addMouse() {
 			}
 		}
 	
-		else if (obj.is("xButton") || obj.is("windowButton") || obj.is("foldButton") || obj.is("minibutton")) {
+		else if (obj.is("xButton") || obj.is("windowButton") || obj.is("folderObj") || obj.is("minibutton")) {
 			if (!isDraggingWindow) {
 				mouse.play("point")
 			}
@@ -672,7 +673,8 @@ export function addPlusPercentageScore(posToAdd, amount, size = [40, 50]) {
 export function addPlusScoreText(posToAdd, amount, size = [40, 50]) {
 	let plusScoreText = add([
 		text("+" + formatNumber(amount, true, false), {
-			size: rand(size[0], size[1])
+			size: rand(size[0], size[1]),
+			font: "lambdao",
 		}),
 		pos(posToAdd),
 		rotate(0),

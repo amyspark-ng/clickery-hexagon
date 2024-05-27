@@ -13,6 +13,8 @@ export function loadAssets() {
 
 	loadSprite("panderito", "sprites/panderito.png")
 	
+	loadSprite("folderObj", "sprites/folderObj.png")
+
 	loadSprite("speakers", "sprites/speakers.png", {
 		sliceX: 2,
 		sliceY: 1,
@@ -133,23 +135,45 @@ export function loadAssets() {
 
 	loadSprite("tooltip", "sprites/tooltip.png")
 
-	loadSprite("folderIcons", "sprites/windows/folderIcons.png", {
-		sliceX: 3,
-		sliceY: 1,
-		anims: {
-			"store": 0,
-			"music": 1,
-			"credits": 2,
+	loadSpriteAtlas("sprites/windows/folderIcons.png", {
+		"icon_store": {
+			"x": 0,
+			"y": 3,
+			"width": 108,
+			"height": 53,
+			"sliceX": 2,
+			"sliceY": 1,
+			"anims": {
+				"regular": 0,
+				"hover": 1,
+			}
+		},
+		"icon_music": {
+			"x": 99,
+			"y": 0,
+			"width": 98,
+			"height": 53,
+			"sliceX": 2,
+			"sliceY": 1,
+			"anims": {
+				"regular": 0,
+				"hover": 1,
+			}
+		},
+		"icon_question": {
+			"x": 197,
+			"y": 0,
+			"width": 98,
+			"height": 53,
+			"sliceX": 2,
+			"sliceY": 1,
+			"anims": {
+				"regular": 0,
+				"hover": 1,
+			}
 		}
 	})
-	// loadSprite("storeWin", "sprites/windows/storeWin.png", {
-	// 	slicex: 2,
-	// 	sliceY: 1,
-	// 	anims: {
-	// 		"active": 0,
-	// 		"inactive": 1,
-	// 	}
-	// })
+	
 	loadSprite("storeWin", "sprites/windows/storeWin.png")
 	loadSprite("musicWin", "sprites/windows/musicWin.png")
 	loadSpriteAtlas("sprites/windows/musicWinElements.png", {
@@ -216,8 +240,12 @@ export function loadAssets() {
 		filter: "linear"
 	})
 
-	loadFont("lambda", "./assets/Lambda-Regular.ttf", {
+	loadFont("lambdao", "./assets/Lambda-Regular.ttf", {
 		outline: 5,
+		filter: "linear"
+	})
+
+	loadFont("lambda", "./assets/Lambda-Regular.ttf", {
 		filter: "linear"
 	})
 

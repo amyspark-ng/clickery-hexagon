@@ -29,7 +29,7 @@ export function setTimeSinceSkip(value) {
 }
 
 export function musicWinContent(winParent) {
-	currentSongIdx = GameState.music.favoriteIdx == null ? 0 : GameState.music.favoriteIdx
+	currentSongIdx = GameState.settings.music.favoriteIdx == null ? 0 : GameState.settings.music.favoriteIdx
 	let disc = winParent.add([
 		sprite("discs", {
 			anim: "defaultCover"
@@ -38,11 +38,16 @@ export function musicWinContent(winParent) {
 		rotate(),
 		anchor("center"),
 		scale(),
+		area(),
 		"bpmChange",
+		"hoverObj",
+		"pauseButton",
+		"musicButton",
+		"windowButton",
 		{
 			verPosition: -20,
 			update() {
-				if (musicHandler.winding || GameState.music.muted || skipping) return
+				if (musicHandler.winding || GameState.settings.music.muted || skipping) return
 				this.angle += songs[Object.keys(songs)[currentSongIdx]].speed
 				if (Math.floor(this.angle % 360 == 0)) this.angle = 0
 			}
@@ -64,7 +69,7 @@ export function musicWinContent(winParent) {
 		anchor("left"),
 		{
 			update() {
-				this.text = `${songs[Object.keys(songs)[currentSongIdx]].idx + 1}. ${songs[Object.keys(songs)[currentSongIdx]].name} ${GameState.music.muted ? "(PAUSED)" : ""}\nby Enysmo`
+				this.text = `${songs[Object.keys(songs)[currentSongIdx]].idx + 1}. ${songs[Object.keys(songs)[currentSongIdx]].name} ${GameState.settings.music.muted ? "(PAUSED)" : ""}\nby Enysmo`
 			}
 		}
 	])
@@ -95,8 +100,8 @@ export function musicWinContent(winParent) {
 			verPosition: 50,
 			update() {
 				this.text = `${formatMusicTime(musicHandler.currentTime === undefined ? 0 : musicHandler.currentTime)}/${formatMusicTime(musicHandler.totalTime === undefined ? musicHandler.duration() : musicHandler.totalTime)}`
-				if (!musicHandler.winding || !GameState.music.muted) musicHandler.currentTime = musicHandler.time()
-				if (!musicHandler.winding || !GameState.music.muted) musicHandler.totalTime = songs[Object.keys(songs)[currentSongIdx]].duration
+				if (!musicHandler.winding || !GameState.settings.music.muted) musicHandler.currentTime = map(progressBar.width, 0, theOneBehind.width, 0, musicHandler.duration())
+				if (!musicHandler.winding || !GameState.settings.music.muted) musicHandler.totalTime = songs[Object.keys(songs)[currentSongIdx]].duration
 			},
 		}
 	])
@@ -128,7 +133,7 @@ export function musicWinContent(winParent) {
 		anchor("left"),
 		{
 			update() {
-				if (musicHandler.winding || GameState.music.muted ) return
+				if (musicHandler.winding || GameState.settings.music.muted ) return
 				this.width = musicHandler.time() / musicHandler.duration() * theOneBehind.width
 			},
 
@@ -157,10 +162,11 @@ export function musicWinContent(winParent) {
 		"hoverObj",
 		"musicButton",
 		"windowButton",
+		"backButton",
 	])
 
 	let pauseButton = winParent.add([
-		text("||", {
+		text(GameState.settings.music.muted ? ">" : "||", {
 			size: 40
 		}),
 		pos(15, 60),
@@ -170,6 +176,7 @@ export function musicWinContent(winParent) {
 		"hoverObj",
 		"musicButton",
 		"windowButton",
+		"pauseButton"
 	])
 
 	let skipButton = winParent.add([
@@ -183,12 +190,13 @@ export function musicWinContent(winParent) {
 		"hoverObj",
 		"musicButton",
 		"windowButton",
+		"skipButton",
 	])
 
 	// each tim you click it waits one seonc, if the time since the skip is greater than 1 it plays the song
 	// if the time since the skip is less than 1 it does nothing
 	get("musicButton", { recursive: true }).forEach(mBtn => mBtn.onClick(() => {
-		if (mBtn.text != "||") {
+		if (!mBtn.is("pauseButton")) {
 			if (skipping == false) {
 				skipping = true
 				get("bpmChange", { recursive: true }).forEach(element => { element.stopWave() });
@@ -198,7 +206,7 @@ export function musicWinContent(winParent) {
 			tween(musicHandler.currentTime, 0, 0.5, (p) => musicHandler.currentTime = p, easings.easeOutQuint)
 			musicHandler.winding = true
 	
-			if (mBtn.text == "<") {
+			if (mBtn.is("backButton")) {
 				if (musicHandler.currentTime > 2) {
 					musicHandler.seek(0)
 					musicHandler.winding = true
@@ -214,7 +222,7 @@ export function musicWinContent(winParent) {
 				playSfx("clickButton", rand(-50, 150))
 			}
 			
-			else if (mBtn.text == ">") {
+			else if (mBtn.is("skipButton")) {
 				currentSongIdx++
 				tween(disc.angle, disc.angle + rand(75, 100), 0.5, (p) => disc.angle = p, easings.easeOutQuint)
 				if (currentSongIdx >= Object.keys(songs).length) currentSongIdx = 0
@@ -223,7 +231,7 @@ export function musicWinContent(winParent) {
 	
 			tween(musicHandler.totalTime, songs[Object.keys(songs)[currentSongIdx]].duration, 0.5, (p) => musicHandler.totalTime = p, easings.easeOutQuint)
 			disc.play(songs[Object.keys(songs)[currentSongIdx]].cover)
-			GameState.music.favoriteIdx = currentSongIdx
+			GameState.settings.music.favoriteIdx = currentSongIdx
 			timeSinceSkip = 0
 	
 			wait(1, () => {
@@ -231,7 +239,7 @@ export function musicWinContent(winParent) {
 					playMusic(Object.keys(songs)[currentSongIdx])
 					skipping = false
 					musicHandler.winding = false
-					if (GameState.music.muted) {
+					if (GameState.settings.music.muted) {
 						musicHandler.paused = true
 						get("bpmChange", { recursive: true }).forEach(element => { element.stopWave() });
 					}
@@ -243,11 +251,12 @@ export function musicWinContent(winParent) {
 		}
 
 		else {
-			if (!GameState.music.muted) {
+			if (!GameState.settings.music.muted) {
 				espMute()
 				get("bpmChange", { recursive: true }).forEach(element => {
 					element.stopWave()
 				})
+				if (pauseButton.text) pauseButton.text = ">"
 			}
 	
 			else {
@@ -255,6 +264,7 @@ export function musicWinContent(winParent) {
 				get("bpmChange", { recursive: true }).forEach(element => {
 					element.startWave()
 				})
+				if (pauseButton.text) pauseButton.text = "||"
 			}
 	
 			playSfx("clickButton", rand(-100, 100))
@@ -265,7 +275,7 @@ export function musicWinContent(winParent) {
 
 	get("bpmChange", { recursive: true }).forEach(bpmChange => {
 		if (!bpmChange.is("wave")) bpmChange.use(waver({ maxAmplitude: 5, wave_speed: songs[Object.keys(songs)[currentSongIdx]].speed, wave_tweenSpeed: 0.2 }))
-		if (!GameState.music.muted) bpmChange.startWave()
+		if (!GameState.settings.music.muted) bpmChange.startWave()
 	})
 	
 	return;

@@ -5,7 +5,7 @@ import { panderitoIndex } from "./scenes/game/gamescene.js";
 export let sfxHandler;
 export function playSfx(sound = "clickPress", tune = 0) {
 	sfxHandler = play(sound, {
-		volume: GameState.sfx.volume,
+		volume: GameState.settings.sfx.volume,
 		detune: tune
 	})
 }
@@ -14,7 +14,7 @@ export let musicHandler;
 export function playMusic(sound = "clickRelease") {
 	musicHandler.stop()
 	musicHandler = play(sound, {
-		volume: GameState.music.volume,
+		volume: GameState.settings.music.volume,
 		detune: 0,
 		loop: true,	
 	})
@@ -37,23 +37,23 @@ export function scratchSong() {
 
 export function espMute() {
 	tween(musicHandler.volume, 0, 0.25, (p) => musicHandler.volume = p, easings.easeOutQuint).onEnd(() => {
-		GameState.music.muted = true
+		GameState.settings.music.muted = true
 		musicHandler.paused = true
 	})
 	tween(musicHandler.detune, -100, 0.25, (p) => musicHandler.detune = p, easings.easeOutQuint)
 }
 
 export function espUnmute() {
-	GameState.music.muted = false
+	GameState.settings.music.muted = false
 	musicHandler.paused = false
-	tween(musicHandler.volume, GameState.music.volume, 0.25, (p) => musicHandler.volume = p, easings.easeOutQuint)
+	tween(musicHandler.volume, GameState.settings.music.volume, 0.25, (p) => musicHandler.volume = p, easings.easeOutQuint)
 	tween(musicHandler.detune, 0, 0.25, (p) => musicHandler.detune = p, easings.easeOutQuint)
 }
 
 export function manageMute() {
-	GameState.music.muted = !GameState.music.muted 
+	GameState.settings.music.muted = !GameState.settings.music.muted 
 	musicHandler.paused = !musicHandler.paused 
-	if (GameState.music.muted) {
+	if (GameState.settings.music.muted) {
 		get("bpmChange", { recursive: true }).forEach(bpmChange => { bpmChange.stopWave() });
 	}
 	else {
@@ -159,11 +159,11 @@ export function volumeManager() {
 		{
 			canChange: true,
 			update() {
-				GameState.volume = parseFloat(GameState.volume.toFixed(1))
-				GameState.sfx.volume = parseFloat(GameState.sfx.volume.toFixed(1))
-				GameState.music.volume = parseFloat(GameState.music.volume.toFixed(1))
+				GameState.settings.volume = parseFloat(GameState.settings.volume.toFixed(1))
+				GameState.settings.sfx.volume = parseFloat(GameState.settings.sfx.volume.toFixed(1))
+				GameState.settings.music.volume = parseFloat(GameState.settings.music.volume.toFixed(1))
 
-				volume(GameState.volume)
+				volume(GameState.settings.volume)
 
 				if (seconds > 0) seconds -= dt()
 
@@ -179,8 +179,8 @@ export function volumeManager() {
 				if (isKeyPressed("-")) {
 					bg.down()
 					
-					if (GameState.volume > 0) {
-						GameState.volume -= 0.1
+					if (GameState.settings.volume > 0) {
+						GameState.settings.volume -= 0.1
 						tune -= 25
 						bars.forEach(element => {
 							element.hidden = false
@@ -188,7 +188,7 @@ export function volumeManager() {
 						speaker.hidden = true
 					}
 
-					if (GameState.volume == 0) {
+					if (GameState.settings.volume == 0) {
 						bars.forEach(element => {
 							element.hidden = true
 						});
@@ -204,8 +204,8 @@ export function volumeManager() {
 				else if (isKeyPressed("+")) {
 					bg.down()
 
-					if (GameState.volume <= 0.9) {
-						GameState.volume += 0.1
+					if (GameState.settings.volume <= 0.9) {
+						GameState.settings.volume += 0.1
 						tune += 25
 						play("volumeChange", { detune: tune })
 					}
@@ -223,16 +223,16 @@ export function volumeManager() {
 
 				else if (isKeyPressed("n") && panderitoIndex != 3) {
 					bg.down()
-					if (!GameState.sfx.muted) {
-						GameState.sfx.volume = 0
-						GameState.sfx.muted = true
+					if (!GameState.settings.sfx.muted) {
+						GameState.settings.sfx.volume = 0
+						GameState.settings.sfx.muted = true
 						speaker.frame = 0
 					}
 					
 					// unmuted
 					else {
-						GameState.sfx.volume = GameState.volume
-						GameState.sfx.muted = false
+						GameState.settings.sfx.volume = GameState.settings.volume
+						GameState.settings.sfx.muted = false
 						speaker.frame = 1
 					} 
 
@@ -247,7 +247,7 @@ export function volumeManager() {
 				else if (isKeyPressed("m")) {
 					bg.down()
 					manageMute()
-					if (GameState.music.muted) speaker.frame = 0
+					if (GameState.settings.music.muted) speaker.frame = 0
 					else speaker.frame = 1
 					bars.forEach(element => {
 						element.hidden = true
@@ -262,16 +262,16 @@ export function volumeManager() {
 					bars[i].fullOp = 0.1
 				}
 				
-				for(let i = 0; i < Math.round(GameState.volume * 10); i++) {
+				for(let i = 0; i < Math.round(GameState.settings.volume * 10); i++) {
 					bars[i].opacity = 1
 					bars[i].fullOp = 1
 				}
 
-				if (!GameState.sfx.muted) GameState.sfx.volume = GameState.volume; else GameState.sfx.volume = 0
-				if (!GameState.music.muted) GameState.music.volume = GameState.volume; else GameState.music.volume = 0
+				if (!GameState.settings.sfx.muted) GameState.settings.sfx.volume = GameState.settings.volume; else GameState.settings.sfx.volume = 0
+				if (!GameState.settings.music.muted) GameState.settings.music.volume = GameState.settings.volume; else GameState.settings.music.volume = 0
 			
-				sfxHandler.volume = GameState.sfx.volume
-				if (!musicHandler.winding) musicHandler.volume = GameState.music.volume
+				sfxHandler.volume = GameState.settings.sfx.volume
+				if (!musicHandler.winding) musicHandler.volume = GameState.settings.music.volume
 			}
 		}
 	])
