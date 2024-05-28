@@ -9,3 +9,6 @@ To build:
 - `pnpm dev` - starts hosting locally
 - go to `localhost:8000`
 - change the files to work on it :thumbsup:
+
+BROKE COMMIT HISTORY BY RENAMING COMMIT :(
+![alt text](image.png)
