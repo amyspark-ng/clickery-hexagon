@@ -2,19 +2,18 @@ import { gamescene } from "./scenes/game/gamescene.js"
 import { introscene } from "./introScene.js"
 import { focuscene } from "./scenes/focuscene.js"
 
+// Sprite atlas were made with this awesome website
+// https://www.finalparsec.com/tools/sprite_sheet_maker
+
 export function loadAssets() {
 	loadRoot("./assets/")
 	loadBean()
 	
 	loadSprite("osaka", "sprites/osaka.png")
 	loadSprite("floppy", "sprites/floppy.png")
-
 	loadSprite("hexagon", "sprites/hexagon.png")
-
 	loadSprite("panderito", "sprites/panderito.png")
-	
 	loadSprite("folderObj", "sprites/folderObj.png")
-
 	loadSprite("speakers", "sprites/speakers.png", {
 		sliceX: 2,
 		sliceY: 1,
@@ -23,6 +22,40 @@ export function loadAssets() {
 			sound: 1,
 		}
 	})
+
+	loadSprite("storeWin", "sprites/windows/storeWin/storeWin.png")
+	loadSpriteAtlas("sprites/windows/storeWin/storeWinElements.png", {
+		"clickersElement": {
+			x: 0,
+			y: 0,
+			width: 349,
+			height: 117,
+		},
+		"cursorsElement": {
+			x: 0,
+			y: 122, // 117 + 5
+			width: 349,
+			height: 117,
+		},
+		"powerupsElement": {
+			x: 0,
+			y: 242, // 122 + 115 + 5 = 
+			width: 349,
+			height: (117 * 2) + 5, // height x 2 (rows) + 5 (space between rows)
+			sliceX: 1,
+			sliceY: 2,
+			anims: {
+				"locked": 0,
+				"unlocked": 1
+			}
+		},
+	})
+
+
+
+
+
+
 
 	loadSprite("cursors", "sprites/cursors.png", {
 		sliceX: 5,
@@ -137,46 +170,45 @@ export function loadAssets() {
 
 	loadSpriteAtlas("sprites/windows/folderIcons.png", {
 		"icon_store": {
-			"x": 0,
-			"y": 3,
-			"width": 108,
-			"height": 53,
-			"sliceX": 2,
-			"sliceY": 1,
-			"anims": {
-				"regular": 0,
-				"hover": 1,
+			width: 48 + 5 + 52,
+			height: 65,
+			sliceX: 2,
+			sliceY: 1,
+			x: 5,
+			y: 5,
+			anims: {
+				regular: 0,
+				hover: 1,
 			}
 		},
 		"icon_music": {
-			"x": 99,
-			"y": 0,
-			"width": 98,
-			"height": 53,
-			"sliceX": 2,
-			"sliceY": 1,
-			"anims": {
-				"regular": 0,
-				"hover": 1,
+			width: 48 + 5 + 52,
+			height: 65,
+			sliceX: 2,
+			sliceY: 1,
+			x: 125,
+			y: 5,
+			anims: {
+				regular: 0,
+				hover: 1,
 			}
 		},
 		"icon_question": {
-			"x": 197,
-			"y": 0,
-			"width": 98,
-			"height": 53,
-			"sliceX": 2,
-			"sliceY": 1,
-			"anims": {
-				"regular": 0,
-				"hover": 1,
+			width: 45 + 5 + 57,
+			height: 73,
+			sliceX: 2,
+			sliceY: 1,
+			x: 245,
+			y: 5,
+			anims: {
+				regular: 0,
+				hover: 1,
 			}
-		}
+		},
 	})
 	
-	loadSprite("storeWin", "sprites/windows/storeWin.png")
-	loadSprite("musicWin", "sprites/windows/musicWin.png")
-	loadSpriteAtlas("sprites/windows/musicWinElements.png", {
+	loadSprite("musicWin", "sprites/windows/musicWin/musicWin.png")
+	loadSpriteAtlas("sprites/windows/musicWin/musicWinElements.png", {
 		"discs": {
 			"x": 0,
 			"y": 0,
@@ -193,8 +225,8 @@ export function loadAssets() {
 	})
 
 	loadSprite("aboutWin", "sprites/windows/aboutWin.png")
-	loadSprite("hexColorWin", "sprites/windows/hexColorWin.png")
-	loadSprite("bgColorWin", "sprites/windows/bgColorWin.png")
+	loadSprite("hexColorWin", "sprites/windows/colorWin/hexColorWin.png")
+	loadSprite("bgColorWin", "sprites/windows/colorWin/bgColorWin.png")
 	
 	// #REGION SOUNDS
 	loadSound("volumeChange", "sounds/volumeChange.mp3")

@@ -3,7 +3,7 @@ import { bop, getSides, mouse } from "../utils.js";
 import { drag, curDraggin, setCurDraggin } from "../../../plugins/drag.js";
 import { playSfx } from "../../../sound.js";
 import { hexagon } from "../addHexagon.js";
-import { storeWinContent } from "./winStore.js";
+import { storeWinContent } from "./store/winStore.js";
 import { musicWinContent, setTimeSinceSkip, timeSinceSkip } from "./winMusic.js";
 import { colorWinContent } from "./winColor.js";
 
@@ -153,14 +153,12 @@ export function addMinibutton(i, xPosition) {
 
 	// if unfolded will not run
 	miniButton.onHover(() => {
-		if (timeSinceFold < 0.25) return
 		if (!folded && !isGenerallyHoveringWindow) {
 			miniButton.startHover()
 		}
 	})
 	
 	miniButton.onHoverEnd(() => {
-		if (timeSinceFold < 0.25) return
 		if (!folded) {
 			miniButton.endHover()
 		}

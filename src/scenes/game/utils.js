@@ -1,7 +1,7 @@
 import { GameState } from "../../GameState";
 import { autoLoopTime, excessTime } from "./gamescene";
 import { autoClick, hexagon } from "./addHexagon";
-import { isHoveringUpgrade, storeOpen } from "./windows/winStore";
+import { isHoveringUpgrade } from "./windows/store/upgrades";
 import { isDraggingWindow, isGenerallyHoveringWindow, isPreciselyHoveringWindow, manageWindow, openWindow } from "./windows/WindowsMenu";
 
 // definetely not chatgpt
@@ -403,6 +403,12 @@ export function addMouse() {
 	})
 }
 
+export function addGrid(opts = { timesX: 3, timesY: 2, parent: null, objectCreator: function() {  } }) {
+	for(let i = 0; i < opts.timesX * opts.timesY; i++) {
+		opts.objectCreator(parent, i)
+	}
+}
+
 export function addFlyingText(posToAdd, textToAdd) {
 	let texty = add([
 		text(textToAdd, {
@@ -506,9 +512,17 @@ export function addToolTip(obj, textToAdd = "cooltext\nverycool", textSize = 20,
 	}
 }
 
+export function endToolTip(speed = 1) {
+	get("tooltip").forEach(element => {
+		tween(element.opacity, 0, 0.05 / speed, (p) => element.opacity = p)
+		wait(0.08 / speed, () => {
+			destroy(element)
+		})
+	});
+}
+
 let maxLogs = 3;
 let toastQueue = [];
-
 export function addToast(opt = { icon: "none", title: "Title", body: "Body", color: WHITE }) {
     let logs = get("toast", { recursive: true });
 
@@ -595,15 +609,6 @@ export function addToast(opt = { icon: "none", title: "Title", body: "Body", col
     }
 
     processQueue(); // Ensure the queue is processed if there are available slots
-}
-
-export function endToolTip(speed = 1) {
-	get("tooltip").forEach(element => {
-		tween(element.opacity, 0, 0.05 / speed, (p) => element.opacity = p)
-		wait(0.08 / speed, () => {
-			destroy(element)
-		})
-	});
 }
 
 export function addPlusPercentageScore(posToAdd, amount, size = [40, 50]) {

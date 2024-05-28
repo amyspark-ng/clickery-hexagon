@@ -3,7 +3,7 @@ import { curDraggin, drag, setCurDraggin } from "../../../plugins/drag";
 import { waver } from "../../../plugins/wave";
 import { playSfx } from "../../../sound";
 import { hexagon } from "../addHexagon";
-import { bop, gameBg, getSides, mouse } from "../utils";
+import { blendColors, bop, gameBg, getSides, mouse } from "../utils";
 import { deactivateAllWindows } from "./WindowsMenu";
 
 let lastSoundPos;
@@ -69,7 +69,8 @@ function addRgbSlider(winParent, posToAdd = vec2(0), coloredObj, type = "r") {
 			let relativePosition = distanceFromCenter / (objectRect.width / 2);
 			relativePosition = (relativePosition + 0.9) / 1.8;
 			relativePosition = clamp(relativePosition, 0, 1)
-			const mappedPosition = (relativePosition * 300) - 150;
+			let mappedPosition = (relativePosition * 300) - 150;
+			mappedPosition = clamp(mappedPosition, getSides(theOneBehind).left, getSides(theOneBehind).right)
 			tween(sliderButton.pos.x, mappedPosition, 0.2, p => sliderButton.pos.x = p, easings.easeOutQuint)
 			playSfx("hoverMiniButton", sliderButton.draggingTune)
 		}
@@ -263,6 +264,7 @@ export function colorWinContent(winParent, winType = "hexColorWin") {
 			hexagon.color.g = gSlider.value
 			hexagon.color.b = bSlider.value
 			GameState.settings.hexColor = [rSlider.value, gSlider.value, bSlider.value]
+			winParent.color = hexagon.color.lighten(150)
 		})
 	}
 
@@ -273,8 +275,10 @@ export function colorWinContent(winParent, winType = "hexColorWin") {
 			gameBg.tintColor.b = bSlider.value
 			gameBg.blendFactor = aSlider.value
 			GameState.settings.bgColor = [rSlider.value, gSlider.value, bSlider.value, aSlider.value]
+			winParent.color = blendColors(gameBg.tintColor.lighten(200), gameBg.tintColor, gameBg.blendFactor)
 		})
 	}
+
 
 	defaultButton.onClick(() => {
 		bop(defaultButton)

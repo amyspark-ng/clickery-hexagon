@@ -231,6 +231,10 @@ export function gamescene() {
 		document.addEventListener("visibilitychange", handleVisibilityChange);
  		// #endregion
 
+		onKeyPress("u", () => {
+			GameState.settings.dropDragsOnMouseOut = !GameState.settings.dropDragsOnMouseOut
+		})
+
 		// prevent dumb ctrl + s
 		document.addEventListener("keydown", (event) => {
 			if (event.keyCode == 83 && (navigator.platform.match("Mac") ? event.metaKey : event.ctrlKey)) {

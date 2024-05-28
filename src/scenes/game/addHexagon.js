@@ -249,7 +249,8 @@ export function addHexagon() {
 	})
 
 	hexagon.onHoverEnd(() => {
-		if (!isPreciselyHoveringWindow && !isDraggingWindow) {
+		if (isDraggingWindow) return
+		if (!isPreciselyHoveringWindow) {
 			hexagon.endHover()
 		}
 

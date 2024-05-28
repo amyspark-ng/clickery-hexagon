@@ -1,6 +1,7 @@
 {
 	"search.exclude": {
-		"**/price-tweaking": true,
-		"**/www/": true
-	}
+		"**/price-tweaker": true,
+	},
+
+	"javascript.preferences.autoImportFileExcludePatterns": ["**/price-tweaker/**"],
 }

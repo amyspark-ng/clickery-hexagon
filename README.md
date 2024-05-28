@@ -1,7 +1,11 @@
 # Clickery Hexagon
 
-Clicker game made in Kaboom.js
+Simple clicker game made in Kaboom.js
 
 (keys.js goes in src root)
 
 To build:
+- `pnpm i` - installs dependencies
+- `pnpm dev` - starts hosting locally
+- go to `localhost:8000`
+- change the files to work on it :thumbsup:
