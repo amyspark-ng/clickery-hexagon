@@ -1,17 +1,17 @@
-import { GameState } from "../../../GameState.js";
+import { GameState } from "../../../gamestate.js";
 import { bop, getSides, mouse } from "../utils.js";
 import { drag, curDraggin, setCurDraggin } from "../../../plugins/drag.js";
 import { playSfx } from "../../../sound.js";
-import { hexagon } from "../addHexagon.js";
-import { storeWinContent } from "./store/winStore.js";
-import { musicWinContent, setTimeSinceSkip, timeSinceSkip } from "./winMusic.js";
-import { colorWinContent } from "./winColor.js";
+import { hexagon } from "../hexagon.js";
+import { storeWinContent } from "./store/storeWindows.js";
+import { musicWinContent, setTimeSinceSkip, timeSinceSkip } from "./musicWindow.js";
+import { colorWinContent } from "./colorWindow.js";
 
 let infoForWindows = {};
-export let isGenerallyHoveringWindow = false;
-export let isPreciselyHoveringWindow = false;
-export let isInClickingRangeOfWindow = false;
-export let isDraggingWindow = false;
+export let isGenerallyHoveringAWindow = false;
+export let isPreciselyHoveringAWindow = false;
+export let isInClickingRangeOfAWindow = false;
+export let isDraggingAWindow = false;
 
 let folderObj;
 let folded = true;
@@ -38,7 +38,7 @@ export function manageWindow(windowKey) {
 			openWindow(windowKey)
 		}
 	}
-	else debug.log("WRONG KEY")
+	else throw new Error("Window not found: " + windowKey);
 }
 
 export function windowsDefinition() {
@@ -81,21 +81,23 @@ export function addMinibutton(i, xPosition) {
 			whiteness: 0,
 			// for these 2 it will do yPos even if locked
 			startHover() {
-				if (isDraggingWindow) return
+				if (isDraggingAWindow) return
 				tween(miniButton.pos.y, miniButton.verPosition - 5, 0.32, (p) => miniButton.pos.y = p, easings.easeOutQuint)
 				tween(miniButton.scale, vec2(1.05), 0.32, (p) => miniButton.scale = p, easings.easeOutQuint)
 				this.defaultScale = vec2(1.05)
 				playSfx("hoverMiniButton", 100 * miniButton.windowInfo.idx / 4)
 				this.play("hover")
+				mouse.play("point")
 			},
 
 			endHover() {
-				if (isDraggingWindow) return
+				if (isDraggingAWindow) return
 				tween(miniButton.pos.y, miniButton.verPosition, 0.32, (p) => miniButton.pos.y = p, easings.easeOutQuint)
 				tween(miniButton.angle, 0, 0.32, (p) => miniButton.angle = p, easings.easeOutQuint)
 				tween(miniButton.scale, vec2(1), 0.32, (p) => miniButton.scale = p, easings.easeOutQuint)
 				miniButton.defaultScale = vec2(1.05)
 				if (this.window == null) this.play("regular")
+				mouse.play("cursor")
 			},
 			
 			manageRespectiveWindow(button = this) {
@@ -115,7 +117,7 @@ export function addMinibutton(i, xPosition) {
 			},
 
 			update() {
-				if (this.isHovering() && !isGenerallyHoveringWindow && !isDraggingWindow && !folded) {
+				if (this.isHovering() && !isGenerallyHoveringAWindow && !isDraggingAWindow && !folded) {
 					// animate it spinning it
 					this.angle = wave(-9, 9, time() * 3)
 				}
@@ -151,21 +153,21 @@ export function addMinibutton(i, xPosition) {
 		"u_size": vec2(quad.w, quad.h),
 	})))
 
-	// if unfolded will not run
 	miniButton.onHover(() => {
-		if (!folded && !isGenerallyHoveringWindow) {
+		if (!isGenerallyHoveringAWindow && !isDraggingAWindow) {
 			miniButton.startHover()
 		}
 	})
-	
+
 	miniButton.onHoverEnd(() => {
-		if (!folded) {
+		if (isDraggingAWindow) return
+		if (!isPreciselyHoveringAWindow) {
 			miniButton.endHover()
 		}
 	})
 
 	miniButton.onClick(() => {
-		if (isPreciselyHoveringWindow || isDraggingWindow) return
+		if (isPreciselyHoveringAWindow || isDraggingAWindow) return
 		miniButton.manageRespectiveWindow(miniButton)
 		bop(miniButton)
 	})
@@ -191,7 +193,6 @@ export function openWindow(name = "") {
 		{
 			idx: infoForWindows[name].idx,
 			miniButton: infoForWindows[name].showable ? miniButtons[infoForWindows[name].idx] : null,
-			dragging: false,
 			showable: infoForWindows[name].showable,
 			close() {
 				folderObj.trigger("winClose")
@@ -231,8 +232,8 @@ export function openWindow(name = "") {
 
 			isMouseInClickingRange() {
 				let condition = 
-				(mousePos().y >= getSides(this).top - 15) &&
-				(mousePos().y <= getSides(this).top + 15)
+				(mousePos().y >= getSides(this).top - 30) &&
+				(mousePos().y <= getSides(this).top + 25)
 				return condition;
 			},
 
@@ -256,6 +257,7 @@ export function openWindow(name = "") {
 
 			update() {
 				this.pos.x = clamp(this.pos.x, -151, 1180)
+				// debug.log(isPreciselyHoveringWindow)
 			}
 		}
 	])
@@ -271,23 +273,22 @@ export function openWindow(name = "") {
 		z(windowObj.z + 1),
 		area({ scale: vec2(1.8, 1.1), offset: vec2(-10, 0)}),
 		"xButton",
-		"hoverObj",
 	])
 
 	xButton.pos.x += windowObj.width - xButton.width - 5
 
 	xButton.onHover(() => {
-		if (isDraggingWindow) return
+		if (isDraggingAWindow) return
 		xButton.color = RED
 	})
 
 	xButton.onHoverEnd(() => {
-		if (isDraggingWindow) return
+		if (isDraggingAWindow) return
 		xButton.color = WHITE
 	})
 
 	xButton.onClick(() => {
-		if (!isDraggingWindow) {
+		if (!isDraggingAWindow) {
 			windowObj.close()
 			if (windowObj.showable) {
 				if (get("window").length == 0) {
@@ -305,8 +306,6 @@ export function openWindow(name = "") {
 			hexagon.endHover()
 		}
 
-		if (!isDraggingWindow) mouse.play("cursor")
-
 		if (folded) return;
 		get("minibutton").forEach(minibuttonHoverEndCheck => {
 			if (minibuttonHoverEndCheck.isHovering()) {
@@ -317,13 +316,13 @@ export function openWindow(name = "") {
 
 	windowObj.onHoverEnd(() => {
 		// debug.log("end hover")
-		if (hexagon.isHovering() && !isDraggingWindow) {
+		if (hexagon.isHovering() && !isDraggingAWindow) {
 			hexagon.startHover()
 		}
 
 		if (folded) return;
 		get("minibutton").forEach(minibuttonHoverEndCheck => {
-			if (minibuttonHoverEndCheck.isHovering() && !isDraggingWindow && !isGenerallyHoveringWindow) {
+			if (minibuttonHoverEndCheck.isHovering() && !isDraggingAWindow && !isGenerallyHoveringAWindow) {
 				minibuttonHoverEndCheck.startHover()
 			}
 		});
@@ -356,7 +355,7 @@ export function openWindow(name = "") {
 		if (curDraggin) {
 			curDraggin.trigger("dragEnd")
 			setCurDraggin(null)
-			mouse.release()
+			mouse.release("cursor")
 		}
 	})
 
@@ -410,7 +409,7 @@ export function folderObjManaging() {
 		area({ scale: vec2(1.2) }),
 		z(4),
 		anchor("center"),
-		"hoverObj",
+		"regularHover",
 		"folderObj",
 		{
 			defaultScale: vec2(1.2),
@@ -504,8 +503,8 @@ export function folderObjManaging() {
 			let allWindows = get("window", { recursive: true })
 			if (allWindows.length > 0) allWindows[clamp(allWindows.length - 1, 0, allWindows.length)].activate()
 
-			isGenerallyHoveringWindow = get("window", { recursive: true }).some((window) => window.isMouseInGeneralRange())
-			isPreciselyHoveringWindow = get("window", { recursive: true }).some((window) => window.isMouseInPreciseRange())
+			isGenerallyHoveringAWindow = get("window", { recursive: true }).some((window) => window.isMouseInGeneralRange())
+			isPreciselyHoveringAWindow = get("window", { recursive: true }).some((window) => window.isMouseInPreciseRange())
 		})
 	})
 
@@ -513,10 +512,10 @@ export function folderObjManaging() {
 		if (!get("window").length > 0) return
 		// if any window is being hovered on
 		get("window").some((window) => {
-			isGenerallyHoveringWindow = window.isMouseInGeneralRange()
-			isPreciselyHoveringWindow = window.isMouseInPreciseRange()
-			isInClickingRangeOfWindow = window.isMouseInClickingRange()
-			isDraggingWindow = window.dragging
+			isGenerallyHoveringAWindow = window.isMouseInGeneralRange()
+			isPreciselyHoveringAWindow = window.isMouseInPreciseRange()
+			isInClickingRangeOfAWindow = window.isMouseInClickingRange()
+			isDraggingAWindow = window.dragging
 		})
 	})
 }
@@ -567,6 +566,6 @@ export function unlockWindow(key) {
 
 	// dummy
 	else {
-		debug.log("PASS A VALID KEY, DUH")
+		throw new Error("Window not found: " + key);
 	}
 }

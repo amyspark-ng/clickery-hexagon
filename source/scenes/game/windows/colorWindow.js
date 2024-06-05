@@ -1,13 +1,14 @@
-import { GameState } from "../../../GameState";
+import { GameState } from "../../../gamestate";
 import { curDraggin, drag, setCurDraggin } from "../../../plugins/drag";
 import { waver } from "../../../plugins/wave";
 import { playSfx } from "../../../sound";
-import { hexagon } from "../addHexagon";
+import { hexagon } from "../hexagon";
 import { blendColors, bop, gameBg, getSides, mouse } from "../utils";
-import { deactivateAllWindows } from "./WindowsMenu";
+import { deactivateAllWindows } from "./windowsAPI";
 
 let lastSoundPos;
 let draggingTune;
+export let isDraggingASlider = false;
 
 function deactivateAllSliders() {
 	get("sliderButton", { recursive: true }).forEach(sliderbuttons => {
@@ -90,7 +91,6 @@ function addRgbSlider(winParent, posToAdd = vec2(0), coloredObj, type = "r") {
 		"slider",
 		type + "slider",
 		{
-			dragging: false,
 			draggingTune: 0,
 			update() {
 				if (type != "a") { // color
@@ -113,6 +113,7 @@ function addRgbSlider(winParent, posToAdd = vec2(0), coloredObj, type = "r") {
 							// grab it!
 							mouse.grab()
 							obj.pick()
+							this.dragging = true
 							break
 						}
 					}
@@ -124,12 +125,23 @@ function addRgbSlider(winParent, posToAdd = vec2(0), coloredObj, type = "r") {
 					if (curDraggin) {
 						curDraggin.trigger("dragEnd")
 						setCurDraggin(null)
-						mouse.release()
+						this.dragging = false
+						mouse.release(get("sliderButton").some(obj => obj.isHovering()) || hexagon.isHovering() ? "point" : "cursor")
 					}
 				}
 			},
 		}
 	])
+
+	sliderButton.onHover(() => {
+		if (isDraggingASlider) return
+		mouse.play("point")
+	})
+
+	sliderButton.onHoverEnd(() => {
+		if (isDraggingASlider) return
+		mouse.play("cursor")
+	})
 
 	// also works as onClick
 	sliderButton.onDrag(() => {
@@ -295,6 +307,10 @@ export function colorWinContent(winParent, winType = "hexColorWin") {
 			})
 			tween(aSlider.button.pos.x, aSlider.bg.pos.x + 16, 0.2, (p) => aSlider.button.pos.x = p, easings.easeOutQuint)
 		}
+	})
+
+	winParent.onUpdate(() => {
+		isDraggingASlider = get("sliderButton", { recursive: true }).some(sliderObj => {if(sliderObj.is("drag")) return sliderObj.dragging})
 	})
 
 	randomButton.onClick(() => {

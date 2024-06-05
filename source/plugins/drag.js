@@ -16,11 +16,13 @@ export function drag() {
 		id: "drag",
 		// This component requires the "pos" and "area" component to work
 		require: [ "pos", "area" ],
+		dragging: false,
 		pick() {
 			// Set the current global dragged to this
 			curDraggin = this
 			offset = mousePos().sub(this.pos)
 			this.trigger("drag")
+			this.dragging = true
 		},
 		// "update" is a lifecycle method gets called every frame the obj is in scene
 		update() {
@@ -28,6 +30,10 @@ export function drag() {
 				if (this.is("sliderButton")) this.pos.x = mousePos().x - (offset.x)
 				else this.pos = mousePos().sub(offset) 
 				this.trigger("dragUpdate")
+			}
+
+			else {
+				this.dragging = false
 			}
 		},
 		onDrag(action) {

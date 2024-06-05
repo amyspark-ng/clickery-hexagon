@@ -1,6 +1,6 @@
-import { GameState } from "../../../../GameState";
+import { GameState } from "../../../../gamestate";
 import { playSfx } from "../../../../sound";
-import { bop, getPrice, getSides } from "../../utils";
+import { bop, getPrice, getSides, mouse } from "../../utils";
 import { addMiscUpgrades, addRegularUpgrades } from "./upgrades";
 
 let elements = {
@@ -33,6 +33,7 @@ function addStoreElement(winParent, opts = { key: "null", pos: vec2(0, 20) }) {
 		`${opts.key}`,
 		{
 			price: 0,
+			isBeingHoveredOn: false,
 			buy(amount) {
 				if (winParent.dragging) return
 				if (this.is("clickersElement")) GameState.clickers += amount
@@ -93,6 +94,7 @@ function addStoreElement(winParent, opts = { key: "null", pos: vec2(0, 20) }) {
 	let timesBoughtWhileHolding = 0
 
 	btn.onMouseDown(() => {
+		if (!winParent.is("active")) return
 		if (!btn.isHovering()) return
 
 		if (GameState.score >= btn.price) {
@@ -119,6 +121,7 @@ function addStoreElement(winParent, opts = { key: "null", pos: vec2(0, 20) }) {
 	})
 
 	btn.onMouseRelease(() => {
+		if (!winParent.is("active")) return
 		timer = 0
 		timesBoughtWhileHolding = 0
 		timeUntilAnotherBuy = 2.25

@@ -1,5 +1,5 @@
 import { gamescene } from "./scenes/game/gamescene.js"
-import { introscene } from "./introScene.js"
+import { introscene } from "./scenes/introScene.js"
 import { focuscene } from "./scenes/focuscene.js"
 
 // Sprite atlas were made with this awesome website

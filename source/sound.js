@@ -1,5 +1,5 @@
 
-import { GameState } from "./GameState.js"
+import { GameState } from "./gamestate.js"
 import { panderitoIndex } from "./scenes/game/gamescene.js";
 
 export let sfxHandler;

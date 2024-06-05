@@ -1,10 +1,10 @@
-import { GameState } from "../../GameState"
-import { scoreVars, addHexagon, autoClick, hexagon } from "./addHexagon.js"
-import { uiCounters } from "./uiCounter"
+import { GameState } from "../../gamestate"
+import { scoreVars, addHexagon, autoClick, hexagon } from "./hexagon.js"
+import { uiCounters } from "./uicounters"
 import { addBackground, addMouse, addToast, debugFunctions, debugTexts, mouse, percentage } from "./utils"
 import { musicHandler, playMusic } from "../../sound"
-import { folderObjManaging, unlockWindow, windowsDefinition } from "./windows/WindowsMenu"
-import { songs } from "./windows/winMusic"
+import { folderObjManaging, unlockWindow, windowsDefinition } from "./windows/windowsAPI"
+import { songs } from "./windows/musicWindow"
 import { curDraggin, setCurDraggin } from "../../plugins/drag"
 import { k } from "../../main"
 
@@ -34,6 +34,8 @@ export function gamescene() {
 		debugTexts()
 
 		setGravity(1600)
+
+		GameState.load()
 
 		playMusic(GameState.settings.music.favoriteIdx == null ? "clicker.wav" : Object.keys(songs)[GameState.settings.music.favoriteIdx])
 		if (GameState.settings.music.muted) musicHandler.paused = true

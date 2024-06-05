@@ -1,10 +1,11 @@
 
-import { GameState } from "../../GameState.js";
-import { scoreText, spsText } from "./uiCounter.js";
+import { GameState } from "../../gamestate.js";
+import { scoreText, spsText } from "./uicounters.js";
 import { addPlusScoreText, mouse, formatNumber, arrayToColor } from "./utils.js";
 import { playSfx } from "../../sound.js";
-import { isDraggingWindow, isGenerallyHoveringWindow, isPreciselyHoveringWindow, manageWindow } from "./windows/WindowsMenu.js";
+import { isDraggingAWindow, isGenerallyHoveringAWindow, isPreciselyHoveringAWindow, manageWindow } from "./windows/windowsAPI.js";
 import { waver } from "../../plugins/wave.js";
+import { isDraggingASlider } from "./windows/colorWindow.js";
 
 export let scoreVars = {
 	scorePerClick: 1,
@@ -93,12 +94,17 @@ export function autoClick() {
 		wait(0.15, () => {
 			autoCursor.play("grab")
 			
-			hexagon.clickPress(false)
+			// clickPress manual false
+			tween(hexagon.scaleIncrease, 0.98, 0.35, (p) => hexagon.scaleIncrease = p, easings.easeOutQuint)
+			playSfx("clickPress", rand(-50, 50))
 
 			wait(0.15, () => {
 				autoCursor.play("point")
 
-				hexagon.clickRelease(false)
+				// clickRelease manual false
+				tween(hexagon.scaleIncrease, hexagon.isHovering() ? 1.05: 1, 0.35, (p) => hexagon.scaleIncrease = p, easings.easeOutQuint)
+				playSfx("clickRelease", rand(-50, 50))
+				
 				addPlusScoreText(autoCursor.pos, scoreVars.scorePerAutoClick, [32.5, 40])
 				GameState.addScore(scoreVars.scorePerAutoClick)
 
@@ -152,8 +158,8 @@ export function addHexagon() {
 		z(2),
 		waver({ maxAmplitude: 5, wave_speed: 1 }),
 		"hexagon",
-		"hoverObj",
 		{
+			isBeingHoveredOn: false,
 			smallestScale: 0.985,
 			biggestScale: 1.0015,
 			defaultScale: vec2(1),
@@ -181,52 +187,37 @@ export function addHexagon() {
 				}
 			},
 			
-			clickPress(manual = true) {
+			clickPress() {
 				this.clickPressTween = tween(this.scaleIncrease, 0.98, 0.35, (p) => this.scaleIncrease = p, easings.easeOutQuint)
-
-				if (manual) {
-					this.isBeingClicked = true
-					mouse.clicking = true
-					mouse.grab()
-				}
-
+				this.isBeingClicked = true
+				mouse.clicking = true
+				mouse.grab()
 				playSfx("clickPress", rand(-50, 50))
 			},
 
-			clickRelease(manual = true) {
+			clickRelease() {
 				this.clickPressTween.cancel()
 				tween(this.scaleIncrease, this.isHovering() ? 1.05: 1, 0.35, (p) => this.scaleIncrease = p, easings.easeOutQuint)
-
-				// manual is true, so this is if it isn't manual
-				if (manual) {
-					mouse.clicking = false
-					this.isBeingClicked = false 
-					isWaitingToClick = true
-					timeTilClick = constTimeTilClick
-					
-					clickVars.clicksPerSecond++
-					mouse.release()
-				}
-
+				mouse.clicking = false
+				this.isBeingClicked = false 
+				isWaitingToClick = true
+				timeTilClick = constTimeTilClick
+				clickVars.clicksPerSecond++
+				mouse.release("point")
 				playSfx("clickRelease", rand(-50, 50))
+			},
+
+			autoClick() {
+				
 			},
 
 			startHover() {
 				if (this.canClick) {
 					tween(this.scaleIncrease, 1.05, 0.35, (p) => this.scaleIncrease = p, easings.easeOutCubic);
 					this.rotationSpeed += hoverRotSpeedIncrease
-					mouse.play("point")
+					if (!isDraggingASlider) mouse.play("point")
+					this.isBeingHoveredOn = true
 				}
-
-				// this.play("hovered")
-
-				// if (!this.is("shader")) {
-				// 	this.use(shader("outline", {
-				// 		"u_color": WHITE,
-				// 		"u_inside": 0,
-				// 		"u_thickness": 10,
-				// 	}))
-				// }
 			},
 
 			endHover() {
@@ -234,6 +225,8 @@ export function addHexagon() {
 					tween(this.scaleIncrease, 1, 0.35, (p) => this.scaleIncrease = p, easings.easeOutCubic);
 					this.isBeingClicked = false
 					this.rotationSpeed = 0
+					if (!isDraggingASlider) mouse.play("cursor")
+					this.isBeingHoveredOn = false
 				}
 			}
 		}
@@ -241,37 +234,33 @@ export function addHexagon() {
 
 	hexagon.startWave()
 
-	hexagon.onHover(() => {
-		// if no window has a mouse in precise range
-		if (!isGenerallyHoveringWindow && !isDraggingWindow) {
+	hexagon.onHoverUpdate(() => {
+		if (!isGenerallyHoveringAWindow && !isDraggingAWindow && !hexagon.isBeingHoveredOn) {
 			hexagon.startHover()
 		}
 	})
 
 	hexagon.onHoverEnd(() => {
-		if (isDraggingWindow) return
-		if (!isPreciselyHoveringWindow) {
+		if (isDraggingAWindow || isDraggingASlider) return
+		if (!isPreciselyHoveringAWindow) {
 			hexagon.endHover()
-		}
-
-		if (mouse.grabbing) {
-			mouse.release()
-			mouse.play("cursor")
 		}
 	});
 
 	hexagon.onMousePress("left", () => {
-		if (hexagon.isHovering()) {
-			if (hexagon.canClick && timeTilClick < 0 && (!isPreciselyHoveringWindow && !isDraggingWindow)) {
-				hexagon.clickPress(true)
+		if (hexagon.isBeingHoveredOn) {
+			if (!isWaitingToClick && (!get("window").some(w => w.isMouseInPreciseRange()) && !isDraggingAWindow)) {
+				hexagon.clickPress()
 			}
 		}
 	})
 	
 	hexagon.onMouseRelease("left", () => {
-		if (hexagon.isHovering()) {
-			if (hexagon.canClick && hexagon.isBeingClicked && !isWaitingToClick && (!get("window").some(w => w.isMouseInPreciseRange()) && !isDraggingWindow)) {
-				hexagon.clickRelease(true)
+		if (hexagon.isBeingHoveredOn) {
+			if (hexagon.canClick && hexagon.isBeingClicked && !isWaitingToClick && (!get("window").some(w => w.isMouseInPreciseRange()) && !isDraggingAWindow)) {
+				hexagon.clickRelease()
+				
+				//actual score additions
 				addPlusScoreText(mouse.pos, scoreVars.scorePerClick)
 				GameState.addScore(scoreVars.scorePerClick)
 				tween(scoreText.scaleIncrease, 1.05, 0.2, (p) => scoreText.scaleIncrease = p, easings.easeOutQuint).onEnd(() => {

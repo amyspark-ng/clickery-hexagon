@@ -1,8 +1,8 @@
-import { GameState } from "../../GameState";
+import { GameState } from "../../gamestate";
 import { autoLoopTime, excessTime } from "./gamescene";
-import { autoClick, hexagon } from "./addHexagon";
+import { autoClick, hexagon } from "./hexagon";
 import { isHoveringUpgrade } from "./windows/store/upgrades";
-import { isDraggingWindow, isGenerallyHoveringWindow, isPreciselyHoveringWindow, manageWindow, openWindow } from "./windows/WindowsMenu";
+import { isDraggingAWindow, isGenerallyHoveringAWindow, isPreciselyHoveringAWindow, manageWindow, openWindow } from "./windows/windowsAPI";
 
 // definetely not chatgpt
 export function formatNumber(number = 0, short = true, isPrice = false) {
@@ -51,6 +51,10 @@ export function formatMusicTime(timeInSeconds) {
 export function percentage(number, percentageTo) {
 	return Math.round((number * percentageTo) / 100)
 }
+
+// function precioCPS(objectAmount, basePrice = 100, percentageIncreaase = 1.15) {
+//     return basePrice * Math.pow(percentageIncreaase, objectAmount);
+// }
 
 export function getPrice(basePrice, percentageIncrease, objectAmount, amountToBuy) {
     let priceToReturn = 0;
@@ -194,7 +198,6 @@ export function debugTexts() {
 
 	texty.hidden = true
 	texty.paused = true
-
 }
 
 export function debugFunctions() {
@@ -263,7 +266,7 @@ export function addBackground() {
     })))
 
 	gameBg.onMousePress("right", () => {
-		if (!hexagon.isHovering() && !get("folderObj")[0].isHovering() && gameBg.isHovering() && !isGenerallyHoveringWindow && !isDraggingWindow) {
+		if (!hexagon.isHovering() && !get("folderObj")[0].isHovering() && gameBg.isHovering() && !isGenerallyHoveringAWindow && !isDraggingAWindow) {
 			manageWindow("bgColorWin")
 		}
 	})
@@ -320,8 +323,9 @@ export function addMouse() {
 				mouse.play("grab")
 			},
 
-			release() {
+			release(newAnim = "cursor") {
 				this.grabbing = false
+				mouse.play(newAnim)
 			},
 
 			pinch() {
@@ -348,58 +352,15 @@ export function addMouse() {
 			}
 		}
 	])
-	
-	onHoverUpdate("hoverObj", (obj) => {
-		if (obj.is("hexagon")) {
-			if (!isPreciselyHoveringWindow && !isDraggingWindow) {
-				if (!mouse.grabbing) {
-					mouse.play("point")
-				}
-			}
-		}
 
-		else if (obj.is("storeElement") || obj.is("upgrade")) {
-			if (!isDraggingWindow) {
-				if (!isHoveringUpgrade) {
-					if (GameState.score >= obj.price) {
-						mouse.play("point")
-					}
-					else {
-						mouse.play("cursor") 
-					}
-				}
-			}
-		}
-	
-		else if (obj.is("xButton") || obj.is("windowButton") || obj.is("folderObj") || obj.is("minibutton")) {
-			if (!isDraggingWindow) {
-				mouse.play("point")
-			}
-		}
-
-		else {
-			if (!isGenerallyHoveringWindow && !isDraggingWindow) {
-				mouse.play("cursor")
-			}
-		}
+	onHover("regularHover", (obj) => {
+		if (isPreciselyHoveringAWindow) return
+		mouse.play("point")
 	})
 
-	onHoverEnd("hoverObj", () => {
-		if (!mouse.grabbing) {
-			mouse.play("cursor")
-		}
-	})
-
-	onHoverUpdate("glass", () => {
-		if (!isGenerallyHoveringWindow && !isDraggingWindow) {
-			if (!storeOpen) mouse.play("check")
-		}
-	})
-
-	onHoverEnd("glass", () => {
-		if (!mouse.grabbing) {
-			mouse.play("cursor")
-		}
+	onHoverEnd("regularHover", (obj) => {
+		if (isPreciselyHoveringAWindow) return
+		mouse.play("cursor")
 	})
 }
 

@@ -1,6 +1,4 @@
-import { GameState } from "../GameState"
-
-// A custom component for waving
+// A custom component for waving - it is TS for this waveCompOpt
 export interface WaveCompOpt {
 	wave_tweenSpeed?: number,
 	wave_startTweenSpeed: number,

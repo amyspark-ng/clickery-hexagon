@@ -3,29 +3,22 @@ import "kaboom/global";
 
 import { drawLoadScreen, customScreens } from "./scenes/game/utils.js";
 import { loadAssets } from "./loader.js"
-import { GameState } from "./GameState.js"
+import { GameState } from "./gamestate.js"
 
 export const k = kaboom({
 	width: 1024,
 	height: 576,
 	font: 'lambda',
-	crisp: true,
 	canvas: document.getElementById("kanva"),
 	logMax: 10,
 	backgroundAudio: true,
-	// scale: 0.99,
 	// stretch: true,
 	// letterbox: true,
 });
 
 loadAssets()
-onLoading(drawLoadScreen)
-onLoad(() => {
-	console.log("finished loading!!!!")
-})
-customScreens()
 
-GameState.load()
+onLoading(drawLoadScreen)
 
 setCursor("none")
 

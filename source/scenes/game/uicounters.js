@@ -1,4 +1,4 @@
-import { GameState } from "../../GameState.js";
+import { GameState } from "../../gamestate.js";
 import { waver } from "../../plugins/wave.js";
 import { formatNumber } from "./utils.js";
 

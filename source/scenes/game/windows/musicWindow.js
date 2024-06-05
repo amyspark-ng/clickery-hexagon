@@ -1,4 +1,4 @@
-import { GameState } from "../../../GameState";
+import { GameState } from "../../../gamestate";
 import { waver } from "../../../plugins/wave";
 import { espMute, espUnmute, musicHandler, playMusic, playSfx, scratchSong } from "../../../sound";
 import { bop, formatMusicTime } from "../utils";
@@ -107,6 +107,7 @@ export function musicWinContent(winParent) {
 	])
 
 	theOneBehind.onClick(() => {
+		if (!winParent.is("active")) return
 		if (!skipping) {
 			if (theOneBehind.isHovering()) {
 				// calculation stuff
@@ -196,6 +197,7 @@ export function musicWinContent(winParent) {
 	// each tim you click it waits one seonc, if the time since the skip is greater than 1 it plays the song
 	// if the time since the skip is less than 1 it does nothing
 	get("musicButton", { recursive: true }).forEach(mBtn => mBtn.onClick(() => {
+		if (!winParent.is("active")) return
 		if (!mBtn.is("pauseButton")) {
 			if (skipping == false) {
 				skipping = true

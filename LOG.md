@@ -13,12 +13,12 @@
 - Make pinch animation
 - Rework tooltips
 - Rework mouse animations system, that sucks whole ass
+- For gods sake just rewrite the mouse animations system
 ## Windows
 - Fix minibuttons hovering animation
 - If hasn't unlocked folderObj i think GameState.unlockedWindows should be null
-- Can hover stuff while hovering another window
-^ CAN CLICK STUFF WHILE BEING BEHIND A WINDOW HOLY SHIT FIX THIS
 - Random bug where the mouse plays point when starting hovering a window sometimes from hexagon
+- You can click hexagon while hovering window for drag, then you drag it and it will not play clickRelease
 * For clicking behind object should check if any other window that is not the current one is active, if any other window is active the button should not work
 ### Store
 * Store elements don't go darker with the unactive color because their color is being defined by score amount and price
