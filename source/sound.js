@@ -61,10 +61,11 @@ export function manageMute() {
 	}
 }
 
+export let volChangeTune = 0
+
 export function volumeManager() {
 	let barXPosition = -110
 	let seconds = 0
-	let tune = 0
 
 	sfxHandler = play("clickPress", { volume: 0 })
 	musicHandler = play("clickRelease", { volume: 0 })
@@ -165,6 +166,8 @@ export function volumeManager() {
 
 				volume(GameState.settings.volume)
 
+				volChangeTune = map(GameState.settings.volume, 0, 1, -250, 0)
+				
 				if (seconds > 0) seconds -= dt()
 
 				else {
@@ -181,7 +184,6 @@ export function volumeManager() {
 					
 					if (GameState.settings.volume > 0) {
 						GameState.settings.volume -= 0.1
-						tune -= 25
 						bars.forEach(element => {
 							element.hidden = false
 						});
@@ -197,7 +199,7 @@ export function volumeManager() {
 					}
 
 					seconds = 1.5
-					play("volumeChange", { detune: tune })
+					play("volumeChange", { detune: volChangeTune })
 					volumeText.text = "VOLUME"
 				}
 				
@@ -206,12 +208,11 @@ export function volumeManager() {
 
 					if (GameState.settings.volume <= 0.9) {
 						GameState.settings.volume += 0.1
-						tune += 25
-						play("volumeChange", { detune: tune })
+						play("volumeChange", { detune: volChangeTune })
 					}
 
 					// else play("whistle")
-					else play("volumeChange", { detune: tune, volume: 5 })
+					else play("volumeChange", { detune: volChangeTune, volume: 5 })
 
 					seconds = 1.5
 					bars.forEach(element => {

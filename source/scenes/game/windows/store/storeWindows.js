@@ -34,6 +34,7 @@ function addStoreElement(winParent, opts = { key: "null", pos: vec2(0, 20) }) {
 		{
 			price: 0,
 			isBeingHoveredOn: false,
+			isBeingClicked: false,
 			buy(amount) {
 				if (winParent.dragging) return
 				if (this.is("clickersElement")) GameState.clickers += amount
@@ -53,6 +54,34 @@ function addStoreElement(winParent, opts = { key: "null", pos: vec2(0, 20) }) {
 			update() {
 				isKeyDown("shift") ? amountToBuy = 10 : amountToBuy = 1
 				if (this.is("clickersElement") || this.is("cursorsElement")) this.price = getPrice(elements[opts.key].basePrice, elements[opts.key].percentageIncrease, GameState[elements[opts.key].gamestateKey], amountToBuy)
+			},
+
+			draw() {
+				if (!this.isBeingClicked) return
+				if (timesBoughtWhileHolding < 2) return
+				if (GameState.score < this.price) return
+				if (timesBoughtWhileHolding < 12) {
+					drawCircle({
+						anchor: "center",
+						pos: vec2((this.pos.x - this.width / 2) + 5, this.pos.y - this.height / 2 - this.height + 10),
+						radius: 10,
+						color: WHITE,
+						z: this.z + 1,
+						fill: false,
+						outline: 5,
+						end: map(timer, 0, timeUntilAnotherBuy, 1, 360),
+					})
+				}
+
+				else {
+					drawText({
+						text: "$",
+						pos: vec2((this.pos.x - this.width / 2) + 5, this.pos.y - this.height / 2 - this.height + 10),
+						size: 20,
+						anchor: "center",
+						z: this.z + 1,
+					})
+				}
 			}
 		}
 	])
@@ -90,22 +119,25 @@ function addStoreElement(winParent, opts = { key: "null", pos: vec2(0, 20) }) {
 	])
 
 	let timer = 0;
-	let timeUntilAnotherBuy = 1
+	let minTime = 0.08
+	let timeUntilAnotherBuy = 1.2
+	let maxTime = 1.2
 	let timesBoughtWhileHolding = 0
 
 	btn.onMouseDown(() => {
-		if (!winParent.is("active")) return
+		// if (!winParent.is("active")) return
 		if (!btn.isHovering()) return
+		btn.isBeingClicked = true
 
 		if (GameState.score >= btn.price) {
 			if (timesBoughtWhileHolding == 0) {
-				timeUntilAnotherBuy = 1
+				timeUntilAnotherBuy = maxTime
 			}
 
 			timer += dt()
 
-			timeUntilAnotherBuy = 1 / (timesBoughtWhileHolding)
-			timeUntilAnotherBuy = clamp(timeUntilAnotherBuy, 0.05, 1)
+			timeUntilAnotherBuy = maxTime / (timesBoughtWhileHolding)
+			timeUntilAnotherBuy = clamp(timeUntilAnotherBuy, minTime, maxTime)
 
 			if (timesBoughtWhileHolding == 0) {
 				timesBoughtWhileHolding = 1
@@ -121,7 +153,17 @@ function addStoreElement(winParent, opts = { key: "null", pos: vec2(0, 20) }) {
 	})
 
 	btn.onMouseRelease(() => {
-		if (!winParent.is("active")) return
+		if (!btn.isHovering()) return
+		btn.isBeingClicked = false
+		// if (!winParent.is("active")) return
+		timer = 0
+		timesBoughtWhileHolding = 0
+		timeUntilAnotherBuy = 2.25
+	})
+
+	btn.onHoverEnd(() => {
+		btn.isBeingClicked = false
+		// if (!winParent.is("active")) return
 		timer = 0
 		timesBoughtWhileHolding = 0
 		timeUntilAnotherBuy = 2.25

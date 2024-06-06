@@ -18,11 +18,15 @@ export const k = kaboom({
 
 loadAssets()
 
-onLoading(drawLoadScreen)
-
 setCursor("none")
 
 export let kanvas = document.getElementById("kanva")
 export let gl = kanvas.getContext("2d")
+
+let dummy = add([
+
+])
+
+export let ROOT = dummy.parent
 
 go("focuscene")

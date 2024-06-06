@@ -126,7 +126,7 @@ function addRgbSlider(winParent, posToAdd = vec2(0), coloredObj, type = "r") {
 						curDraggin.trigger("dragEnd")
 						setCurDraggin(null)
 						this.dragging = false
-						mouse.release(get("sliderButton").some(obj => obj.isHovering()) || hexagon.isHovering() ? "point" : "cursor")
+						mouse.releaseAndPlay(get("sliderButton").some(obj => obj.isHovering()) || hexagon.isHovering() ? "point" : "cursor")
 					}
 				}
 			},

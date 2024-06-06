@@ -24,12 +24,6 @@ export let actualScorePerSecond = 0; // the actual and current score per second
 let clicksPerSecond = 0; // to properly calculate sps
 let secondTimerForClicks = 0; // to properly calculate sps
 
-// totally not anti cheat
-// let constTimeTilClick = 37/1000
-let constTimeTilClick = 32/1000
-let timeTilClick = constTimeTilClick
-let isWaitingToClick = false
-
 export let hexagon;
 
 let hoverRotSpeedIncrease = 0.01 * 0.25
@@ -158,6 +152,7 @@ export function addHexagon() {
 		z(2),
 		waver({ maxAmplitude: 5, wave_speed: 1 }),
 		"hexagon",
+		"hover_outsideWindow",
 		{
 			isBeingHoveredOn: false,
 			smallestScale: 0.985,
@@ -190,7 +185,6 @@ export function addHexagon() {
 			clickPress() {
 				this.clickPressTween = tween(this.scaleIncrease, 0.98, 0.35, (p) => this.scaleIncrease = p, easings.easeOutQuint)
 				this.isBeingClicked = true
-				mouse.clicking = true
 				mouse.grab()
 				playSfx("clickPress", rand(-50, 50))
 			},
@@ -198,13 +192,10 @@ export function addHexagon() {
 			clickRelease() {
 				this.clickPressTween.cancel()
 				tween(this.scaleIncrease, this.isHovering() ? 1.05: 1, 0.35, (p) => this.scaleIncrease = p, easings.easeOutQuint)
-				mouse.clicking = false
 				this.isBeingClicked = false 
-				isWaitingToClick = true
-				timeTilClick = constTimeTilClick
 				clickVars.clicksPerSecond++
-				mouse.release("point")
 				playSfx("clickRelease", rand(-50, 50))
+				mouse.releaseAndPlay("point")
 			},
 
 			autoClick() {
@@ -215,7 +206,6 @@ export function addHexagon() {
 				if (this.canClick) {
 					tween(this.scaleIncrease, 1.05, 0.35, (p) => this.scaleIncrease = p, easings.easeOutCubic);
 					this.rotationSpeed += hoverRotSpeedIncrease
-					if (!isDraggingASlider) mouse.play("point")
 					this.isBeingHoveredOn = true
 				}
 			},
@@ -225,7 +215,6 @@ export function addHexagon() {
 					tween(this.scaleIncrease, 1, 0.35, (p) => this.scaleIncrease = p, easings.easeOutCubic);
 					this.isBeingClicked = false
 					this.rotationSpeed = 0
-					if (!isDraggingASlider) mouse.play("cursor")
 					this.isBeingHoveredOn = false
 				}
 			}
@@ -249,7 +238,7 @@ export function addHexagon() {
 
 	hexagon.onMousePress("left", () => {
 		if (hexagon.isBeingHoveredOn) {
-			if (!isWaitingToClick && (!get("window").some(w => w.isMouseInPreciseRange()) && !isDraggingAWindow)) {
+			if (!isPreciselyHoveringAWindow && !isDraggingAWindow) {
 				hexagon.clickPress()
 			}
 		}
@@ -257,9 +246,9 @@ export function addHexagon() {
 	
 	hexagon.onMouseRelease("left", () => {
 		if (hexagon.isBeingHoveredOn) {
-			if (hexagon.canClick && hexagon.isBeingClicked && !isWaitingToClick && (!get("window").some(w => w.isMouseInPreciseRange()) && !isDraggingAWindow)) {
+			if (hexagon.canClick && hexagon.isBeingClicked && !isPreciselyHoveringAWindow&& !isDraggingAWindow) {
 				hexagon.clickRelease()
-				
+
 				//actual score additions
 				addPlusScoreText(mouse.pos, scoreVars.scorePerClick)
 				GameState.addScore(scoreVars.scorePerClick)
@@ -300,14 +289,6 @@ export function addHexagon() {
 		scoreVars.actualScorePerSecond = (clickVars.clicksPerSecond * scoreVars.scorePerClick) + scoreVars.autoScorePerSecond
 		scoreVars.actualScorePerSecond = scoreVars.actualScorePerSecond.toFixed(1);
 		scoreVars.actualScorePerSecond = formatNumber(scoreVars.actualScorePerSecond, true, false)
-
-		if (timeTilClick > 0) {
-			timeTilClick -= dt()
-		}
-
-		else if (isWaitingToClick) {
-			isWaitingToClick = false
-		}
 	})
 
 	loop(2.5, () => {

@@ -174,6 +174,18 @@ export function getSides(obj) {
 	}
 }
 
+export function getVariable(obj, path) {
+	const parts = path.split(".")
+	const target = parts.slice(0, -1).reduce((o, p) => o[p], obj)
+	return target[parts[parts.length-1]]
+}
+
+export function setVariable(obj, path, value) {
+	const parts = path.split(".")
+	const target = parts.slice(0, -1).reduce((o, p) => o[p], obj)
+	target[parts[parts.length-1]] = value
+}
+
 export function debugTexts() {
 	let texty = add([
 		text("", {
@@ -241,7 +253,6 @@ export function addBackground() {
 		pos(center()),
 		anchor("center"),
 		scale(8),
-		area(),
 		color(),
 		z(0),
 		{
@@ -266,7 +277,7 @@ export function addBackground() {
     })))
 
 	gameBg.onMousePress("right", () => {
-		if (!hexagon.isHovering() && !get("folderObj")[0].isHovering() && gameBg.isHovering() && !isGenerallyHoveringAWindow && !isDraggingAWindow) {
+		if (!hexagon.isHovering() && !get("folderObj")[0].isHovering() && !isGenerallyHoveringAWindow && !isDraggingAWindow) {
 			manageWindow("bgColorWin")
 		}
 	})
@@ -309,13 +320,12 @@ export function addMouse() {
 	mouse = add([
 		sprite("cursors"),
 		pos(mousePos()),
-		scale(),
+		scale(0.8),
 		color(WHITE),
 		anchor(vec2(-0.5, -0.65)),
 		z(100),
 		{
-			start: false,
-			clicking: false,
+			intro: false,
 			speed: 5000, // 5000 is the optimal for actual mouse movement
 			grabbing: false,
 			grab() {
@@ -323,7 +333,7 @@ export function addMouse() {
 				mouse.play("grab")
 			},
 
-			release(newAnim = "cursor") {
+			releaseAndPlay(newAnim = "cursor") {
 				this.grabbing = false
 				mouse.play(newAnim)
 			},
@@ -353,13 +363,31 @@ export function addMouse() {
 		}
 	])
 
-	onHover("regularHover", (obj) => {
-		if (isPreciselyHoveringAWindow) return
+	onHover("xButton", () => {
 		mouse.play("point")
 	})
 
-	onHoverEnd("regularHover", (obj) => {
-		if (isPreciselyHoveringAWindow) return
+	onHoverEnd("xButton", () => {
+		mouse.play("cursor")
+	})
+
+	onHover("hover_outsideWindow", () => {
+		if (!isPreciselyHoveringAWindow && !isDraggingAWindow) {
+			mouse.play("point")
+		}
+	})
+
+	onHoverEnd("hover_outsideWindow", () => {
+		if (!isPreciselyHoveringAWindow && !isDraggingAWindow) {
+			mouse.play("cursor")
+		}
+	})
+
+	onHover("hover_insideWindow", () => {
+		mouse.play("point")
+	})
+
+	onHoverEnd("hover_insideWindow", () => {
 		mouse.play("cursor")
 	})
 }
@@ -638,9 +666,15 @@ export function addPlusPercentageScore(posToAdd, amount, size = [40, 50]) {
 
 export function addPlusScoreText(posToAdd, amount, size = [40, 50]) {
 	let plusScoreText = add([
-		text("+" + formatNumber(amount, true, false), {
+		text("+" + formatNumber(amount, true, false) + "[small]x2[/small]", {
 			size: rand(size[0], size[1]),
 			font: "lambdao",
+			styles: {
+				"small": {
+					scale: 0.8,
+					pos: vec2(0, +4)
+				}
+			}
 		}),
 		pos(posToAdd),
 		rotate(0),

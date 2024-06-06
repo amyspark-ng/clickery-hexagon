@@ -1,6 +1,7 @@
 import { gamescene } from "./scenes/game/gamescene.js"
 import { introscene } from "./scenes/introScene.js"
 import { focuscene } from "./scenes/focuscene.js"
+import { drawLoadScreen } from "./scenes/game/utils.js"
 
 // Sprite atlas were made with this awesome website
 // https://www.finalparsec.com/tools/sprite_sheet_maker
@@ -169,39 +170,99 @@ export function loadAssets() {
 	loadSprite("tooltip", "sprites/tooltip.png")
 
 	loadSpriteAtlas("sprites/windows/folderIcons.png", {
-		"icon_store": {
-			width: 48 + 5 + 52,
-			height: 65,
+		"icon_about": {
+			width: 140,
+			height: 70,
 			sliceX: 2,
 			sliceY: 1,
-			x: 5,
-			y: 5,
+			x: 0,
+			y: 0,
 			anims: {
-				regular: 0,
+				default: 0,
+				hover: 1,
+			}
+		},
+		"icon_achievements": {
+			width: 140,
+			height: 70,
+			sliceX: 2,
+			sliceY: 1,
+			x: 140,
+			y: 0,
+			anims: {
+				default: 0,
+				hover: 1,
+			}
+		},
+		"icon_ascend": {
+			width: 140,
+			height: 70,
+			sliceX: 2,
+			sliceY: 1,
+			x: 280,
+			y: 0,
+			anims: {
+				default: 0,
+				hover: 1,
+			}
+		},
+		"icon_settings": {
+			width: 140,
+			height: 70,
+			sliceX: 2,
+			sliceY: 1,
+			x: 420,
+			y: 0,
+			anims: {
+				default: 0,
+				hover: 1,
+			}
+		},
+		"icon_leaderboards": {
+			width: 140,
+			height: 70,
+			sliceX: 2,
+			sliceY: 1,
+			x: 560,
+			y: 0,
+			anims: {
+				default: 0,
 				hover: 1,
 			}
 		},
 		"icon_music": {
-			width: 48 + 5 + 52,
-			height: 65,
+			width: 140,
+			height: 70,
 			sliceX: 2,
 			sliceY: 1,
-			x: 125,
-			y: 5,
+			x: 700,
+			y: 0,
 			anims: {
-				regular: 0,
+				default: 0,
 				hover: 1,
 			}
 		},
-		"icon_question": {
-			width: 45 + 5 + 57,
-			height: 73,
+		"icon_stats": {
+			width: 140,
+			height: 70,
 			sliceX: 2,
 			sliceY: 1,
-			x: 245,
-			y: 5,
+			x: 840,
+			y: 0,
 			anims: {
-				regular: 0,
+				default: 0,
+				hover: 1,
+			}
+		},
+		"icon_store": {
+			width: 140,
+			height: 70,
+			sliceX: 2,
+			sliceY: 1,
+			x: 0,
+			y: 70,
+			anims: {
+				default: 0,
 				hover: 1,
 			}
 		},
@@ -225,6 +286,7 @@ export function loadAssets() {
 	})
 
 	loadSprite("aboutWin", "sprites/windows/aboutWin.png")
+	loadSprite("settingsWin", "sprites/windows/settingsWin.png")
 	loadSprite("hexColorWin", "sprites/windows/colorWin/hexColorWin.png")
 	loadSprite("bgColorWin", "sprites/windows/colorWin/bgColorWin.png")
 	

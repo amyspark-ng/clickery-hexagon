@@ -3,7 +3,7 @@ import { scoreVars, addHexagon, autoClick, hexagon } from "./hexagon.js"
 import { uiCounters } from "./uicounters"
 import { addBackground, addMouse, addToast, debugFunctions, debugTexts, mouse, percentage } from "./utils"
 import { musicHandler, playMusic } from "../../sound"
-import { folderObjManaging, unlockWindow, windowsDefinition } from "./windows/windowsAPI"
+import { folderObjManaging, unlockWindow, windowsStuff as windowsStuff } from "./windows/windowsAPI"
 import { songs } from "./windows/musicWindow"
 import { curDraggin, setCurDraggin } from "../../plugins/drag"
 import { k } from "../../main"
@@ -29,7 +29,7 @@ export function gamescene() {
 		addHexagon()
 		uiCounters()
 		folderObjManaging()
-		windowsDefinition()
+		windowsStuff()
 
 		debugTexts()
 
@@ -40,8 +40,6 @@ export function gamescene() {
 		playMusic(GameState.settings.music.favoriteIdx == null ? "clicker.wav" : Object.keys(songs)[GameState.settings.music.favoriteIdx])
 		if (GameState.settings.music.muted) musicHandler.paused = true
 		
-		k.backgroundAudio = GameState.settings.keepAudioOnTabChange
-
 		// wait 60 seconds
 		wait(60, () => {
 			loop(60, () => {
@@ -81,6 +79,8 @@ export function gamescene() {
 				}
 			}
 
+			// k.backgroundAudio = GameState.settings.keepAudioOnTabChange
+			// debug.log(k.backgroundAudio)
 			// debug
 			// if (isKeyPressed("h")) { GameState.timeUntilAutoLoopEnds--; debug.log(GameState.timeUntilAutoLoopEnds) } 
 		})
@@ -249,7 +249,7 @@ export function gamescene() {
 				if (curDraggin) {
 					curDraggin.trigger("dragEnd")
 					setCurDraggin(null)
-					mouse.release()
+					mouse.releaseAndPlay()
 				}
 			}
 		}, false);

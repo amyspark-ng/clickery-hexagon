@@ -75,7 +75,7 @@ export let GameState = {
 	},
 
 	// order doesn't affect idx
-	unlockedWindows: ["aboutWin"],
+	unlockedWindows: ["settingsWin", "aboutWin", "storeWin", "musicWin", "ascendWin", "statsWin"],
 
 	// medals: {
 	// 	start: new medalData("It starts", 3484, false, "itstarts")

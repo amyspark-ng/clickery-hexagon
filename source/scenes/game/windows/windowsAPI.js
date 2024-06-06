@@ -2,10 +2,10 @@ import { GameState } from "../../../gamestate.js";
 import { bop, getSides, mouse } from "../utils.js";
 import { drag, curDraggin, setCurDraggin } from "../../../plugins/drag.js";
 import { playSfx } from "../../../sound.js";
-import { hexagon } from "../hexagon.js";
 import { storeWinContent } from "./store/storeWindows.js";
 import { musicWinContent, setTimeSinceSkip, timeSinceSkip } from "./musicWindow.js";
 import { colorWinContent } from "./colorWindow.js";
+import { settingsWinContent } from "./settingsWindow.js";
 
 let infoForWindows = {};
 export let isGenerallyHoveringAWindow = false;
@@ -41,16 +41,20 @@ export function manageWindow(windowKey) {
 	else throw new Error("Window not found: " + windowKey);
 }
 
-export function windowsDefinition() {
+export function windowsStuff() {
+	// spriteName is the actual window it will open
+	// hotkey should be the one in taskbar corresponding to the placement
 	infoForWindows = {
-		"storeWin": { idx: 0, name: "storeWin", icon: "store", content: storeWinContent, lastPos: vec2(818, 280), hotkey: "1", color: rgb(24, 38, 94), showable: true, },
-		"musicWin": { idx: 1, name: "musicWin", icon: "music", content: musicWinContent, lastPos: vec2(208, 96), hotkey: "2", color: rgb(90, 33, 128), showable: true },
-		"ascendWin": { idx: 2, name: "storeWin", icon: "store", content: emtpyWinContent, lastPos: vec2(center().x, center().y), hotkey: "3", color: WHITE, showable: true },
-		"statsWin": { idx: 3, name: "storeWin", icon: "store", content: emtpyWinContent, lastPos: vec2(center().x, center().y), hotkey: "4", color: WHITE, showable: true },
-		"medalsWin": { idx: 4, name: "storeWin", icon: "store", content: emtpyWinContent, lastPos: vec2(center().x, center().y), hotkey: "5", color: WHITE, showable: true },
-		"aboutWin": { idx: 5, name: "aboutWin", icon: "question", content: emtpyWinContent, lastPos: vec2(center().x, center().y), hotkey: "6", color: RED, showable: true },
-		"hexColorWin": { idx: 6, name: "hexColorWin", icon: "store", content: colorWinContent, lastPos: vec2(208, 160), hotkey: null, color: WHITE, showable: false },
-		"bgColorWin": { idx: 7, name: "bgColorWin", icon: "store", content: colorWinContent, lastPos: vec2(1024 - 200, 200), hotkey: null, color: WHITE, showable: false },
+		"storeWin": { idx: 0, spriteName: "storeWin", icon: "store", content: storeWinContent, lastPos: vec2(818, 280), hotkey: "1", color: rgb(24, 38, 94), showable: true, },
+		"musicWin": { idx: 1, spriteName: "musicWin", icon: "music", content: musicWinContent, lastPos: vec2(208, 96), hotkey: "2", color: rgb(90, 33, 128), showable: true },
+		"ascendWin": { idx: 2, spriteName: "storeWin", icon: "ascend", content: emtpyWinContent, lastPos: vec2(center().x, center().y), hotkey: "3", color: WHITE, showable: true },
+		"statsWin": { idx: 3, spriteName: "storeWin", icon: "stats", content: emtpyWinContent, lastPos: vec2(center().x, center().y), hotkey: "4", color: WHITE, showable: true },
+		"medalsWin": { idx: 4, spriteName: "storeWin", icon: "achievements", content: emtpyWinContent, lastPos: vec2(center().x, center().y), hotkey: "5", color: WHITE, showable: true },
+		"aboutWin": { idx: 5, spriteName: "aboutWin", icon: "about", content: emtpyWinContent, lastPos: vec2(center().x, center().y), hotkey: "6", color: RED, showable: true },
+		"creditsWin": { idx: 6, spriteName: "creditsWin", icon: "about", content: emtpyWinContent, lastPos: vec2(center().x, center().y), hotkey: "6", color: RED, showable: true },
+		"settingsWin": { idx: 7, spriteName: "settingsWin", icon: "settings", content: settingsWinContent, lastPos: vec2(center().x, center().y), hotkey: "6", color: RED, showable: true },
+		"hexColorWin": { idx: 8, spriteName: "hexColorWin", icon: "store", content: colorWinContent, lastPos: vec2(208, 160), hotkey: null, color: WHITE, showable: false },
+		"bgColorWin": { idx: 9, spriteName: "bgColorWin", icon: "store", content: colorWinContent, lastPos: vec2(1024 - 200, 200), hotkey: null, color: WHITE, showable: false },
 	}
 }
 
@@ -62,7 +66,7 @@ export function addMinibutton(i, xPosition) {
 	
 	let miniButton = add([
 		sprite(`icon_${infoForWindows[Object.keys(infoForWindows)[i]].icon}`, {
-			anim: "regular"
+			anim: "default"
 		}),
 		pos(folderObj.pos.x, folderObj.pos.y),
 		anchor("center"),
@@ -70,7 +74,7 @@ export function addMinibutton(i, xPosition) {
 		scale(1),
 		rotate(0),
 		z(folderObj.z - 1),
-		"hoverObj",
+		"hover_outsideWindow",
 		"minibutton",
 		{
 			idx: i,
@@ -87,7 +91,6 @@ export function addMinibutton(i, xPosition) {
 				this.defaultScale = vec2(1.05)
 				playSfx("hoverMiniButton", 100 * miniButton.windowInfo.idx / 4)
 				this.play("hover")
-				mouse.play("point")
 			},
 
 			endHover() {
@@ -96,8 +99,7 @@ export function addMinibutton(i, xPosition) {
 				tween(miniButton.angle, 0, 0.32, (p) => miniButton.angle = p, easings.easeOutQuint)
 				tween(miniButton.scale, vec2(1), 0.32, (p) => miniButton.scale = p, easings.easeOutQuint)
 				miniButton.defaultScale = vec2(1.05)
-				if (this.window == null) this.play("regular")
-				mouse.play("cursor")
+				this.play("default")
 			},
 			
 			manageRespectiveWindow(button = this) {
@@ -112,12 +114,11 @@ export function addMinibutton(i, xPosition) {
 					// hasn't open it
 					let theWindow = openWindow(button.windowInfo.name)
 					button.window = theWindow
-					if (!this.curAnim() == "hover") this.play("hover")
 				}
 			},
 
 			update() {
-				if (this.isHovering() && !isGenerallyHoveringAWindow && !isDraggingAWindow && !folded) {
+				if (this.isHovering() && !isPreciselyHoveringAWindow && !isDraggingAWindow && !folded) {
 					// animate it spinning it
 					this.angle = wave(-9, 9, time() * 3)
 				}
@@ -176,12 +177,12 @@ export function addMinibutton(i, xPosition) {
 	return miniButton;
 }
 
-export function openWindow(name = "") {
+export function openWindow(windowKey = "") {
 	playSfx("openWin", rand(0.8, 1.2))
 
 	let windowObj = add([
-		sprite(name),
-		pos(infoForWindows[name].lastPos),
+		sprite(windowKey ? windowKey : "storeWin"),
+		pos(infoForWindows[windowKey].lastPos),
 		anchor("center"),
 		opacity(0),
 		scale(0.8),
@@ -189,11 +190,11 @@ export function openWindow(name = "") {
 		drag(),
 		area(),
 		"window",
-		`${name}`,
+		`${windowKey}`,
 		{
-			idx: infoForWindows[name].idx,
-			miniButton: infoForWindows[name].showable ? miniButtons[infoForWindows[name].idx] : null,
-			showable: infoForWindows[name].showable,
+			idx: infoForWindows[windowKey].idx,
+			miniButton: infoForWindows[windowKey].showable ? miniButtons[infoForWindows[windowKey].idx] : null,
+			showable: infoForWindows[windowKey].showable,
 			close() {
 				folderObj.trigger("winClose")
 				this.removeAll()
@@ -207,8 +208,8 @@ export function openWindow(name = "") {
 					destroy(this)
 				})
 
-				infoForWindows[name].lastPos = this.pos
-				if (!this.showable || folded || !GameState.unlockedWindows.includes(name)) return
+				infoForWindows[windowKey].lastPos = this.pos
+				if (!this.showable || folded || !GameState.unlockedWindows.includes(windowKey)) return
 				this.miniButton.window = null
 			},
 
@@ -232,17 +233,17 @@ export function openWindow(name = "") {
 
 			isMouseInClickingRange() {
 				let condition = 
-				(mousePos().y >= getSides(this).top - 30) &&
+				(mousePos().y >= getSides(this).top) &&
 				(mousePos().y <= getSides(this).top + 25)
 				return condition;
 			},
 
 			isMouseInPreciseRange() {
 				let condition = 
-				(mousePos().y >= getSides(this).top - 5) && 
-				(mousePos().y <= getSides(this).bottom - 5) &&
-				(mousePos().x <= getSides(this).right - 5) &&
-				(mousePos().x >= getSides(this).left - 5)
+				(mousePos().y >= getSides(this).top) && 
+				(mousePos().y <= getSides(this).bottom) &&
+				(mousePos().x <= getSides(this).right) &&
+				(mousePos().x >= getSides(this).left)
 				return condition;
 			},
 
@@ -258,33 +259,42 @@ export function openWindow(name = "") {
 			update() {
 				this.pos.x = clamp(this.pos.x, -151, 1180)
 				// debug.log(isPreciselyHoveringWindow)
-			}
+			},
 		}
 	])
 
-	infoForWindows[name].lastPos.x = clamp(infoForWindows[name].lastPos.x, 196, 827)
-	infoForWindows[name].lastPos.y = clamp(infoForWindows[name].lastPos.y, height() - windowObj.height / 2, -windowObj.height / 2)
-	windowObj.pos = infoForWindows[name].lastPos
+	infoForWindows[windowKey].lastPos.x = clamp(infoForWindows[windowKey].lastPos.x, 196, 827)
+	infoForWindows[windowKey].lastPos.y = clamp(infoForWindows[windowKey].lastPos.y, height() - windowObj.height / 2, -windowObj.height / 2)
+	windowObj.pos = infoForWindows[windowKey].lastPos
 
 	let xButton = windowObj.add([
 		text("X"),
 		color(WHITE),
 		pos(-windowObj.width / 2, -windowObj.height / 2),
 		z(windowObj.z + 1),
-		area({ scale: vec2(1.8, 1.1), offset: vec2(-10, 0)}),
+		area({ scale: vec2(1.8, 1.1), offset: vec2(-5, 0)}),
 		"xButton",
+		"hover_outsideWindow",
+		{
+			startHover() {
+				this.color = RED
+			},
+			endHover() {
+				this.color = WHITE
+			}
+		}
 	])
 
 	xButton.pos.x += windowObj.width - xButton.width - 5
 
 	xButton.onHover(() => {
 		if (isDraggingAWindow) return
-		xButton.color = RED
+		xButton.startHover()
 	})
 
 	xButton.onHoverEnd(() => {
 		if (isDraggingAWindow) return
-		xButton.color = WHITE
+		xButton.endHover()
 	})
 
 	xButton.onClick(() => {
@@ -295,37 +305,27 @@ export function openWindow(name = "") {
 					folderObj.fold()
 				}
 			}
-			if (!get("*", { recursive: true }).some(element => element.is("hoverObj") && element.isHovering())) {
-				mouse.play("cursor")
-			}
 		}
 	})
 
 	windowObj.onHover(() => {
-		if (hexagon.isHovering()) {
-			hexagon.endHover()
-		}
-
-		if (folded) return;
-		get("minibutton").forEach(minibuttonHoverEndCheck => {
-			if (minibuttonHoverEndCheck.isHovering()) {
-				minibuttonHoverEndCheck.endHover()
+		get("hover_outsideWindow").forEach(hoverObj => {
+			if (hoverObj.isHovering() && hoverObj.endHover) {
+				hoverObj.endHover()
 			}
-		});
+		})
+
+		// check if hovering any window button, if it it's not start pointing, if yes don't point
+		if (!isDraggingAWindow && !xButton.isHovering()) mouse.play("cursor")
 	})
 
 	windowObj.onHoverEnd(() => {
-		// debug.log("end hover")
-		if (hexagon.isHovering() && !isDraggingAWindow) {
-			hexagon.startHover()
-		}
-
-		if (folded) return;
-		get("minibutton").forEach(minibuttonHoverEndCheck => {
-			if (minibuttonHoverEndCheck.isHovering() && !isDraggingAWindow && !isGenerallyHoveringAWindow) {
-				minibuttonHoverEndCheck.startHover()
+		get("hover_outsideWindow").forEach(hoverObj => {
+			if (hoverObj.isHovering() && hoverObj.startHover) {
+				hoverObj.startHover()
+				mouse.play("point")
 			}
-		});
+		})
 	})
 
 	windowObj.onMousePress(() => {
@@ -346,6 +346,7 @@ export function openWindow(name = "") {
 				if (!windowObj.is("active")) {
 					deactivateAllWindows()
 					windowObj.activate()
+					readd(windowObj)
 				}
 			}
 		}
@@ -355,19 +356,8 @@ export function openWindow(name = "") {
 		if (curDraggin) {
 			curDraggin.trigger("dragEnd")
 			setCurDraggin(null)
-			mouse.release("cursor")
+			mouse.releaseAndPlay("cursor")
 		}
-	})
-
-	windowObj.onDrag(() => {
-		// Remove the object and re-add it, so it'll be drawn on top
-		readd(windowObj)
-		windowObj.dragging = true
-	})
-	
-	windowObj.onDragEnd(() => {
-		mouse.play("cursor")
-		windowObj.dragging = false
 	})
 
 	windowObj.onKeyPress("escape", () => {
@@ -379,7 +369,7 @@ export function openWindow(name = "") {
 	windowObj.activate()
 
 	// add content
-	windowObj.add(infoForWindows[name].content(windowObj, name))
+	windowObj.add(infoForWindows[windowKey].content(windowObj, windowKey))
 	// searches for the key
 
 	windowObj.defColor = WHITE
@@ -409,11 +399,12 @@ export function folderObjManaging() {
 		area({ scale: vec2(1.2) }),
 		z(4),
 		anchor("center"),
-		"regularHover",
+		"hover_outsideWindow",
 		"folderObj",
 		{
 			defaultScale: vec2(1.2),
 			unfold() {
+				GameState.unlockedWindows = ["settingsWin", "aboutWin", "storeWin", "musicWin", "ascendWin", "statsWin"],
 				folded = false
 				timeSinceFold = 0
 				playSfx("fold", rand(-50, 50))
@@ -494,9 +485,17 @@ export function folderObjManaging() {
 	})
 
 	folderObj.on("winClose", () => {
-		if (hexagon.isHovering()) {
-			hexagon.startHover()
+		let anyHovered = false
+		for (const hoverObj of get("hover_outsideWindow")) {
+			if (hoverObj.isHovering()) {
+				if (hoverObj.startHover) hoverObj.startHover()
+				anyHovered = true;
+				break;
+			}
 		}
+
+		if (anyHovered) mouse.play("point")
+		else mouse.play("cursor")
 
 		wait(0.05, () => {
 			// gets the topmost window
