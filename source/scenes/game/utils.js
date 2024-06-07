@@ -77,7 +77,7 @@ export function changeValueBasedOnAnother(value, maxValue, determiningValue, max
 	return value;
 }
 
-function getRandomElementDifferentFrom(arr, element) {
+export function getRandomElementDifferentFrom(arr, element) {
     // Step 1: Filter the array to exclude the specified element
     const filteredArray = arr.filter(item => item !== element);
 
@@ -254,7 +254,7 @@ export function addBackground() {
 		anchor("center"),
 		scale(8),
 		color(),
-		z(0),
+		z(-1),
 		{
 			speed: 0.1,
 			movAngle: 5,
@@ -277,7 +277,8 @@ export function addBackground() {
     })))
 
 	gameBg.onMousePress("right", () => {
-		if (!hexagon.isHovering() && !get("folderObj")[0].isHovering() && !isGenerallyHoveringAWindow && !isDraggingAWindow) {
+		if (!get("folderObj")[0]) return
+		if (!hexagon?.isHovering() && !get("folderObj")[0]?.isHovering() && !isGenerallyHoveringAWindow && !isDraggingAWindow) {
 			manageWindow("bgColorWin")
 		}
 	})
@@ -323,6 +324,7 @@ export function addMouse() {
 		scale(0.8),
 		color(WHITE),
 		anchor(vec2(-0.5, -0.65)),
+		fixed(),
 		z(100),
 		{
 			intro: false,
@@ -666,7 +668,7 @@ export function addPlusPercentageScore(posToAdd, amount, size = [40, 50]) {
 
 export function addPlusScoreText(posToAdd, amount, size = [40, 50]) {
 	let plusScoreText = add([
-		text("+" + formatNumber(amount, true, false) + "[small]x2[/small]", {
+		text("+" + formatNumber(amount, true, false), {
 			size: rand(size[0], size[1]),
 			font: "lambdao",
 			styles: {

@@ -46,6 +46,9 @@ https://kaplay.lajbel.com/?code=eJy9U01PwzAMvfdX%2BJhs076QEOoYEhIScEDakQlxyFpvLZ
 - Do the funny thing with music title in clicker.wav like deltarune did
 - Random chance of +1 making something funny
 - Image if the game had support for adding your own songs
+- Different messages in the mage scene
+^ add a normal" translation button where the mage doesn't speak shakesperean
+
 
 # Arte: 
 - Boton de la carpeta (folderObj)

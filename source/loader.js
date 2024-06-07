@@ -2,6 +2,7 @@ import { gamescene } from "./scenes/game/gamescene.js"
 import { introscene } from "./scenes/introScene.js"
 import { focuscene } from "./scenes/focuscene.js"
 import { drawLoadScreen } from "./scenes/game/utils.js"
+import { ascendscene } from "./scenes/game/ascendscene.js"
 
 // Sprite atlas were made with this awesome website
 // https://www.finalparsec.com/tools/sprite_sheet_maker
@@ -290,6 +291,75 @@ export function loadAssets() {
 	loadSprite("hexColorWin", "sprites/windows/colorWin/hexColorWin.png")
 	loadSprite("bgColorWin", "sprites/windows/colorWin/bgColorWin.png")
 	
+	// # REGION clickerius hernelius  
+	loadSound("mage_e", "sounds/mage_e.mp3")
+	loadSpriteAtlas("sprites/ascendscene/hexAgony.png", {
+		"mage_body": {
+			"x": 1000,
+			"y": 0,
+			"width": 500,
+			"height": 500, 
+		},
+		"mage_body_lightning": {
+			"x": 0,
+			"y": 500,
+			"width": 500,
+			"height": 500, 
+		},
+		"mage_botarm": {
+			"x": 500,
+			"y": 0,
+			"width": 500,
+			"height": 500,
+		},
+		"mage_botarm_lightning": {
+			"x": 0,
+			"y": 0,
+			"width": 500,
+			"height": 500,
+		},
+		"mage_toparm": {
+			"x": 1000,
+			"y": 500,
+			"width": 500,
+			"height": 500,
+		},
+		"mage_toparm_lightning": {
+			"x": 0,
+			"y": 1000,
+			"width": 500,
+			"height": 500,
+		},
+		"mage_cursors": {
+			"x": 500,
+			"y": 500,
+			"width": 500,
+			"height": 500, 
+		},
+	})
+	loadSprite("mage_eye", "sprites/ascendscene/eye.png", {
+		width: 300,
+		sliceX: 4,
+		sliceY: 1,
+		anims: {
+			"blink": {
+				from: 1,
+				to: 3,
+			},
+		}
+	})
+	loadSprite("dialogue", "sprites/ascendscene/dialogue.png")
+	loadSprite("eye_translate", "sprites/ascendscene/translate.png", {
+		width: 500,
+		sliceX: 4,
+		sliceY: 1,
+		anims: {
+			"woke": 3,
+			"dumb": 1,
+		}
+	})
+	//#endregion
+
 	// #REGION SOUNDS
 	loadSound("volumeChange", "sounds/volumeChange.mp3")
 	loadSound("whistle", "sounds/whistle.mp3")
@@ -317,6 +387,7 @@ export function loadAssets() {
 	loadSound("magic", "sounds/music/magic.ogg")
 	loadSound("watchout", "sounds/music/watchout.ogg")
 	loadSound("catnip", "sounds/music/catnip.ogg")
+	//#endregion
 
 	// # REGION Other stuff
 	loadFont("apl386", "https://kaboomjs.com/examples/fonts/apl386.ttf", {
@@ -384,4 +455,5 @@ export function loadAssets() {
 	focuscene()
 	introscene()
 	gamescene()
+	ascendscene()
 }

@@ -30,3 +30,5 @@ let dummy = add([
 export let ROOT = dummy.parent
 
 go("focuscene")
+// if (!k.debug) go("focuscene")
+// else go("gamescene")

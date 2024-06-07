@@ -10,5 +10,13 @@ To build:
 - go to `localhost:8000`
 - change the files to work on it :thumbsup:
 
+## CREDITS:
+- AmySpark - Code
+- Enysmo - Sound
+- DevkyRD - Art & Design
+- lajbel - Code & Design
+- MF - Shaders
+- Khriz28 - Playtesting
+
 BROKE COMMIT HISTORY BY RENAMING COMMIT :(
 ![alt text](image.png)

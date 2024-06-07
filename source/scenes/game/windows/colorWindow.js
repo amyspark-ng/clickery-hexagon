@@ -238,9 +238,12 @@ function addRgbSlider(winParent, posToAdd = vec2(0), coloredObj, type = "r") {
 }
 
 export function colorWinContent(winParent, winType = "hexColorWin") {
-	let rSlider = addRgbSlider(winParent, vec2(-25, -80), winType == "hexColorWin" ? hexagon : gameBg, "r")
-	let gSlider = addRgbSlider(winParent, vec2(-25, rSlider.bg.pos.y + 50), winType == "hexColorWin" ? hexagon : gameBg, "g")
-	let bSlider = addRgbSlider(winParent, vec2(-25, gSlider.bg.pos.y + 50), winType == "hexColorWin" ? hexagon : gameBg, "b")
+	let objToColor = winType == "hexColorWin" ? get("hexagon", { recursive: true })[0] : gameBg
+	console.log(objToColor)
+
+	let rSlider = addRgbSlider(winParent, vec2(-25, -80), objToColor, "r")
+	let gSlider = addRgbSlider(winParent, vec2(-25, rSlider.bg.pos.y + 50), objToColor, "g")
+	let bSlider = addRgbSlider(winParent, vec2(-25, gSlider.bg.pos.y + 50), objToColor, "b")
 	let aSlider;
 	if (winType == "bgColorWin") aSlider = addRgbSlider(winParent, vec2(-25, bSlider.bg.pos.y + 50), gameBg, "a")
 	
@@ -270,27 +273,21 @@ export function colorWinContent(winParent, winType = "hexColorWin") {
 		"windowButton",
 	])
 
-	if (winType == "hexColorWin") {
-		hexagon.onUpdate(() => {
-			hexagon.color.r = rSlider.value
-			hexagon.color.g = gSlider.value
-			hexagon.color.b = bSlider.value
+	objToColor.onUpdate(() => {
+		objToColor.color.r = rSlider.value
+		objToColor.color.g = gSlider.value
+		objToColor.color.b = bSlider.value
+		
+		if (winType == "hexColorWin" && objToColor == hexagon) {
 			GameState.settings.hexColor = [rSlider.value, gSlider.value, bSlider.value]
 			winParent.color = hexagon.color.lighten(150)
-		})
-	}
+		}
 
-	else {
-		gameBg.onUpdate(() => {
-			gameBg.tintColor.r = rSlider.value
-			gameBg.tintColor.g = gSlider.value
-			gameBg.tintColor.b = bSlider.value
-			gameBg.blendFactor = aSlider.value
+		else if (winType == "bgColorWin" && objToColor == gameBg) {
 			GameState.settings.bgColor = [rSlider.value, gSlider.value, bSlider.value, aSlider.value]
 			winParent.color = blendColors(gameBg.tintColor.lighten(200), gameBg.tintColor, gameBg.blendFactor)
-		})
-	}
-
+		}
+	})
 
 	defaultButton.onClick(() => {
 		bop(defaultButton)
