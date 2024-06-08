@@ -14,6 +14,7 @@ export let songs = {
 	"magic": { name: "magic.", idx: 7, speed: 1, cover: "defaultCover", duration: 46},
 	"watchout": { name: "Watch out!", idx: 8, speed: 2.4, cover: "defaultCover", duration: 49,},
 	"catnip": { name: "catnip", idx: 9, speed: 2.1, cover: "catnipCover", duration: 67},
+	"project_23": { name: "Project_23", idx: 10, speed: 2.1, cover: "defaultCover", duration: 45},
 }
 
 export let currentSongIdx = 0

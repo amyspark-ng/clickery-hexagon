@@ -89,7 +89,6 @@ export function addMinibutton(i, xPosition) {
 				tween(miniButton.pos.y, miniButton.verPosition - 5, 0.32, (p) => miniButton.pos.y = p, easings.easeOutQuint)
 				tween(miniButton.scale, vec2(1.05), 0.32, (p) => miniButton.scale = p, easings.easeOutQuint)
 				this.defaultScale = vec2(1.05)
-				playSfx("hoverMiniButton", 100 * miniButton.windowInfo.idx / 4)
 				this.play("hover")
 			},
 
@@ -112,7 +111,7 @@ export function addMinibutton(i, xPosition) {
 				// will have window 
 				else {
 					// hasn't open it
-					let theWindow = openWindow(button.windowInfo.name)
+					let theWindow = openWindow(button.windowInfo.spriteName)
 					button.window = theWindow
 				}
 			},
@@ -157,6 +156,7 @@ export function addMinibutton(i, xPosition) {
 	miniButton.onHover(() => {
 		if (!isGenerallyHoveringAWindow && !isDraggingAWindow) {
 			miniButton.startHover()
+			playSfx("hoverMiniButton", 100 * miniButton.windowInfo.idx / 4)
 		}
 	})
 
@@ -416,13 +416,23 @@ export function folderObjManaging() {
 				let initialX = folderObj.pos.x;
 				
 				// Iterate over the sorted unlockedWindows array to create buttons
-				if (get("minibutton").length > 0) return
-				GameState.unlockedWindows.forEach((key, index) => {
-					if (!infoForWindows[key].showable) return;
-					let xPos = initialX - buttonSpacing * index - 75;
-					let i = infoForWindows[key].idx;
-					addMinibutton(i, xPos);
-				});
+				// There are already minibutto
+				if (get("minibutton").length > 0) {
+					get("miniButton").forEach((miniButton, index) => {
+						let xPos = initialX - buttonSpacing * index - 75;
+						tween(miniButton.pos.x, xPos, 0.32, (p) => miniButton.pos.x = p, easings.easeOutQuint)
+					})
+				}
+
+				// There are not, create them
+				else {
+					GameState.unlockedWindows.forEach((key, index) => {
+						if (!infoForWindows[key].showable) return;
+						let xPos = initialX - buttonSpacing * index - 75;
+						let i = infoForWindows[key].idx;
+						addMinibutton(i, xPos);
+					});
+				}
 			},
 			
 			fold() {

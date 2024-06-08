@@ -16,7 +16,40 @@ export function addRegularUpgrades(elementParent) {
 			color(RED.lighten(rand(100, 150))),
 			anchor("center"),
 			area(),
+			{
+				type: elementParent.is("clickersElement") ? "k_" : "c_",
+				idx: i,
+				value: 0, // set later
+			}
 		])
+
+		if (upgrade.type == "k_") {
+			upgrade.value = 2 ** (upgrade.idx + 1)
+		}
+
+		else if (upgrade.type == "c_") {
+			if (upgrade.idx > 0 && upgrade.idx < 3) {
+				switch (upgrade.idx) {
+					case 0:
+						upgrade.freq = 10
+					break;
+					case 1:
+						upgrade.freq = 5
+					break;
+					case 0:
+						upgrade.freq = 1
+					break;
+				}
+			}
+
+			else {
+				
+			}
+		}
+
+		upgrade.onClick(() => {
+			debug.log(upgrade.idx)
+		})
 	}
 }
 

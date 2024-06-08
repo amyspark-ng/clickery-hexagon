@@ -22,11 +22,11 @@ export let GameState = {
 	
 	clickers: 0,
 	clicksUpgrades: 0, // multiplier for clicks
-	clickPercentage: 0,
+	clickPercentage: 0, // percentage added
 
 	cursors: 0,
 	cursorUpgrades: 0, // multiplier for cursors
-	cursorsPercentage: 0,
+	cursorsPercentage: 0, // percentage added
 	timeUntilAutoLoopEnds: 10, // cursor frequency
 
 	hasUnlockedPowerups: false,
@@ -37,35 +37,11 @@ export let GameState = {
 	
 	achievementMultiplierPercentage: 0,
 	generalUpgrades: 1, // general multiplier
-	
+
 	ascendLevel: 0,
 
-	upgradesBought: [
-		false,
-		false,
-		false,
-		false,
-		false,
-		false,
-		false,
-		false,
-		false,
-		false,
-		false,
-		false,
-		false,
-		false,
-		false,
-		false,
-		false,
-	],
+	upgradesBought: new Array(16).fill(false),
 
-	personalization: {
-		panderitoMode: false,
-		colorIndex: 0,
-		cursorSkins: [],
-	},
-	
 	medals: {
 		itstartedforyou: {
 			id: 0,
@@ -81,13 +57,13 @@ export let GameState = {
 	// 	start: new medalData("It starts", 3484, false, "itstarts")
 	// },
 
-	// # stats
-	// clicks
-	// scoregainedbyclicks
-	// powerupsclicked
-	// flakesclicked
-	// timeplayed
-	// max cookies per second gained
+	stats: {
+		clicks: 0,
+		scoreGainedByClicks: 0,
+		powerupsClicked: 0,
+		flakesClicked: 0,
+		timePlayed: 0,
+	},
 
 	settings: {
 		sfx: new VolumeData(1, false),
@@ -97,7 +73,8 @@ export let GameState = {
 		bgColor: [0, 0, 0, 0.55],
 		keepAudioOnTabChange: true,
 		dropDragsOnMouseOut: true,
-		fullScreen: false,
+		fullscreen: false,
+		panderitoMode: false,
 	},
 
 	save(anim = true) {
@@ -109,7 +86,6 @@ export let GameState = {
 		else {
 			setData("hexagon-save", this)
 		}
-		// console.log(this)
 	},
 
 	load() {

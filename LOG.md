@@ -7,26 +7,29 @@
 
 # Issues!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ## General
+- Add the cool template sound
 - Make minibuttons wave at the speed of the song? would be funny hehehe
 - Format actual working numbers
 - Loading screen isn't working
 - Do general unlocking stuff, like when you first start the game, also the start transition, so cool stuff
 - Make pinch animation
 - Rework tooltips
+- Fix panderito hitbox
 
 - REWRITING THE MOUSE SYSTEM IN PROGRESS:
 * Unactive windows have some undesired behaviour (not unhovering hexagon)
 * Buttons inside windows don't have hovers
+* Minibuttons will play "cursor" sometims when hovering from the folderObj
+
 ## Windows
-- If hasn't unlocked folderObj i think GameState.unlockedWindows should be null
 - You can click hexagon while hovering window for drag, then you drag it and it will not play clickRelease
 * For clicking behind object should check if any other window that is not the current one is active, if any other window is active the button should not work
 
 ### Store
 * Store elements don't go darker with the unactive color because their color is being defined by score amount and price
-- Ending hover doesn't restore the holding to buy time
 ### Music
 * Change vynil to cd, looks better
+^ Maybe simply mask them what the hell
 - play bar stutters when going back
 - fix music waving speed
 ### Color
@@ -48,7 +51,6 @@ https://kaplay.lajbel.com/?code=eJy9U01PwzAMvfdX%2BJhs076QEOoYEhIScEDakQlxyFpvLZ
 - Image if the game had support for adding your own songs
 - Different messages in the mage scene
 ^ add a normal" translation button where the mage doesn't speak shakesperean
-
 
 # Arte: 
 - Boton de la carpeta (folderObj)

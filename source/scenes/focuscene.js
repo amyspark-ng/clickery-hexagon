@@ -4,6 +4,6 @@ export function focuscene() {
 	return scene("focuscene", () => {
 		volumeManager()
 
-		go("ascendscene")
+		go("gamescene")
 	})	
 }

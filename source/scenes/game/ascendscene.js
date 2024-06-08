@@ -108,27 +108,27 @@ function addMage() {
 				activeWaits.forEach(waitCall => waitCall.cancel());
 				activeWaits = [];
 				dialogueText.text = ""
-				
+
 				let currentDelay = 0
 				Array.from(thingToSay).forEach((letter, index) => {
 					let delay = speed;
 					if (letter === ',' || letter === "_") {
 						delay = speed * 5; // Adjust the multiplier as needed for commas and spaces
 					}
-			
+
 					// Increment currentDelay by the calculated delay
 					currentDelay += delay;
-			
+
 					const waitCall = wait(currentDelay, () => {
 						if (letter !== "_") dialogueText.text += letter;
 						// playSfx("mage_e", rand(-150, 150));
 					});
-			
+
 					activeWaits.push(waitCall);
 				});
 			},
 		}
-	])
+	]);	
 	mage.startWave()
 
 	let mage_body = mage.add([
@@ -343,10 +343,11 @@ export function ascendscene() {
 					}),
 				},
 				width: 606, // width without tail
-				align: "left",
+				align: "center",
 				size: 25,
 			}),
-			pos(58, -30),
+			positionSetter(),
+			pos(43, -22),
 			anchor("center"),
 			color(BLACK),
 		])
@@ -358,7 +359,6 @@ export function ascendscene() {
 			pos(980, 250),
 			area(),
 			scale(),
-			positionSetter(),
 			anchor("center"),
 			{
 				woke: true,
@@ -393,6 +393,5 @@ export function ascendscene() {
 		})
 
 		mage.say(dialogues[currentDialogueIdx][dialogueEye.woke ? "woke" : "dumb"], dialogues[currentDialogueIdx].speed)
-		// mage.say("what do you think would happen if i were to put a REAAAAAAAAAAAL long dialogue here, would it get messed up with the wrapping or what the hell would it happen")
 	})
 }

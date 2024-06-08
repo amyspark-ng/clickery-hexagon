@@ -9,7 +9,6 @@ import { curDraggin, setCurDraggin } from "../../plugins/drag"
 import { k } from "../../main"
 
 // debug
-let cameraScale = 1
 
 let panderitoLetters = "panderito".split("")
 export let panderitoIndex = 0
@@ -21,8 +20,15 @@ export let excessTime = 0; // Time that has passed after autoLoopTime
 
 export let autoLoopTime = 0;
 
+export let cam = {
+	scale: [],
+	rotation: 0,
+}
+
 export function gamescene() {
 	return scene("gamescene", () => {
+
+		cam.scale = 1
 
 		addBackground()
 		addMouse()
@@ -83,6 +89,8 @@ export function gamescene() {
 			// debug.log(k.backgroundAudio)
 			// debug
 			// if (isKeyPressed("h")) { GameState.timeUntilAutoLoopEnds--; debug.log(GameState.timeUntilAutoLoopEnds) } 
+			camRot(cam.rotation)
+			camScale(cam.scale)
 		})
 
 		// panderito checkin
@@ -96,11 +104,11 @@ export function gamescene() {
 			}
 		
 			if (panderitoIndex == panderitoLetters.length) {
-				GameState.personalization.panderitoMode = !GameState.personalization.panderitoMode
+				GameState.settings.panderitoMode = !GameState.settings.panderitoMode
 				panderitoIndex = 0
 
 				let panderitoText = add([
-					text(`Panderito mode: ${GameState.personalization.panderitoMode ? "ACTIVATED" : "DEACTIVATED"}`, {
+					text(`Panderito mode: ${GameState.settings.panderitoMode ? "ACTIVATED" : "DEACTIVATED"}`, {
 						size: 26,
 						font: 'emulogic',
 					}),
@@ -128,7 +136,7 @@ export function gamescene() {
 					})
 				})
 
-				if (GameState.personalization.panderitoMode) {
+				if (GameState.settings.panderitoMode) {
 					hexagon.use(sprite("panderito"))
 					hexagon.area.scale = vec2(0.5, 0.8)
 				}
@@ -144,13 +152,11 @@ export function gamescene() {
 
 		// #region debug stuff
 		onScroll((delta)=>{
-			cameraScale = cameraScale * (1 - 0.1 * Math.sign(delta.y))
-			camScale(cameraScale)
+			cam.scale = cam.scale * (1 - 0.1 * Math.sign(delta.y))
 		})
 
 		onMousePress("middle", () => {
-			cameraScale = 1
-			camScale(1)
+			cam.scale = vec2(1)
 		})
 
 		//#endregion

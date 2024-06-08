@@ -6,6 +6,7 @@ import { playSfx } from "../../sound.js";
 import { isDraggingAWindow, isGenerallyHoveringAWindow, isPreciselyHoveringAWindow, manageWindow } from "./windows/windowsAPI.js";
 import { waver } from "../../plugins/wave.js";
 import { isDraggingASlider } from "./windows/colorWindow.js";
+import { cam } from "./gamescene.js";
 
 export let scoreVars = {
 	scorePerClick: 1,
@@ -131,7 +132,7 @@ export function autoClick() {
 
 export function addHexagon() {
 	hexagon = add([
-		sprite(GameState.personalization.panderitoMode ? "panderito" : "hexagon"),
+		sprite(GameState.settings.panderitoMode ? "panderito" : "hexagon"),
 		pos(center().x, center().y + 55),
 		anchor("center"),
 		rotate(0),
@@ -147,7 +148,7 @@ export function addHexagon() {
 				vec2(315, 293),
 			]),
 			offset: vec2(-512, -293),
-			scale: GameState.personalization.panderitoMode ? vec2(0.5, 1) : vec2(1.08, 1.08) 
+			scale: GameState.settings.panderitoMode ? vec2(0.5, 1) : vec2(1.08, 1.08) 
 		}),		
 		z(2),
 		waver({ maxAmplitude: 5, wave_speed: 1 }),
@@ -295,5 +296,13 @@ export function addHexagon() {
 		hexagon.stretched = !hexagon.stretched
 		if (hexagon.stretched) tween(hexagon.stretchScaleIncrease, 0.98, 2, (p) => hexagon.stretchScaleIncrease = p, easings.linear)
 		else tween(hexagon.stretchScaleIncrease, 1.01, 2, (p) => hexagon.stretchScaleIncrease = p, easings.linear)
+	})
+
+	// COMBO STUFF
+	onKeyPress("f", () => {
+		// do cam rot
+		tween(-30, 0, 0.5, (p) => cam.rotation = p, easings.easeOutQuint)
+		tween(0.5, 1, 0.5, (p) => cam.scale = p, easings.easeOutQuint)
+		playSfx("combo")
 	})
 }

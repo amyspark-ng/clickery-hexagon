@@ -28,6 +28,7 @@ function addStoreElement(winParent, opts = { key: "null", pos: vec2(0, 20) }) {
 		opacity(1),
 		scale(1),
 		anchor("center"),
+		z(winParent.z + 1),
 		"hoverObj",
 		"storeElement",
 		`${opts.key}`,
@@ -35,7 +36,8 @@ function addStoreElement(winParent, opts = { key: "null", pos: vec2(0, 20) }) {
 			price: 0,
 			isBeingHoveredOn: false,
 			isBeingClicked: false,
-			buy(amount) {
+			down: false,
+			buy: function(amount) {
 				if (winParent.dragging) return
 				if (this.is("clickersElement")) GameState.clickers += amount
 				else if (this.is("cursorsElement")) GameState.cursors += amount
@@ -48,7 +50,19 @@ function addStoreElement(winParent, opts = { key: "null", pos: vec2(0, 20) }) {
 				if (hasBoughtRecently == true) storeTune += 25;
 				storeTune = clamp(storeTune, -100, 500)
 				playSfx("kaching", storeTune)
-				bop(this)
+				
+				if (this.isBeingClicked) {
+					this.play("down")
+					this.get("*").forEach(element => {
+						element.pos.y += 2
+					});
+					wait(0.15, () => {
+						this.play("up")
+						this.get("*").forEach(element => {
+							element.pos.y -= 2
+						});
+					})
+				}
 			},
 
 			update() {
@@ -86,15 +100,20 @@ function addStoreElement(winParent, opts = { key: "null", pos: vec2(0, 20) }) {
 		}
 	])
 
-	if (opts.key == "powerupsElement") { !GameState.hasUnlockedPowerups ? btn.play("locked") : btn.play("unlocked") }
-
+	if (opts.key == "powerupsElement" && !GameState.hasUnlockedPowerups) {
+		let chains = add([
+			// sprite("chains"),
+		])
+	}
+	
 	let stacksText = btn.add([
 		text("Stacked upgrades: 0", {
 			size: 14,
 		}),
 		anchor("center"),
-		pos(-100, 30),
+		pos(-100, 24),
 		color(BLACK),
+		z(btn.z + 1),
 		{
 			update() {
 				this.text = "Stacked upgrades: 0"
@@ -109,6 +128,7 @@ function addStoreElement(winParent, opts = { key: "null", pos: vec2(0, 20) }) {
 		anchor("center"),
 		pos(stacksText.pos.x - 5, stacksText.pos.y + 15),
 		color(BLACK),
+		z(btn.z + 1),
 		{
 			update() {
 				this.text = `$${btn.price}`
@@ -128,45 +148,64 @@ function addStoreElement(winParent, opts = { key: "null", pos: vec2(0, 20) }) {
 		// if (!winParent.is("active")) return
 		if (!btn.isHovering()) return
 		btn.isBeingClicked = true
+		if (!GameState.score >= btn.price) return
 
-		if (GameState.score >= btn.price) {
-			if (timesBoughtWhileHolding == 0) {
-				timeUntilAnotherBuy = maxTime
-			}
+		if (timesBoughtWhileHolding == 0) {
+			timeUntilAnotherBuy = maxTime
+		}
 
-			timer += dt()
+		timer += dt()
 
-			timeUntilAnotherBuy = maxTime / (timesBoughtWhileHolding)
-			timeUntilAnotherBuy = clamp(timeUntilAnotherBuy, minTime, maxTime)
+		timeUntilAnotherBuy = maxTime / (timesBoughtWhileHolding)
+		timeUntilAnotherBuy = clamp(timeUntilAnotherBuy, minTime, maxTime)
 
-			if (timesBoughtWhileHolding == 0) {
-				timesBoughtWhileHolding = 1
-				btn.buy(amountToBuy)
-			}
+		if (timesBoughtWhileHolding == 0) {
+			timesBoughtWhileHolding = 1
+			btn.buy(amountToBuy)
+		}
 
-			if (timer > timeUntilAnotherBuy) {
-				timer = 0
-				timesBoughtWhileHolding++	
-				btn.buy(amountToBuy)
-			}
+		if (timer > timeUntilAnotherBuy) {
+			timer = 0
+			timesBoughtWhileHolding++	
+			btn.buy(amountToBuy)
+		}
+
+		if (timesBoughtWhileHolding > 10 && !get("smoke")[0]) {
+			let smoke = add([
+				sprite("smoke"),
+				pos(btn.worldPos().x - btn.width / 2, btn.worldPos().y - btn.height / 2),
+				opacity(),
+				anchor("center"),
+				z(btn.z - 1),
+				fadeIn(1),
+				"smoke",
+			])
+
+			smoke.play("smoking")
 		}
 	})
 
 	btn.onMouseRelease(() => {
 		if (!btn.isHovering()) return
 		btn.isBeingClicked = false
+		
 		// if (!winParent.is("active")) return
 		timer = 0
 		timesBoughtWhileHolding = 0
 		timeUntilAnotherBuy = 2.25
+		
+		get("smoke", { recursive: true })[0].fadeOut(0.25)
+		get("smoke", { recursive: true })[0].unuse("smoke")
 	})
 
 	btn.onHoverEnd(() => {
-		btn.isBeingClicked = false
-		// if (!winParent.is("active")) return
-		timer = 0
-		timesBoughtWhileHolding = 0
-		timeUntilAnotherBuy = 2.25
+		if (btn.isBeingClicked) {
+			btn.isBeingClicked = false
+			// if (!winParent.is("active")) return
+			timer = 0
+			timesBoughtWhileHolding = 0
+			timeUntilAnotherBuy = 2.25
+		}
 	})
 
 	return btn;

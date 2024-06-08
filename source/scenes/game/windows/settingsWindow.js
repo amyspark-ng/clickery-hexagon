@@ -31,7 +31,6 @@ export function addVolumeControl(opts = { pos: vec2(), variable: ""}, parent) {
 	};
 
 	let volbars = get("volbar", { recursive: true });
-	debug.log(volbars[0].volume);
 
 	// buttons
 	let minus = (parent || ROOT).add([
@@ -48,7 +47,6 @@ export function addVolumeControl(opts = { pos: vec2(), variable: ""}, parent) {
 		}
 
 		else if (GameState.settings.volume -= 0.1 == 0) {
-			debug.log("MUTED")
 		}
 
 		play("volumeChange", { detune: volChangeTune })
@@ -75,13 +73,15 @@ export function addVolumeControl(opts = { pos: vec2(), variable: ""}, parent) {
 	return volbars[0];
 }
 
-
 export function addCheckbox(opts = { pos: vec2(), variable: "", sprite: "" }, parent) {
+	GameState.settings.fullscreen = false
+
 	let checkBox = (parent || ROOT).add([
 		rect(45, 45),
 		pos(opts.pos),
 		anchor("center"),
 		area(),
+		color(getVariable(GameState, opts.variable) ? GREEN : RED),
 		{
 			update() {
 				if (getVariable(GameState, opts.variable) == true) this.color = GREEN
