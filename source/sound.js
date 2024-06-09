@@ -115,7 +115,7 @@ export function volumeManager() {
 	
 	let volumeText = bg.add([
 		text("VOLUME", {
-			font: 'emulogic',
+			font: 'lambda',
 			size: 26
 		}),
 		pos(0, bg.height - 16),

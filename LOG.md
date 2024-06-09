@@ -15,6 +15,8 @@
 - Make pinch animation
 - Rework tooltips
 - Fix panderito hitbox
+- Figure out why gamescene breaks when re-entering after being on ascendscnee
+- I think toasts don't work when being out of the game a lot
 
 - REWRITING THE MOUSE SYSTEM IN PROGRESS:
 * Unactive windows have some undesired behaviour (not unhovering hexagon)
@@ -50,7 +52,7 @@ https://kaplay.lajbel.com/?code=eJy9U01PwzAMvfdX%2BJhs076QEOoYEhIScEDakQlxyFpvLZ
 - Random chance of +1 making something funny
 - Image if the game had support for adding your own songs
 - Different messages in the mage scene
-^ add a normal" translation button where the mage doesn't speak shakesperean
+- Add an achievement for opening all windows at the same time 
 
 # Arte: 
 - Boton de la carpeta (folderObj)

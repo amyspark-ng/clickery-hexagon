@@ -1,6 +1,6 @@
 import { GameState } from "../../gamestate";
 import { autoLoopTime, excessTime } from "./gamescene";
-import { autoClick, hexagon } from "./hexagon";
+import { hexagon, scoreVars } from "./hexagon";
 import { isHoveringUpgrade } from "./windows/store/upgrades";
 import { isDraggingAWindow, isGenerallyHoveringAWindow, isPreciselyHoveringAWindow, manageWindow, openWindow } from "./windows/windowsAPI";
 
@@ -232,12 +232,8 @@ export function debugFunctions() {
 			GameState.cheat()
 		}
 
-		else if (isKeyDown("q")) {
-			GameState.addScore(10)
-		}
-
 		else if (isKeyPressed("w")) {
-			autoClick()
+			hexagon.autoClick()
 		}
 
 		else if (isKeyPressed("y")) {
@@ -664,83 +660,6 @@ export function addPlusPercentageScore(posToAdd, amount, size = [40, 50]) {
 	wait(0.25, () => {
 		destroy(plusScoreText);
 	});
-}
-
-export function addPlusScoreText(posToAdd, amount, size = [40, 50]) {
-	let plusScoreText = add([
-		text("+" + formatNumber(amount, true, false), {
-			size: rand(size[0], size[1]),
-			font: "lambdao",
-			styles: {
-				"small": {
-					scale: 0.8,
-					pos: vec2(0, +4)
-				}
-			}
-		}),
-		pos(posToAdd),
-		rotate(0),
-		anchor("center"),
-		z(4),
-		{
-			// TODO: i like this, look at it !!!
-			// dir: vec2(rand(-200, 200), 200),
-			// update() {
-			// 	this.angle += this.dir.x / 100
-			// 	this.dir.y += 10
-			// 	this.move(this.dir)
-			// },
-			// update() {
-
-			// }
-		}
-	])
-
-	// tween(plusScoreText.pos.y, plusScoreText.pos.y - 50, 1, (p) => plusScoreText.pos.y = p, )
-	// tween(1, 0, 1, (p) => plusScoreText.opacity = p, )
-
-	// plusScoreText.pos.x = choose([
-	// 	rand(posToAdd.x - 50, posToAdd.x - 40),
-	// 	rand(posToAdd.x + 50, posToAdd.x + 40),
-	// ])
-
-	// plusScoreText.pos.y = choose([
-	// 	rand(posToAdd.y - 10, posToAdd.y - 10),
-	// 	rand(posToAdd.y + 10, posToAdd.y + 10),
-	// ])
-
-	plusScoreText.pos.x = posToAdd.x + 2
-	plusScoreText.pos.y = posToAdd.y - 18
-
-	// animate plusscoretext
-	tween(
-		plusScoreText.pos.y,
-		plusScoreText.pos.y - 20,
-		0.25,
-		(p) => plusScoreText.pos.y = p,
-	);
-	tween(
-		1,
-		0,
-		0.25,
-		(p) => plusScoreText.opacity = p,
-	);
-
-	wait(0.25, () => {
-		tween(
-			plusScoreText.opacity,
-			0,
-			0.25,
-			(p) => plusScoreText.opacity = p,
-		);
-	});
-	
-	wait(0.25, () => {
-		destroy(plusScoreText);
-	});
-
-	if (plusScoreText.pos.x > posToAdd.x) plusScoreText.anchor = "left"
-	else plusScoreText.anchor = "right"
 }
 
 export function saveAnim() {

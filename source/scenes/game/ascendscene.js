@@ -1,3 +1,4 @@
+import { GameState } from "../../gamestate"
 import { drag } from "../../plugins/drag"
 import { positionSetter } from "../../plugins/positionSetter"
 import { waver } from "../../plugins/wave"
@@ -17,7 +18,7 @@ let currentDialogueIdx = 0
 let dialogues = {
 	0: { 
 		"woke": "Thy hexagon is palmy, giveth t to me and i'll giveth thee anoth'r one, f'r one of these",
-		"dumb": "Your hexagon is mighty, give it to me, and i'll you another one, for one of these",
+		"dumb": "Your hexagon is mighty, give it to me, and i'll give you another one, for one of these",
 		"speed": 0.05
 	},
 	// #region eye picking ones
@@ -36,7 +37,7 @@ let dialogues = {
 		"dumb": "fuck you dumbass!",
 		"speed": 0.01
 	},
-	//#endregion
+	//#endregion eye picking ones
 }
 
 let trophies;
@@ -236,8 +237,8 @@ function addMage() {
 	])
 
 	let mage_hexagon = mage.add([
-		pos(231, 244),
-		sprite("hexagon"),
+		pos(GameState.settings.panderitoMode ? vec2(231, 250): vec2(231, 244)),
+		sprite(GameState.settings.panderitoMode ? "panderito" : "hexagon"),
 		scale(0.35),
 		waver({ wave_speed: 1, maxAmplitude: 10 }),
 		rotate(0),
@@ -291,6 +292,11 @@ function addMage() {
 
 	onUpdate("mage_lightning", (light) => {
 		light.color = mage_hexagon.color
+	})
+
+	// dumb
+	onKeyPress("escape", () => {
+		go("gamescene")
 	})
 }
 
@@ -391,6 +397,13 @@ export function ascendscene() {
 			// find how to clamp it based on how much of them are
 			trophies.pos.x = clamp(trophies.pos.x, Infinity, -100)
 		})
+
+		if (GameState.settings.panderitoMode) {
+			Object.keys(dialogues).forEach(dialogueKey => {
+				dialogues[dialogueKey].woke = dialogues[dialogueKey].woke.replaceAll("hexagon", "panderito")
+				dialogues[dialogueKey].dumb = dialogues[dialogueKey].dumb.replaceAll("hexagon", "panderito")
+			});
+		}
 
 		mage.say(dialogues[currentDialogueIdx][dialogueEye.woke ? "woke" : "dumb"], dialogues[currentDialogueIdx].speed)
 	})

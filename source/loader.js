@@ -292,6 +292,7 @@ export function loadAssets() {
 	//#region Other ones huh
 	loadSprite("aboutWin", "sprites/windows/aboutWin.png")
 	loadSprite("settingsWin", "sprites/windows/settingsWin.png")
+	loadSprite("ascendWin", "sprites/windows/musicWin/musicWin.png")
 	loadSprite("hexColorWin", "sprites/windows/colorWin/hexColorWin.png")
 	loadSprite("bgColorWin", "sprites/windows/colorWin/bgColorWin.png")
 	//#endregion

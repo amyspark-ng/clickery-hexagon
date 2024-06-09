@@ -1,24 +1,33 @@
 
 import { GameState } from "../../gamestate.js";
 import { scoreText, spsText } from "./uicounters.js";
-import { addPlusScoreText, mouse, formatNumber, arrayToColor } from "./utils.js";
+import { mouse, formatNumber, arrayToColor } from "./utils.js";
 import { playSfx } from "../../sound.js";
 import { isDraggingAWindow, isGenerallyHoveringAWindow, isPreciselyHoveringAWindow, manageWindow } from "./windows/windowsAPI.js";
 import { waver } from "../../plugins/wave.js";
 import { isDraggingASlider } from "./windows/colorWindow.js";
-import { cam } from "./gamescene.js";
+import { addPlusScoreText, dropCombo, startCombo } from "./combo-utils.js";
+import { addConfetti } from "../../plugins/confetti.js";
 
 export let scoreVars = {
 	scorePerClick: 1,
 	scorePerAutoClick: 0,
 	autoScorePerSecond: 0, // the score per second you're getting automatically
 	actualScorePerSecond: 0, // the actual and current score per second - used in the ui
-	scoreNeededToAscend: 1000000
+	scoreNeededToAscend: 1000000,
+	combo: 1,
 }
+
+const INITIAL_COMBO = 25
+const COMBO_INCREMENT = 15
+const MAX_COMBO = 10
 
 export let clickVars = {
 	clicksPerSecond: 0, // to properly calculate sps
+	consecutiveClicks: 0,
 }
+
+let consecutiveClicksWaiting = null;
 
 export let autoScorePerSecond = 0; // the score per second you're getting automatically
 export let actualScorePerSecond = 0; // the actual and current score per second
@@ -29,106 +38,6 @@ export let hexagon;
 
 let hoverRotSpeedIncrease = 0.01 * 0.25
 let maxRotSpeed = 10
-
-export function autoClick() {
-	let autoCursor = add([
-		sprite("cursors"),
-		pos(),
-		scale(0.8),
-		z(2.1),
-		rotate(0),
-		z(4),
-		anchor("center"),
-		"cursor",
-		{
-			update() {
-				// debug.log(this.angle)
-			}
-		}
-	])
-
-	// fucking cursor position
-	autoCursor.pos.x = rand(
-		hexagon.pos.x - 50,
-		hexagon.pos.x + 50,
-	);
-	autoCursor.pos.y = rand(
-		hexagon.pos.y - 50,
-		hexagon.pos.y + 50,
-	);
-
-	tween(0, 1, 0.5, (p) => autoCursor.opacity = p, easings.easeOutQuint)
-	tween(autoCursor.pos, autoCursor.pos.add(choose([-80, -70, -60, -50, 50, 60, 70, 80])), 0.5, (p) => autoCursor.pos = p, easings.easeOutQuint)
-
-	if (
-		autoCursor.pos.x > hexagon.pos.x - 50
-		&& autoCursor.pos.x < hexagon.pos.x
-	) {
-		autoCursor.angle = 90;
-	} else if (
-		autoCursor.pos.x > hexagon.pos.x
-		&& autoCursor.pos.x < hexagon.pos.x + 50
-	) {
-		autoCursor.angle = 270;
-	}
-
-	if (
-		autoCursor.pos.y > hexagon.pos.y - 50
-		&& autoCursor.pos.y < hexagon.pos.y
-	) {
-		autoCursor.angle += 45;
-	} else if (
-		autoCursor.pos.y > hexagon.pos.y
-		&& autoCursor.pos.y < hexagon.pos.y + 50
-	) {
-		autoCursor.angle -= 45;
-	}
-	
-	wait(0.25, () => {
-		autoCursor.play("point")
-		wait(0.15, () => {
-			autoCursor.play("grab")
-			
-			// clickPress manual false
-			tween(hexagon.scaleIncrease, 0.98, 0.35, (p) => hexagon.scaleIncrease = p, easings.easeOutQuint)
-			playSfx("clickPress", rand(-50, 50))
-
-			wait(0.15, () => {
-				autoCursor.play("point")
-
-				// clickRelease manual false
-				tween(hexagon.scaleIncrease, hexagon.isHovering() ? 1.05: 1, 0.35, (p) => hexagon.scaleIncrease = p, easings.easeOutQuint)
-				playSfx("clickRelease", rand(-50, 50))
-				
-				addPlusScoreText(autoCursor.pos, scoreVars.scorePerAutoClick, [32.5, 40])
-				GameState.addScore(scoreVars.scorePerAutoClick)
-
-				// has done its bidding, time to roll and dissapear
-				autoCursor.use(area({ collisionIgnore: ["cursor"] }))
-				autoCursor.use(body())
-				autoCursor.jump(300)
-
-				wait(0.2, () => {
-					tween(1, 0, 0.25, (p) => autoCursor.opacity = p, )
-					if (autoCursor.pos.x > hexagon.pos.x) {
-						tween(autoCursor.angle, autoCursor.angle + 90, 1, (p) => autoCursor.angle = p, )
-						autoCursor.vel.x = rand(25, 50)
-					}
-					
-					if (autoCursor.pos.x < hexagon.pos.x) {
-						tween(autoCursor.angle, autoCursor.angle - 90, 1, (p) => autoCursor.angle = p, )
-						autoCursor.vel.x = rand(-25, -50)
-					}
-				
-					// ok you're done
-					wait(1, () => {
-						destroy(autoCursor)
-					})
-				})
-			})
-		})
-	})
-}
 
 export function addHexagon() {
 	hexagon = add([
@@ -181,6 +90,12 @@ export function addHexagon() {
 				if (this.angle >= 360) {
 					this.angle = 0
 				}
+
+				if (!debug) return
+				if (isKeyDown("q")) {
+					this.clickPress()
+					wait(0.1, () => this.clickRelease())
+				}
 			},
 			
 			clickPress() {
@@ -197,10 +112,135 @@ export function addHexagon() {
 				clickVars.clicksPerSecond++
 				playSfx("clickRelease", rand(-50, 50))
 				mouse.releaseAndPlay("point")
+
+				clickVars.consecutiveClicks++
+				if (clickVars.consecutiveClicks == 25) {
+					scoreVars.combo = 2
+					startCombo() // checks if first combo dw
+				}
+
+				else if (clickVars.consecutiveClicks == INITIAL_COMBO + (COMBO_INCREMENT * scoreVars.combo) && scoreVars.combo < MAX_COMBO) {
+					scoreVars.combo++
+					startCombo() // checks if first combo dw
+				}
+
+				if (scoreVars.combo == 10 && clickVars.consecutiveClicks == INITIAL_COMBO + (COMBO_INCREMENT) * 10) {
+					// yippee
+					addConfetti({ pos: vec2(hexagon.pos.x, hexagon.pos.y + 100) })
+					debug.log("add confetti")
+				}
+
+				consecutiveClicksWaiting.cancel()
+				consecutiveClicksWaiting = wait(1, () => {
+					dropCombo()
+				})
+
+				//actual score additions
+				addPlusScoreText(mouse.pos, scoreVars.scorePerClick)
+				GameState.addScore(scoreVars.scorePerClick * scoreVars.combo)
+				tween(scoreText.scaleIncrease, 1.05, 0.2, (p) => scoreText.scaleIncrease = p, easings.easeOutQuint).onEnd(() => {
+					tween(scoreText.scaleIncrease, 1, 0.2, (p) => scoreText.scaleIncrease = p, easings.easeOutQuint)
+				})
 			},
 
 			autoClick() {
+				let autoCursor = add([
+					sprite("cursors"),
+					pos(),
+					scale(0.8),
+					z(2.1),
+					rotate(0),
+					z(4),
+					anchor("center"),
+					"cursor",
+					{
+						update() {
+							// debug.log(this.angle)
+						}
+					}
+				])
+			
+				// fucking cursor position
+				autoCursor.pos.x = rand(
+					hexagon.pos.x - 50,
+					hexagon.pos.x + 50,
+				);
+				autoCursor.pos.y = rand(
+					hexagon.pos.y - 50,
+					hexagon.pos.y + 50,
+				);
+			
+				tween(0, 1, 0.5, (p) => autoCursor.opacity = p, easings.easeOutQuint)
+				tween(autoCursor.pos, autoCursor.pos.add(choose([-80, -70, -60, -50, 50, 60, 70, 80])), 0.5, (p) => autoCursor.pos = p, easings.easeOutQuint)
+			
+				if (
+					autoCursor.pos.x > hexagon.pos.x - 50
+					&& autoCursor.pos.x < hexagon.pos.x
+				) {
+					autoCursor.angle = 90;
+				} else if (
+					autoCursor.pos.x > hexagon.pos.x
+					&& autoCursor.pos.x < hexagon.pos.x + 50
+				) {
+					autoCursor.angle = 270;
+				}
+			
+				if (
+					autoCursor.pos.y > hexagon.pos.y - 50
+					&& autoCursor.pos.y < hexagon.pos.y
+				) {
+					autoCursor.angle += 45;
+				} else if (
+					autoCursor.pos.y > hexagon.pos.y
+					&& autoCursor.pos.y < hexagon.pos.y + 50
+				) {
+					autoCursor.angle -= 45;
+				}
 				
+				wait(0.25, () => {
+					autoCursor.play("point")
+					wait(0.15, () => {
+						autoCursor.play("grab")
+						
+						// clickPress manual false
+						tween(hexagon.scaleIncrease, 0.98, 0.35, (p) => hexagon.scaleIncrease = p, easings.easeOutQuint)
+						playSfx("clickPress", rand(-50, 50))
+			
+						wait(0.15, () => {
+							autoCursor.play("point")
+			
+							// clickRelease manual false
+							tween(hexagon.scaleIncrease, hexagon.isHovering() ? 1.05: 1, 0.35, (p) => hexagon.scaleIncrease = p, easings.easeOutQuint)
+							playSfx("clickRelease", rand(-50, 50))
+							
+							addPlusScoreText(autoCursor.pos, scoreVars.scorePerAutoClick, [32.5, 40])
+							GameState.addScore(scoreVars.scorePerAutoClick)
+			
+							// has done its bidding, time to roll and dissapear
+							autoCursor.use(area({ collisionIgnore: ["cursor"] }))
+							autoCursor.use(body())
+							autoCursor.jump(300)
+			
+							wait(0.2, () => {
+								tween(1, 0, 0.25, (p) => autoCursor.opacity = p, )
+								if (autoCursor.pos.x > hexagon.pos.x) {
+									tween(autoCursor.angle, autoCursor.angle + 90, 1, (p) => autoCursor.angle = p, )
+									autoCursor.vel.x = rand(25, 50)
+								}
+								
+								if (autoCursor.pos.x < hexagon.pos.x) {
+									tween(autoCursor.angle, autoCursor.angle - 90, 1, (p) => autoCursor.angle = p, )
+									autoCursor.vel.x = rand(-25, -50)
+								}
+							
+								// ok you're done
+								wait(1, () => {
+									destroy(autoCursor)
+								})
+							})
+						})
+					})
+				})
 			},
 
 			startHover() {
@@ -249,13 +289,6 @@ export function addHexagon() {
 		if (hexagon.isBeingHoveredOn) {
 			if (hexagon.canClick && hexagon.isBeingClicked && !isPreciselyHoveringAWindow&& !isDraggingAWindow) {
 				hexagon.clickRelease()
-
-				//actual score additions
-				addPlusScoreText(mouse.pos, scoreVars.scorePerClick)
-				GameState.addScore(scoreVars.scorePerClick)
-				tween(scoreText.scaleIncrease, 1.05, 0.2, (p) => scoreText.scaleIncrease = p, easings.easeOutQuint).onEnd(() => {
-					tween(scoreText.scaleIncrease, 1, 0.2, (p) => scoreText.scaleIncrease = p, easings.easeOutQuint)
-				})
 			}
 		}
 	})
@@ -299,10 +332,8 @@ export function addHexagon() {
 	})
 
 	// COMBO STUFF
+	consecutiveClicksWaiting = wait();
 	onKeyPress("f", () => {
-		// do cam rot
-		tween(-30, 0, 0.5, (p) => cam.rotation = p, easings.easeOutQuint)
-		tween(0.5, 1, 0.5, (p) => cam.scale = p, easings.easeOutQuint)
-		playSfx("combo")
+		startCombo()
 	})
 }

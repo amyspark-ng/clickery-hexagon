@@ -1,5 +1,5 @@
 import { GameState } from "../../gamestate"
-import { scoreVars, addHexagon, autoClick, hexagon } from "./hexagon.js"
+import { scoreVars, addHexagon, hexagon } from "./hexagon.js"
 import { uiCounters } from "./uicounters"
 import { addBackground, addMouse, addToast, debugFunctions, debugTexts, mouse, percentage } from "./utils"
 import { musicHandler, playMusic } from "../../sound"
@@ -80,7 +80,7 @@ export function gamescene() {
 				// this runs when time's up
 				if (autoLoopTime >= GameState.timeUntilAutoLoopEnds) {
 					if (excessTime > 0) autoLoopTime = excessTime
-					else { autoLoopTime = 0; autoClick() }
+					else { autoLoopTime = 0; hexagon.autoClick() }
 					excessTime = 0
 				}
 			}
@@ -156,7 +156,7 @@ export function gamescene() {
 		})
 
 		onMousePress("middle", () => {
-			cam.scale = vec2(1)
+			cam.scale = 1
 		})
 
 		//#endregion

@@ -2,10 +2,12 @@ import { GameState } from "../../../gamestate.js";
 import { bop, getSides, mouse } from "../utils.js";
 import { drag, curDraggin, setCurDraggin } from "../../../plugins/drag.js";
 import { playSfx } from "../../../sound.js";
+// window contents
 import { storeWinContent } from "./store/storeWindows.js";
 import { musicWinContent, setTimeSinceSkip, timeSinceSkip } from "./musicWindow.js";
 import { colorWinContent } from "./colorWindow.js";
 import { settingsWinContent } from "./settingsWindow.js";
+import { ascendWinContent } from "./ascendWindow.js";
 
 let infoForWindows = {};
 export let isGenerallyHoveringAWindow = false;
@@ -47,7 +49,7 @@ export function windowsStuff() {
 	infoForWindows = {
 		"storeWin": { idx: 0, spriteName: "storeWin", icon: "store", content: storeWinContent, lastPos: vec2(818, 280), hotkey: "1", color: rgb(24, 38, 94), showable: true, },
 		"musicWin": { idx: 1, spriteName: "musicWin", icon: "music", content: musicWinContent, lastPos: vec2(208, 96), hotkey: "2", color: rgb(90, 33, 128), showable: true },
-		"ascendWin": { idx: 2, spriteName: "storeWin", icon: "ascend", content: emtpyWinContent, lastPos: vec2(center().x, center().y), hotkey: "3", color: WHITE, showable: true },
+		"ascendWin": { idx: 2, spriteName: "ascendWin", icon: "ascend", content: ascendWinContent, lastPos: vec2(center().x, center().y), hotkey: "3", color: WHITE, showable: true },
 		"statsWin": { idx: 3, spriteName: "storeWin", icon: "stats", content: emtpyWinContent, lastPos: vec2(center().x, center().y), hotkey: "4", color: WHITE, showable: true },
 		"medalsWin": { idx: 4, spriteName: "storeWin", icon: "achievements", content: emtpyWinContent, lastPos: vec2(center().x, center().y), hotkey: "5", color: WHITE, showable: true },
 		"aboutWin": { idx: 5, spriteName: "aboutWin", icon: "about", content: emtpyWinContent, lastPos: vec2(center().x, center().y), hotkey: "6", color: RED, showable: true },
@@ -131,7 +133,7 @@ export function addMinibutton(i, xPosition) {
 				}
 
 				if (miniButton.pos.x < folderObj.pos.x - buttonSpacing + 10) {
-					miniButton.area.scale = vec2(0.9, 1.4)
+					miniButton.area.scale = vec2(0.75, 1)
 					miniButton.area.offset = vec2(2, 4)
 				}
 				
