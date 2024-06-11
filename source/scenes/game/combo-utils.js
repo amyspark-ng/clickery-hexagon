@@ -3,9 +3,13 @@ import { cam } from "./gamescene"
 import { clickVars, scoreVars } from "./hexagon"
 import { blendColors, formatNumber } from "./utils";
 
-// export function getClicksForComboLevel(level) {
-//     return Math.floor(INITIAL_COMBO + rand(3, 5) * (level - 1));
-// }
+export function getClicksForComboLevel(level) {
+    const a = 1.5;   // Adjust this value to change the curvature
+    const b = 0;     // Adjust this value to change the linear growth
+    const c = 25;    // Starting clicks at level 1
+
+    return Math.ceil(a * Math.pow(level, 2) + b * level + c);
+}
 
 export function addPlusScoreText(posToAdd, amount, size = [40, 50]) {
 	let textBlendFactor = 0;

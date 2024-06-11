@@ -19,4 +19,4 @@ To build:
 - Khriz28 - Playtesting
 
 BROKE COMMIT HISTORY BY RENAMING COMMIT :(
-![alt text](image.png)
+![alt text](proof.png)

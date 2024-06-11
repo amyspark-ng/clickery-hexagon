@@ -239,7 +239,6 @@ function addRgbSlider(winParent, posToAdd = vec2(0), coloredObj, type = "r") {
 
 export function colorWinContent(winParent, winType = "hexColorWin") {
 	let objToColor = winType == "hexColorWin" ? get("hexagon", { recursive: true })[0] : gameBg
-	console.log(objToColor)
 
 	let rSlider = addRgbSlider(winParent, vec2(-25, -80), objToColor, "r")
 	let gSlider = addRgbSlider(winParent, vec2(-25, rSlider.bg.pos.y + 50), objToColor, "g")
@@ -274,19 +273,21 @@ export function colorWinContent(winParent, winType = "hexColorWin") {
 	])
 
 	objToColor.onUpdate(() => {
-		objToColor.color.r = rSlider.value
-		objToColor.color.g = gSlider.value
-		objToColor.color.b = bSlider.value
-		
 		if (winType == "hexColorWin" && objToColor == hexagon) {
 			GameState.settings.hexColor = [rSlider.value, gSlider.value, bSlider.value]
 			winParent.color = hexagon.color.lighten(150)
+			objToColor.color.r = rSlider.value
+			objToColor.color.g = gSlider.value
+			objToColor.color.b = bSlider.value
 		}
 
 		else if (winType == "bgColorWin" && objToColor == gameBg) {
 			GameState.settings.bgColor = [rSlider.value, gSlider.value, bSlider.value, aSlider.value]
 			winParent.color = blendColors(gameBg.tintColor.lighten(200), gameBg.tintColor, gameBg.blendFactor)
-		}
+			objToColor.tintColor.r = rSlider.value
+			objToColor.tintColor.g = gSlider.value
+			objToColor.tintColor.b = bSlider.value
+		}		
 	})
 
 	defaultButton.onClick(() => {

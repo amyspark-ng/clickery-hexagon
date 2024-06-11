@@ -1,3 +1,5 @@
+// # Initial code by MeowcaTheoRange / modified by amyspark-ng
+
 import { blendColors } from "../scenes/game/utils";
 
 var sprIter = 0;

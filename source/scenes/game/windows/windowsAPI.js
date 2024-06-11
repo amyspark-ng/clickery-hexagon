@@ -2,12 +2,14 @@ import { GameState } from "../../../gamestate.js";
 import { bop, getSides, mouse } from "../utils.js";
 import { drag, curDraggin, setCurDraggin } from "../../../plugins/drag.js";
 import { playSfx } from "../../../sound.js";
+
 // window contents
 import { storeWinContent } from "./store/storeWindows.js";
 import { musicWinContent, setTimeSinceSkip, timeSinceSkip } from "./musicWindow.js";
 import { colorWinContent } from "./colorWindow.js";
 import { settingsWinContent } from "./settingsWindow.js";
 import { ascendWinContent } from "./ascendWindow.js";
+import { addShockwave } from "../../../plugins/shockwave.js";
 
 let infoForWindows = {};
 export let isGenerallyHoveringAWindow = false;
@@ -27,47 +29,47 @@ export function deactivateAllWindows() {
 }
 
 export function manageWindow(windowKey) {
-	if (infoForWindows.hasOwnProperty(windowKey)) {
-		let maybeWindow = get(windowKey)[0]
-		// if window even exists in the first place
-		if (maybeWindow) {
-			// if it isn't it means that it's being closed
-			if (maybeWindow.is("window")) {
-				maybeWindow.close()
-			}
-		}
-		else {
-			openWindow(windowKey)
+	if (!infoForWindows.hasOwnProperty(windowKey)) throw new Error("No such window for: " + windowKey);
+	
+	let maybeWindow = get(windowKey)[0]
+	// if window even exists in the first place
+	if (maybeWindow) {
+		// if it isn't it means that it's being closed
+		if (maybeWindow.is("window")) {
+			maybeWindow.close()
 		}
 	}
-	else throw new Error("Window not found: " + windowKey);
+	else {
+		openWindow(windowKey)
+	}
 }
 
 export function windowsStuff() {
 	// spriteName is the actual window it will open
 	// hotkey should be the one in taskbar corresponding to the placement
 	infoForWindows = {
-		"storeWin": { idx: 0, spriteName: "storeWin", icon: "store", content: storeWinContent, lastPos: vec2(818, 280), hotkey: "1", color: rgb(24, 38, 94), showable: true, },
-		"musicWin": { idx: 1, spriteName: "musicWin", icon: "music", content: musicWinContent, lastPos: vec2(208, 96), hotkey: "2", color: rgb(90, 33, 128), showable: true },
-		"ascendWin": { idx: 2, spriteName: "ascendWin", icon: "ascend", content: ascendWinContent, lastPos: vec2(center().x, center().y), hotkey: "3", color: WHITE, showable: true },
-		"statsWin": { idx: 3, spriteName: "storeWin", icon: "stats", content: emtpyWinContent, lastPos: vec2(center().x, center().y), hotkey: "4", color: WHITE, showable: true },
-		"medalsWin": { idx: 4, spriteName: "storeWin", icon: "achievements", content: emtpyWinContent, lastPos: vec2(center().x, center().y), hotkey: "5", color: WHITE, showable: true },
-		"aboutWin": { idx: 5, spriteName: "aboutWin", icon: "about", content: emtpyWinContent, lastPos: vec2(center().x, center().y), hotkey: "6", color: RED, showable: true },
-		"creditsWin": { idx: 6, spriteName: "creditsWin", icon: "about", content: emtpyWinContent, lastPos: vec2(center().x, center().y), hotkey: "6", color: RED, showable: true },
-		"settingsWin": { idx: 7, spriteName: "settingsWin", icon: "settings", content: settingsWinContent, lastPos: vec2(center().x, center().y), hotkey: "6", color: RED, showable: true },
-		"hexColorWin": { idx: 8, spriteName: "hexColorWin", icon: "store", content: colorWinContent, lastPos: vec2(208, 160), hotkey: null, color: WHITE, showable: false },
-		"bgColorWin": { idx: 9, spriteName: "bgColorWin", icon: "store", content: colorWinContent, lastPos: vec2(1024 - 200, 200), hotkey: null, color: WHITE, showable: false },
+		"storeWin": { idx: 0, content: storeWinContent, lastPos: vec2(818, 280) },
+		"musicWin": { idx: 1, content: musicWinContent, lastPos: vec2(208, 96) },
+		"ascendWin": { idx: 2, content: ascendWinContent, lastPos: vec2(center().x, center().y) },
+		"statsWin": { idx: 3, content: emptyWinContent, lastPos: vec2(center().x, center().y) },
+		"medalsWin": { idx: 4, content: emptyWinContent, lastPos: vec2(center().x, center().y) },
+		"aboutWin": { idx: 5, content: emptyWinContent, lastPos: vec2(center().x, center().y) },
+		"creditsWin": { idx: 6, content: emptyWinContent, lastPos: vec2(center().x, center().y) },
+		"settingsWin": { idx: 7, content: settingsWinContent, lastPos: vec2(center().x, center().y) },
+		"leaderboardsWin": { idx: 8, content: emptyWinContent, lastPos: vec2(center().x, center().y) },
+		"hexColorWin": { idx: 9, content: colorWinContent, lastPos: vec2(208, 160) },
+		"bgColorWin": { idx: 10, content: colorWinContent, lastPos: vec2(1024 - 200, 200) },
 	}
 }
 
-export function addMinibutton(i, xPosition) {
+export function addMinibutton(i, xPosition, taskbarIndex) {
 	let quad;
 	getSprite("bean").then(quady => {
 		quad = quady
 	})
 	
 	let miniButton = add([
-		sprite(`icon_${infoForWindows[Object.keys(infoForWindows)[i]].icon}`, {
+		sprite(`icon_${Object.keys(infoForWindows)[i].replace("Win", "")}`, {
 			anim: "default"
 		}),
 		pos(folderObj.pos.x, folderObj.pos.y),
@@ -85,6 +87,8 @@ export function addMinibutton(i, xPosition) {
 			window: get(`${Object.keys(infoForWindows)[i]}`, { recursive: true })[0],
 			windowInfo: infoForWindows[Object.keys(infoForWindows)[i]],
 			whiteness: 0,
+			windowKey: Object.keys(infoForWindows)[i],
+			taskbarIndex: taskbarIndex,
 			// for these 2 it will do yPos even if locked
 			startHover() {
 				if (isDraggingAWindow) return
@@ -119,11 +123,6 @@ export function addMinibutton(i, xPosition) {
 			},
 
 			update() {
-				if (this.isHovering() && !isPreciselyHoveringAWindow && !isDraggingAWindow && !folded) {
-					// animate it spinning it
-					this.angle = wave(-9, 9, time() * 3)
-				}
-
 				if (this.window != null) {
 					this.whiteness = wave(0.01, 0.1, (time() * 3))
 				}
@@ -132,8 +131,12 @@ export function addMinibutton(i, xPosition) {
 					this.whiteness = 0
 				}
 
+				if (this.isHovering()) {
+					this.angle = wave(-8, 8, time () * 3)
+				}
+
 				if (miniButton.pos.x < folderObj.pos.x - buttonSpacing + 10) {
-					miniButton.area.scale = vec2(0.75, 1)
+					miniButton.area.scale = vec2(0.75, 1.1)
 					miniButton.area.offset = vec2(2, 4)
 				}
 				
@@ -155,10 +158,13 @@ export function addMinibutton(i, xPosition) {
 		"u_size": vec2(quad.w, quad.h),
 	})))
 
-	miniButton.onHover(() => {
+	miniButton.onHover(() => {3
 		if (!isGenerallyHoveringAWindow && !isDraggingAWindow) {
 			miniButton.startHover()
 			playSfx("hoverMiniButton", 100 * miniButton.windowInfo.idx / 4)
+			
+			// animate it spinning it
+
 		}
 	})
 
@@ -171,19 +177,22 @@ export function addMinibutton(i, xPosition) {
 
 	miniButton.onClick(() => {
 		if (isPreciselyHoveringAWindow || isDraggingAWindow) return
-		miniButton.manageRespectiveWindow(miniButton)
+		manageWindow(miniButton.windowKey)
 		bop(miniButton)
+		// addShockwave(miniButton.pos, 50)
 	})
 
-	miniButtons[i] = miniButton
+	miniButtons[taskbarIndex] = miniButton
 	return miniButton;
 }
 
 export function openWindow(windowKey = "") {
+	if (!infoForWindows.hasOwnProperty(windowKey)) throw new Error(`No such window for: ${windowKey}`)
+	
 	playSfx("openWin", rand(0.8, 1.2))
 
 	let windowObj = add([
-		sprite(windowKey ? windowKey : "storeWin"),
+		sprite(getSprite(windowKey) ? windowKey : "dumbTestWin"),
 		pos(infoForWindows[windowKey].lastPos),
 		anchor("center"),
 		opacity(0),
@@ -195,8 +204,7 @@ export function openWindow(windowKey = "") {
 		`${windowKey}`,
 		{
 			idx: infoForWindows[windowKey].idx,
-			miniButton: infoForWindows[windowKey].showable ? miniButtons[infoForWindows[windowKey].idx] : null,
-			showable: infoForWindows[windowKey].showable,
+			miniButton: miniButtons[infoForWindows[windowKey].idx],
 			close() {
 				folderObj.trigger("winClose")
 				this.removeAll()
@@ -211,8 +219,7 @@ export function openWindow(windowKey = "") {
 				})
 
 				infoForWindows[windowKey].lastPos = this.pos
-				if (!this.showable || folded || !GameState.unlockedWindows.includes(windowKey)) return
-				this.miniButton.window = null
+				if (folded || !GameState.unlockedWindows.includes(windowKey)) return
 			},
 
 			activate() {
@@ -302,11 +309,6 @@ export function openWindow(windowKey = "") {
 	xButton.onClick(() => {
 		if (!isDraggingAWindow) {
 			windowObj.close()
-			if (windowObj.showable) {
-				if (get("window").length == 0) {
-					folderObj.fold()
-				}
-			}
 		}
 	})
 
@@ -406,19 +408,20 @@ export function folderObjManaging() {
 		{
 			defaultScale: vec2(1.2),
 			unfold() {
-				GameState.unlockedWindows = ["settingsWin", "aboutWin", "storeWin", "musicWin", "ascendWin", "statsWin"],
+				GameState.unlockedWindows = Object.keys(infoForWindows)
+				// GameState.unlockedWindows = ["storeWin"]
 				folded = false
 				timeSinceFold = 0
 				playSfx("fold", rand(-50, 50))
 
 				// Sort the unlockedWindows array based on the order in infoForWindows
-				GameState.unlockedWindows.sort((a, b) => infoForWindows[a].idx - infoForWindows[b].idx);
+				GameState.taskbar.sort((a, b) => infoForWindows[a].idx - infoForWindows[b].idx);
 
 				// Initial x position for the buttons
 				let initialX = folderObj.pos.x;
 				
-				// Iterate over the sorted unlockedWindows array to create buttons
-				// There are already minibutto
+				// Iterate over the sorted taskbar array to create buttons
+				// There are already minibuttons
 				if (get("minibutton").length > 0) {
 					get("miniButton").forEach((miniButton, index) => {
 						let xPos = initialX - buttonSpacing * index - 75;
@@ -428,11 +431,10 @@ export function folderObjManaging() {
 
 				// There are not, create them
 				else {
-					GameState.unlockedWindows.forEach((key, index) => {
-						if (!infoForWindows[key].showable) return;
-						let xPos = initialX - buttonSpacing * index - 75;
+					GameState.taskbar.forEach((key, taskbarIndex) => {
+						let xPos = initialX - buttonSpacing * taskbarIndex - 75;
 						let i = infoForWindows[key].idx;
-						addMinibutton(i, xPos);
+						addMinibutton(i, xPos, taskbarIndex);
 					});
 				}
 			},
@@ -472,29 +474,28 @@ export function folderObjManaging() {
 	])
 
 	// this HAS to exist because if not how can you tell the hotkey was being pressed if the object doesn't exist
+	// tf you mean by exist?
 	folderObj.onCharInput((key) => {
-		// checks for all windowsinfo if the key pressed coincides with any of the hotkeys
-		Object.keys(infoForWindows).forEach(hotWindowInfo => {
-			// coincides to one	of the hotkeys
-			if (key == infoForWindows[hotWindowInfo].hotkey) {
-				// if unlockedwindows contains that window corresponding to the hotkey
-				if (GameState.unlockedWindows.includes(hotWindowInfo)) {
-				if (folded) folderObj.unfold()
-					if (get("window").length == 1) {
-						if (infoForWindows[Object.keys(infoForWindows)[get("window")[0].idx]].showable) {
-							if (key == get("window")[0].miniButton.windowInfo.hotkey) {
-								if (!folded) folderObj.fold()
-							}
-						}
-					}
-					
-					// manages the window and boops the button
-					miniButtons[infoForWindows[hotWindowInfo].idx].manageRespectiveWindow(miniButtons[infoForWindows[hotWindowInfo].idx])
-					bop(miniButtons[infoForWindows[hotWindowInfo].idx])
-				}
+		// Parse the key input to get the number pressed
+		const numberPressed = parseInt(key);
+		if (isNaN(numberPressed)) return; // If the key is not a number, return
+	
+		// Adjust for 1-based index (e.g., pressing '1' should access the first element)
+		const index = numberPressed - 1;
+	
+		// Ensure the number is within the range of GameState.taskbar indices
+		if (index >= 0 && index < GameState.taskbar.length) {
+			const windowKey = GameState.taskbar[index];
+	
+			// Check if the window is unlocked
+			if (GameState.unlockedWindows.includes(windowKey)) {
+				// Open the window and handle UI updates
+				if (folded) folderObj.unfold();
+				manageWindow(windowKey);
+				bop(miniButtons[index]);
 			}
-		});
-	})
+		}
+	});
 
 	folderObj.on("winClose", () => {
 		let anyHovered = false
@@ -529,10 +530,6 @@ export function folderObjManaging() {
 			isDraggingAWindow = window.dragging
 		})
 	})
-}
-
-export function emtpyWinContent() {
-
 }
 
 function calculateButtonPosition(index, folderObjX, buttonSpacing = 75) {
@@ -579,4 +576,13 @@ export function unlockWindow(key) {
 	else {
 		throw new Error("Window not found: " + key);
 	}
+}
+
+export function emptyWinContent(winParent) {
+	winParent.add([
+		text("THIS WINDOW IS EMPTY", {
+			align: "center"
+		}),
+		anchor("center"),
+	])
 }

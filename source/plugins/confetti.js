@@ -1,3 +1,5 @@
+// # found in kaplay examples
+
 const DEF_COUNT = 80
 const DEF_GRAVITY = 800
 const DEF_AIR_DRAG = 0.9

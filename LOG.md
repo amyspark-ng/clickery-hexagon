@@ -1,17 +1,27 @@
 # [Issues](#issues)
 # [Bookmarks](#bookmarks)
 # [Ideas](#ideas)
-# [TODO](#to-do)
 
 * Do "-" for issues, "*" for notes, "^" for comments on either
 
+# Little TODO (today)
+- Fix minibutton snap when hovering and spin animation
+
+# Little TODO (tomorrow)
+- Do minibutton shockwave
+- Add combo bar
+^ Maybe add bar above or below scoretext
+- Format actual working numbers
+^ Make it work with new shorten numbers setting
+- Re-design make working toasts
+
+- Keep working on store
+- Do general unlocking stuff, like when you first start the game, also the start transition, so cool stuff
+
 # Issues!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ## General
-- Add the cool template sound
 - Make minibuttons wave at the speed of the song? would be funny hehehe
-- Format actual working numbers
 - Loading screen isn't working
-- Do general unlocking stuff, like when you first start the game, also the start transition, so cool stuff
 - Make pinch animation
 - Rework tooltips
 - Fix panderito hitbox
@@ -31,8 +41,6 @@
 * Store elements don't go darker with the unactive color because their color is being defined by score amount and price
 ### Music
 * Change vynil to cd, looks better
-^ Maybe simply mask them what the hell
-- play bar stutters when going back
 - fix music waving speed
 ### Color
 * Sliders are not precise, too lazy to fix it probably
@@ -53,6 +61,7 @@ https://kaplay.lajbel.com/?code=eJy9U01PwzAMvfdX%2BJhs076QEOoYEhIScEDakQlxyFpvLZ
 - Image if the game had support for adding your own songs
 - Different messages in the mage scene
 - Add an achievement for opening all windows at the same time 
+- Make unactive windows grayscale
 
 # Arte: 
 - Boton de la carpeta (folderObj)

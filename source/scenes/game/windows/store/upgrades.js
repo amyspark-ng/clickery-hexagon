@@ -19,7 +19,7 @@ export function addRegularUpgrades(elementParent) {
 			{
 				type: elementParent.is("clickersElement") ? "k_" : "c_",
 				idx: i,
-				value: 0, // set later
+				value: 0, // is setted below
 			}
 		])
 
@@ -36,14 +36,25 @@ export function addRegularUpgrades(elementParent) {
 					case 1:
 						upgrade.freq = 5
 					break;
-					case 0:
+					case 2:
 						upgrade.freq = 1
 					break;
 				}
 			}
 
+			// is multiplier upgrades
 			else {
-				
+				switch (upgrade.idx) {
+					case 9:
+						upgrade.value = 8;
+					break;
+					case 10:
+						upgrade.value = 16;
+					break;
+					case 11:
+						upgrade.value = 36;
+					break;
+				}
 			}
 		}
 

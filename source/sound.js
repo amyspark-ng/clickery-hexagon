@@ -1,6 +1,14 @@
 
 import { GameState } from "./gamestate.js"
+import { positionSetter } from "./plugins/positionSetter.js";
 import { panderitoIndex } from "./scenes/game/gamescene.js";
+import { bop, gameBg } from "./scenes/game/utils.js";
+
+let bg;
+let volumeText;
+let speaker;
+let trayVolElements;
+let volumeBars;
 
 export let sfxHandler;
 export function playSfx(sound = "clickPress", tune = 0) {
@@ -20,9 +28,6 @@ export function playMusic(sound = "clickRelease") {
 	})
 }
 
-
-let volElements;
-
 // takes 1.25 seconds
 export function scratchSong() {
 	musicHandler.winding = true
@@ -35,37 +40,79 @@ export function scratchSong() {
 	})
 }
 
-export function espMute() {
-	tween(musicHandler.volume, 0, 0.25, (p) => musicHandler.volume = p, easings.easeOutQuint).onEnd(() => {
-		GameState.settings.music.muted = true
-		musicHandler.paused = true
-	})
-	tween(musicHandler.detune, -100, 0.25, (p) => musicHandler.detune = p, easings.easeOutQuint)
-}
-
-export function espUnmute() {
-	GameState.settings.music.muted = false
-	musicHandler.paused = false
-	tween(musicHandler.volume, GameState.settings.music.volume, 0.25, (p) => musicHandler.volume = p, easings.easeOutQuint)
-	tween(musicHandler.detune, 0, 0.25, (p) => musicHandler.detune = p, easings.easeOutQuint)
-}
-
-export function manageMute() {
-	GameState.settings.music.muted = !GameState.settings.music.muted 
-	musicHandler.paused = !musicHandler.paused 
-	if (GameState.settings.music.muted) {
-		get("bpmChange", { recursive: true }).forEach(bpmChange => { bpmChange.stopWave() });
-	}
-	else {
-		get("bpmChange", { recursive: true }).forEach(bpmChange => { bpmChange.startWave() });
-	}
-}
-
 export let volChangeTune = 0
+let showTween = null;
+
+export function addSoundElements() {
+	bg = add([
+		rect(width() / 6, 80, { radius: 2.5 }),
+		pos(width() / 2, 0),
+		anchor("top"),
+		color(BLACK),
+		stay(),
+		opacity(0.75),
+		z(999999999),
+		"trayVolElement",
+		{
+			upYPos: -80,
+			downYPos: 0,
+		}
+	])
+
+	bg.pos.y = bg.upYPos
+	
+	volumeText = bg.add([
+		text("VOLUME"),
+		pos(0, bg.height - 12),
+		anchor("center"),
+		scale(0.6),
+		z(9999999999),
+		"trayVolElement",
+	])
+
+	speaker = volumeText.add([
+		sprite("speakers"),
+		opacity(1),
+		pos(0, -64),
+		positionSetter(),
+		anchor("center"),
+		"trayVolElement",
+	])
+
+	// frame 1 is sound / frame 0 is muted
+	speaker.frame = 0
+	speaker.hidden = true
+
+	// bars
+	for (let i = 0; i < 10; i++) {
+		bg.add([
+			pos(-67 + i * 15, 30),
+			rect(10, bg.height - 40, { radius: 1 }),
+			opacity(0),
+			anchor("center"),
+			z(99999999999),
+			"trayVolElement",
+			"trayVolBar",
+			{
+				volume: 0.1 * (i + 1),
+				update() {
+					if (GameState.settings.volume.toFixed(1) < this.volume.toFixed(1)) this.opacity = 0.1
+					else this.opacity = 1
+				}
+			}
+		])
+	}
+
+	trayVolElements = get("trayVolElement", { recursive: true })
+	volumeBars = get("trayVolBar", { recursive: true })
+}
 
 export function volumeManager() {
-	let barXPosition = -110
-	let seconds = 0
+	showTween = tween(gameBg.opacity, gameBg.opacity, 0, (p) => gameBg.opacity = p)
+	volume(GameState.settings.volume)
+
+	let changeVolTune = 0
+	let waitingTimer = wait()
 
 	sfxHandler = play("clickPress", { volume: 0 })
 	musicHandler = play("clickRelease", { volume: 0 })
@@ -73,207 +120,144 @@ export function volumeManager() {
 	musicHandler.currentTime = 0 // time()
 	musicHandler.totalTime = 0 // duration()
 	
-	// for (let i = 0; i < get("volElement").length; i++) {
-	// 	destroy(get("volElement")[i])
-	// }
+	trayVolElements = get("trayVolElement", { recursive: true }) 
 
-	let bg = add([
-		rect(width() / 6, 80),
-		pos(width() / 2, -80),
-		anchor("top"),
-		color(BLACK),
-		opacity(0.5),
-		stay(),
-		z(999999999),
-		"volElement",
-		{
-			isUp: true,
-			isActuallyUp: true,
-			up() {
-				if (!this.isUp) {
-					this.isUp = true
-					tween(this.pos.y, -this.height, 0.35, (p) => this.pos.y = p, easings.easeInQuint)
-					wait(0.36, () => {
-						this.isActuallyUp = true
-					})
-				}
-			},
-			down() {
-				if (this.isUp) {
-					this.isUp = false
-					this.isActuallyUp = false
-					get("volElement", { recursive: true }).forEach(element => {
-						element.hidden = false
-					});
-					tween(this.pos.y, 0, 0.35, (p) => this.pos.y = p, easings.easeOutQuint)
-				}
-			},
-		}
-	])
-
-	bg.up()
-	
-	let volumeText = bg.add([
-		text("VOLUME", {
-			font: 'lambda',
-			size: 26
-		}),
-		pos(0, bg.height - 16),
-		anchor("center"),
-		scale(0.6),
-		opacity(1),
-		// stay(),
-		z(9999999999),
-		"volElement",
-	])
-	
-	let bars;
-	
-	for (let i = 0; i < 10; i++) {
-		barXPosition += 20
-		
-		volumeText.add([
-			pos(barXPosition, -65),
-			rect(10, bg.height - 10),
-			opacity(1),
-			anchor("center"),
-			z(99999999999),
-			"volElement",
-			"bar",
-		])
-	}
-
-	bars = volumeText.get("bar", { recursive: true })
-	let speaker = volumeText.add([
-		sprite("speakers"),
-		opacity(1),
-		pos(-40, -110),
-		"volElement",
-	])
-
-	speaker.frame = 1
-
-	volElements = get("volElement", { recursive: true }) 
-
-	let gameManager = add([
+	let soundManager = add([
 		stay(),
 		{
-			canChange: true,
 			update() {
 				GameState.settings.volume = parseFloat(GameState.settings.volume.toFixed(1))
 				GameState.settings.sfx.volume = parseFloat(GameState.settings.sfx.volume.toFixed(1))
 				GameState.settings.music.volume = parseFloat(GameState.settings.music.volume.toFixed(1))
-
-				volume(GameState.settings.volume)
-
 				volChangeTune = map(GameState.settings.volume, 0, 1, -250, 0)
-				
-				if (seconds > 0) seconds -= dt()
 
-				else {
-					bg.up()
-					if (bg.isActuallyUp) {
-						volElements.forEach(element => {
-							element.hidden = true
-						});
-					}
-				}
-				
 				if (isKeyPressed("-")) {
-					bg.down()
-					
+					// have to trigger this before because else the objects will not exist
+					this.trigger("show")
 					if (GameState.settings.volume > 0) {
 						GameState.settings.volume -= 0.1
-						bars.forEach(element => {
-							element.hidden = false
-						});
-						speaker.hidden = true
-					}
+						volume(GameState.settings.volume)
 
-					if (GameState.settings.volume == 0) {
-						bars.forEach(element => {
-							element.hidden = true
-						});
-						speaker.hidden = false
-						speaker.frame = 0
-					}
+						// would mute
+						if (GameState.settings.volume == 0) {
+							// mute everything
+							volumeText.text = "SOUND OFF"
+							// no need to mute other things because their volume 
+							// is being managed by the volume() function globally lol!
+						}
+							
+						else {
+							volumeText.text = `VOLUME: ${GameState.settings.volume.toFixed(1) * 100}%`
+							bop(volumeBars[clamp(Math.floor(GameState.settings.volume * 10 - 1), 0, 10)], 0.05)
+						}
 
-					seconds = 1.5
-					play("volumeChange", { detune: volChangeTune })
-					volumeText.text = "VOLUME"
+						get("trayVolBar", { recursive: true }).forEach(trayVolBar => {
+							trayVolBar.hidden = GameState.settings.volume == 0 ? true : false
+						})
+						speaker.hidden = GameState.settings.volume == 0 ? false : true
+						speaker.frame = GameState.settings.volume == 0 ? 0 : 1
+					}
 				}
 				
 				else if (isKeyPressed("+")) {
-					bg.down()
+					// have to trigger this before because else the objects will not exist
+					this.trigger("show")
+					get("trayVolBar", { recursive: true }).forEach(trayVolBar => {
+						trayVolBar.hidden = false
+					})
+					speaker.hidden = true
+					speaker.frame = 1
 
 					if (GameState.settings.volume <= 0.9) {
 						GameState.settings.volume += 0.1
-						play("volumeChange", { detune: volChangeTune })
+						volume(GameState.settings.volume)
 					}
 
-					// else play("whistle")
-					else play("volumeChange", { detune: volChangeTune, volume: 5 })
+					else {
+						// // this is too loud
+						// play("whistle")
+					}
 
-					seconds = 1.5
-					bars.forEach(element => {
-						element.hidden = false
-					});
-					speaker.hidden = true
-					volumeText.text = "VOLUME"
+					bop(volumeBars[clamp(Math.floor(GameState.settings.volume * 10 - 1), 0, 10)], 0.05)
+					volumeText.text = `VOLUME ${GameState.settings.volume.toFixed(1) * 100}%`
 				}
 
 				else if (isKeyPressed("n") && panderitoIndex != 3) {
-					bg.down()
-					if (!GameState.settings.sfx.muted) {
-						GameState.settings.sfx.volume = 0
-						GameState.settings.sfx.muted = true
-						speaker.frame = 0
-					}
+					// have to trigger this before because else the objects will not exist
+					this.trigger("show")
 					
-					// unmuted
-					else {
-						GameState.settings.sfx.volume = GameState.settings.volume
-						GameState.settings.sfx.muted = false
-						speaker.frame = 1
-					} 
-
-					bars.forEach(element => {
-						element.hidden = true
-					});
+					GameState.settings.sfx.muted = !GameState.settings.sfx.muted
+					volumeText.text = `SFX: ${GameState.settings.sfx.muted ? "OFF" : "ON"}`
+					
+					get("trayVolBar", { recursive: true }).forEach(trayVolBar => {
+						trayVolBar.hidden = true
+					})
 					speaker.hidden = false
-					seconds = 1.55
-					volumeText.text = "SFX"
+					speaker.frame = GameState.settings.sfx.muted ? 0 : 1
+					bop(speaker, 0.05)
 				}
 
 				else if (isKeyPressed("m")) {
-					bg.down()
-					manageMute()
-					if (GameState.settings.music.muted) speaker.frame = 0
-					else speaker.frame = 1
-					bars.forEach(element => {
-						element.hidden = true
-					});
+					// have to trigger this before because else the objects will not exist
+					this.trigger("show")
+					
+					GameState.settings.music.muted = !GameState.settings.music.muted
+					volumeText.text = `MUSIC: ${GameState.settings.music.muted ? "OFF" : "ON"}`
+					
+					get("trayVolBar", { recursive: true }).forEach(trayVolBar => {
+						trayVolBar.hidden = true
+					})
 					speaker.hidden = false
-					seconds = 1.55
-					volumeText.text = "MUSIC"
+					speaker.frame = GameState.settings.music.muted ? 0 : 1
+					get("bpmChange", { recursive: true }).forEach((bpmChange) => {
+						GameState.settings.music.muted ? bpmChange.stopWave() : bpmChange.startWave()
+					})
+					bop(speaker, 0.05)
 				}
 
-				for(let i = 0; i < bars.length; i++) {
-					bars[i].opacity = 0.1
-					bars[i].fullOp = 0.1
-				}
+				if (!GameState.settings.sfx.muted) GameState.settings.sfx.volume = GameState.settings.volume; 
+				else GameState.settings.sfx.volume = 0
 				
-				for(let i = 0; i < Math.round(GameState.settings.volume * 10); i++) {
-					bars[i].opacity = 1
-					bars[i].fullOp = 1
-				}
-
-				if (!GameState.settings.sfx.muted) GameState.settings.sfx.volume = GameState.settings.volume; else GameState.settings.sfx.volume = 0
-				if (!GameState.settings.music.muted) GameState.settings.music.volume = GameState.settings.volume; else GameState.settings.music.volume = 0
+				if (!GameState.settings.music.muted) GameState.settings.music.volume = GameState.settings.volume; 
+				else GameState.settings.music.volume = 0
 			
 				sfxHandler.volume = GameState.settings.sfx.volume
 				if (!musicHandler.winding) musicHandler.volume = GameState.settings.music.volume
 			}
 		}
 	])
+
+	soundManager.on("hide", () => {
+		if (get("trayVolElement").length === 0) return
+
+		showTween.cancel()
+		showTween = tween(bg.pos.y, bg.upYPos, 0.32, (p) => bg.pos.y = p, easings.easeOutQuad).then(() => {
+			waitingTimer.cancel()
+			waitingTimer = wait(0.5, () => {
+				trayVolElements.forEach(soundElement => {
+					destroy(soundElement)
+				});
+			})
+		})
+	})
+
+	soundManager.on("show", () => {
+		if (get("trayVolElement").length === 0) addSoundElements()
+
+		if (showTween) {
+			showTween.cancel()
+		}
+		showTween = tween(bg.pos.y, bg.downYPos, 0.32, (p) => bg.pos.y = p, easings.easeOutQuad)
+
+		waitingTimer.cancel()
+		waitingTimer = wait(1, () => {
+			soundManager.trigger("hide")
+		})
+
+		if (GameState.settings.volume < 10)	play("volumeChange", { detune: changeVolTune })
+	})
+
+	// DON'T ADD ONCHARINPUT BECAUSE THE NUMBERS ARE EXCLUSIVE FOR THE WINDOWS BUTTONS!!!!
+
+	return soundManager;
 }

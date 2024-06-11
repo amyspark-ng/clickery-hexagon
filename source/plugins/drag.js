@@ -1,3 +1,5 @@
+// # Found in kaplay examples
+
 // Keep track of the current draggin item
 export let curDraggin = null
 

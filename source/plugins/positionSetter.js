@@ -1,3 +1,5 @@
+// # by amyspark-ng
+
 export function positionSetter() {
 	return {
 		id: "setterAnimation",

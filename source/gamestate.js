@@ -50,8 +50,8 @@ export let GameState = {
 		}
 	},
 
-	// order doesn't affect idx
-	unlockedWindows: ["settingsWin", "aboutWin", "storeWin", "musicWin", "ascendWin", "statsWin"],
+	unlockedWindows: null,
+	taskbar: ["storeWin", "settingsWin"],
 
 	// medals: {
 	// 	start: new medalData("It starts", 3484, false, "itstarts")
@@ -73,6 +73,7 @@ export let GameState = {
 		bgColor: [0, 0, 0, 0.55],
 		keepAudioOnTabChange: true,
 		dropDragsOnMouseOut: true,
+		shortNumbers: false,
 		fullscreen: false,
 		panderitoMode: false,
 	},

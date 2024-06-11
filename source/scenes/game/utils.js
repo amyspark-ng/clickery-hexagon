@@ -251,6 +251,7 @@ export function addBackground() {
 		scale(8),
 		color(),
 		z(-1),
+		stay(),
 		{
 			speed: 0.1,
 			movAngle: 5,
@@ -259,6 +260,14 @@ export function addBackground() {
 			col2D: rgb(190, 190, 190),
 			tintColor: arrayToColor(GameState.settings.bgColor),
 			blendFactor: GameState.settings.bgColor[3],
+			update() {
+				if (isMousePressed("right")) {
+					if (!get("folderObj")[0]) return
+					if (!hexagon?.isHovering() && !get("folderObj")[0]?.isHovering() && !get("minibutton")[0]?.isHovering() && !isGenerallyHoveringAWindow && !isDraggingAWindow) {
+						manageWindow("bgColorWin")
+					}
+				}
+			}
 		}
 	])
 
@@ -271,13 +280,6 @@ export function addBackground() {
         "u_scale": gameBg.uScale,
 		"u_aspect": width() / height()
     })))
-
-	gameBg.onMousePress("right", () => {
-		if (!get("folderObj")[0]) return
-		if (!hexagon?.isHovering() && !get("folderObj")[0]?.isHovering() && !isGenerallyHoveringAWindow && !isDraggingAWindow) {
-			manageWindow("bgColorWin")
-		}
-	})
 }
 
 export function customScreens() {

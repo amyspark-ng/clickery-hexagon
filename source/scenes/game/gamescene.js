@@ -1,7 +1,7 @@
 import { GameState } from "../../gamestate"
 import { scoreVars, addHexagon, hexagon } from "./hexagon.js"
 import { uiCounters } from "./uicounters"
-import { addBackground, addMouse, addToast, debugFunctions, debugTexts, mouse, percentage } from "./utils"
+import { addBackground, addMouse, addToast, arrayToColor, debugFunctions, debugTexts, gameBg, mouse, percentage } from "./utils"
 import { musicHandler, playMusic } from "../../sound"
 import { folderObjManaging, unlockWindow, windowsStuff as windowsStuff } from "./windows/windowsAPI"
 import { songs } from "./windows/musicWindow"
@@ -25,12 +25,57 @@ export let cam = {
 	rotation: 0,
 }
 
+export function togglePanderito() {
+	GameState.settings.panderitoMode = !GameState.settings.panderitoMode
+	panderitoIndex = 0
+
+	let panderitoText = add([
+		text(`Panderito mode: ${GameState.settings.panderitoMode ? "ACTIVATED" : "DEACTIVATED"}`, {
+			size: 26,
+			font: 'emulogic',
+		}),
+		pos(center()),
+		anchor("center"),
+		z(999),
+		opacity(1),
+	])
+
+	let block = add([
+		rect(width(), 100),
+		pos(center()),
+		anchor("center"),
+		opacity(0.5),
+		color(BLACK),
+		z(998),
+	])
+
+	wait(0.8, () => {
+		tween(0.5, 0, 0.5, (p) => block.opacity = p, )
+		tween(1, 0, 0.5, (p) => panderitoText.opacity = p, )
+		wait(0.5, () => {
+			destroy(panderitoText)
+			destroy(block)
+		})
+	})
+
+	if (GameState.settings.panderitoMode) {
+		hexagon.use(sprite("panderito"))
+		hexagon.area.scale = vec2(0.5, 0.8)
+	}
+	
+	else {
+		hexagon.use(sprite("hexagon"))
+		hexagon.area.scale = vec2(1.08)
+	}
+
+	GameState.save(false)
+}
+
 export function gamescene() {
 	return scene("gamescene", () => {
 
 		cam.scale = 1
 
-		addBackground()
 		addMouse()
 		addHexagon()
 		uiCounters()
@@ -44,7 +89,6 @@ export function gamescene() {
 		GameState.load()
 
 		playMusic(GameState.settings.music.favoriteIdx == null ? "clicker.wav" : Object.keys(songs)[GameState.settings.music.favoriteIdx])
-		if (GameState.settings.music.muted) musicHandler.paused = true
 		
 		// wait 60 seconds
 		wait(60, () => {
@@ -60,17 +104,21 @@ export function gamescene() {
 			addToast({ title: "Unlocked store window", body: "This is a body", color: BLUE })
 		})
 
+		// set bg valeus
+		tween(1, 0.55, 0.5, (p) => gameBg.blendFactor = p, easings.easeOutQuad)
+		tween(BLACK, arrayToColor(GameState.settings.bgColor), 0.5, (p) => gameBg.tintColor = p, easings.easeOutQuad)
+
 		onUpdate(() => {
 			GameState.score = clamp(GameState.score, 0, Infinity)
 			GameState.score = Math.round(GameState.score)
 			debugFunctions()
 			
 			if (GameState.score > 50) {
-				if (!GameState.unlockedWindows.includes("storeWin")) unlockWindow("storeWin")
+				// if (!GameState.unlockedWindows.includes("storeWin")) unlockWindow("storeWin")
 			}
 
 			if (GameState.score > 100) {
-				if (!GameState.unlockedWindows.includes("musicWin")) unlockWindow("musicWin")
+				// if (!GameState.unlockedWindows.includes("musicWin")) unlockWindow("musicWin")
 			}
 
 			// auto loop stuff
@@ -104,49 +152,7 @@ export function gamescene() {
 			}
 		
 			if (panderitoIndex == panderitoLetters.length) {
-				GameState.settings.panderitoMode = !GameState.settings.panderitoMode
-				panderitoIndex = 0
-
-				let panderitoText = add([
-					text(`Panderito mode: ${GameState.settings.panderitoMode ? "ACTIVATED" : "DEACTIVATED"}`, {
-						size: 26,
-						font: 'emulogic',
-					}),
-					pos(center()),
-					anchor("center"),
-					z(999),
-					opacity(1),
-				])
-
-				let block = add([
-					rect(width(), 100),
-					pos(center()),
-					anchor("center"),
-					opacity(0.5),
-					color(BLACK),
-					z(998),
-				])
-
-				wait(0.8, () => {
-					tween(0.5, 0, 0.5, (p) => block.opacity = p, )
-					tween(1, 0, 0.5, (p) => panderitoText.opacity = p, )
-					wait(0.5, () => {
-						destroy(panderitoText)
-						destroy(block)
-					})
-				})
-
-				if (GameState.settings.panderitoMode) {
-					hexagon.use(sprite("panderito"))
-					hexagon.area.scale = vec2(0.5, 0.8)
-				}
-				
-				else {
-					hexagon.use(sprite("hexagon"))
-					hexagon.area.scale = vec2(1.08)
-				}
-
-				GameState.save(false)
+				togglePanderito()
 			}
 		})
 
@@ -180,7 +186,7 @@ export function gamescene() {
 					totalTimeOutsideTab += timeOutsideTab;
 		
 					// 60 being the seconds outside of screen to get the zzz screen
-					if (totalTimeOutsideTab / 1000 > 1) {
+					if (totalTimeOutsideTab / 1000 > 10) {
 						let black = add([
 							rect(width(), height()),
 							pos(center()),
@@ -259,5 +265,13 @@ export function gamescene() {
 				}
 			}
 		}, false);
+
+		add([
+			sprite("volbarbutton", {
+				anim: "on"
+			}
+			),
+			pos(center()),
+		])
 	})
 }

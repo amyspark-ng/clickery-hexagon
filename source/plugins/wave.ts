@@ -1,3 +1,5 @@
+// # Update code by MF / the other stuff by amyspark-ng
+
 // A custom component for waving - it is TS for this waveCompOpt
 export interface WaveCompOpt {
 	wave_tweenSpeed?: number,

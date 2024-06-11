@@ -12,6 +12,19 @@ export function loadAssets() {
 	loadBean()
 	
 	//#region SPRITES
+	// cursors
+	loadSprite("cursors", "sprites/cursors.png", {
+		sliceX: 5,
+		sliceY: 1,
+		anims: {
+			cursor: 0,
+			point: 1,
+			grab: 2,
+			wait: 3,
+			check: 4,
+		},
+	});
+	
 	loadSprite("osaka", "sprites/osaka.png")
 	loadSprite("floppy", "sprites/floppy.png")
 	loadSprite("hexagon", "sprites/hexagon.png")
@@ -27,6 +40,7 @@ export function loadAssets() {
 	})
 
 	//#region Windows
+	loadSprite("dumbTestWin", "sprites/windows/dumbTestWin.png")
 	loadSpriteAtlas("sprites/windows/folderIcons.png", {
 		"icon_about": {
 			width: 140,
@@ -40,7 +54,7 @@ export function loadAssets() {
 				hover: 1,
 			}
 		},
-		"icon_achievements": {
+		"icon_medals": {
 			width: 140,
 			height: 70,
 			sliceX: 2,
@@ -124,6 +138,42 @@ export function loadAssets() {
 				hover: 1,
 			}
 		},
+		"icon_bgColor": {
+			width: 140,
+			height: 70,
+			sliceX: 2,
+			sliceY: 1,
+			x: 140,
+			y: 70,
+			anims: {
+				default: 0,
+				hover: 1,
+			}
+		},
+		"icon_hexColor": {
+			width: 140,
+			height: 70,
+			sliceX: 2,
+			sliceY: 1,
+			x: 280,
+			y: 70,
+			anims: {
+				default: 0,
+				hover: 1,
+			}
+		},
+		"icon_credits": {
+			width: 140,
+			height: 70,
+			sliceX: 2,
+			sliceY: 1,
+			x: 420,
+			y: 70,
+			anims: {
+				default: 0,
+				hover: 1,
+			}
+		},
 	})
 
 	//#region Store
@@ -175,19 +225,6 @@ export function loadAssets() {
 		}
 	})
 
-	// cursors
-	loadSprite("cursors", "sprites/cursors.png", {
-		sliceX: 5,
-		sliceY: 1,
-		anims: {
-			cursor: 0,
-			point: 1,
-			grab: 2,
-			wait: 3,
-			check: 4,
-		},
-	});
-	
 	loadSprite("upgrades", "sprites/upgrades.png", {
 		sliceX: 18,
 		sliceY: 3,
@@ -289,10 +326,36 @@ export function loadAssets() {
 	})
 	//#endregion
 
+	// #region Settings
+	loadSpriteAtlas("sprites/windows/settingsWin/settingsVolBars.png", {
+		"plusbutton": {
+			"x": 90,
+			"y": 0,
+			"width": 30,
+			"height": 50,
+		},
+		"minusbutton": {
+			"x": 60,
+			"y": 0,
+			"width": 30,
+			"height": 50,
+		},
+		"volbarbutton": {
+			"x": 0,
+			"y": 0,
+			"width": 60,
+			"height": 50,
+			"sliceX": 2,
+			"sliceY": 1,
+			"anims": {
+				on: 1,
+				off: 0,
+			}
+		}
+	})
+	//#endregion Settings
+
 	//#region Other ones huh
-	loadSprite("aboutWin", "sprites/windows/aboutWin.png")
-	loadSprite("settingsWin", "sprites/windows/settingsWin.png")
-	loadSprite("ascendWin", "sprites/windows/musicWin/musicWin.png")
 	loadSprite("hexColorWin", "sprites/windows/colorWin/hexColorWin.png")
 	loadSprite("bgColorWin", "sprites/windows/colorWin/bgColorWin.png")
 	//#endregion
@@ -370,7 +433,7 @@ export function loadAssets() {
 
 	// #region SOUNDS
 	loadSound("volumeChange", "sounds/volumeChange.mp3")
-	loadSound("whistle", "sounds/whistle.mp3")
+	loadSound("whistle", "sounds/sfx/whistle.ogg")
 	loadSound("mage_e", "sounds/mage_e.mp3")
 	loadSound("clickPress", "sounds/click_press.mp3")
 	loadSound("clickRelease", "sounds/click_release.mp3")
