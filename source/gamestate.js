@@ -50,8 +50,8 @@ export let GameState = {
 		}
 	},
 
-	unlockedWindows: null,
-	taskbar: ["storeWin", "settingsWin"],
+	unlockedWindows: [],
+	taskbar: [],
 
 	// medals: {
 	// 	start: new medalData("It starts", 3484, false, "itstarts")

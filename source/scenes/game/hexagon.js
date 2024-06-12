@@ -3,7 +3,7 @@ import { GameState } from "../../gamestate.js";
 import { scoreText, spsText } from "./uicounters.js";
 import { mouse, formatNumber, arrayToColor } from "./utils.js";
 import { playSfx } from "../../sound.js";
-import { isDraggingAWindow, isGenerallyHoveringAWindow, isPreciselyHoveringAWindow, manageWindow } from "./windows/windowsAPI.js";
+import { isDraggingAWindow, isGenerallyHoveringAWindow, isPreciselyHoveringAWindow, manageWindow } from "./windows/windows-api/windowsAPI.js";
 import { waver } from "../../plugins/wave.js";
 import { isDraggingASlider } from "./windows/colorWindow.js";
 import { addPlusScoreText, dropCombo, startCombo } from "./combo-utils.js";

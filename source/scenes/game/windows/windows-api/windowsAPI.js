@@ -1,28 +1,29 @@
-import { GameState } from "../../../gamestate.js";
-import { bop, getSides, mouse } from "../utils.js";
-import { drag, curDraggin, setCurDraggin } from "../../../plugins/drag.js";
-import { playSfx } from "../../../sound.js";
+import { GameState } from "../../../../gamestate.js";
+import { bop, getSides, mouse } from "../../utils.js";
+import { drag, curDraggin, setCurDraggin } from "../../../../plugins/drag.js";
+import { playSfx } from "../../../../sound.js";
+import { addShockwave } from "../../../../plugins/shockwave.js";
 
 // window contents
-import { storeWinContent } from "./store/storeWindows.js";
-import { musicWinContent, setTimeSinceSkip, timeSinceSkip } from "./musicWindow.js";
-import { colorWinContent } from "./colorWindow.js";
-import { settingsWinContent } from "./settingsWindow.js";
-import { ascendWinContent } from "./ascendWindow.js";
-import { addShockwave } from "../../../plugins/shockwave.js";
+import { storeWinContent } from "../store/storeWindows.js";
+import { musicWinContent, setTimeSinceSkip, timeSinceSkip } from "../musicWindow.js";
+import { colorWinContent } from "../colorWindow.js";
+import { settingsWinContent } from "../settingsWindow.js";
+import { ascendWinContent } from "../ascendWindow.js";
+import { extraWinContent } from "../extraWindow.js";
 
-let infoForWindows = {};
+export let infoForWindows = {};
 export let isGenerallyHoveringAWindow = false;
 export let isPreciselyHoveringAWindow = false;
 export let isInClickingRangeOfAWindow = false;
 export let isDraggingAWindow = false;
 
-let folderObj;
+export let folderObj;
 let folded = true;
 let timeSinceFold = 0;
 
-let miniButtons = [];
-let buttonSpacing = 75;
+export let miniButtonsArray = [];
+export const buttonSpacing = 75;
 
 export function deactivateAllWindows() {
 	get("active").forEach(element => { element.deactivate() });
@@ -44,32 +45,44 @@ export function manageWindow(windowKey) {
 	}
 }
 
-export function windowsStuff() {
-	// spriteName is the actual window it will open
-	// hotkey should be the one in taskbar corresponding to the placement
+export function windowsDefinition() {
 	infoForWindows = {
+		// horizontal
 		"storeWin": { idx: 0, content: storeWinContent, lastPos: vec2(818, 280) },
+		// horizontal
 		"musicWin": { idx: 1, content: musicWinContent, lastPos: vec2(208, 96) },
+		// horizontal
 		"ascendWin": { idx: 2, content: ascendWinContent, lastPos: vec2(center().x, center().y) },
+		// horizontal
 		"statsWin": { idx: 3, content: emptyWinContent, lastPos: vec2(center().x, center().y) },
+		// vertical
 		"medalsWin": { idx: 4, content: emptyWinContent, lastPos: vec2(center().x, center().y) },
+		// vertical
 		"aboutWin": { idx: 5, content: emptyWinContent, lastPos: vec2(center().x, center().y) },
+		// vertical
 		"creditsWin": { idx: 6, content: emptyWinContent, lastPos: vec2(center().x, center().y) },
+		// vertical
 		"settingsWin": { idx: 7, content: settingsWinContent, lastPos: vec2(center().x, center().y) },
+		// vertical
 		"leaderboardsWin": { idx: 8, content: emptyWinContent, lastPos: vec2(center().x, center().y) },
+		// vertical
 		"hexColorWin": { idx: 9, content: colorWinContent, lastPos: vec2(208, 160) },
+		// vertical
 		"bgColorWin": { idx: 10, content: colorWinContent, lastPos: vec2(1024 - 200, 200) },
+		"extraWin": { idx: 11, icon: "about", content: extraWinContent, lastPos: center(), verticalButton: true, },
 	}
+
+	GameState.taskbar = [ "storeWin", "musicWin" ]
 }
 
-export function addMinibutton(i, xPosition, taskbarIndex) {
+export function addMinibutton(i, posToAdd, taskbarIndex) {
 	let quad;
 	getSprite("bean").then(quady => {
 		quad = quady
 	})
 	
 	let miniButton = add([
-		sprite(`icon_${Object.keys(infoForWindows)[i].replace("Win", "")}`, {
+		sprite(`icon_${infoForWindows[Object.keys(infoForWindows)[i]].icon || Object.keys(infoForWindows)[i].replace("Win", "")}`, {
 			anim: "default"
 		}),
 		pos(folderObj.pos.x, folderObj.pos.y),
@@ -82,17 +95,18 @@ export function addMinibutton(i, xPosition, taskbarIndex) {
 		"minibutton",
 		{
 			idx: i,
-			verPosition: folderObj.pos.y,
+			destinedPosition: vec2(posToAdd.x, posToAdd.y),
 			defaultScale: vec2(1),
 			window: get(`${Object.keys(infoForWindows)[i]}`, { recursive: true })[0],
 			windowInfo: infoForWindows[Object.keys(infoForWindows)[i]],
 			whiteness: 0,
 			windowKey: Object.keys(infoForWindows)[i],
 			taskbarIndex: taskbarIndex,
+			vertical: infoForWindows[Object.keys(infoForWindows)[i]].verticalButton,
 			// for these 2 it will do yPos even if locked
 			startHover() {
 				if (isDraggingAWindow) return
-				tween(miniButton.pos.y, miniButton.verPosition - 5, 0.32, (p) => miniButton.pos.y = p, easings.easeOutQuint)
+				tween(miniButton.pos.y, miniButton.destinedPosition.y - 5, 0.32, (p) => miniButton.pos.y = p, easings.easeOutQuint)
 				tween(miniButton.scale, vec2(1.05), 0.32, (p) => miniButton.scale = p, easings.easeOutQuint)
 				this.defaultScale = vec2(1.05)
 				this.play("hover")
@@ -100,28 +114,13 @@ export function addMinibutton(i, xPosition, taskbarIndex) {
 
 			endHover() {
 				if (isDraggingAWindow) return
-				tween(miniButton.pos.y, miniButton.verPosition, 0.32, (p) => miniButton.pos.y = p, easings.easeOutQuint)
+				tween(miniButton.pos.y, miniButton.destinedPosition.y, 0.32, (p) => miniButton.pos.y = p, easings.easeOutQuint)
 				tween(miniButton.angle, 0, 0.32, (p) => miniButton.angle = p, easings.easeOutQuint)
 				tween(miniButton.scale, vec2(1), 0.32, (p) => miniButton.scale = p, easings.easeOutQuint)
 				miniButton.defaultScale = vec2(1.05)
 				this.play("default")
 			},
 			
-			manageRespectiveWindow(button = this) {
-				// has a window already opened
-				if (button.window != null) {
-					button.window.close()
-					button.window = null
-				}
-
-				// will have window 
-				else {
-					// hasn't open it
-					let theWindow = openWindow(button.windowInfo.spriteName)
-					button.window = theWindow
-				}
-			},
-
 			update() {
 				if (this.window != null) {
 					this.whiteness = wave(0.01, 0.1, (time() * 3))
@@ -135,22 +134,34 @@ export function addMinibutton(i, xPosition, taskbarIndex) {
 					this.angle = wave(-8, 8, time () * 3)
 				}
 
-				if (miniButton.pos.x < folderObj.pos.x - buttonSpacing + 10) {
-					miniButton.area.scale = vec2(0.75, 1.1)
-					miniButton.area.offset = vec2(2, 4)
+				if (miniButton.vertical) {
+					if (miniButton.pos.y < folderObj.pos.y - buttonSpacing + 10) {
+						miniButton.area.scale = vec2(0.75, 1.1)
+						miniButton.area.offset = vec2(2, 4)
+					}
+
+					else {
+						miniButton.area.scale = vec2(0)
+					}
 				}
-				
+
 				else {
-					miniButton.area.scale = vec2(0)
+					if (miniButton.pos.x < folderObj.pos.x - buttonSpacing + 10) {
+						miniButton.area.scale = vec2(0.75, 1.1)
+						miniButton.area.offset = vec2(2, 4)
+					}
+					
+					else {
+						miniButton.area.scale = vec2(0)
+					}
 				}
 			}
 		}
 	])
 
 	// animate them
-	tween(miniButton.pos.x, xPosition, 0.32, (p) => miniButton.pos.x = p, easings.easeOutQuint).then(() => {
-		if (timeSinceFold < 0.25) return
-	})
+	if (miniButton.vertical) tween(miniButton.pos.y, miniButton.destinedPosition.y, 0.32, (p) => miniButton.pos.y = p, easings.easeOutQuint)
+	else tween(miniButton.pos.x, miniButton.destinedPosition.x, 0.32, (p) => miniButton.pos.x = p, easings.easeOutQuint) 
 
 	miniButton.use(shader("saturate", () => ({
 		"whiteness": miniButton.whiteness,
@@ -164,7 +175,6 @@ export function addMinibutton(i, xPosition, taskbarIndex) {
 			playSfx("hoverMiniButton", 100 * miniButton.windowInfo.idx / 4)
 			
 			// animate it spinning it
-
 		}
 	})
 
@@ -182,7 +192,7 @@ export function addMinibutton(i, xPosition, taskbarIndex) {
 		// addShockwave(miniButton.pos, 50)
 	})
 
-	miniButtons[taskbarIndex] = miniButton
+	miniButtonsArray[taskbarIndex] = miniButton
 	return miniButton;
 }
 
@@ -204,7 +214,8 @@ export function openWindow(windowKey = "") {
 		`${windowKey}`,
 		{
 			idx: infoForWindows[windowKey].idx,
-			miniButton: miniButtons[infoForWindows[windowKey].idx],
+			miniButton: miniButtonsArray[infoForWindows[windowKey].idx],
+			windowKey: windowKey,
 			close() {
 				folderObj.trigger("winClose")
 				this.removeAll()
@@ -224,20 +235,10 @@ export function openWindow(windowKey = "") {
 
 			activate() {
 				this.use("active")
-
-				this.color = this.defColor
-				windowObj.get("*", { recursive: true }).forEach((element) => {
-					element.color = element.defColor
-				});
 			},
 
 			deactivate() {
 				this.unuse("active")
-
-				this.color = this.defColor.darken(150)
-				windowObj.get("*", { recursive: true }).forEach((element) => {
-					element.color = element.defColor.darken(150)
-				});
 			},
 
 			isMouseInClickingRange() {
@@ -397,6 +398,8 @@ export function folderObjManaging() {
 		unlockWindow("musicWin")
 	})
 
+	GameState.unlockedWindows = GameState.taskbar
+
 	folderObj = add([
 		sprite("folderObj"),
 		pos(width() - 40, height() - 40),
@@ -408,7 +411,6 @@ export function folderObjManaging() {
 		{
 			defaultScale: vec2(1.2),
 			unfold() {
-				GameState.unlockedWindows = Object.keys(infoForWindows)
 				// GameState.unlockedWindows = ["storeWin"]
 				folded = false
 				timeSinceFold = 0
@@ -419,23 +421,34 @@ export function folderObjManaging() {
 
 				// Initial x position for the buttons
 				let initialX = folderObj.pos.x;
+				let initialY = folderObj.pos.y;
 				
 				// Iterate over the sorted taskbar array to create buttons
 				// There are already minibuttons
 				if (get("minibutton").length > 0) {
 					get("miniButton").forEach((miniButton, index) => {
 						let xPos = initialX - buttonSpacing * index - 75;
+						let yPos = initialY - buttonSpacing * index - 75;
+
 						tween(miniButton.pos.x, xPos, 0.32, (p) => miniButton.pos.x = p, easings.easeOutQuint)
+						if (infoForWindows[miniButton.windowKey].verticalButton == true) {
+							tween(miniButton.pos.y, yPos, 0.32, (p) => miniButton.pos.y = p, easings.easeOutQuint)
+						}
 					})
 				}
 
 				// There are not, create them
 				else {
 					GameState.taskbar.forEach((key, taskbarIndex) => {
+						let yPos = initialY - buttonSpacing * 1; // no support for other buttons, fuck you
 						let xPos = initialX - buttonSpacing * taskbarIndex - 75;
+
 						let i = infoForWindows[key].idx;
-						addMinibutton(i, xPos, taskbarIndex);
+						addMinibutton(i, vec2(xPos, initialY), taskbarIndex);
 					});
+				
+					// adds the extra window minibutton
+					addMinibutton(Object.keys(infoForWindows).length - 1, vec2(folderObj.pos.x, folderObj.pos.y - buttonSpacing));
 				}
 			},
 			
@@ -444,7 +457,7 @@ export function folderObjManaging() {
 				
 				get("minibutton").forEach(miniButtonFoldTween => {
 					miniButtonFoldTween.area.scale = vec2(0)
-					tween(miniButtonFoldTween.pos.x, folderObj.pos.x, 0.32, (p) => miniButtonFoldTween.pos.x = p, easings.easeOutQuint).then(() => {
+					tween(miniButtonFoldTween.pos, folderObj.pos, 0.32, (p) => miniButtonFoldTween.pos = p, easings.easeOutQuint).then(() => {
 						destroy(miniButtonFoldTween)
 					})
 				});
@@ -492,7 +505,7 @@ export function folderObjManaging() {
 				// Open the window and handle UI updates
 				if (folded) folderObj.unfold();
 				manageWindow(windowKey);
-				bop(miniButtons[index]);
+				bop(miniButtonsArray[index]);
 			}
 		}
 	});
@@ -559,14 +572,14 @@ export function unlockWindow(key) {
 				let newXPos = calculateButtonPosition(index, folderObj.pos.x, buttonSpacing);
 	
 				// If the button already exists, move it to the new position
-				if (miniButtons[buttonIdx]) {
-					let button = miniButtons[buttonIdx];
+				if (miniButtonsArray[buttonIdx]) {
+					let button = miniButtonsArray[buttonIdx];
 					tween(button.pos.x, newXPos, 0.32, (p) => button.pos.x = p, easings.easeOutQuint);
 				} 
 				
 				else {
 					// Add the new minibutton
-					addMinibutton(buttonIdx, newXPos);
+					addMinibutton(buttonIdx, vec2(newXPos, folderObj.pos.y));
 				}
 			});
 		}
@@ -578,9 +591,14 @@ export function unlockWindow(key) {
 	}
 }
 
+export function getExtraWindows() {
+	var elmts = GameState.unlockedWindows.filter(f => !GameState.taskbar.includes(f)); 
+    return elmts;
+}
+
 export function emptyWinContent(winParent) {
 	winParent.add([
-		text("THIS WINDOW IS EMPTY", {
+		text(`THIS WINDOW IS EMPTY\nThis is the ${winParent.windowKey}`, {
 			align: "center"
 		}),
 		anchor("center"),

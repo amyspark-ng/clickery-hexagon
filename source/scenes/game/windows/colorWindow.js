@@ -4,7 +4,7 @@ import { waver } from "../../../plugins/wave";
 import { playSfx } from "../../../sound";
 import { hexagon } from "../hexagon";
 import { blendColors, bop, gameBg, getSides, mouse } from "../utils";
-import { deactivateAllWindows } from "./windowsAPI";
+import { deactivateAllWindows } from "./windows-api/windowsAPI";
 
 let lastSoundPos;
 let draggingTune;
@@ -154,10 +154,10 @@ function addRgbSlider(winParent, posToAdd = vec2(0), coloredObj, type = "r") {
 		lastSoundPos = mousePos().x
 
 		// golly
-		if (!winParent.is("active")) {
-			deactivateAllWindows()
-			winParent.activate()
-		}
+		// if (!winParent.is("active")) {
+		// 	deactivateAllWindows()
+		// 	winParent.activate()
+		// }
 	})
 
 	sliderButton.onMouseMove(() => {

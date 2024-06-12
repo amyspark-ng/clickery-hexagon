@@ -3,7 +3,7 @@ import { scoreVars, addHexagon, hexagon } from "./hexagon.js"
 import { uiCounters } from "./uicounters"
 import { addBackground, addMouse, addToast, arrayToColor, debugFunctions, debugTexts, gameBg, mouse, percentage } from "./utils"
 import { musicHandler, playMusic } from "../../sound"
-import { folderObjManaging, unlockWindow, windowsStuff as windowsStuff } from "./windows/windowsAPI"
+import { folderObjManaging, unlockWindow, windowsDefinition as windowsDefinition } from "./windows/windows-api/windowsAPI"
 import { songs } from "./windows/musicWindow"
 import { curDraggin, setCurDraggin } from "../../plugins/drag"
 import { k } from "../../main"
@@ -80,7 +80,7 @@ export function gamescene() {
 		addHexagon()
 		uiCounters()
 		folderObjManaging()
-		windowsStuff()
+		windowsDefinition()
 
 		debugTexts()
 
@@ -265,13 +265,5 @@ export function gamescene() {
 				}
 			}
 		}, false);
-
-		add([
-			sprite("volbarbutton", {
-				anim: "on"
-			}
-			),
-			pos(center()),
-		])
 	})
 }

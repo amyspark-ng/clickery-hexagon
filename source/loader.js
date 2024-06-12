@@ -353,6 +353,25 @@ export function loadAssets() {
 			}
 		}
 	})
+	loadSpriteAtlas("sprites/windows/settingsWin/settingsCheckbox.png", {
+		"checkbox": {
+			"x": 0,
+			"y": 0,
+			"width": 45 * 2,
+			"height": 45,
+			"sliceX": 2,
+			"anims": {
+				"on": 1,
+				"off": 0,
+			}
+		},
+		"tick": {
+			"x": 90,
+			"y": 0,
+			"width": 60,
+			"height": 54,
+		},
+	})
 	//#endregion Settings
 
 	//#region Other ones huh

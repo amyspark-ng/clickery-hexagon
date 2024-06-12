@@ -4,7 +4,7 @@ import { positionSetter } from "../../plugins/positionSetter"
 import { waver } from "../../plugins/wave"
 import { playSfx } from "../../sound"
 import { addBackground, addMouse, blendColors, bop, gameBg, getRandomElementDifferentFrom, mouse } from "./utils"
-import { manageWindow, openWindow, windowsStuff } from "./windows/windowsAPI"
+import { manageWindow, openWindow, windowsDefinition } from "./windows/windows-api/windowsAPI"
 
 let cameraScale = 1
 let mage;

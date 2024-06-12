@@ -2,7 +2,7 @@ import { GameState } from "../../gamestate";
 import { autoLoopTime, excessTime } from "./gamescene";
 import { hexagon, scoreVars } from "./hexagon";
 import { isHoveringUpgrade } from "./windows/store/upgrades";
-import { isDraggingAWindow, isGenerallyHoveringAWindow, isPreciselyHoveringAWindow, manageWindow, openWindow } from "./windows/windowsAPI";
+import { isDraggingAWindow, isGenerallyHoveringAWindow, isPreciselyHoveringAWindow, manageWindow, openWindow } from "./windows/windows-api/windowsAPI";
 
 // definetely not chatgpt
 export function formatNumber(number = 0, short = true, isPrice = false) {
@@ -263,7 +263,7 @@ export function addBackground() {
 			update() {
 				if (isMousePressed("right")) {
 					if (!get("folderObj")[0]) return
-					if (!hexagon?.isHovering() && !get("folderObj")[0]?.isHovering() && !get("minibutton")[0]?.isHovering() && !isGenerallyHoveringAWindow && !isDraggingAWindow) {
+					if (!hexagon?.isHovering() && !get("folderObj")[0]?.isHovering() && !get("minibutton")[0]?.isHovering() && get("window")[0]?.isHovering() && !isGenerallyHoveringAWindow && !isDraggingAWindow) {
 						manageWindow("bgColorWin")
 					}
 				}
@@ -693,4 +693,11 @@ export function bop(obj, howMuch = 0.1) {
 	tween(obj.scale, obj.bopDefScale.sub(howMuch), 0.15, (p) => obj.scale = p, easings.easeOutQuint).then(() => {
 		tween(obj.scale, obj.bopDefScale, 0.15, (p) => obj.scale = p, easings.easeOutQuint)
 	})
+}
+
+export function shrink(obj, howMuch) {
+	if (!obj.is("scale")) obj.use(scale(1))
+	if (!obj.shrinkDefScale) obj.shrinkDefScale = obj.scale
+	
+	tween(obj.scale, obj.scale.sub(obj.scale), 0.15, (p) => obj.scale = p, easings.easeOutQuint)
 }

@@ -108,7 +108,7 @@ export function addSoundElements() {
 }
 
 export function volumeManager() {
-	showTween = tween(gameBg.opacity, gameBg.opacity, 0, (p) => gameBg.opacity = p)
+	showTween = tween(GameState.settings.volume, GameState.settings.volume , 0, (p) => GameState.settings.volume = p, easings.linear)
 	volume(GameState.settings.volume)
 
 	let changeVolTune = 0
@@ -195,6 +195,12 @@ export function volumeManager() {
 					speaker.hidden = false
 					speaker.frame = GameState.settings.sfx.muted ? 0 : 1
 					bop(speaker, 0.05)
+
+					// toggle checkbox in setings window
+					if (get("sfxCheckbox", { recursive: true })[0]) {
+						if (GameState.settings.sfx.muted) get("sfxCheckbox", { recursive: true })[0]?.turnOff()
+						else get("sfxCheckbox", { recursive: true })[0]?.turnOn()
+					}
 				}
 
 				else if (isKeyPressed("m")) {
@@ -213,6 +219,12 @@ export function volumeManager() {
 						GameState.settings.music.muted ? bpmChange.stopWave() : bpmChange.startWave()
 					})
 					bop(speaker, 0.05)
+
+					// toggle checkbox in setings window
+					if (get("musicCheckbox", { recursive: true })[0]) {
+						if (GameState.settings.music.muted) get("musicCheckbox", { recursive: true })[0]?.turnOff()
+						else get("musicCheckbox", { recursive: true })[0]?.turnOn()
+					}
 				}
 
 				if (!GameState.settings.sfx.muted) GameState.settings.sfx.volume = GameState.settings.volume; 

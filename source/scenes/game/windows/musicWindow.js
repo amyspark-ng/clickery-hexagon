@@ -108,7 +108,7 @@ export function musicWinContent(winParent) {
 	])
 
 	theOneBehind.onClick(() => {
-		if (!winParent.is("active")) return
+		// if (!winParent.is("active")) return
 		if (!skipping) {
 			if (theOneBehind.isHovering()) {
 				// calculation stuff

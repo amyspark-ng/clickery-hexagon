@@ -5,7 +5,7 @@ import { positionSetter } from "../../../plugins/positionSetter"
 import { playSfx, volChangeTune } from "../../../sound"
 import { togglePanderito } from "../gamescene"
 import { bop, getVariable, setVariable } from "../utils"
-import { manageWindow } from "./windowsAPI"
+import { manageWindow } from "./windows-api/windowsAPI"
 
 let volumeControlBg;
 let barscontainer;
@@ -105,31 +105,73 @@ export function addVolumeControl(opts = { pos: vec2(), variable: ""}, parent) {
 }
 
 export function addCheckbox(opts = { pos: vec2(), variable: "", sprite: "", title: "", titleSize: 10 }, parent) {
+	let isVolume = opts.variable == "settings.sfx.muted" || opts.variable == "settings.music.muted" ? true : false
+
 	let checkBox = (parent || ROOT).add([
-		rect(45, 45),
+		sprite("checkbox", {
+			anim: "off"
+		}),
 		pos(opts.pos),
 		anchor("center"),
 		area(),
-		color(),
+		opts.variable == "settings.sfx.muted" ? "sfxCheckbox" : null,
+		opts.variable == "settings.music.muted" ? "musicCheckbox" : null,
 		{
-			update() {
-				if (opts.variable == "settings.sfx.muted" || opts.variable == "settings.music.muted") {
-					if (getVariable(GameState, opts.variable) == true) this.color = rgb(40, 41, 40) 
-					else this.color = rgb(190, 194, 190)
-				}
+			addTick(opts = { anim: true}) {
+				const tick = this.add([
+					sprite("tick"),
+					anchor("center"),
+					scale(1),
+					"tick",
+					{
+						goAway() {
+							destroy(this)
+						}
+					}
+				])
+			},
 
-				else {
-					if (getVariable(GameState, opts.variable) == true) this.color = rgb(190, 194, 190)
-					else this.color = rgb(40, 41, 40)
-				}
-			}
+			turnOn(opts = { anim: true }) {
+				this.play("on")
+				this.addTick({ anim: opts.anim });
+			},
+			
+			turnOff() {
+				this.play("off")
+				this.get("tick", { recursive: true })[0]?.goAway()
+			},
 		}
 	])
+
+	if (isVolume) {
+		if (getVariable(GameState, opts.variable) == true) checkBox.turnOff()
+		else checkBox.turnOn()
+	}
+
+	else {
+		if (getVariable(GameState, opts.variable) == true) checkBox.turnOn()
+		else checkBox.turnOff()
+	}
 
 	checkBox.onMousePress("left", (() => {
 		if (!checkBox.isHovering()) return
 		bop(checkBox)
+
+		// if is not volume and the value is true
+		if (!isVolume) {
+			if (getVariable(GameState, opts.variable) == true) checkBox.turnOff()
+			else checkBox.turnOn(true)
+		}
+
+		// is volume
+		else {
+			if (getVariable(GameState, opts.variable) == true) checkBox.turnOn()
+			else checkBox.turnOff(true)
+		}
+
 		setVariable(GameState, opts.variable, !getVariable(GameState, opts.variable))
+
+		playSfx("clickButton", getVariable(GameState, opts.variable) == true ? 150 : -150)
 		if (opts.variable == "settings.fullscreen") setFullscreen(getVariable(GameState, "settings.fullscreen"))
 	}))
 
@@ -229,9 +271,9 @@ export function settingsWinContent(winParent) {
 		setWinBut.onMousePress("left", () => {
 			if (!setWinBut.isHovering()) return
 			
-			playSfx("openWin", rand(0.8, 1.2))
-			debug.log("times called")
-			bop(setWinBut)
+			// don't call playSfx openWin here because it is already called openWindow
+			if (setWinBut.is("panderitoButton")) playSfx("clickButton", rand(-100, 100))
+			// bop(setWinBut, setWinBut.is("panderitoButton") ? 2 : 1)
 			setWinBut.action()
 		})
 

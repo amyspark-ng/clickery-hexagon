@@ -5,18 +5,24 @@
 * Do "-" for issues, "*" for notes, "^" for comments on either
 
 # Little TODO (today)
-- Fix minibutton snap when hovering and spin animation
-
+The fucking drag inventory thing fuck you chris
 # Little TODO (tomorrow)
-- Do minibutton shockwave
+
+# This got messy quick didn't it
+TASKBAR SYSTEM / EXTRA WINDOW
+- Extrawin should not be on taskbar
+
+- Do checkbox animation
 - Add combo bar
 ^ Maybe add bar above or below scoretext
+
+- Do general unlocking stuff, like when you first start the game, also the start transition, so cool stuff
 - Format actual working numbers
 ^ Make it work with new shorten numbers setting
 - Re-design make working toasts
-
 - Keep working on store
-- Do general unlocking stuff, like when you first start the game, also the start transition, so cool stuff
+- Fix minibutton snap when hovering and spin animation
+- Do minibutton shockwave
 
 # Issues!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ## General
