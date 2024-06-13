@@ -11,6 +11,7 @@ import { colorWinContent } from "../colorWindow.js";
 import { settingsWinContent } from "../settingsWindow.js";
 import { ascendWinContent } from "../ascendWindow.js";
 import { extraWinContent } from "../extraWindow.js";
+import { addMinibutton, calculateXButtonPosition } from "./windowsAPI-utils.js";
 
 export let infoForWindows = {};
 export let isGenerallyHoveringAWindow = false;
@@ -69,131 +70,10 @@ export function windowsDefinition() {
 		"hexColorWin": { idx: 9, content: colorWinContent, lastPos: vec2(208, 160) },
 		// vertical
 		"bgColorWin": { idx: 10, content: colorWinContent, lastPos: vec2(1024 - 200, 200) },
-		"extraWin": { idx: 11, icon: "about", content: extraWinContent, lastPos: center(), verticalButton: true, },
+		"extraWin": { idx: 11, icon: "extra", content: extraWinContent, lastPos: center(), verticalButton: true, },
 	}
 
-	GameState.taskbar = [ "storeWin", "musicWin" ]
-}
-
-export function addMinibutton(i, posToAdd, taskbarIndex) {
-	let quad;
-	getSprite("bean").then(quady => {
-		quad = quady
-	})
-	
-	let miniButton = add([
-		sprite(`icon_${infoForWindows[Object.keys(infoForWindows)[i]].icon || Object.keys(infoForWindows)[i].replace("Win", "")}`, {
-			anim: "default"
-		}),
-		pos(folderObj.pos.x, folderObj.pos.y),
-		anchor("center"),
-		area({ scale: vec2(0) }),
-		scale(1),
-		rotate(0),
-		z(folderObj.z - 1),
-		"hover_outsideWindow",
-		"minibutton",
-		{
-			idx: i,
-			destinedPosition: vec2(posToAdd.x, posToAdd.y),
-			defaultScale: vec2(1),
-			window: get(`${Object.keys(infoForWindows)[i]}`, { recursive: true })[0],
-			windowInfo: infoForWindows[Object.keys(infoForWindows)[i]],
-			whiteness: 0,
-			windowKey: Object.keys(infoForWindows)[i],
-			taskbarIndex: taskbarIndex,
-			vertical: infoForWindows[Object.keys(infoForWindows)[i]].verticalButton,
-			// for these 2 it will do yPos even if locked
-			startHover() {
-				if (isDraggingAWindow) return
-				tween(miniButton.pos.y, miniButton.destinedPosition.y - 5, 0.32, (p) => miniButton.pos.y = p, easings.easeOutQuint)
-				tween(miniButton.scale, vec2(1.05), 0.32, (p) => miniButton.scale = p, easings.easeOutQuint)
-				this.defaultScale = vec2(1.05)
-				this.play("hover")
-			},
-
-			endHover() {
-				if (isDraggingAWindow) return
-				tween(miniButton.pos.y, miniButton.destinedPosition.y, 0.32, (p) => miniButton.pos.y = p, easings.easeOutQuint)
-				tween(miniButton.angle, 0, 0.32, (p) => miniButton.angle = p, easings.easeOutQuint)
-				tween(miniButton.scale, vec2(1), 0.32, (p) => miniButton.scale = p, easings.easeOutQuint)
-				miniButton.defaultScale = vec2(1.05)
-				this.play("default")
-			},
-			
-			update() {
-				if (this.window != null) {
-					this.whiteness = wave(0.01, 0.1, (time() * 3))
-				}
-
-				else {
-					this.whiteness = 0
-				}
-
-				if (this.isHovering()) {
-					this.angle = wave(-8, 8, time () * 3)
-				}
-
-				if (miniButton.vertical) {
-					if (miniButton.pos.y < folderObj.pos.y - buttonSpacing + 10) {
-						miniButton.area.scale = vec2(0.75, 1.1)
-						miniButton.area.offset = vec2(2, 4)
-					}
-
-					else {
-						miniButton.area.scale = vec2(0)
-					}
-				}
-
-				else {
-					if (miniButton.pos.x < folderObj.pos.x - buttonSpacing + 10) {
-						miniButton.area.scale = vec2(0.75, 1.1)
-						miniButton.area.offset = vec2(2, 4)
-					}
-					
-					else {
-						miniButton.area.scale = vec2(0)
-					}
-				}
-			}
-		}
-	])
-
-	// animate them
-	if (miniButton.vertical) tween(miniButton.pos.y, miniButton.destinedPosition.y, 0.32, (p) => miniButton.pos.y = p, easings.easeOutQuint)
-	else tween(miniButton.pos.x, miniButton.destinedPosition.x, 0.32, (p) => miniButton.pos.x = p, easings.easeOutQuint) 
-
-	miniButton.use(shader("saturate", () => ({
-		"whiteness": miniButton.whiteness,
-		"u_pos": vec2(quad.x, quad.y),
-		"u_size": vec2(quad.w, quad.h),
-	})))
-
-	miniButton.onHover(() => {3
-		if (!isGenerallyHoveringAWindow && !isDraggingAWindow) {
-			miniButton.startHover()
-			playSfx("hoverMiniButton", 100 * miniButton.windowInfo.idx / 4)
-			
-			// animate it spinning it
-		}
-	})
-
-	miniButton.onHoverEnd(() => {
-		if (isDraggingAWindow) return
-		if (!isPreciselyHoveringAWindow) {
-			miniButton.endHover()
-		}
-	})
-
-	miniButton.onClick(() => {
-		if (isPreciselyHoveringAWindow || isDraggingAWindow) return
-		manageWindow(miniButton.windowKey)
-		bop(miniButton)
-		// addShockwave(miniButton.pos, 50)
-	})
-
-	miniButtonsArray[taskbarIndex] = miniButton
-	return miniButton;
+	GameState.taskbar = [ "storeWin", "musicWin", "ascendWin", "settingsWin" ]
 }
 
 export function openWindow(windowKey = "") {
@@ -358,7 +238,7 @@ export function openWindow(windowKey = "") {
 	})
 
 	windowObj.onMouseRelease(() => {
-		if (curDraggin) {
+		if (curDraggin && curDraggin == windowObj) {
 			curDraggin.trigger("dragEnd")
 			setCurDraggin(null)
 			mouse.releaseAndPlay("cursor")
@@ -410,14 +290,12 @@ export function folderObjManaging() {
 		"folderObj",
 		{
 			defaultScale: vec2(1.2),
+			editingBar: false,
 			unfold() {
 				// GameState.unlockedWindows = ["storeWin"]
 				folded = false
 				timeSinceFold = 0
 				playSfx("fold", rand(-50, 50))
-
-				// Sort the unlockedWindows array based on the order in infoForWindows
-				GameState.taskbar.sort((a, b) => infoForWindows[a].idx - infoForWindows[b].idx);
 
 				// Initial x position for the buttons
 				let initialX = folderObj.pos.x;
@@ -440,15 +318,12 @@ export function folderObjManaging() {
 				// There are not, create them
 				else {
 					GameState.taskbar.forEach((key, taskbarIndex) => {
-						let yPos = initialY - buttonSpacing * 1; // no support for other buttons, fuck you
-						let xPos = initialX - buttonSpacing * taskbarIndex - 75;
-
 						let i = infoForWindows[key].idx;
-						addMinibutton(i, vec2(xPos, initialY), taskbarIndex);
+						addMinibutton(i, taskbarIndex, folderObj.pos, vec2(calculateXButtonPosition(taskbarIndex), folderObj.pos.y));
 					});
 				
-					// adds the extra window minibutton
-					addMinibutton(Object.keys(infoForWindows).length - 1, vec2(folderObj.pos.x, folderObj.pos.y - buttonSpacing));
+					// adds the extra minibutton
+					addMinibutton(11, 1, folderObj.pos, vec2(folderObj.pos.x, folderObj.pos.y - buttonSpacing));
 				}
 			},
 			
@@ -472,6 +347,23 @@ export function folderObjManaging() {
 				else {
 					folderObj.fold()
 				}
+			},
+
+			openTaskbarEdit() {
+				let taskbaredit = add([
+					pos(this.pos.x, this.pos.y),
+					rect(0, this.height - 5, { radius: 5 }),
+					anchor("right"),
+					z(this.z - 2),
+					color(BLACK),
+					"taskbaredit",
+				])
+
+				tween(taskbaredit.width, buttonSpacing * 4, 0.32, (p) => taskbaredit.width = p, easings.easeOutQuint)
+			},
+
+			closeTaskbarEdit() {
+				get("taskbaredit")[0]?.destroy()
 			},
 
 			update() {
@@ -545,56 +437,7 @@ export function folderObjManaging() {
 	})
 }
 
-function calculateButtonPosition(index, folderObjX, buttonSpacing = 75) {
-    return folderObjX - buttonSpacing * (index + 1);
-}
-
-export function unlockWindow(key) {
-	// if already unlocked
-	if (GameState.unlockedWindows.includes(key)) return
-	
-	// hasn't
-	GameState.unlockedWindows.push(key)
-	folderObj.trigger("winUnlock")
-	play("hoverhex")
-
-	// if valid key
-	if (infoForWindows.hasOwnProperty(key)) {
-		// if unfolded do cool animation, i hate you player/perfectionism
-		if (!folded) {
-			// Check if the windowKey exists in the infoForWindows object
-			// Sort the unlocked windows based on their idx values
-			GameState.unlockedWindows.sort((a, b) => infoForWindows[a].idx - infoForWindows[b].idx);
-	
-			// Calculate positions and animate buttons
-			GameState.unlockedWindows.forEach((key, index) => {
-				let buttonIdx = infoForWindows[key].idx;
-				let newXPos = calculateButtonPosition(index, folderObj.pos.x, buttonSpacing);
-	
-				// If the button already exists, move it to the new position
-				if (miniButtonsArray[buttonIdx]) {
-					let button = miniButtonsArray[buttonIdx];
-					tween(button.pos.x, newXPos, 0.32, (p) => button.pos.x = p, easings.easeOutQuint);
-				} 
-				
-				else {
-					// Add the new minibutton
-					addMinibutton(buttonIdx, vec2(newXPos, folderObj.pos.y));
-				}
-			});
-		}
-	}
-
-	// dummy
-	else {
-		throw new Error("Window not found: " + key);
-	}
-}
-
-export function getExtraWindows() {
-	var elmts = GameState.unlockedWindows.filter(f => !GameState.taskbar.includes(f)); 
-    return elmts;
-}
+// TODO: Re do unlock window function
 
 export function emptyWinContent(winParent) {
 	winParent.add([

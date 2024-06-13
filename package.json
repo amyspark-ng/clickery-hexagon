@@ -8,6 +8,6 @@
   },
   "dependencies": {
     "esbuild": "^0.20.2",
-    "kaboom": "^3000.1.17"
+    "kaplay": "3001.0.0-alpha.10"
   }
 }

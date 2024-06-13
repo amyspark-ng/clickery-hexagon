@@ -47,5 +47,8 @@ export function drag() {
 		onDragEnd(action) {
 			return this.on("dragEnd", action)
 		},
+		inspect() {
+			return `dragging: ${this.dragging}`
+		}
 	}
 }

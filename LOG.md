@@ -5,13 +5,14 @@
 * Do "-" for issues, "*" for notes, "^" for comments on either
 
 # Little TODO (today)
-The fucking drag inventory thing fuck you chris
+- whiteness is not working properly
+
 # Little TODO (tomorrow)
+- make it so you can leave empty spaces in the taskbar
+^ You can drag minibuttons to the extra window and leave them there leaving an empty space
+^ Visceversa
 
 # This got messy quick didn't it
-TASKBAR SYSTEM / EXTRA WINDOW
-- Extrawin should not be on taskbar
-
 - Do checkbox animation
 - Add combo bar
 ^ Maybe add bar above or below scoretext

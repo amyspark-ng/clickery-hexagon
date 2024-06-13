@@ -54,6 +54,18 @@ export function loadAssets() {
 				hover: 1,
 			}
 		},
+		"icon_extra": {
+			width: 140,
+			height: 70,
+			sliceX: 2,
+			sliceY: 1,
+			x: 0,
+			y: 0,
+			anims: {
+				default: 0,
+				hover: 1,
+			}
+		},
 		"icon_medals": {
 			width: 140,
 			height: 70,
@@ -467,18 +479,23 @@ export function loadAssets() {
 	loadSound("fold", "sounds/sfx/fold.wav")
 	loadSound("combo", "sounds/sfx/combo.wav")
 
+	loadSound("plap", "sounds/sfx/plap.mp3")
+	loadSound("plop", "sounds/sfx/plop.mp3")
+
 	// music
-	loadSound("clicker.wav", "sounds/music/clicker.ogg")
-	loadSound("menu.wav", "sounds/music/menu.ogg")
-	loadSound("whatttt.wav", "sounds/music/whatttt.ogg")
-	loadSound("simple.wav", "sounds/music/simple.ogg")
-	loadSound("jazz.wav", "sounds/music/jazz.ogg")
-	loadSound("sweet.wav", "sounds/music/sweet.ogg")
-	loadSound("ok_instrumental", "sounds/music/ok_instrumental.ogg")
-	loadSound("magic", "sounds/music/magic.ogg")
-	loadSound("watchout", "sounds/music/watchout.ogg")
-	loadSound("catnip", "sounds/music/catnip.ogg")
-	loadSound("project_23", "sounds/music/project_23.wav")
+	// don't load as music because then it won't play when the game loads
+	// only done on debug to make the game load quicker since im not listening the music really
+	loadMusic("clicker.wav", "sounds/music/clicker.ogg")
+	loadMusic("menu.wav", "sounds/music/menu.ogg")
+	loadMusic("whatttt.wav", "sounds/music/whatttt.ogg")
+	loadMusic("simple.wav", "sounds/music/simple.ogg")
+	loadMusic("jazz.wav", "sounds/music/jazz.ogg")
+	loadMusic("sweet.wav", "sounds/music/sweet.ogg")
+	loadMusic("ok_instrumental", "sounds/music/ok_instrumental.ogg")
+	loadMusic("magic", "sounds/music/magic.ogg")
+	loadMusic("watchout", "sounds/music/watchout.ogg")
+	loadMusic("catnip", "sounds/music/catnip.ogg")
+	loadMusic("project_23", "sounds/music/project_23.wav")
 	//#endregion MUSIC
 
 	// #region OTHER STUFF

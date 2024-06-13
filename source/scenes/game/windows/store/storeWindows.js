@@ -177,10 +177,10 @@ function addStoreElement(winParent, opts = { key: "null", pos: vec2(0, 20) }) {
 				opacity(),
 				anchor("center"),
 				z(btn.z - 1),
-				fadeIn(1),
 				"smoke",
 			])
 
+			smoke.fadeIn(1)
 			smoke.play("smoking")
 		}
 	})
@@ -194,8 +194,9 @@ function addStoreElement(winParent, opts = { key: "null", pos: vec2(0, 20) }) {
 		timesBoughtWhileHolding = 0
 		timeUntilAnotherBuy = 2.25
 		
-		get("smoke", { recursive: true })[0].fadeOut(0.25)
-		get("smoke", { recursive: true })[0].unuse("smoke")
+		// if there's smoke
+		get("smoke", { recursive: true })[0]?.fadeOut(0.25)
+		get("smoke", { recursive: true })[0]?.unuse("smoke")
 	})
 
 	btn.onHoverEnd(() => {
