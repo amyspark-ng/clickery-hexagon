@@ -1,6 +1,6 @@
 {
-  "name": "deno-kaboom-template",
-  "description": "An example app created with Deno",
+  "name": "clickery-hexagon",
+  "description": "A simple clicker game",
   "type": "module",
   "scripts": {
     "build": "esbuild --bundle source/main.js --outfile=www/game.js",
@@ -8,6 +8,6 @@
   },
   "dependencies": {
     "esbuild": "^0.20.2",
-    "kaplay": "3001.0.0-alpha.10"
+    "kaplay": "3001.0.0-alpha.14"
   }
 }

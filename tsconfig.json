@@ -2,7 +2,7 @@
     "compilerOptions": {
         "allowJs": true,
         "types": [
-        "./node_modules/kaplay/dist/global.d.ts"
+        "./node_modules/kaplay/dist/declaration/global.d.ts"
         ],
         "declaration": true,
         "emitDeclarationOnly": true,

@@ -1,11 +1,11 @@
-// # by Luiz Bills / modified to be a component and not a plugin by amyspark-ng
-export function fill(_color, _opacity = 0) {
+// # by Luiz Bills / modified by amyspark-ng
+export function fill(_color, _opacity = 0, _blendFactor = 1) {
 	let fillColor = null
 	let shaderLoaded = false
 	return {
 		id: 'fill',
 
-		fill(_color, _opacity = 1) {
+		fill(_color, _opacity = 1, _blendFactor = _blendFactor) {
 			if (_color instanceof Color) {
 				fillColor = _color
 				this.use(
@@ -41,5 +41,9 @@ export function fill(_color, _opacity = 0) {
 		get fillColor() {
 			return fillColor
 		},
+
+		set fillColor(newColor) {
+			this.fill(newColor, _opacity)
+		}
 	}
 }

@@ -12,11 +12,11 @@ To build:
 
 ## CREDITS:
 - AmySpark - Code
-- Enysmo - Sound
+- Enysmo - Sound & Music
 - DevkyRD - Art & Design
 - lajbel - Code & Design
-- MF - Shaders
-- Khriz28 - Playtesting
+- MF - Code & Shaders
+- Khriz28 - Playtesting & Support
 
 BROKE COMMIT HISTORY BY RENAMING COMMIT :(
 ![alt text](proof.png)

@@ -8,6 +8,7 @@ import { waver } from "../../plugins/wave.js";
 import { isDraggingASlider } from "./windows/colorWindow.js";
 import { addPlusScoreText, dropCombo, startCombo } from "./combo-utils.js";
 import { addConfetti } from "../../plugins/confetti.js";
+import { curDraggin } from "../../plugins/drag.js";
 
 export let scoreVars = {
 	scorePerClick: 1,
@@ -122,12 +123,12 @@ export function addHexagon() {
 				else if (clickVars.consecutiveClicks == INITIAL_COMBO + (COMBO_INCREMENT * scoreVars.combo) && scoreVars.combo < MAX_COMBO) {
 					scoreVars.combo++
 					startCombo() // checks if first combo dw
-				}
 
-				if (scoreVars.combo == 10 && clickVars.consecutiveClicks == INITIAL_COMBO + (COMBO_INCREMENT) * 10) {
-					// yippee
-					addConfetti({ pos: vec2(hexagon.pos.x, hexagon.pos.y + 100) })
-					debug.log("add confetti")
+					if (scoreVars.combo == 10) {
+						// yippee
+						addConfetti({ pos: vec2(hexagon.pos.x, hexagon.pos.y + 100) })
+						debug.log("add confetti")
+					}
 				}
 
 				consecutiveClicksWaiting.cancel()
@@ -265,14 +266,14 @@ export function addHexagon() {
 	hexagon.startWave()
 
 	hexagon.onHoverUpdate(() => {
-		if (!isGenerallyHoveringAWindow && !isDraggingAWindow && !hexagon.isBeingHoveredOn) {
+		if (!isGenerallyHoveringAWindow && !isDraggingAWindow && !hexagon.isBeingHoveredOn && !curDraggin?.is("minibutton")) {
 			hexagon.startHover()
 		}
 	})
 
 	hexagon.onHoverEnd(() => {
 		if (isDraggingAWindow || isDraggingASlider) return
-		if (!isPreciselyHoveringAWindow) {
+		if (!isPreciselyHoveringAWindow && !curDraggin?.is("minibutton")) {
 			hexagon.endHover()
 		}
 	});

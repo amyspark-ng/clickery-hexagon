@@ -23,7 +23,6 @@ export let folderObj;
 let folded = true;
 let timeSinceFold = 0;
 
-export let miniButtonsArray = [];
 export const buttonSpacing = 75;
 
 export function deactivateAllWindows() {
@@ -32,7 +31,7 @@ export function deactivateAllWindows() {
 
 export function manageWindow(windowKey) {
 	if (!infoForWindows.hasOwnProperty(windowKey)) throw new Error("No such window for: " + windowKey);
-	
+
 	let maybeWindow = get(windowKey)[0]
 	// if window even exists in the first place
 	if (maybeWindow) {
@@ -42,8 +41,10 @@ export function manageWindow(windowKey) {
 		}
 	}
 	else {
-		openWindow(windowKey)
+		maybeWindow = openWindow(windowKey)
 	}
+
+	return maybeWindow
 }
 
 export function windowsDefinition() {
@@ -94,9 +95,9 @@ export function openWindow(windowKey = "") {
 		`${windowKey}`,
 		{
 			idx: infoForWindows[windowKey].idx,
-			miniButton: miniButtonsArray[infoForWindows[windowKey].idx],
 			windowKey: windowKey,
 			close() {
+				this.trigger("close")
 				folderObj.trigger("winClose")
 				this.removeAll()
 				playSfx("closeWin", rand(0.8, 1.2))
@@ -196,7 +197,7 @@ export function openWindow(windowKey = "") {
 	windowObj.onHover(() => {
 		get("hover_outsideWindow").forEach(hoverObj => {
 			if (hoverObj.isHovering() && hoverObj.endHover) {
-				hoverObj.endHover()
+				if (!curDraggin == hoverObj) hoverObj.endHover()
 			}
 		})
 
@@ -207,8 +208,10 @@ export function openWindow(windowKey = "") {
 	windowObj.onHoverEnd(() => {
 		get("hover_outsideWindow").forEach(hoverObj => {
 			if (hoverObj.isHovering() && hoverObj.startHover) {
-				hoverObj.startHover()
-				mouse.play("point")
+				if (!curDraggin == hoverObj) {
+					hoverObj.endHover()
+					mouse.play("point")
+				}
 			}
 		})
 	})
@@ -267,6 +270,8 @@ export function openWindow(windowKey = "") {
 	tween(windowObj.opacity, 1, 0.32, (p) => windowObj.opacity = p, easings.easeOutQuint)
 	tween(windowObj.scale, vec2(1), 0.32, (p) => windowObj.scale = p, easings.easeOutQuint)
 	
+	// manage the minibutton
+	// get("minibutton").filter(minibutton => minibutton["windowKey"] === windowKey)?.window = windowObj
 	return windowObj;
 }
 
@@ -393,12 +398,11 @@ export function folderObjManaging() {
 			const windowKey = GameState.taskbar[index];
 	
 			// Check if the window is unlocked
-			if (GameState.unlockedWindows.includes(windowKey)) {
+			// if (GameState.unlockedWindows.includes(windowKey)) {
 				// Open the window and handle UI updates
 				if (folded) folderObj.unfold();
 				manageWindow(windowKey);
-				bop(miniButtonsArray[index]);
-			}
+			// }
 		}
 	});
 

@@ -1,4 +1,8 @@
+import { playMusic } from "../../../sound"
+
 export function ascendWinContent(winParent) {
+	debug.log("alexa play ascend ominus")
+
 	let button = winParent.add([
 		text("go to ascendscene", {
 			size: 20,
@@ -15,4 +19,7 @@ export function ascendWinContent(winParent) {
 		go("ascendscene")
 	})
 	
+	winParent.on("close", () => {
+		debug.log("goodbye")
+	})
 }

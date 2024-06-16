@@ -5,18 +5,21 @@
 * Do "-" for issues, "*" for notes, "^" for comments on either
 
 # Little TODO (today)
-- whiteness is not working properly
+- Manage minibuttons on window function and not sepparetly so they're always linked in a single function and not separeted on click or function
+- Do some more juicy things
+- Add a thing for knowing which minibutton are you going to replace so i don't have to do the weird swap behaviour too for gridminibutton
+- Fix distance for gridMinibutons
+- Make them shake doing a loop of small angle tweeens
 
-# Little TODO (tomorrow)
-- make it so you can leave empty spaces in the taskbar
-^ You can drag minibuttons to the extra window and leave them there leaving an empty space
-^ Visceversa
+- colorBG can't be put on taskbarindex 3
+- Fix animation for when the extraWindow opens the gridMinibuttons look weird
+- Did you know that the game will crash if you close the extraWin while you're dragging the gridMinibuttons? LOL!!!
 
-# This got messy quick didn't it
 - Do checkbox animation
 - Add combo bar
 ^ Maybe add bar above or below scoretext
 
+# This got messy quick didn't it
 - Do general unlocking stuff, like when you first start the game, also the start transition, so cool stuff
 - Format actual working numbers
 ^ Make it work with new shorten numbers setting

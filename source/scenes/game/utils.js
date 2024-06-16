@@ -1,4 +1,5 @@
 import { GameState } from "../../gamestate";
+import { curDraggin } from "../../plugins/drag";
 import { autoLoopTime, excessTime } from "./gamescene";
 import { hexagon, scoreVars } from "./hexagon";
 import { isHoveringUpgrade } from "./windows/store/upgrades";
@@ -372,13 +373,13 @@ export function addMouse() {
 	})
 
 	onHover("hover_outsideWindow", () => {
-		if (!isPreciselyHoveringAWindow && !isDraggingAWindow) {
+		if (!isPreciselyHoveringAWindow && !isDraggingAWindow && !curDraggin?.is("minibutton")) {
 			mouse.play("point")
 		}
 	})
 
 	onHoverEnd("hover_outsideWindow", () => {
-		if (!isPreciselyHoveringAWindow && !isDraggingAWindow) {
+		if (!isPreciselyHoveringAWindow && !isDraggingAWindow && !curDraggin?.is("minibutton")) {
 			mouse.play("cursor")
 		}
 	})
@@ -686,12 +687,12 @@ export function saveAnim() {
 	})
 }
 
-export function bop(obj, howMuch = 0.1) {
+export function bop(obj, howMuch = 0.1, bopEasing = easings.easeOutQuint) {
 	if (!obj.is("scale")) obj.use(scale(1))
 	if (!obj.bopDefScale) obj.bopDefScale = obj.scale
 
-	tween(obj.scale, obj.bopDefScale.sub(howMuch), 0.15, (p) => obj.scale = p, easings.easeOutQuint).then(() => {
-		tween(obj.scale, obj.bopDefScale, 0.15, (p) => obj.scale = p, easings.easeOutQuint)
+	tween(obj.scale, obj.bopDefScale.sub(howMuch), 0.15, (p) => obj.scale = p, bopEasing).then(() => {
+		tween(obj.scale, obj.bopDefScale, 0.15, (p) => obj.scale = p, bopEasing)
 	})
 }
 
