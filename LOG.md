@@ -4,44 +4,35 @@
 
 * Do "-" for issues, "*" for notes, "^" for comments on either
 
-# Little TODO (today)
-- Manage minibuttons on window function and not sepparetly so they're always linked in a single function and not separeted on click or function
-- Do some more juicy things
-- Add a thing for knowing which minibutton are you going to replace so i don't have to do the weird swap behaviour too for gridminibutton
-- Fix distance for gridMinibutons
-- Make them shake doing a loop of small angle tweeens
-
-- colorBG can't be put on taskbarindex 3
-- Fix animation for when the extraWindow opens the gridMinibuttons look weird
-- Did you know that the game will crash if you close the extraWin while you're dragging the gridMinibuttons? LOL!!!
-
-- Do checkbox animation
-- Add combo bar
-^ Maybe add bar above or below scoretext
-
-# This got messy quick didn't it
-- Do general unlocking stuff, like when you first start the game, also the start transition, so cool stuff
+# TODAY
+- Add more juice to the dragging gridMinibuttons
+	* When dragging a gridMinibutton make the icons shake and make the closest decrease in size and fade their opacity
+	^ The approach would be to get the currentClosestMinibutton onUpdate and if it doesn't have a certain component then add it to it and that component would run an onupdate event that maps the distance to the currentDragging to some value the currentMinibutton would have, and when the currentClosestMinibutton changes unuse the component making it deattach it and reset values to normal
+- Figure out why loading screen doesn't work 
 - Format actual working numbers
-^ Make it work with new shorten numbers setting
+	* Make it work with new shorten numbers setting (might not do)
 - Re-design make working toasts
+	* Add support for icons
 - Keep working on store
-- Fix minibutton snap when hovering and spin animation
-- Do minibutton shockwave
+	* Do the upgrade element
+	* Make the upgrades actually work
+	* Fix smoke not working (working weirdly)
+	^ I think it's because it's a child that it can't appear above it
 
-# Issues!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-## General
-- Make minibuttons wave at the speed of the song? would be funny hehehe
-- Loading screen isn't working
-- Make pinch animation
+# TOMORROW
+- Make start animation
 - Rework tooltips
 - Fix panderito hitbox
 - Figure out why gamescene breaks when re-entering after being on ascendscnee
-- I think toasts don't work when being out of the game a lot
+	^ It's probably because variables that are outside of the scene are not getting resetted 
 
+# Issues!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+## General
 - REWRITING THE MOUSE SYSTEM IN PROGRESS:
-* Unactive windows have some undesired behaviour (not unhovering hexagon)
-* Buttons inside windows don't have hovers
-* Minibuttons will play "cursor" sometims when hovering from the folderObj
+	* Unactive windows have some undesired behaviour (not unhovering hexagon)
+	* Buttons inside windows don't have hovers
+	* Minibuttons will play "cursor" sometims when hovering from the folderObj
+- Make pinch animation
 
 ## Windows
 - You can click hexagon while hovering window for drag, then you drag it and it will not play clickRelease
@@ -54,8 +45,14 @@
 - fix music waving speed
 ### Color
 * Sliders are not precise, too lazy to fix it probably
-### Settings
-- Volume not synced with volume bar
+
+# Ideas
+- Add achievement for making the hexagon black and the bg white (bad apple)
+- Do the funny thing with music title in clicker.wav like deltarune did
+- Random chance of cursor making something funny (going upwards that'd be funny)
+- Add an achievement for opening all windows in your taskbar at the same time
+- Make unactive windows grayscale
+- Discount powerup (very short)
 
 # Bookmarks
 - Saving this for explosion stuff
@@ -63,15 +60,3 @@ https://kaplay.lajbel.com/?code=eJx9UstOwzAQvOcr9lZbjdqUUoRUygUhrhUHDiAOqb1JrTh2
 
 - Saving this for drawing hexagon
 https://kaplay.lajbel.com/?code=eJy9U01PwzAMvfdX%2BJhs076QEOoYEhIScEDakQlxyFpvLZR4StPRCvHfcdKPddsdH5Lo2S9%2BdpxPtSH6EjIItoWObEoaYqO%2Bn7BUO9JCwk8AbBHp3EKE2qJ5hSVMFxfw%2Bhw2Kk6LnNHZdLqAyQTu44%2BCcZtg61M5aMQY46DH21tHens%2FSUEZmRb2%2BJYMiAwtpD4vb7dwzdtw2Go%2BspXeZchhL8om49UzTOAKBpAuzsJKDmlLHLYSBzUrolz4a%2BQ5q%2BpY6wtWnuoLFpc33hd5Ig4YzUU5gkrKpiZn3KdH1GiUxbZqVyqqKIEDGotlL79z15eZ3UZ0Dmc%2B%2FzYjMsIfjdKxe2iWNpvfsFJe5ehfKB1DNm34rct1g7airHKDdnyyPeUh%2BN7UXRVyzE3qzlVPAbcydMsRocJmqcYQrCmwN3MN3hs4r4P1sBbSD6xEsOrlXTM7J3%2BAg2TwBzQo3pc%3D
-
-# Ideas
-- Add achievement for making the hexagon black and the bg white (bad apple)
-- Do the funny thing with music title in clicker.wav like deltarune did
-- Random chance of +1 making something funny
-- Image if the game had support for adding your own songs
-- Different messages in the mage scene
-- Add an achievement for opening all windows at the same time 
-- Make unactive windows grayscale
-
-# Arte: 
-- Boton de la carpeta (folderObj)

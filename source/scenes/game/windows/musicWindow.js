@@ -49,7 +49,7 @@ export function musicWinContent(winParent) {
 		{
 			verPosition: -20,
 			update() {
-				if (musicHandler.winding || GameState.settings.music.muted || skipping || musicHandler.paused) return
+				if (musicHandler.winding || skipping || musicHandler.paused) return
 				this.angle += songs[Object.keys(songs)[currentSongIdx]].speed
 				if (Math.floor(this.angle % 360 == 0)) this.angle = 0
 			}

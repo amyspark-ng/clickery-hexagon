@@ -1,12 +1,50 @@
 import { GameState } from "../../../gamestate";
 import { ROOT } from "../../../main";
 import { curDraggin, drag, setCurDraggin } from "../../../plugins/drag";
+import { dummyShadow } from "../../../plugins/dummyShadow";
 import { playSfx } from "../../../sound";
 import { mouse } from "../utils";
 import { buttonSpacing, folderObj, infoForWindows, manageWindow, openWindow } from "./windows-api/windowsAPI";
 import { addMinibutton } from "./windows-api/windowsAPI-utils";
 
 export let gridContainer;
+
+let currentClosest
+
+// Function to update the closest minibutton
+function updateClosestMinibuttonToDrag() {
+    // Get all minibuttons
+    const minibuttons = get("minibutton");
+
+    // Initialize variables to track the closest minibutton
+    let closestDistance = Infinity;
+    let closestMinibutton = null;
+
+    // Check the distance to each minibutton
+    minibuttons.forEach(minibutton => {
+        const dist = distance(currentMinibutton.screenPos(), minibutton.pos);
+        if (dist < closestDistance) {
+            closestDistance = dist;
+            closestMinibutton = minibutton;
+        }
+    });
+
+    // If the closest minibutton has changed
+    if (closestMinibutton !== currentClosest) {
+        // Detach the onUpdate event from the previous closest minibutton
+        if (currentClosest) {
+            currentClosest.off("update", currentClosestUpdateEvent);
+        }
+
+        // Update the current closest minibutton
+        currentClosest = closestMinibutton;
+
+        // Attach the onUpdate event to the new closest minibutton
+        if (currentClosest) {
+            currentClosest.on("update", currentClosestUpdateEvent);
+        }
+    }
+}
 
 export function makeGridMinibutton(idx, gridSlot, winParent) {
 	let selection;
@@ -21,6 +59,7 @@ export function makeGridMinibutton(idx, gridSlot, winParent) {
 		color(WHITE),
 		scale(0),
 		drag(),
+		z(),
 		area(),
 		rotate(0),
 		"gridMiniButton",
@@ -92,88 +131,6 @@ export function makeGridMinibutton(idx, gridSlot, winParent) {
 		}
 	})
 
-	gridMiniButton.onMouseRelease((button) => {
-		if (!gridMiniButton.isHovering()) return
-		if (button != "left") return
-		// was holding
-		if (gridMiniButton.beingHeld == false) {
-			gridMiniButton.holdTimer = 0
-			gridMiniButton.beingHeld = false
-
-			// click function
-			manageWindow(gridMiniButton.windowKey)
-		}
-	
-		else if (gridMiniButton.beingHeld == true) {
-			gridMiniButton.holdTimer = 0
-			gridMiniButton.beingHeld = false
-
-			// release hold function
-			if (curDraggin == gridMiniButton) {
-				curDraggin.trigger("dragEnd")
-				setCurDraggin(null)
-				mouse.releaseAndPlay("cursor")
-	
-				let closestMinibutton = null;
-				let closestDistance = Infinity;
-	
-				// Get all minibuttons
-				const minibuttons = get("minibutton").filter(minibutton => !minibutton.is("extraMinibutton"));
-	
-				// Check the distance to each minibutton
-				minibuttons.forEach(minibutton => {
-					const distance = gridMiniButton.screenPos().dist(minibutton.pos);
-					if (distance < closestDistance) {
-						closestDistance = distance;
-						closestMinibutton = minibutton;
-					}
-				});
-	
-				// TODO: Tweak this
-				// if the distance from the currentPos to the original position is lesser than 570 (minimum distance to minibuttons)
-				if (gridMiniButton.screenPos().dist(toScreen(gridSlot.pos)) < 570) {
-					// get back to parent
-					ROOT.children.splice(ROOT.children.indexOf(gridMiniButton), 1)
-					gridMiniButton.parent = gridContainer
-					gridContainer.children.push(gridMiniButton)
-					// convert root position to gridContainer local position
-					gridMiniButton.pos = gridContainer.fromScreen(mousePos())
-					tween(gridMiniButton.pos, gridSlot.pos, 0.32, (p) => gridMiniButton.pos = p, easings.easeOutQuint).onEnd(() => {
-						if (gridMiniButton.isHovering()) {
-							gridMiniButton.startHover()
-						}
-					})
-					tween(gridMiniButton.angle, 0, 0.32, (p) => gridMiniButton.angle = p, easings.easeOutQuint)
-				}
-				
-				else {
-					console.log("GO TO CLOSEST MINIBUTTON")
-	
-					// cmb => closest minibutton
-					let cmbShadow = get(`gridShadow_${closestMinibutton.idxForInfo}`, { recursive: true })[0]
-	
-					// add the new minibutton to the minibutton list
-					let newMinibutton = addMinibutton(idx, closestMinibutton.taskbarIndex, gridMiniButton.pos, closestMinibutton.pos)
-					GameState.taskbar[closestMinibutton.taskbarIndex] = newMinibutton.windowKey
-					
-					// Snap the button to the closest minibutton
-					tween(gridMiniButton.pos.x, closestMinibutton.pos.x, 0.32, (p) => gridMiniButton.pos.x = p, easings.easeOutQuint);
-					tween(gridMiniButton.pos.y, closestMinibutton.pos.y, 0.32, (p) => gridMiniButton.pos.y = p, easings.easeOutQuint);
-					
-					// destroy closestminibutton and grid minibutton
-					tween(closestMinibutton.scale, vec2(0), 0.32, (p) => closestMinibutton.scale = p, easings.easeOutQuint).onEnd(() => {
-						destroy(closestMinibutton)
-					})
-					destroy(gridMiniButton)
-					
-					// make the new gridminibutton to the one that was just unpinned
-					gridContainer.add(makeGridMinibutton(closestMinibutton.idxForInfo, cmbShadow, winParent))
-					playSfx("plop")
-				}
-			}
-		}
-	})
-
 	gridMiniButton.onHover(() => {
 		if (curDraggin) return
 		gridMiniButton.startHover()
@@ -184,38 +141,100 @@ export function makeGridMinibutton(idx, gridSlot, winParent) {
 		gridMiniButton.endHover()
 	})
 
-	let gridMinibuttonShadow;
 	gridMiniButton.onDrag(() => {
 		get("gridMinibuttonSelection", { recursive: true }).forEach(selection => {
 			destroy(selection)
 		})
 
-		gridMinibuttonShadow = add([
-			pos(gridMiniButton.pos),
-			sprite(gridMiniButton.sprite),
-			z(gridMiniButton.z - 1),
-			rotate(0),
-			color(BLACK),
-			opacity(0.8),
-			anchor("center"),
-			rotate(0),
-			{
-				update() {
-					let xPos = map(gridMiniButton.pos.x, 0, width(), gridMiniButton.pos.x + 8, gridMiniButton.pos.x - 8)
-					this.pos.x = lerp(this.pos.x, xPos, 1.1)
-					this.pos.y = lerp(this.pos.y, gridMiniButton.pos.y + 8, 1.1)
-					this.angle = gridMiniButton.angle
+		gridMiniButton.use(dummyShadow())
+	})
+
+	let currentClosest = null
+	gridMiniButton.onUpdate(() => {
+		if (!gridMiniButton.dragging) return
+		let closestMinibutton = null;
+		let closestDistance = Infinity;
+
+		// Get all minibuttons
+		const minibuttons = get("minibutton").filter(minibutton => !minibutton.is("extraMinibutton"));
+
+		// Check the distance to each minibutton
+		minibuttons.forEach(minibutton => {
+			const distance = gridMiniButton.screenPos().dist(minibutton.pos);
+			if (distance < closestDistance) {
+				closestDistance = distance;
+				closestMinibutton = minibutton;
+			}
+		});
+
+		let distanceToSlot = gridMiniButton.screenPos().dist(gridSlot.screenPos())
+		let distanceToClosestMinibutton = gridMiniButton.screenPos().dist(closestMinibutton.screenPos())
+
+		if (isMouseReleased("left")) {
+			if (!gridMiniButton.isHovering()) return
+			// was holding
+			if (gridMiniButton.beingHeld == false) {
+				gridMiniButton.holdTimer = 0
+				gridMiniButton.beingHeld = false
+	
+				// click function
+				manageWindow(gridMiniButton.windowKey)
+			}
+		
+			else if (gridMiniButton.beingHeld == true) {
+				gridMiniButton.holdTimer = 0
+				gridMiniButton.beingHeld = false
+	
+				// release hold function
+				if (curDraggin == gridMiniButton) {
+					curDraggin.trigger("dragEnd")
+					setCurDraggin(null)
+					mouse.releaseAndPlay("cursor")
+	
+					// DROP
+					// if the distance to the slot is lesser than the distance to closest minibutton
+					if (distanceToSlot < distanceToClosestMinibutton) {
+					// GO BACK TO SLOT
+						let gridMinibuttonIdx = infoForWindows[gridMiniButton.windowKey].idx
+						destroy(gridMiniButton)
+						gridContainer.add(makeGridMinibutton(gridMinibuttonIdx, get(`gridShadow_${gridMinibuttonIdx}`, { recursive: true })[0], winParent))
+						playSfx("plop")
+						
+						// reset their angles
+						get("minibutton").forEach(element => {
+							tween(element.angle, 0, 0.32, (p) => element.angle = p, easings.easeOutQuint)
+						});
+					}
+					
+					else {
+						// add the new minibutton to the minibutton list
+						let newMinibutton = addMinibutton(idx, closestMinibutton.taskbarIndex, gridMiniButton.pos, closestMinibutton.pos)
+						GameState.taskbar[closestMinibutton.taskbarIndex] = newMinibutton.windowKey
+						
+						// Snap the button to the closest minibutton
+						tween(gridMiniButton.pos.x, closestMinibutton.pos.x, 0.32, (p) => gridMiniButton.pos.x = p, easings.easeOutQuint);
+						tween(gridMiniButton.pos.y, closestMinibutton.pos.y, 0.32, (p) => gridMiniButton.pos.y = p, easings.easeOutQuint);
+						
+						// destroy closestminibutton and grid minibutton
+						tween(closestMinibutton.scale, vec2(0), 0.32, (p) => closestMinibutton.scale = p, easings.easeOutQuint).onEnd(() => {
+							destroy(closestMinibutton)
+						})
+						destroy(gridMiniButton)
+						
+						// cmb => closest minibutton
+						let cmbShadow = get(`gridShadow_${closestMinibutton.idxForInfo}`, { recursive: true })[0]
+		
+						// make the new gridminibutton to the one that was just unpinned
+						gridContainer.add(makeGridMinibutton(closestMinibutton.idxForInfo, cmbShadow, winParent))
+						playSfx("plop")
+	
+						get("minibutton").forEach(minibutton => {
+							tween(minibutton.angle, 0, 0.15, (p) => minibutton.angle = p, easings.easeOutQuint)
+						})
+					}
 				}
 			}
-		])
-	})
-
-	gridMiniButton.onDragEnd(() => {
-		gridMinibuttonShadow?.destroy()
-	})
-
-	gridMiniButton.onDestroy(() => {
-		gridMinibuttonShadow?.destroy()
+		}
 	})
 
 	return gridMiniButton
@@ -260,4 +279,11 @@ export function extraWinContent(winParent) {
 			gridContainer.add(makeGridMinibutton(i, shadowOne, winParent))
 		}
 	}
+
+	winParent.on("close", () => {
+		let extraMinibutton = get("extraMinibutton")[0]
+		if (extraMinibutton.isHovering()) return
+		extraMinibutton.shut = true
+		extraMinibutton.play(`shut_${extraMinibutton.isHovering() ? "hover" : "default"}`)
+	})
 }

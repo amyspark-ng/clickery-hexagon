@@ -7,6 +7,7 @@ import { folderObjManaging, windowsDefinition } from "./windows/windows-api/wind
 import { songs } from "./windows/musicWindow"
 import { curDraggin, setCurDraggin } from "../../plugins/drag"
 import { k } from "../../main"
+import { getComboFromClicks } from "./combo-utils"
 
 // debug
 
@@ -89,7 +90,10 @@ export function gamescene() {
 		GameState.load()
 
 		playMusic(GameState.settings.music.favoriteIdx == null ? "clicker.wav" : Object.keys(songs)[GameState.settings.music.favoriteIdx])
-		
+
+
+		// console.log(getComboFromClicks(25))
+
 		// wait 60 seconds
 		wait(60, () => {
 			loop(60, () => {
@@ -111,7 +115,8 @@ export function gamescene() {
 		onUpdate(() => {
 			GameState.score = clamp(GameState.score, 0, Infinity)
 			GameState.score = Math.round(GameState.score)
-			debugFunctions()
+			
+			if (k.debug) debugFunctions()
 			
 			if (GameState.score > 50) {
 				// if (!GameState.unlockedWindows.includes("storeWin")) unlockWindow("storeWin")
@@ -154,6 +159,8 @@ export function gamescene() {
 			if (panderitoIndex == panderitoLetters.length) {
 				togglePanderito()
 			}
+
+			debug.log(panderitoIndex)
 		})
 
 		// #region debug stuff
@@ -244,10 +251,6 @@ export function gamescene() {
 		// Listen for visibility change events
 		document.addEventListener("visibilitychange", handleVisibilityChange);
  		// #endregion
-
-		onKeyPress("r", () => {
-			go("gamescene")
-		})
 
 		// prevent dumb ctrl + s
 		document.addEventListener("keydown", (event) => {

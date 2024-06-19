@@ -1,6 +1,6 @@
 import { GameState } from "../../gamestate";
 import { curDraggin } from "../../plugins/drag";
-import { autoLoopTime, excessTime } from "./gamescene";
+import { autoLoopTime, excessTime, panderitoIndex } from "./gamescene";
 import { hexagon, scoreVars } from "./hexagon";
 import { isHoveringUpgrade } from "./windows/store/upgrades";
 import { isDraggingAWindow, isGenerallyHoveringAWindow, isPreciselyHoveringAWindow, manageWindow, openWindow } from "./windows/windows-api/windowsAPI";
@@ -239,6 +239,10 @@ export function debugFunctions() {
 
 		else if (isKeyPressed("y")) {
 			GameState.clickers++
+		}
+
+		else if (isKeyPressed("r") && panderitoIndex != 6) {
+			go("gamescene")
 		}
 	// }
 }

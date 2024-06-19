@@ -249,7 +249,7 @@ export function openWindow(windowKey = "") {
 	})
 
 	windowObj.onKeyPress("escape", () => {
-		if (windowObj.is("active")) windowObj.close()
+		if (windowObj.is("active") && !(windowObj.is("extraWin") && curDraggin?.is("gridMiniButton"))) windowObj.close()
 	})
 
 	// activate
@@ -260,29 +260,25 @@ export function openWindow(windowKey = "") {
 	windowObj.add(infoForWindows[windowKey].content(windowObj, windowKey))
 	// searches for the key
 
-	windowObj.defColor = WHITE
-	windowObj.get("*", { recursive: true }).forEach((element) => {
-		if (!element.color) element.use(color())
-		element.defColor = element.color
-	})
-
 	// animate it
 	tween(windowObj.opacity, 1, 0.32, (p) => windowObj.opacity = p, easings.easeOutQuint)
 	tween(windowObj.scale, vec2(1), 0.32, (p) => windowObj.scale = p, easings.easeOutQuint)
 	
 	// manage the minibutton
-	// get("minibutton").filter(minibutton => minibutton["windowKey"] === windowKey)?.window = windowObj
+	let correspondingMinibutton = get("minibutton").filter(minibutton => minibutton["windowKey"] === windowKey)[0]
+	if (!correspondingMinibutton) return
+	correspondingMinibutton.window = windowObj
+	bop(correspondingMinibutton)
+
+	windowObj.on("close", () => {
+		correspondingMinibutton.window = null
+		bop(correspondingMinibutton)
+	})
+
 	return windowObj;
 }
 
 export function folderObjManaging() {
-	// onMousePress("middle", () => {
-	// 	unlockWindow("storeWin")
-	// })
-	onKeyPress("h", () => {
-		unlockWindow("musicWin")
-	})
-
 	GameState.unlockedWindows = GameState.taskbar
 
 	folderObj = add([
@@ -297,7 +293,6 @@ export function folderObjManaging() {
 			defaultScale: vec2(1.2),
 			editingBar: false,
 			unfold() {
-				// GameState.unlockedWindows = ["storeWin"]
 				folded = false
 				timeSinceFold = 0
 				playSfx("fold", rand(-50, 50))
@@ -335,8 +330,8 @@ export function folderObjManaging() {
 			fold() {
 				folded = true
 				
+				// return them to folderObj pos
 				get("minibutton").forEach(miniButtonFoldTween => {
-					miniButtonFoldTween.area.scale = vec2(0)
 					tween(miniButtonFoldTween.pos, folderObj.pos, 0.32, (p) => miniButtonFoldTween.pos = p, easings.easeOutQuint).then(() => {
 						destroy(miniButtonFoldTween)
 					})
@@ -346,12 +341,8 @@ export function folderObjManaging() {
 			},
 
 			manageFold() {
-				if (folded) {
-					folderObj.unfold()
-				}
-				else {
-					folderObj.fold()
-				}
+				if (folded) folderObj.unfold()
+				else folderObj.fold()
 			},
 
 			openTaskbarEdit() {

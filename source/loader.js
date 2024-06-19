@@ -54,18 +54,6 @@ export function loadAssets() {
 				hover: 1,
 			}
 		},
-		"icon_extra": {
-			width: 140,
-			height: 70,
-			sliceX: 2,
-			sliceY: 1,
-			x: 0,
-			y: 0,
-			anims: {
-				default: 0,
-				hover: 1,
-			}
-		},
 		"icon_medals": {
 			width: 140,
 			height: 70,
@@ -131,18 +119,6 @@ export function loadAssets() {
 			height: 70,
 			sliceX: 2,
 			sliceY: 1,
-			x: 840,
-			y: 0,
-			anims: {
-				default: 0,
-				hover: 1,
-			}
-		},
-		"icon_store": {
-			width: 140,
-			height: 70,
-			sliceX: 2,
-			sliceY: 1,
 			x: 0,
 			y: 70,
 			anims: {
@@ -150,7 +126,7 @@ export function loadAssets() {
 				hover: 1,
 			}
 		},
-		"icon_bgColor": {
+		"icon_store": {
 			width: 140,
 			height: 70,
 			sliceX: 2,
@@ -162,7 +138,7 @@ export function loadAssets() {
 				hover: 1,
 			}
 		},
-		"icon_hexColor": {
+		"icon_bgColor": {
 			width: 140,
 			height: 70,
 			sliceX: 2,
@@ -174,7 +150,7 @@ export function loadAssets() {
 				hover: 1,
 			}
 		},
-		"icon_credits": {
+		"icon_hexColor": {
 			width: 140,
 			height: 70,
 			sliceX: 2,
@@ -184,6 +160,38 @@ export function loadAssets() {
 			anims: {
 				default: 0,
 				hover: 1,
+			}
+		},
+		"icon_credits": {
+			width: 140,
+			height: 70,
+			sliceX: 2,
+			sliceY: 1,
+			x: 560,
+			y: 70,
+			anims: {
+				default: 0,
+				hover: 1,
+			}
+		},
+		"white_noise": {
+			width: 140,
+			height: 70,
+			x: 770,
+			y: 70,
+		},
+		"icon_extra": {
+			width: 280,
+			height: 70,
+			sliceX: 4,
+			sliceY: 1,
+			x: 0,
+			y: 140,
+			anims: {
+				open_default: 0,
+				open_hover: 1,
+				shut_default: 2,
+				shut_hover: 3,
 			}
 		},
 	})
@@ -550,16 +558,17 @@ export function loadAssets() {
 
 	// made by MF
 	loadShader("saturate", null, `
-	uniform float whiteness;
-	uniform vec2 u_pos;
-	uniform vec2 u_size;
+		uniform float saturation;
+		uniform vec2 u_pos;
+		uniform vec2 u_size;
+		uniform vec3 saturationColor;
 
-	vec4 frag(vec2 pos, vec2 uv, vec4 color, sampler2D tex) {
-		vec4 c = def_frag();
-		return c + vec4(mix(vec3(0), vec3(1), whiteness), 0);
-	}
+		vec4 frag(vec2 pos, vec2 uv, vec4 color, sampler2D tex) {
+			vec4 c = def_frag();
+			vec4 col = vec4(saturationColor/255.0, 1);
+			return (c + vec4(mix(vec3(0), vec3(1), saturation), 0)) * col;
+		}
 	`)
-	
 	focuscene()
 	introscene()
 	gamescene()

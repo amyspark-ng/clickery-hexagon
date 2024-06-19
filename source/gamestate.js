@@ -76,6 +76,7 @@ export let GameState = {
 		shortNumbers: false,
 		fullscreen: false,
 		panderitoMode: false,
+		spsTextMode: 1,
 	},
 
 	save(anim = true) {

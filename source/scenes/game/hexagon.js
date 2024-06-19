@@ -6,7 +6,7 @@ import { playSfx } from "../../sound.js";
 import { isDraggingAWindow, isGenerallyHoveringAWindow, isPreciselyHoveringAWindow, manageWindow } from "./windows/windows-api/windowsAPI.js";
 import { waver } from "../../plugins/wave.js";
 import { isDraggingASlider } from "./windows/colorWindow.js";
-import { addPlusScoreText, dropCombo, startCombo } from "./combo-utils.js";
+import { addPlusScoreText, comboBarContent, getClicksFromCombo, increaseCombo, maxBarWidth, startCombo } from "./combo-utils.js";
 import { addConfetti } from "../../plugins/confetti.js";
 import { curDraggin } from "../../plugins/drag.js";
 
@@ -19,14 +19,17 @@ export let scoreVars = {
 	combo: 1,
 }
 
-const INITIAL_COMBO = 25
-const COMBO_INCREMENT = 15
-const MAX_COMBO = 10
-
 export let clickVars = {
 	clicksPerSecond: 0, // to properly calculate sps
 	consecutiveClicks: 0,
+	comboDropped: true,
+	maxedCombo: false,
+	constantlyClicking: false,
 }
+
+export const COMBO_MINCLICKS = 25; // 25
+export const COMBO_MAXCLICKS = 160; // 160
+export const COMBO_MAX = 10
 
 let consecutiveClicksWaiting = null;
 
@@ -41,6 +44,12 @@ let hoverRotSpeedIncrease = 0.01 * 0.25
 let maxRotSpeed = 10
 
 export function addHexagon() {
+	scoreVars.combo = 1
+	clickVars.consecutiveClicks = 0
+	clickVars.constantlyClicking = false
+	clickVars.comboDropped = true
+	clickVars.maxedCombo = false
+	
 	hexagon = add([
 		sprite(GameState.settings.panderitoMode ? "panderito" : "hexagon"),
 		pos(center().x, center().y + 55),
@@ -114,29 +123,44 @@ export function addHexagon() {
 				playSfx("clickRelease", rand(-50, 50))
 				mouse.releaseAndPlay("point")
 
-				clickVars.consecutiveClicks++
-				if (clickVars.consecutiveClicks == 25) {
-					scoreVars.combo = 2
-					startCombo() // checks if first combo dw
-				}
-
-				else if (clickVars.consecutiveClicks == INITIAL_COMBO + (COMBO_INCREMENT * scoreVars.combo) && scoreVars.combo < MAX_COMBO) {
-					scoreVars.combo++
-					startCombo() // checks if first combo dw
-
-					if (scoreVars.combo == 10) {
-						// yippee
-						addConfetti({ pos: vec2(hexagon.pos.x, hexagon.pos.y + 100) })
-						debug.log("add confetti")
-					}
-				}
+				// # combo stuff
+				clickVars.constantlyClicking = true
 
 				consecutiveClicksWaiting.cancel()
 				consecutiveClicksWaiting = wait(1, () => {
-					dropCombo()
+					clickVars.constantlyClicking = false
 				})
 
-				//actual score additions
+				// if consecutiveclicks is not combo_maxclicks increase clicks
+				if (clickVars.consecutiveClicks != COMBO_MAXCLICKS) {
+					clickVars.consecutiveClicks++
+					
+					// if (scoreVars.combo > 1) {
+					// }
+				}
+
+				// checks for first combo
+				if (clickVars.consecutiveClicks == getClicksFromCombo(2) && clickVars.comboDropped == true) {
+					startCombo()
+				}
+
+				// check for all the other combos
+				else if (scoreVars.combo < COMBO_MAX) {
+					for (let i = 2; i < COMBO_MAX + 1; i++) {
+						if (clickVars.consecutiveClicks == getClicksFromCombo(i)) {
+							increaseCombo()
+						}
+					}
+				}
+
+				if (scoreVars.combo == 10 && clickVars.maxedCombo == false) {
+					clickVars.maxedCombo = true
+					addConfetti({ pos: center() })
+				}
+
+				// debug.log(`${clickVars.consecutiveClicks} / ${COMBO_MAXCLICKS}`)
+
+				// # actual score additions
 				addPlusScoreText(mouse.pos, scoreVars.scorePerClick)
 				GameState.addScore(scoreVars.scorePerClick * scoreVars.combo)
 				tween(scoreText.scaleIncrease, 1.05, 0.2, (p) => scoreText.scaleIncrease = p, easings.easeOutQuint).onEnd(() => {
@@ -314,7 +338,10 @@ export function addHexagon() {
 		secondTimerForClicks += dt();
 		if (secondTimerForClicks > 1) {
 			secondTimerForClicks = 0;
-			spsText.text = scoreVars.actualScorePerSecond + "/s"
+
+			// shoutout to Candy&Carmel
+			let divideValue = Math.pow(60, GameState.settings.spsTextMode-1);
+			spsText.value = (clickVars.clicksPerSecond / divideValue).toFixed(1)
 			clickVars.clicksPerSecond = 0;
 		}
 
