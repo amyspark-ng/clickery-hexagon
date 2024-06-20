@@ -3,7 +3,8 @@ import { drag } from "../../plugins/drag"
 import { positionSetter } from "../../plugins/positionSetter"
 import { waver } from "../../plugins/wave"
 import { playSfx } from "../../sound"
-import { addBackground, addMouse, blendColors, bop, gameBg, getRandomElementDifferentFrom, mouse } from "./utils"
+import { addBackground, gameBg, addMouse, mouse } from "../game/additives"
+import { blendColors, bop, getRandomElementDifferentFrom } from "./utils"
 import { manageWindow, openWindow, windowsDefinition } from "./windows/windows-api/windowsAPI"
 
 let cameraScale = 1
@@ -104,7 +105,9 @@ function addMage() {
 		pos(-17, 154),
 		waver({ wave_speed: 1, maxAmplitude: 2.5 }),
 		{
+			currentThingToSay: "",
 			say(thingToSay = "Hello world", speed = 0.1) {
+				this.currentThingToSay = thingToSay
 				tween(0.5, 1, 0.25, (p) => dialogueBox.scale.x = p, easings.easeOutQuint)
 				activeWaits.forEach(waitCall => waitCall.cancel());
 				activeWaits = [];
@@ -128,6 +131,11 @@ function addMage() {
 					activeWaits.push(waitCall);
 				});
 			},
+
+			skipSay() {
+				activeWaits.forEach(waitCall => waitCall.cancel());
+				dialogueText.text = this.currentThingToSay
+			}
 		}
 	]);	
 	mage.startWave()
@@ -168,7 +176,7 @@ function addMage() {
 			update() {
 				if (this.isHovering() && isMousePressed("left")) {
 					this.play("blink")
-					currentDialogueIdx = getRandomElementDifferentFrom([1, 2, 3], currentDialogueIdx)
+					currentDialogueIdx = getRandomElementDifferentFrom([1, 2, 3, 4], currentDialogueIdx)
 					mage.say(dialogues[currentDialogueIdx][dialogueEye.woke ? "woke" : "dumb"], dialogues[currentDialogueIdx].speed)
 				}
 				
@@ -406,5 +414,8 @@ export function ascendscene() {
 		}
 
 		mage.say(dialogues[currentDialogueIdx][dialogueEye.woke ? "woke" : "dumb"], dialogues[currentDialogueIdx].speed)
+		onClick(() => {
+			if (dialogueText.text.length != dialogues[currentDialogueIdx][dialogueEye.woke ? "woke" : "dumb"].length) mage.skipSay()
+		})
 	})
 }

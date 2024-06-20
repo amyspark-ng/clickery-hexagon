@@ -1,9 +1,7 @@
 import kaplay from "kaplay";
 import "kaplay/global";
 
-import { drawLoadScreen, customScreens } from "./scenes/game/utils.js";
-import { loadAssets } from "./loader.js"
-import { GameState } from "./gamestate.js"
+import { loadEverything } from "./loader.js"
 
 export const k = kaplay({
 	width: 1024,
@@ -14,11 +12,13 @@ export const k = kaplay({
 	backgroundAudio: true,
 	debugKey: "f1",
 	debug: true,
+	loadingScreen: true,
 	// stretch: true,
 	// letterbox: true,
 });
 
-loadAssets()
+loadEverything()
+
 setCursor("none")
 
 export let kanvas = document.getElementById("kanva")
@@ -26,6 +26,19 @@ export let gl = kanvas.getContext("2d")
 
 export let ROOT = getTreeRoot()
 
-go("focuscene")
+onLoad(() => {
+	let drawEvent = onDraw(() => {
+		drawRect({
+			width: width(),
+			height: height(),
+			color: BLACK,
+		})
+	})
+
+	go("focuscene")
+	// wait(1, () => {
+	// 	drawEvent.cancel()
+	// })
+})
 // if (!k.debug) go("focuscene")
 // else go("gamescene")

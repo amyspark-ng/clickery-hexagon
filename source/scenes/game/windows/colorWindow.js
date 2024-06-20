@@ -3,7 +3,8 @@ import { curDraggin, drag, setCurDraggin } from "../../../plugins/drag";
 import { waver } from "../../../plugins/wave";
 import { playSfx } from "../../../sound";
 import { hexagon } from "../hexagon";
-import { blendColors, bop, gameBg, getSides, mouse } from "../utils";
+import { blendColors, bop, getSides } from "../utils";
+import { gameBg, mouse } from "../additives";
 import { deactivateAllWindows } from "./windows-api/windowsAPI";
 
 let lastSoundPos;

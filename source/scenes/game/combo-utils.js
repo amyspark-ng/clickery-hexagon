@@ -78,7 +78,7 @@ export function addComboBar() {
 				let blendFactor = map(scoreVars.combo, 1, 10, 0, 1)
 				this.color = blendColors(
 					WHITE,
-					hsl2rgb((time() * 0.2 * 0.1) % 1, 0.7, 0.8),
+					hsl2rgb((time() * 0.2 * 0.1) % 1, 1.5, 0.8),
 					blendFactor
 				)
 

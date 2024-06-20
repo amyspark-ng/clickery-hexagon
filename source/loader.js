@@ -1,15 +1,72 @@
 import { gamescene } from "./scenes/game/gamescene.js"
 import { introscene } from "./scenes/introScene.js"
 import { focuscene } from "./scenes/focuscene.js"
-import { drawLoadScreen } from "./scenes/game/utils.js"
 import { ascendscene } from "./scenes/game/ascendscene.js"
+
+function drawSeriousLoadScreen() {
+	onLoading((progress) => {
+		drawRect({
+			width: width(),
+			height: height(),
+			color: BLACK,
+			opacity: map(progress, 0, 0.25, 0, 1)
+		})
+
+		drawSprite({
+			sprite: "hexagon",
+			scale: vec2(wave(-0.25, 0.25, time() * 3) ,0.25),
+			color: WHITE,
+			anchor: "center",
+			pos: vec2(width() - 60, height() - 75),
+			opacity: map(progress, 0, 0.25, 0, 1),
+		})
+
+		drawText({
+			text: `LOADING ${Math.round(progress * 100)}%`,
+			size: 40,
+			color: WHITE,
+			anchor: "right",
+			pos: vec2(899, 525),
+			opacity: map(progress, 0, 0.25, 0, 1),
+		})
+
+		// bar
+		drawRect({
+			width: map(progress, 0, 1, 5, width() - 5), 
+			radius: 2.5,
+			height: 10,
+			anchor: "left",
+			pos: vec2(5, height() - 10),
+			opacity: map(progress, 0, 0.25, 0, 1),
+		})
+	})
+}
+
+function drawDevkyLoadScreen() {
+	onLoading((progress) => {
+		drawRect({
+			width: width(),
+			height: height(),
+			color: BLACK,
+		})
+		
+		drawSprite({
+			sprite: "devky",
+			anchor: "topleft",
+			pos: 0,
+			width: map(progress, 0, 1, 0, width()),
+			height: height(),
+		})
+	})
+}
 
 // Sprite atlas were made with this awesome website
 // https://www.finalparsec.com/tools/sprite_sheet_maker
-
-export function loadAssets() {
-	loadRoot("./assets/")
+export function loadEverything() {
 	loadBean()
+	loadSprite("hexagon", "./assets/sprites/hexagon.png")
+	loadSprite("devky", "./image.png")
+	loadRoot("./assets/")
 	
 	//#region SPRITES
 	// cursors
@@ -27,7 +84,6 @@ export function loadAssets() {
 	
 	loadSprite("osaka", "sprites/osaka.png")
 	loadSprite("floppy", "sprites/floppy.png")
-	loadSprite("hexagon", "sprites/hexagon.png")
 	loadSprite("panderito", "sprites/panderito.png")
 	loadSprite("folderObj", "sprites/folderObj.png")
 	loadSprite("speakers", "sprites/speakers.png", {
@@ -574,4 +630,9 @@ export function loadAssets() {
 	gamescene()
 	ascendscene()
 	//#endregion OTHER STUFF
+
+	// 20% of getting devky's funny loading screen 
+	// if (chance(0.2)) drawDevkyLoadScreen()
+	// else drawSeriousLoadScreen()
+	drawSeriousLoadScreen()
 }

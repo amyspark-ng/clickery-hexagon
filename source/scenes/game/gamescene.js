@@ -1,13 +1,13 @@
 import { GameState } from "../../gamestate"
 import { scoreVars, addHexagon, hexagon } from "./hexagon.js"
 import { uiCounters } from "./uicounters"
-import { addBackground, addMouse, addToast, arrayToColor, debugFunctions, debugTexts, gameBg, mouse, percentage } from "./utils"
-import { musicHandler, playMusic } from "../../sound"
+import { arrayToColor } from "./utils"
+import { addToast, debugFunctions, debugTexts, gameBg, mouse } from "./additives"
+import { playMusic } from "../../sound"
 import { folderObjManaging, windowsDefinition } from "./windows/windows-api/windowsAPI"
 import { songs } from "./windows/musicWindow"
 import { curDraggin, setCurDraggin } from "../../plugins/drag"
 import { k } from "../../main"
-import { getComboFromClicks } from "./combo-utils"
 
 // debug
 
@@ -77,7 +77,6 @@ export function gamescene() {
 
 		cam.scale = 1
 
-		addMouse()
 		addHexagon()
 		uiCounters()
 		folderObjManaging()
@@ -89,10 +88,9 @@ export function gamescene() {
 
 		GameState.load()
 
-		playMusic(GameState.settings.music.favoriteIdx == null ? "clicker.wav" : Object.keys(songs)[GameState.settings.music.favoriteIdx])
-
-
-		// console.log(getComboFromClicks(25))
+		if (!GameState.settings.music.muted) {
+			playMusic(GameState.settings.music.favoriteIdx == null ? "clicker.wav" : Object.keys(songs)[GameState.settings.music.favoriteIdx])
+		}
 
 		// wait 60 seconds
 		wait(60, () => {
@@ -159,8 +157,6 @@ export function gamescene() {
 			if (panderitoIndex == panderitoLetters.length) {
 				togglePanderito()
 			}
-
-			debug.log(panderitoIndex)
 		})
 
 		// #region debug stuff
@@ -206,6 +202,7 @@ export function gamescene() {
 						let sleepyText = add([
 							text("Z Z Z . . . ", {
 								size: 90,
+								font: "lambda",
 								transform: (idx) => ({
 									pos: vec2(0, wave(-4, 4, time() * 4 + idx * 0.5)),
 									scale: wave(1, 1.2, time() * 3 + idx),

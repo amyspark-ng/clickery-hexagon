@@ -67,6 +67,9 @@ export function uiCounters() {
 					case 3:
 						textThing = "/h"
 					break;
+					default: 
+						textThing = "/s"
+					break;
 				}
 
 				this.text = this.value + textThing

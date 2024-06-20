@@ -1,7 +1,8 @@
 import { GameState } from "../../../../gamestate";
 import { playSfx } from "../../../../sound";
-import { bop, getPrice, getSides, mouse } from "../../utils";
-import { addMiscUpgrades, addRegularUpgrades } from "./upgrades";
+import { bop, getPrice, getSides } from "../../utils";
+import { mouse } from "../../additives";
+import { addUpgrades } from "./upgrades";
 
 let elements = {
 	"clickersElement": { gamestateKey: "clickers", basePrice: 25, percentageIncrease: 15 },
@@ -170,10 +171,10 @@ function addStoreElement(winParent, opts = { key: "null", pos: vec2(0, 20) }) {
 			btn.buy(amountToBuy)
 		}
 
-		if (timesBoughtWhileHolding > 10 && !get("smoke")[0]) {
-			let smoke = add([
+		if (timesBoughtWhileHolding > 10 && !get("smoke", { recursive: true })[0]) {
+			let smoke = winParent.add([
 				sprite("smoke"),
-				pos(btn.worldPos().x - btn.width / 2, btn.worldPos().y - btn.height / 2),
+				pos(btn.pos.x - btn.width / 2, btn.pos.y - btn.height / 2),
 				opacity(),
 				anchor("center"),
 				z(btn.z - 1),
@@ -195,8 +196,12 @@ function addStoreElement(winParent, opts = { key: "null", pos: vec2(0, 20) }) {
 		timeUntilAnotherBuy = 2.25
 		
 		// if there's smoke
-		get("smoke", { recursive: true })[0]?.fadeOut(0.25)
-		get("smoke", { recursive: true })[0]?.unuse("smoke")
+		let smoke = get("smoke", { recursive: true })[0]
+		if (smoke) {
+			smoke.unuse("smoke")
+			smoke.fadeOut(1)
+			tween(smoke.pos.y, smoke.pos.y - 15, 0.5, (p) => smoke.pos.y = p)
+		}
 	})
 
 	btn.onHoverEnd(() => {
@@ -218,12 +223,11 @@ let powerupsElement;
 
 export function storeWinContent(winParent) {
 
-	clickersElement = addStoreElement(winParent, { key: "clickersElement", pos: vec2(0, -150) })
-	addRegularUpgrades(clickersElement)
+	clickersElement = addStoreElement(winParent, { key: "clickersElement", pos: vec2(0, -160) })
+	addUpgrades(clickersElement)
 	cursorsElement = addStoreElement(winParent, { key: "cursorsElement", pos: vec2(0, (clickersElement.pos.y + clickersElement.height) + 15) })
-	addRegularUpgrades(cursorsElement)
+	addUpgrades(cursorsElement)
 	powerupsElement = addStoreElement(winParent, { key: "powerupsElement", pos: vec2(0, (cursorsElement.pos.y + cursorsElement.height) + 15) })
-	addMiscUpgrades(winParent)
 
 	storeElements = [clickersElement, cursorsElement, powerupsElement]
 

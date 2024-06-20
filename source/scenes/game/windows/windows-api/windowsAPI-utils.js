@@ -1,10 +1,9 @@
-import { GameState } from "../../../../gamestate";
 import { curDraggin, drag, setCurDraggin } from "../../../../plugins/drag";
 import { dummyShadow } from "../../../../plugins/dummyShadow";
 import { playSfx } from "../../../../sound";
-import { bop, mouse } from "../../utils";
-import { gridContainer, makeGridMinibutton } from "../extraWindow";
-import { folderObj, infoForWindows, buttonSpacing, isGenerallyHoveringAWindow, isDraggingAWindow, isPreciselyHoveringAWindow, manageWindow } from "./windowsAPI";
+import { bop } from "../../utils";
+import { mouse } from "../../additives";
+import { folderObj, infoForWindows, isGenerallyHoveringAWindow, isDraggingAWindow, isPreciselyHoveringAWindow, manageWindow } from "./windowsAPI";
 
 export function calculateXButtonPosition(index, buttonSpacing = 75) {
     return folderObj.pos.x - buttonSpacing * (index) - buttonSpacing;
@@ -24,9 +23,10 @@ export function addMinibutton(idxForInfo, taskbarIndex, posToAdd = vec2(), initi
 		scale(1),
 		opacity(1),
 		rotate(0),
+		timer(),
 		drag(),
+		color(),
 		z(folderObj.z - 1),
-		"hover_outsideWindow",
 		"minibutton",
 		infoForWindows[Object.keys(infoForWindows)[idxForInfo]].icon == "extra" ? "extraMinibutton" : "",
 		{
@@ -35,6 +35,7 @@ export function addMinibutton(idxForInfo, taskbarIndex, posToAdd = vec2(), initi
 			window: get(`${Object.keys(infoForWindows)[idxForInfo]}`, { recursive: true })[0] ?? null,
 			windowInfo: infoForWindows[Object.keys(infoForWindows)[idxForInfo]],
 			windowKey: Object.keys(infoForWindows)[idxForInfo],
+			nervousSpinSpeed: 10,
 			saturation: 0,
 			saturationColor: WHITE,
 			defaultScale: vec2(1),
@@ -51,6 +52,7 @@ export function addMinibutton(idxForInfo, taskbarIndex, posToAdd = vec2(), initi
 				
 				if (this.extraMb) this.shut ? this.play("shut_hover") : this.play("open_hover")
 				else this.play("hover")
+				mouse.play("point")
 
 				if (this.is("extraMinibutton") || this.dragging) return
 				tween(currentMinibutton.pos.x, calculateXButtonPosition(this.taskbarIndex), 0.32, (p) => currentMinibutton.pos.x = p, easings.easeOutQuint)
@@ -65,7 +67,8 @@ export function addMinibutton(idxForInfo, taskbarIndex, posToAdd = vec2(), initi
 				
 				if (this.extraMb) this.shut ? this.play("shut_default") : this.play("open_default")
 				else this.play("default")
-	
+				mouse.play("cursor")
+
 				// reset some stuff
 				this.holdTimer = 0
 				this.beingHeld = false
@@ -113,14 +116,10 @@ export function addMinibutton(idxForInfo, taskbarIndex, posToAdd = vec2(), initi
 						}
 					}
 
-					// curDragging is gridMinibutton, this is waiting to be replaced, panic!!
+					// curDragging is gridMinibutton, this is waiting to be replaced, nervous, panic!!
 					else if (curDraggin?.is("gridMiniButton") && !this.is("extraMinibutton")) {
-						this.angle = wave(-4, 4, time () * 10)
+						this.angle = wave(-4, 4, time () * this.nervousSpinSpeed)
 						this.saturation = wave(0.01, 0.1, (time() * 3))
-
-						let distanceToCurDrag = this.screenPos().dist(curDraggin.screenPos())
-						this.opacity = map(distanceToCurDrag, 550, 30, 1, 0.25)
-						// debug.log(distanceToCurDrag)
 					}
 
 					// no curdragging
@@ -184,7 +183,7 @@ export function addMinibutton(idxForInfo, taskbarIndex, posToAdd = vec2(), initi
 						pos(calculateXButtonPosition(index), folderObj.pos.y),
 						color(BLACK),
 						anchor("center"),
-						opacity(1),
+						opacity(0.5),
 						"minibuttonslot",
 						"slot_" + index,
 						{
@@ -282,7 +281,7 @@ export function addMinibutton(idxForInfo, taskbarIndex, posToAdd = vec2(), initi
 		currentMinibutton.destinedPosition = calculateXButtonPosition(currentMinibutton.taskbarIndex)
 
 		// sets to the new position based on taskbarindex
-		tween(currentMinibutton.pos.x, calculateXButtonPosition(currentMinibutton.taskbarIndex), 0.32, (p) => currentMinibutton.pos.x = p, easings.easeOutQuint)
+		tween(currentMinibutton.pos.x, calculateXButtonPosition(currentMinibutton.taskbarIndex), 0.32, (p) => currentMinibutton.pos.x = p, easings.easeOutBack)
 	})
 
 	currentMinibutton.use(shader("saturate", () => ({

@@ -1,8 +1,8 @@
 import { GameState } from "../../../../gamestate.js";
-import { bop, getSides, mouse } from "../../utils.js";
+import { blendColors, bop, getSides } from "../../utils.js";
+import { mouse } from "../../additives.js";
 import { drag, curDraggin, setCurDraggin } from "../../../../plugins/drag.js";
 import { playSfx } from "../../../../sound.js";
-import { addShockwave } from "../../../../plugins/shockwave.js";
 
 // window contents
 import { storeWinContent } from "../store/storeWindows.js";
@@ -158,8 +158,11 @@ export function openWindow(windowKey = "") {
 	infoForWindows[windowKey].lastPos.y = clamp(infoForWindows[windowKey].lastPos.y, height() - windowObj.height / 2, -windowObj.height / 2)
 	windowObj.pos = infoForWindows[windowKey].lastPos
 
+	let xButtonSelection;
 	let xButton = windowObj.add([
-		text("X"),
+		text("X", {
+			font: "lambda",
+		}),
 		color(WHITE),
 		pos(-windowObj.width / 2, -windowObj.height / 2),
 		z(windowObj.z + 1),
@@ -195,23 +198,20 @@ export function openWindow(windowKey = "") {
 	})
 
 	windowObj.onHover(() => {
-		get("hover_outsideWindow").forEach(hoverObj => {
-			if (hoverObj.isHovering() && hoverObj.endHover) {
-				if (!curDraggin == hoverObj) hoverObj.endHover()
+		get("minibutton").forEach(minibutton => {
+			if (minibutton.isHovering() && !minibutton.dragging) {
+				minibutton.endHover()
 			}
-		})
+		}) 
 
 		// check if hovering any window button, if it it's not start pointing, if yes don't point
 		if (!isDraggingAWindow && !xButton.isHovering()) mouse.play("cursor")
 	})
 
 	windowObj.onHoverEnd(() => {
-		get("hover_outsideWindow").forEach(hoverObj => {
-			if (hoverObj.isHovering() && hoverObj.startHover) {
-				if (!curDraggin == hoverObj) {
-					hoverObj.endHover()
-					mouse.play("point")
-				}
+		get("minibutton").forEach(minibutton => {
+			if (minibutton.isHovering() && !minibutton.dragging) {
+				minibutton.startHover()
 			}
 		})
 	})
@@ -374,9 +374,10 @@ export function folderObjManaging() {
 		}
 	])
 
-	// this HAS to exist because if not how can you tell the hotkey was being pressed if the object doesn't exist
-	// tf you mean by exist?
+	// this can't be attached to the buttons because you won't be able to call the event if the buttons don't exist
 	folderObj.onCharInput((key) => {
+		if (isKeyDown("control")) return
+
 		// Parse the key input to get the number pressed
 		const numberPressed = parseInt(key);
 		if (isNaN(numberPressed)) return; // If the key is not a number, return
@@ -429,6 +430,20 @@ export function folderObjManaging() {
 			isInClickingRangeOfAWindow = window.isMouseInClickingRange()
 			isDraggingAWindow = window.dragging
 		})
+	})
+
+	// manages behaviour related tothe closeest minibutton
+	onUpdate("closestMinibuttonToDrag", (minibutton) => {
+		if (!curDraggin?.is("gridMiniButton")) return
+		if (curDraggin?.screenPos().dist(minibutton.screenPos()) > 120) return
+		let distanceToCurDragging = curDraggin?.screenPos().dist(minibutton.screenPos())
+	
+		let blackness = map(distanceToCurDragging, 20, 120, 1, 0.25)
+		minibutton.opacity = map(distanceToCurDragging, 20, 120, 0.5, 1)
+		minibutton.scale.x = map(distanceToCurDragging, 20, 120, 0.8, 1)
+		minibutton.scale.y = map(distanceToCurDragging, 20, 120, 0.8, 1)
+		minibutton.scale.y = map(distanceToCurDragging, 20, 120, 0.8, 1)
+		minibutton.color = blendColors(WHITE, BLACK, blackness)
 	})
 }
 

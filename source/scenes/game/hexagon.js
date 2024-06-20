@@ -1,7 +1,8 @@
 
 import { GameState } from "../../gamestate.js";
 import { scoreText, spsText } from "./uicounters.js";
-import { mouse, formatNumber, arrayToColor } from "./utils.js";
+import { formatNumber, arrayToColor } from "./utils.js";
+import { mouse } from "./additives.js";
 import { playSfx } from "../../sound.js";
 import { isDraggingAWindow, isGenerallyHoveringAWindow, isPreciselyHoveringAWindow, manageWindow } from "./windows/windows-api/windowsAPI.js";
 import { waver } from "../../plugins/wave.js";
@@ -72,7 +73,6 @@ export function addHexagon() {
 		z(2),
 		waver({ maxAmplitude: 5, wave_speed: 1 }),
 		"hexagon",
-		"hover_outsideWindow",
 		{
 			isBeingHoveredOn: false,
 			smallestScale: 0.985,
@@ -129,14 +129,12 @@ export function addHexagon() {
 				consecutiveClicksWaiting.cancel()
 				consecutiveClicksWaiting = wait(1, () => {
 					clickVars.constantlyClicking = false
+					if (scoreVars.combo < 2) clickVars.consecutiveClicks = 0
 				})
 
 				// if consecutiveclicks is not combo_maxclicks increase clicks
 				if (clickVars.consecutiveClicks != COMBO_MAXCLICKS) {
 					clickVars.consecutiveClicks++
-					
-					// if (scoreVars.combo > 1) {
-					// }
 				}
 
 				// checks for first combo
@@ -273,6 +271,7 @@ export function addHexagon() {
 					tween(this.scaleIncrease, 1.05, 0.35, (p) => this.scaleIncrease = p, easings.easeOutCubic);
 					this.rotationSpeed += hoverRotSpeedIncrease
 					this.isBeingHoveredOn = true
+					mouse.play("point")
 				}
 			},
 
@@ -282,6 +281,7 @@ export function addHexagon() {
 					this.isBeingClicked = false
 					this.rotationSpeed = 0
 					this.isBeingHoveredOn = false
+					mouse.play("cursor")
 				}
 			}
 		}
@@ -340,7 +340,7 @@ export function addHexagon() {
 			secondTimerForClicks = 0;
 
 			// shoutout to Candy&Carmel
-			let divideValue = Math.pow(60, GameState.settings.spsTextMode-1);
+			let divideValue = GameState.settings.spsText ? Math.pow(60, GameState.settings.spsTextMode-1) : 1;
 			spsText.value = (clickVars.clicksPerSecond / divideValue).toFixed(1)
 			clickVars.clicksPerSecond = 0;
 		}

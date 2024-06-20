@@ -2,7 +2,7 @@
 import { GameState } from "./gamestate.js"
 import { positionSetter } from "./plugins/positionSetter.js";
 import { panderitoIndex } from "./scenes/game/gamescene.js";
-import { bop, gameBg } from "./scenes/game/utils.js";
+import { bop } from "./scenes/game/utils.js";
 
 let bg;
 let volumeText;
