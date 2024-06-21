@@ -24,17 +24,12 @@ function typeToColor(type) {
 	else return rgb(22, 22, 22)
 }
 
-function GetbuttonPosBasedOnValue(coloredObj, type = "r", theOneBehind) {
+function GetbuttonPosBasedOnValue(value, type = "r", theOneBehind) {
 	let xPos;
 	
-	if (coloredObj.is("hexagon")) {
-		xPos = map(coloredObj.color[type], 0, 255, getSides(theOneBehind).left, getSides(theOneBehind).right);
-	}
+	if (type != "a") xPos = map(value, 0, 255, getSides(theOneBehind).left, getSides(theOneBehind).right)
+	else xPos = map(value, 0, 1, getSides(theOneBehind).left, getSides(theOneBehind).right);
 
-	else {
-		if (type != "a") xPos = map(coloredObj.tintColor[type], 0, 255, getSides(theOneBehind).left, getSides(theOneBehind).right)
-		else xPos = map(coloredObj.blendFactor, 0, 1, getSides(theOneBehind).left, getSides(theOneBehind).right);
-	}
 	return xPos;
 }
 
@@ -80,7 +75,7 @@ function addRgbSlider(winParent, posToAdd = vec2(0), coloredObj, type = "r") {
 
 	sliderButton = winParent.add([
 		rect(10, 35, { radius: 2.5  }),
-		pos(GetbuttonPosBasedOnValue(coloredObj, type, theOneBehind), theOneBehind.pos.y),
+		pos(GetbuttonPosBasedOnValue(coloredObj.color[type], type, theOneBehind), theOneBehind.pos.y),
 		color(BLACK),
 		anchor("center"),
 		area({ scale: vec2(3.5, 1) }),
@@ -274,21 +269,20 @@ export function colorWinContent(winParent, winType = "hexColorWin") {
 	])
 
 	objToColor.onUpdate(() => {
-		if (winType == "hexColorWin" && objToColor == hexagon) {
+		objToColor.color.r = rSlider.value
+		objToColor.color.g = gSlider.value
+		objToColor.color.b = bSlider.value
+		if (winType == "bgColorWin") objToColor.color.a = aSlider.value
+		
+		if (winType == "hexColorWin" && objToColor === hexagon) {
 			GameState.settings.hexColor = [rSlider.value, gSlider.value, bSlider.value]
 			winParent.color = hexagon.color.lighten(150)
-			objToColor.color.r = rSlider.value
-			objToColor.color.g = gSlider.value
-			objToColor.color.b = bSlider.value
 		}
 
-		else if (winType == "bgColorWin" && objToColor == gameBg) {
+		else if (winType == "bgColorWin" && objToColor === gameBg) {
 			GameState.settings.bgColor = [rSlider.value, gSlider.value, bSlider.value, aSlider.value]
-			winParent.color = blendColors(gameBg.tintColor.lighten(200), gameBg.tintColor, gameBg.blendFactor)
-			objToColor.tintColor.r = rSlider.value
-			objToColor.tintColor.g = gSlider.value
-			objToColor.tintColor.b = bSlider.value
-		}		
+			winParent.color = blendColors(gameBg.color.lighten(200), gameBg.color, gameBg.color.a)
+		}
 	})
 
 	defaultButton.onClick(() => {
@@ -304,7 +298,7 @@ export function colorWinContent(winParent, winType = "hexColorWin") {
 			excludedSliders.forEach(slider => {
 				tween(slider.button.pos.x, getSides(slider.bg).left, 0.2, (p) => slider.button.pos.x = p, easings.easeOutQuint)
 			})
-			tween(aSlider.button.pos.x, aSlider.bg.pos.x + 16, 0.2, (p) => aSlider.button.pos.x = p, easings.easeOutQuint)
+			tween(aSlider.button.pos.x, GetbuttonPosBasedOnValue(0.88, "a", aSlider.bg), 0.2, (p) => aSlider.button.pos.x = p, easings.easeOutQuint)
 		}
 	})
 

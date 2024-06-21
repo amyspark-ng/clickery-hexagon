@@ -2,61 +2,91 @@ import { gamescene } from "./scenes/game/gamescene.js"
 import { introscene } from "./scenes/introScene.js"
 import { focuscene } from "./scenes/focuscene.js"
 import { ascendscene } from "./scenes/game/ascendscene.js"
+import { k } from "./main.js"
 
-function drawSeriousLoadScreen() {
-	onLoading((progress) => {
-		drawRect({
-			width: width(),
-			height: height(),
-			color: BLACK,
-			opacity: map(progress, 0, 0.25, 0, 1)
-		})
+export function drawSeriousLoadScreen(progress, op = 1) {
+	function drawHexagon(opts = {
+		pos: center(),
+		scale: vec2(1),
+		opacity: 1,
+		color: WHITE,
+	}) {
+		const centerX = 0;
+		const centerY = 0;
+		const radius = 100;
+	
+		const pts = [];
+		const colors = [];
+	
+		for (let i = 0; i < 6; i++) {
+			const angle = Math.PI / 3 * i;
+			const x = centerX + radius * Math.cos(angle);
+			const y = centerY + radius * Math.sin(angle);
+			pts.push(vec2(x, y));
+	
+			// Generate colors for each vertex
+			colors.push(rgb(
+				Math.floor(Math.random() * 128 + 128),
+				Math.floor(Math.random() * 128 + 128),
+				Math.floor(Math.random() * 128 + 128)
+			));
+		}
+	
+		drawPolygon({
+			pos: opts.pos,
+			opacity: opts.opacity,
+			scale: opts.scale,
+			color: opts.color,
+			pts: pts,
+		});
+	}
+	
+	drawRect({
+		width: width(),
+		height: height(),
+		color: BLACK,
+	})
 
-		drawSprite({
-			sprite: "hexagon",
-			scale: vec2(wave(-0.25, 0.25, time() * 3) ,0.25),
-			color: WHITE,
-			anchor: "center",
-			pos: vec2(width() - 60, height() - 75),
-			opacity: map(progress, 0, 0.25, 0, 1),
-		})
+	drawHexagon({
+		pos: vec2(963, 495),
+		opacity: op,
+		scale: vec2(wave(-0.5, 0.5, time() * 3), 0.5),
+		color: WHITE,
+	})
 
-		drawText({
-			text: `LOADING ${Math.round(progress * 100)}%`,
-			size: 40,
-			color: WHITE,
-			anchor: "right",
-			pos: vec2(899, 525),
-			opacity: map(progress, 0, 0.25, 0, 1),
-		})
+	drawText({
+		text: `LOADING ${Math.round(progress * 100)}%`,
+		size: 40,
+		color: WHITE,
+		anchor: "right",
+		pos: vec2(899, 525),
+		opacity: op,
+	})
 
-		// bar
-		drawRect({
-			width: map(progress, 0, 1, 5, width() - 5), 
-			radius: 2.5,
-			height: 10,
-			anchor: "left",
-			pos: vec2(5, height() - 10),
-			opacity: map(progress, 0, 0.25, 0, 1),
-		})
+	// bar
+	drawRect({
+		width: map(progress, 0, 1, 5, width() - 5), 
+		radius: 2.5,
+		height: 10,
+		anchor: "left",
+		pos: vec2(5, height() - 10),
+		opacity: op,
 	})
 }
 
-function drawDevkyLoadScreen() {
-	onLoading((progress) => {
-		drawRect({
-			width: width(),
-			height: height(),
-			color: BLACK,
-		})
-		
-		drawSprite({
-			sprite: "devky",
-			anchor: "topleft",
-			pos: 0,
-			width: map(progress, 0, 1, 0, width()),
-			height: height(),
-		})
+function drawDevkyLoadScreen(progress) {
+	drawRect({
+		width: width(),
+		height: height(),
+		color: BLACK,
+	})
+	
+	drawSprite({
+		sprite: "devky",
+		anchor: "topleft",
+		pos: 0,
+		width: map(progress, 0, 1, 0, width()),
+		height: height(),
 	})
 }
 
@@ -68,6 +98,8 @@ export function loadEverything() {
 	loadSprite("devky", "./image.png")
 	loadRoot("./assets/")
 	
+	if (!k.debug) {load(new Promise((res) => { setTimeout(() => { res() }, 5000) })) }
+
 	//#region SPRITES
 	// cursors
 	loadSprite("cursors", "sprites/cursors.png", {
@@ -457,6 +489,8 @@ export function loadEverything() {
 
 	//#endregion
 
+	if (!k.debug) {load(new Promise((res) => { setTimeout(() => { res() }, 5000) })) }
+
 	// #region clickerius hernelius  
 	loadSpriteAtlas("sprites/ascendscene/hexAgony.png", {
 		"mage_body": {
@@ -527,6 +561,8 @@ export function loadEverything() {
 	//#endregion SPRITES
 
 	// #region SOUNDS
+	if (!k.debug) {load(new Promise((res) => { setTimeout(() => { res() }, 5000) })) }
+
 	loadSound("volumeChange", "sounds/volumeChange.mp3")
 	loadSound("whistle", "sounds/sfx/whistle.ogg")
 	loadSound("mage_e", "sounds/mage_e.mp3")
@@ -549,6 +585,8 @@ export function loadEverything() {
 	// music
 	// don't load as music because then it won't play when the game loads
 	// only done on debug to make the game load quicker since im not listening the music really
+	if (!k.debug) {load(new Promise((res) => { setTimeout(() => { res() }, 5000) })) }
+
 	loadMusic("clicker.wav", "sounds/music/clicker.ogg")
 	loadMusic("menu.wav", "sounds/music/menu.ogg")
 	loadMusic("whatttt.wav", "sounds/music/whatttt.ogg")
@@ -563,6 +601,8 @@ export function loadEverything() {
 	//#endregion MUSIC
 
 	// #region OTHER STUFF
+	if (!k.debug) {load(new Promise((res) => { setTimeout(() => { res() }, 5000) })) }
+
 	loadFont("apl386", "https://kaboomjs.com/examples/fonts/apl386.ttf", {
 		outline: 4,
 		filter: "linear",
@@ -587,6 +627,8 @@ export function loadEverything() {
 		filter: "linear"
 	})
 
+	if (!k.debug) {load(new Promise((res) => { setTimeout(() => { res() }, 5000) })) }
+	
 	// made by MF
 	loadShader("checkeredBg", null, `
 	uniform float u_time;
@@ -625,6 +667,17 @@ export function loadEverything() {
 			return (c + vec4(mix(vec3(0), vec3(1), saturation), 0)) * col;
 		}
 	`)
+
+	// made by MF
+	loadShader("grayscale", null, `
+		vec4 frag(vec2 pos, vec2 uv, vec4 color, sampler2D tex) {
+			vec4 c = def_frag();
+			return vec4(vec3(dot(c.rgb, vec3(0.2125, 0.7154, 0.0721))), c.a);
+		}
+	`)
+	
+	if (!k.debug) {load(new Promise((res) => { setTimeout(() => { res() }, 5000) })) }
+
 	focuscene()
 	introscene()
 	gamescene()
@@ -632,7 +685,6 @@ export function loadEverything() {
 	//#endregion OTHER STUFF
 
 	// 20% of getting devky's funny loading screen 
-	// if (chance(0.2)) drawDevkyLoadScreen()
-	// else drawSeriousLoadScreen()
-	drawSeriousLoadScreen()
+	if (chance(0.2)) onLoading((progress) => drawDevkyLoadScreen(progress))
+	else onLoading((progress) => drawSeriousLoadScreen(progress))
 }

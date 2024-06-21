@@ -12,6 +12,8 @@ import { settingsWinContent } from "../settingsWindow.js";
 import { ascendWinContent } from "../ascendWindow.js";
 import { extraWinContent } from "../extraWindow.js";
 import { addMinibutton, calculateXButtonPosition } from "./windowsAPI-utils.js";
+import { hexagon } from "../../hexagon.js";
+import { creditsWinContent } from "../creditsWin.js";
 
 export let infoForWindows = {};
 export let isGenerallyHoveringAWindow = false;
@@ -62,7 +64,7 @@ export function windowsDefinition() {
 		// vertical
 		"aboutWin": { idx: 5, content: emptyWinContent, lastPos: vec2(center().x, center().y) },
 		// vertical
-		"creditsWin": { idx: 6, content: emptyWinContent, lastPos: vec2(center().x, center().y) },
+		"creditsWin": { idx: 6, content: creditsWinContent, lastPos: vec2(center().x, center().y) },
 		// vertical
 		"settingsWin": { idx: 7, content: settingsWinContent, lastPos: vec2(center().x, center().y) },
 		// vertical
@@ -116,10 +118,22 @@ export function openWindow(windowKey = "") {
 
 			activate() {
 				this.use("active")
+
+				if (!this.is("shader")) return
+				this.unuse("shader")
+				this.get("*", { recursive: true }).forEach((obj) => {
+					obj.unuse("shader")
+				})
 			},
 
 			deactivate() {
 				this.unuse("active")
+
+				if (this.is("shader")) return
+				this.use(shader("grayscale"))
+				this.get("*", { recursive: true }).forEach((obj) => {
+					obj.use(shader("grayscale"))
+				})
 			},
 
 			isMouseInClickingRange() {
@@ -202,7 +216,11 @@ export function openWindow(windowKey = "") {
 			if (minibutton.isHovering() && !minibutton.dragging) {
 				minibutton.endHover()
 			}
-		}) 
+		})
+
+		if (hexagon.isHovering()) {
+			hexagon.endHover()
+		}
 
 		// check if hovering any window button, if it it's not start pointing, if yes don't point
 		if (!isDraggingAWindow && !xButton.isHovering()) mouse.play("cursor")
@@ -214,6 +232,10 @@ export function openWindow(windowKey = "") {
 				minibutton.startHover()
 			}
 		})
+
+		if (hexagon.isHovering()) {
+			hexagon.startHover()
+		}
 	})
 
 	windowObj.onMousePress(() => {

@@ -5,8 +5,9 @@ export function focuscene() {
 	return scene("focuscene", () => {
 		addBackground()
 		addMouse()
-		gameBg.tintColor = BLACK
-		gameBg.blendFactor = 1
+		gameBg.movAngle = -5
+		gameBg.color = BLACK
+		gameBg.color.a = Number(1)
 		
 		volumeManager()
 

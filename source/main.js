@@ -1,7 +1,7 @@
 import kaplay from "kaplay";
 import "kaplay/global";
 
-import { loadEverything } from "./loader.js"
+import { drawSeriousLoadScreen, loadEverything } from "./loader.js"
 
 export const k = kaplay({
 	width: 1024,
@@ -27,18 +27,18 @@ export let gl = kanvas.getContext("2d")
 export let ROOT = getTreeRoot()
 
 onLoad(() => {
-	let drawEvent = onDraw(() => {
-		drawRect({
-			width: width(),
-			height: height(),
-			color: BLACK,
+	if (!k.debug) {
+		let opacity = 1
+		tween(opacity, 0, 1, (p) => opacity = p, easings.linear)
+	
+		let drawEvent = onDraw(() => {
+			drawSeriousLoadScreen(1, opacity)
 		})
-	})
-
-	go("focuscene")
-	// wait(1, () => {
-	// 	drawEvent.cancel()
-	// })
+	
+		wait(1, () => {
+			drawEvent.cancel()
+			go("focuscene")
+		})
+	}
+	else go("focuscene")
 })
-// if (!k.debug) go("focuscene")
-// else go("gamescene")

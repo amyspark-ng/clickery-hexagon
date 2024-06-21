@@ -70,7 +70,7 @@ export let GameState = {
 		music: new VolumeData(1, false),
 		volume: 1,
 		hexColor: [255, 255, 255],
-		bgColor: [0, 0, 0, 0.55],
+		bgColor: [0, 0, 0, 0.84],
 		keepAudioOnTabChange: true,
 		dropDragsOnMouseOut: true,
 		shortNumbers: false,

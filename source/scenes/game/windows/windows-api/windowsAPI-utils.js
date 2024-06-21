@@ -54,7 +54,7 @@ export function addMinibutton(idxForInfo, taskbarIndex, posToAdd = vec2(), initi
 				else this.play("hover")
 				mouse.play("point")
 
-				if (this.is("extraMinibutton") || this.dragging) return
+				if (this.extraMb || this.dragging) return
 				tween(currentMinibutton.pos.x, calculateXButtonPosition(this.taskbarIndex), 0.32, (p) => currentMinibutton.pos.x = p, easings.easeOutQuint)
 			},
 
@@ -73,7 +73,7 @@ export function addMinibutton(idxForInfo, taskbarIndex, posToAdd = vec2(), initi
 				this.holdTimer = 0
 				this.beingHeld = false
 				
-				if (this.is("extraMinibutton") || this.dragging) return
+				if (this.extraMb || this.dragging) return
 				tween(currentMinibutton.pos.x, calculateXButtonPosition(this.taskbarIndex), 0.32, (p) => currentMinibutton.pos.x = p, easings.easeOutQuint)
 			},
 			
@@ -92,7 +92,7 @@ export function addMinibutton(idxForInfo, taskbarIndex, posToAdd = vec2(), initi
 				}
 
 				else {
-					if (curDraggin?.is("minibutton") && !this.is("extraMinibutton")) {
+					if (curDraggin?.is("minibutton") && !this.extraMb) {
 						// spinning
 						// if it's waiting to be swapped
 						this.angle = wave(-8, 8, time () * 3)
@@ -117,7 +117,7 @@ export function addMinibutton(idxForInfo, taskbarIndex, posToAdd = vec2(), initi
 					}
 
 					// curDragging is gridMinibutton, this is waiting to be replaced, nervous, panic!!
-					else if (curDraggin?.is("gridMiniButton") && !this.is("extraMinibutton")) {
+					else if (curDraggin?.is("gridMiniButton") && !this.extraMb) {
 						this.angle = wave(-4, 4, time () * this.nervousSpinSpeed)
 						this.saturation = wave(0.01, 0.1, (time() * 3))
 					}
@@ -156,7 +156,7 @@ export function addMinibutton(idxForInfo, taskbarIndex, posToAdd = vec2(), initi
 			},
 
 			draw() {
-				if (debug.inspect && !this.is("extraMinibutton")) {
+				if (debug.inspect && !this.extraMb) {
 					drawText({
 						text: this.taskbarIndex,
 						pos: vec2(0, -this.height),
@@ -176,7 +176,7 @@ export function addMinibutton(idxForInfo, taskbarIndex, posToAdd = vec2(), initi
 				this.pick()
 
 				this.z = mouse.z - 1
-				get("minibutton").filter(minibutton => !minibutton.is("extraMinibutton")).forEach((minibutton, index) => {
+				get("minibutton").filter(minibutton => !minibutton.extraMb).forEach((minibutton, index) => {
 					// add slots
 					add([
 						rect(20, 20, { radius: 4 }),
@@ -307,49 +307,35 @@ export function addMinibutton(idxForInfo, taskbarIndex, posToAdd = vec2(), initi
 		}
 	})
 
-	currentMinibutton.onMouseDown((button) => {
+	let holdWaiting = wait();
+	currentMinibutton.onMousePress("left", () => {
 		if (!currentMinibutton.isHovering()) return
-		if (button != "left") return
-		if (currentMinibutton.is("extraMinibutton")) return
-		if (currentMinibutton.beingHeld == false) {
-			currentMinibutton.holdTimer += dt()
-		}
-		
-		if (currentMinibutton.holdTimer > 0.1 && currentMinibutton.beingHeld == false) {
-			currentMinibutton.beingHeld = true
-			
-			// hold function
+		if (currentMinibutton.extraMb) return
+
+		holdWaiting.cancel()
+		holdWaiting = wait(0.1, () => {
 			currentMinibutton.pickFromTaskbar()
-		}
+		})
 	})
 
 	currentMinibutton.onMouseRelease((button) => {
 		if (!currentMinibutton.isHovering()) return
 		if (button != "left") return
-		// was holding
-		if (currentMinibutton.beingHeld == false) {
-			currentMinibutton.holdTimer = 0
-			currentMinibutton.beingHeld = false
+		holdWaiting.cancel()
 
+		// wasn't dragggin
+		if (!currentMinibutton.dragging) {
+			if (curDraggin) return
+			
 			// click function
 			if (isPreciselyHoveringAWindow || isDraggingAWindow) return
 			manageWindow(currentMinibutton.windowKey)
 			bop(currentMinibutton)
-
-			// manages open closed animation
-			if (currentMinibutton.extraMb) {
-				currentMinibutton.shut = !currentMinibutton.shut
-				currentMinibutton.play(currentMinibutton.shut ? "shut_hover" : "open_hover")
-				// will always play hover since you're clicking it will be hovered lol
-			}
 		}
-	
-		else if (currentMinibutton.beingHeld == true) {
-			currentMinibutton.holdTimer = 0
-			currentMinibutton.beingHeld = false
 
+		// was dragging
+		else if (currentMinibutton.dragging) {
 			// release hold function
-			if (!currentMinibutton.isHovering()) return
 			if (curDraggin == currentMinibutton) {
 				currentMinibutton.drop()
 			}

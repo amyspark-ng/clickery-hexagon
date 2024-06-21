@@ -1,9 +1,6 @@
 import { GameState } from "../../gamestate";
-import { curDraggin } from "../../plugins/drag";
-import { autoLoopTime, excessTime, panderitoIndex } from "./gamescene";
-import { hexagon, scoreVars } from "./hexagon";
-import { isHoveringUpgrade } from "./windows/store/upgrades";
-import { isDraggingAWindow, isGenerallyHoveringAWindow, isPreciselyHoveringAWindow, manageWindow, openWindow } from "./windows/windows-api/windowsAPI";
+import { addToast } from "./additives";
+import { autoLoopTime, cam, excessTime, panderitoIndex } from "./gamescene";
 
 // definetely not chatgpt
 export function formatNumber(number = 0, short = true, isPrice = false) {
@@ -219,4 +216,59 @@ export function shrink(obj, howMuch) {
 	if (!obj.shrinkDefScale) obj.shrinkDefScale = obj.scale
 	
 	tween(obj.scale, obj.scale.sub(obj.scale), 0.15, (p) => obj.scale = p, easings.easeOutQuint)
+}
+
+export function debugTexts() {
+	let texty = add([
+		text("", {
+			size: 20
+		}),
+		pos(-50, 60),
+		anchor("topleft"),
+		"debugText",
+		{
+			update() {
+				this.text = `
+				timeUntilAutoLoopEnds: ${GameState.timeUntilAutoLoopEnds}
+				autoLoopTime: ${autoLoopTime.toFixed(4)}
+				excessTime: ${excessTime.toFixed(4)}
+				masterVolume: ${GameState.settings.volume}
+				sfx: ${GameState.settings.sfx.volume}
+				music: ${GameState.settings.music.volume}
+				`.trim()
+			}
+		}
+	])
+
+	texty.hidden = true
+	texty.paused = true
+}
+
+export function debugFunctions() {
+	debugTexts()
+	
+	window.taskbar = function() {
+		console.log(GameState.taskbar)
+	}
+	
+	onUpdate(() => {
+		// if (isKeyDown("control")) {
+		if (isKeyPressed("c")) GameState.save(true)
+		else if (isKeyPressed("v")) GameState.delete()
+		else if (isKeyPressed("b")) GameState.cheat()
+		else if (isKeyPressed("r") && panderitoIndex != 6) go("gamescene")
+		
+		else if (isKeyPressed("g")) addToast({ title: "Welcome back!", body: "Now with a body" })
+		else if (isKeyPressed("h")) addToast({ title: "Welcome back!", body: "Did you know there's actually a limit to how long these body texts can b-"})
+		else if (isKeyPressed("j")) addToast({ title: "Welcome back!", body: "Now with a body and an icon too", icon: "cursor" })
+	})
+
+	// #region debug stuff
+	onScroll((delta)=>{
+		cam.scale = cam.scale * (1 - 0.1 * Math.sign(delta.y))
+	})
+
+	onMousePress("middle", () => {
+		cam.scale = 1
+	})
 }

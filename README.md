@@ -18,5 +18,8 @@ To build:
 - MF - Code & Shaders
 - Khriz28 - Playtesting & Support
 
+### Extra:
+- [Lambda font](https://ggbot.itch.io/lambda-font)
+
 BROKE COMMIT HISTORY BY RENAMING COMMIT :(
 ![alt text](proof.png)

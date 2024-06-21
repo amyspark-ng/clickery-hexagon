@@ -95,10 +95,14 @@ export function addComboBar() {
 	return barFrame;
 }
 
-export function addPlusScoreText(posToAdd, amount, size = [40, 50]) {
+export function addPlusScoreText(opts = {posToAdd: vec2(), amount: 1, manual: true }) {
+	let size;
+	if (opts.manual) size = [40, 50]
+	else size = [32.5, 40]
+
 	let textBlendFactor = 0;
 	let plusScoreText = add([
-		text(`[combo]+${formatNumber(amount, true, false)}`, {
+		text(`${opts.manual ? "[combo]" : ""}+${formatNumber(opts.amount, true, false)}`, {
 			size: rand(size[0], size[1]),
 			font: "lambdao",
 			styles: {
@@ -116,31 +120,26 @@ export function addPlusScoreText(posToAdd, amount, size = [40, 50]) {
 				})
 			}
 		}),
-		pos(posToAdd),
+		pos(opts.posToAdd),
 		rotate(0),
 		anchor("center"),
 		z(4),
 		"plusScoreText",
 		{
-			// TODO: i like this, look at it !!!
-			// dir: vec2(rand(-200, 200), 200),
-			// update() {
-			// 	this.angle += this.dir.x / 100
-			// 	this.dir.y += 10
-			// 	this.move(this.dir)
-			// },
 			update() {
+				if (!opts.manual) return
 				textBlendFactor = map(scoreVars.combo, 1, 10, 0, 1)
 			}
 		}
 	])
 
-	if (scoreVars.combo > 1) plusScoreText.text += `x${Math.floor(scoreVars.combo)}`
-	plusScoreText.text += "[/combo]"
-	// debug.log(plusScoreText.text)
+	if (opts.manual) {
+		if (scoreVars.combo > 1) plusScoreText.text += `x${Math.floor(scoreVars.combo)}`
+		plusScoreText.text += "[/combo]"
+	}
 
-	plusScoreText.pos.x = posToAdd.x + 2
-	plusScoreText.pos.y = posToAdd.y - 18
+	plusScoreText.pos.x = opts.posToAdd.x + 2
+	plusScoreText.pos.y = opts.posToAdd.y - 18
 
 	// animate plusscoretext
 	tween(
@@ -169,7 +168,7 @@ export function addPlusScoreText(posToAdd, amount, size = [40, 50]) {
 		destroy(plusScoreText);
 	});
 
-	if (plusScoreText.pos.x > posToAdd.x) plusScoreText.anchor = "left"
+	if (plusScoreText.pos.x > opts.posToAdd.x) plusScoreText.anchor = "left"
 	else plusScoreText.anchor = "right"
 }
 

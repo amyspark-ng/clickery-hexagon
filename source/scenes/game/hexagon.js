@@ -10,6 +10,7 @@ import { isDraggingASlider } from "./windows/colorWindow.js";
 import { addPlusScoreText, comboBarContent, getClicksFromCombo, increaseCombo, maxBarWidth, startCombo } from "./combo-utils.js";
 import { addConfetti } from "../../plugins/confetti.js";
 import { curDraggin } from "../../plugins/drag.js";
+import { cam } from "./gamescene.js";
 
 export let scoreVars = {
 	scorePerClick: 1,
@@ -34,10 +35,10 @@ export const COMBO_MAX = 10
 
 let consecutiveClicksWaiting = null;
 
-export let autoScorePerSecond = 0; // the score per second you're getting automatically
-export let actualScorePerSecond = 0; // the actual and current score per second
-let clicksPerSecond = 0; // to properly calculate sps
-let secondTimerForClicks = 0; // to properly calculate sps
+// export let autoScorePerSecond = 0; // the score per second you're getting automatically
+// export let actualScorePerSecond = 0; // the actual and current score per second
+// let clicksPerSecond = 0; // to properly calculate sps
+let spsUpdaterTimer = 0; // to properly calculate sps
 
 export let hexagon;
 
@@ -154,12 +155,13 @@ export function addHexagon() {
 				if (scoreVars.combo == 10 && clickVars.maxedCombo == false) {
 					clickVars.maxedCombo = true
 					addConfetti({ pos: center() })
+					tween(-10, 0, 0.5, (p) => cam.rotation = p, easings.easeOutQuint)
 				}
 
 				// debug.log(`${clickVars.consecutiveClicks} / ${COMBO_MAXCLICKS}`)
 
 				// # actual score additions
-				addPlusScoreText(mouse.pos, scoreVars.scorePerClick)
+				addPlusScoreText({posToAdd: mousePos(), amount: scoreVars.scorePerClick, manual: true})
 				GameState.addScore(scoreVars.scorePerClick * scoreVars.combo)
 				tween(scoreText.scaleIncrease, 1.05, 0.2, (p) => scoreText.scaleIncrease = p, easings.easeOutQuint).onEnd(() => {
 					tween(scoreText.scaleIncrease, 1, 0.2, (p) => scoreText.scaleIncrease = p, easings.easeOutQuint)
@@ -236,7 +238,7 @@ export function addHexagon() {
 							tween(hexagon.scaleIncrease, hexagon.isHovering() ? 1.05: 1, 0.35, (p) => hexagon.scaleIncrease = p, easings.easeOutQuint)
 							playSfx("clickRelease", rand(-50, 50))
 							
-							addPlusScoreText(autoCursor.pos, scoreVars.scorePerAutoClick, [32.5, 40])
+							addPlusScoreText({posToAdd: autoCursor.pos, amount: scoreVars.scorePerAutoClick, manual: false})
 							GameState.addScore(scoreVars.scorePerAutoClick)
 			
 							// has done its bidding, time to roll and dissapear
@@ -335,13 +337,13 @@ export function addHexagon() {
 		// scorePerAutoClick += Math.round(percentage(scorePerAutoClick, GameState.cursorsPercentage))
 
 		// sps
-		secondTimerForClicks += dt();
-		if (secondTimerForClicks > 1) {
-			secondTimerForClicks = 0;
+		spsUpdaterTimer += dt();
+		if (spsUpdaterTimer > 1) {
+			spsUpdaterTimer = 0;
 
 			// shoutout to Candy&Carmel
 			let divideValue = GameState.settings.spsText ? Math.pow(60, GameState.settings.spsTextMode-1) : 1;
-			spsText.value = (clickVars.clicksPerSecond / divideValue).toFixed(1)
+			spsText.value = (Number(scoreVars.actualScorePerSecond) / divideValue)
 			clickVars.clicksPerSecond = 0;
 		}
 

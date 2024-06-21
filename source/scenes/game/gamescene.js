@@ -1,8 +1,8 @@
 import { GameState } from "../../gamestate"
 import { scoreVars, addHexagon, hexagon } from "./hexagon.js"
 import { uiCounters } from "./uicounters"
-import { arrayToColor } from "./utils"
-import { addToast, debugFunctions, debugTexts, gameBg, mouse } from "./additives"
+import { arrayToColor, debugFunctions } from "./utils"
+import { addToast, gameBg, mouse } from "./additives"
 import { playMusic } from "../../sound"
 import { folderObjManaging, windowsDefinition } from "./windows/windows-api/windowsAPI"
 import { songs } from "./windows/musicWindow"
@@ -82,8 +82,6 @@ export function gamescene() {
 		folderObjManaging()
 		windowsDefinition()
 
-		debugTexts()
-
 		setGravity(1600)
 
 		GameState.load()
@@ -99,22 +97,14 @@ export function gamescene() {
 			})
 		})
 
-		onKeyPress("j", () => {
-			addToast({ title: "This is a title", body: "This is a body", color: GREEN })
-		})
-		onKeyPress("k", () => {
-			addToast({ title: "Unlocked store window", body: "This is a body", color: BLUE })
-		})
-
 		// set bg valeus
-		tween(1, 0.55, 0.5, (p) => gameBg.blendFactor = p, easings.easeOutQuad)
-		tween(BLACK, arrayToColor(GameState.settings.bgColor), 0.5, (p) => gameBg.tintColor = p, easings.easeOutQuad)
+		tween(BLACK, arrayToColor(GameState.settings.bgColor), 0.5, (p) => gameBg.color = p, easings.easeOutQuad)
+		tween(-5, 5, 0.5, (p) => gameBg.movAngle = p, easings.easeOutQuad)
+		tween(1, GameState.settings.bgColor[3], 0.5, (p) => gameBg.color.a = p, easings.easeOutQuad)
 
 		onUpdate(() => {
 			GameState.score = clamp(GameState.score, 0, Infinity)
 			GameState.score = Math.round(GameState.score)
-			
-			if (k.debug) debugFunctions()
 			
 			if (GameState.score > 50) {
 				// if (!GameState.unlockedWindows.includes("storeWin")) unlockWindow("storeWin")
@@ -159,17 +149,6 @@ export function gamescene() {
 			}
 		})
 
-		// #region debug stuff
-		onScroll((delta)=>{
-			cam.scale = cam.scale * (1 - 0.1 * Math.sign(delta.y))
-		})
-
-		onMousePress("middle", () => {
-			cam.scale = 1
-		})
-
-		//#endregion
-	
 		// #region OUTSIDE OF TAB STUFF
 		// Function to handle tab visibility change
 		function handleVisibilityChange() {
@@ -234,7 +213,7 @@ export function gamescene() {
 		
 							// 120 being the seconds outside screen you have to be to get a "pop up"
 							if ((totalTimeOutsideTab / 1000) > 2) {
-								addToast({ title: `+${gainedScore} points!`, body: `Auto Click`, color: GREEN })
+								addToast({ icon: "cursor", title: "Welcome back!", body: `+${gainedScore} points!`, color: GREEN })
 							}
 				
 							tween(GameState.score, GameState.score + gainedScore, 0.25, (p) => GameState.score = p, easings.easeOutQuint)
@@ -265,5 +244,7 @@ export function gamescene() {
 				}
 			}
 		}, false);
+
+		if (k.debug) debugFunctions()
 	})
 }

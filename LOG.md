@@ -5,8 +5,8 @@
 * Do "-" for issues, "*" for notes, "^" for comments on either
 
 # TODAY
-
-# TOMORROW
+- Remove the dumb "drop drags on mouse out" and just make it always like that
+	* Have to unify all mouse release functions and call them drop() or something like that  
 - Keep working on store
 	* I have to tell devky to make the upgrade icons and the upgrade store element, then i can work on it 
 - Figure out why gamescene breaks when re-entering after being on ascendscnee
@@ -16,11 +16,17 @@
 - Format actual working numbers
 	* Make it work with new shorten numbers setting (might not do)
 - Re-design/make working toasts
-	* Wait for lajbel about toast design
 	* Add support for icons
-- Make start animation
+	^ Manage to do text wrappings
+- Start start animation
 - Rework tooltips
 - Fix panderito hitbox
+
+### bugs
+- onCharInput doesn't work when updating taskkbar
+
+# TOMORROW
+- spstext doesn't work with the spsTextMode at all lol 
 
 # Soon
 - I REALLYYY need to fix the hover animations
@@ -34,6 +40,9 @@
 	* Buttons inside windows don't have hovers
 	* Minibuttons will play "cursor" sometims when hovering from the folderObj
 - Make pinch animation
+- music doesn't loop on gamescene
+cursor gets something when combo is high
+- volume works weirdly when muted (like if you mute it and lower it and increase it)
 
 ## Windows
 - You can click hexagon while hovering window for drag, then you drag it and it will not play clickRelease
@@ -67,9 +76,6 @@
 # Bookmarks
 - Saving this for explosion stuff
 https://kaplay.lajbel.com/?code=eJx9UstOwzAQvOcr9lZbjdqUUoRUygUhrhUHDiAOqb1JrTh2ZDt9gPo3%2FAk%2FxpIX7YWT7ZnZnfXYRbqxtmQ8irLaiKCsATxU2nrasUMMRw6fEYCwxgcwdblOXVBCo4cVXCdLojLrgGkMoAhKlrTcXQgJGY%2FbLgDTKTw6H1BrNLAjs0ZWoDZQqgAfdfb9pbXK0cETerHdKyNVXiBxtZHwrMQ21CZverUz%2BQpRkrNLjWSzJIlhdpvw5ZlCKtfzxM5vLtmqm5MkqZTsraEAHIrA5iTncYdU1reB9ICw2jrm8g1rei9%2BrZOEx%2FDfkQ%2FlqRFbqh8JNAHdaMBLu0NGM8ft1QZcqwx9lRqWTBYD6EWqsfUnOIarvv97d0kK%2FHUI1cMLui5Vyl9Syn3%2BjXifqtA3m8XQGAHjsLrvng%2Boxgdnj6yPrbM5NespOkWRNQ9aiYKd1%2F19qdLWHtcUJZ9QmGenI49O%2FAerrLvf
-
-- Saving this for drawing hexagon
-https://kaplay.lajbel.com/?code=eJy9U01PwzAMvfdX%2BJhs076QEOoYEhIScEDakQlxyFpvLZR4StPRCvHfcdKPddsdH5Lo2S9%2BdpxPtSH6EjIItoWObEoaYqO%2Bn7BUO9JCwk8AbBHp3EKE2qJ5hSVMFxfw%2Bhw2Kk6LnNHZdLqAyQTu44%2BCcZtg61M5aMQY46DH21tHens%2FSUEZmRb2%2BJYMiAwtpD4vb7dwzdtw2Go%2BspXeZchhL8om49UzTOAKBpAuzsJKDmlLHLYSBzUrolz4a%2BQ5q%2BpY6wtWnuoLFpc33hd5Ig4YzUU5gkrKpiZn3KdH1GiUxbZqVyqqKIEDGotlL79z15eZ3UZ0Dmc%2B%2FzYjMsIfjdKxe2iWNpvfsFJe5ehfKB1DNm34rct1g7airHKDdnyyPeUh%2BN7UXRVyzE3qzlVPAbcydMsRocJmqcYQrCmwN3MN3hs4r4P1sBbSD6xEsOrlXTM7J3%2BAg2TwBzQo3pc%3D
 
 # Medals
 - click 25 tims

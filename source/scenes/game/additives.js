@@ -1,69 +1,9 @@
 import { GameState } from "../../gamestate"
+import { curDraggin } from "../../plugins/drag"
+import { panderitoIndex } from "./gamescene"
+import { hexagon } from "./hexagon"
 import { arrayToColor, blendColors } from "./utils"
-
-export function debugTexts() {
-	let texty = add([
-		text("", {
-			size: 20
-		}),
-		pos(-50, 60),
-		anchor("topleft"),
-		"debugText",
-		{
-			update() {
-				this.text = `
-				timeUntilAutoLoopEnds: ${GameState.timeUntilAutoLoopEnds}
-				autoLoopTime: ${autoLoopTime.toFixed(4)}
-				excessTime: ${excessTime.toFixed(4)}
-				masterVolume: ${GameState.settings.volume}
-				sfx: ${GameState.settings.sfx.volume}
-				music: ${GameState.settings.music.volume}
-				`.trim()
-			}
-		}
-	])
-
-	texty.hidden = true
-	texty.paused = true
-}
-
-export function debugFunctions() {
-	window.taskbar = function() {
-		console.log(GameState.taskbar)
-	}
-	
-	// if (isKeyDown("control")) {
-		if (isKeyPressed("c")) {
-			GameState.save(true)
-		}
-
-		else if (isKeyPressed("v")) {
-			GameState.delete()
-		}
-
-		else if (isKeyPressed("tab")) {
-			// debug.inspect = !debug.inspect
-			// get("debugText")[0].hidden = !debug.inspect
-			// get("debugText")[0].paused = !debug.inspect
-		}
-
-		else if (isKeyPressed("b")) {
-			GameState.cheat()
-		}
-
-		else if (isKeyPressed("w")) {
-			hexagon.autoClick()
-		}
-
-		else if (isKeyPressed("y")) {
-			GameState.clickers++
-		}
-
-		else if (isKeyPressed("r") && panderitoIndex != 6) {
-			go("gamescene")
-		}
-	// }
-}
+import { isDraggingAWindow, isGenerallyHoveringAWindow, isPreciselyHoveringAWindow, manageWindow } from "./windows/windows-api/windowsAPI"
 
 export let gameBg;
 export function addBackground() {
@@ -72,7 +12,7 @@ export function addBackground() {
 		pos(center()),
 		anchor("center"),
 		scale(8),
-		color(),
+		color(arrayToColor(GameState.settings.bgColor)),
 		z(-1),
 		stay(),
 		{
@@ -81,12 +21,10 @@ export function addBackground() {
 			uScale: 2,
 			col1D: rgb(128, 128, 128),
 			col2D: rgb(190, 190, 190),
-			tintColor: arrayToColor(GameState.settings.bgColor),
-			blendFactor: GameState.settings.bgColor[3],
 			update() {
 				if (isMousePressed("right")) {
-					if (!get("folderObj")[0]) return
-					if (!hexagon?.isHovering() && !get("folderObj")[0]?.isHovering() && !get("minibutton")[0]?.isHovering() && get("window")[0]?.isHovering() && !isGenerallyHoveringAWindow && !isDraggingAWindow) {
+					// doesn't check for hovering this because you will always be hovering it lol
+					if (!hexagon?.isHovering() && !get("folderObj")[0]?.isHovering() && !get("minibutton")[0]?.isHovering() && !get("window")[0]?.isHovering() && !isDraggingAWindow) {
 						manageWindow("bgColorWin")
 					}
 				}
@@ -94,10 +32,11 @@ export function addBackground() {
 		}
 	])
 
+	gameBg.color.a = GameState.settings.bgColor[3]
 	gameBg.use(shader("checkeredBg", () => ({
         "u_time": time() / 10,
-        "u_color1": blendColors(gameBg.col1D, gameBg.tintColor, gameBg.blendFactor * 1.5),
-        "u_color2": blendColors(gameBg.col2D, gameBg.tintColor, gameBg.blendFactor * 1.5),
+        "u_color1": blendColors(gameBg.col1D, gameBg.color, gameBg.color.a),
+        "u_color2": blendColors(gameBg.col2D, gameBg.color, gameBg.color.a),
         "u_speed": vec2(-1, 2).scale(gameBg.speed),
         "u_angle": gameBg.movAngle,
         "u_scale": gameBg.uScale,
@@ -304,15 +243,16 @@ export function endToolTip(speed = 1) {
 
 let maxLogs = 3;
 let toastQueue = [];
-export function addToast(opt = { icon: "none", title: "Title", body: "Body", color: WHITE }) {
+export function addToast(opts = { icon: "none", title: "Title", body: "Body", color: WHITE }) {
     let logs = get("toast", { recursive: true });
 
     function actuallyAddToast(idx, opt) {
         let toastBg = add([
-            rect(200, 100),
-            pos(-200, idx * 150),
+            rect(280, 120, { radius: [0, 10, 10, 0] }),
+            pos(-200, 25 + idx * 150),
             anchor("topleft"),
-            color(BLACK.lighten(100)),
+            color(WHITE.darken(50)),
+			z(hexagon.z),
 			area(),
             "toast",
             {
@@ -331,6 +271,18 @@ export function addToast(opt = { icon: "none", title: "Title", body: "Body", col
             },
         ]);
 
+		let drawShadow = onDraw(() => {
+			drawRect({
+				pos: vec2(toastBg.pos.x, toastBg.pos.y + 5),
+				width: toastBg.width,
+				height: toastBg.height,
+				color: BLACK,
+				radius: [0, 10, 10, 0],
+				z: toastBg.z - 1,
+				opacity: 0.5,
+			})
+		})
+
 		toastBg.onClick(() => {
 			toastBg.running = true
 			toastBg.close()
@@ -339,21 +291,60 @@ export function addToast(opt = { icon: "none", title: "Title", body: "Body", col
 		})
 
         // Add content to the toast
-        toastBg.add([
-            text(opt.title, { size: 24 }),
-            pos(10, 10),
-        ]);
+		let icon;
+		if (opts.icon) {
+			icon = toastBg.add([
+				sprite("mupgrades", {
+					anim: "u_12",
+				}),
+				anchor("center"),
+				pos(40, 40),
+			])
+
+			icon.width = 60
+			icon.height = 60
+		}
+		
+		// position and scale them based on icon opts.icon ? x
+		let titleText = toastBg.add([
+			text(opts.title, {
+				font: "lambda",
+				size: opts.icon ? 35 : 40,
+				align: "left",
+			}),
+			pos(opts.icon ? icon.pos.x + 35 : 10, opts.icon ? icon.pos.y - 15 : 10),
+			color(BLACK),
+			scale(),
+		]);
+
+		opts.icon ? titleText.scale.y = 1.1 : null;
+
+		let bodyText = toastBg.add([
+			text(opts.body, {
+				font: "lambda",
+				size: 20,
+				align: "left",
+				width: toastBg.width - 10
+			}),
+			pos(opts.icon ? icon.pos.x - icon.width / 2 : 10, opts.icon ? icon.pos.y + icon.height / 2  + 15 : titleText.pos.y + titleText.height / 2 + 20),
+			color(BLACK),
+		]);
 
         let toastProgressBar = toastBg.add([
             rect(toastBg.width, 10),
             pos(0, toastBg.height),
-			color(opt.color)
+			color(opt.color),
+			opacity(0),
         ]);
 
-        tween(toastBg.pos.x, 0, 0.5, (p) => (toastBg.pos.x = p), easings.easeOutQuint);
-        tween(toastProgressBar.width, 0, 2, (p) => (toastProgressBar.width = p), easings.linear).onEnd(() => {
-			if (toastBg.running) toastBg.close() 
+        tween(toastBg.pos.x, 0, 0.5, (p) => toastBg.pos.x = p, easings.easeOutQuint);
+        tween(toastProgressBar.width, 0, 2, (p) => toastProgressBar.width = p, easings.linear).onEnd(() => {
+			if (toastBg.running) toastBg.close()
 		});
+
+		toastBg.onDestroy(() => {
+			drawShadow.cancel()
+		})
     }
 
     function processQueue() {
@@ -381,11 +372,11 @@ export function addToast(opt = { icon: "none", title: "Title", body: "Body", col
     logs = get("toast", { recursive: true }); // Update logs
 
     if (logs.length >= maxLogs) {
-        toastQueue.push(opt);
+        toastQueue.push(opts);
     } else {
         let availableIndex = getAvailableIndex(logs);
         if (availableIndex !== -1) {
-            actuallyAddToast(availableIndex, opt);
+            actuallyAddToast(availableIndex, opts);
         }
     }
 
