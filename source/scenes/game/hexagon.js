@@ -32,32 +32,31 @@ export let clickVars = {
 export const COMBO_MINCLICKS = 25; // 25
 export const COMBO_MAXCLICKS = 160; // 160
 export const COMBO_MAX = 10
+const hoverRotSpeedIncrease = 0.01 * 0.25
 
 let consecutiveClicksWaiting = null;
-
-// export let autoScorePerSecond = 0; // the score per second you're getting automatically
-// export let actualScorePerSecond = 0; // the actual and current score per second
-// let clicksPerSecond = 0; // to properly calculate sps
 let spsUpdaterTimer = 0; // to properly calculate sps
 
 export let hexagon;
 
-let hoverRotSpeedIncrease = 0.01 * 0.25
 let maxRotSpeed = 10
-
 export function addHexagon() {
+	// reset variables
 	scoreVars.combo = 1
 	clickVars.consecutiveClicks = 0
 	clickVars.constantlyClicking = false
 	clickVars.comboDropped = true
 	clickVars.maxedCombo = false
-	
+	spsUpdaterTimer = 0
+	maxRotSpeed = 10
+
 	hexagon = add([
 		sprite(GameState.settings.panderitoMode ? "panderito" : "hexagon"),
 		pos(center().x, center().y + 55),
 		anchor("center"),
 		rotate(0),
 		scale(),
+		opacity(1),
 		color(arrayToColor(GameState.settings.hexColor)),
 		area({
 			shape: new Polygon([
@@ -74,6 +73,7 @@ export function addHexagon() {
 		z(2),
 		waver({ maxAmplitude: 5, wave_speed: 1 }),
 		"hexagon",
+		"hoverOutsideWindow",
 		{
 			isBeingHoveredOn: false,
 			smallestScale: 0.985,
@@ -100,12 +100,6 @@ export function addHexagon() {
 
 				if (this.angle >= 360) {
 					this.angle = 0
-				}
-
-				if (!debug) return
-				if (isKeyDown("q")) {
-					this.clickPress()
-					wait(0.1, () => this.clickRelease())
 				}
 			},
 			
@@ -363,7 +357,4 @@ export function addHexagon() {
 
 	// COMBO STUFF
 	consecutiveClicksWaiting = wait();
-	onKeyPress("f", () => {
-		startCombo()
-	})
 }

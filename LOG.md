@@ -5,28 +5,22 @@
 * Do "-" for issues, "*" for notes, "^" for comments on either
 
 # TODAY
-- Remove the dumb "drop drags on mouse out" and just make it always like that
-	* Have to unify all mouse release functions and call them drop() or something like that  
 - Keep working on store
 	* I have to tell devky to make the upgrade icons and the upgrade store element, then i can work on it 
-- Figure out why gamescene breaks when re-entering after being on ascendscnee
-	^ It's probably because variables that are outside of the scene are not getting resetted 
-	^ shadows work weird
-	* MAYBE ascendscene will be a substate instead of an actual scene
+	* Rework tooltips for upgrades
 - Format actual working numbers
 	* Make it work with new shorten numbers setting (might not do)
 - Re-design/make working toasts
+	* add toast condition where there's title but no body
 	* Add support for icons
 	^ Manage to do text wrappings
-- Start start animation
-- Rework tooltips
+- when window closes check if any hoverOutsideWindow is being hovered and trigger their onHoverStart
+	* same for closing
 - Fix panderito hitbox
+- spstext doesn't work with the spsTextMode at all lol 
+	* It's completely broken
 
 ### bugs
-- onCharInput doesn't work when updating taskkbar
-
-# TOMORROW
-- spstext doesn't work with the spsTextMode at all lol 
 
 # Soon
 - I REALLYYY need to fix the hover animations
@@ -63,6 +57,7 @@ cursor gets something when combo is high
 - Add an achievement for opening all windows in your taskbar at the same time
 - Make unactive windows grayscale
 - Discount powerup (very short)
+- when clicking run through every achievement in an object that has a clicking property and check if the score is higher or equal to another property there
 
 # Missing
 - Ascend mechanic

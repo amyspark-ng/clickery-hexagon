@@ -1,13 +1,13 @@
 import { GameState } from "../../gamestate"
 import { scoreVars, addHexagon, hexagon } from "./hexagon.js"
-import { uiCounters } from "./uicounters"
+import { buildingsText, scoreText, spsText, uiCounters } from "./uicounters"
 import { arrayToColor, debugFunctions } from "./utils"
 import { addToast, gameBg, mouse } from "./additives"
 import { playMusic } from "../../sound"
-import { folderObjManaging, windowsDefinition } from "./windows/windows-api/windowsAPI"
+import { folderObj, folderObjManaging, windowsDefinition } from "./windows/windows-api/windowsAPI"
 import { songs } from "./windows/musicWindow"
-import { curDraggin, setCurDraggin } from "../../plugins/drag"
-import { k } from "../../main"
+import { curDraggin } from "../../plugins/drag"
+import { DEBUG } from "../../main"
 
 // debug
 
@@ -74,6 +74,7 @@ export function togglePanderito() {
 
 export function gamescene() {
 	return scene("gamescene", () => {
+		GameState.load() // loadSave()
 
 		cam.scale = 1
 
@@ -81,10 +82,8 @@ export function gamescene() {
 		uiCounters()
 		folderObjManaging()
 		windowsDefinition()
-
+		
 		setGravity(1600)
-
-		GameState.load()
 
 		if (!GameState.settings.music.muted) {
 			playMusic(GameState.settings.music.favoriteIdx == null ? "clicker.wav" : Object.keys(songs)[GameState.settings.music.favoriteIdx])
@@ -97,23 +96,10 @@ export function gamescene() {
 			})
 		})
 
-		// set bg valeus
-		tween(BLACK, arrayToColor(GameState.settings.bgColor), 0.5, (p) => gameBg.color = p, easings.easeOutQuad)
-		tween(-5, 5, 0.5, (p) => gameBg.movAngle = p, easings.easeOutQuad)
-		tween(1, GameState.settings.bgColor[3], 0.5, (p) => gameBg.color.a = p, easings.easeOutQuad)
-
 		onUpdate(() => {
 			GameState.score = clamp(GameState.score, 0, Infinity)
 			GameState.score = Math.round(GameState.score)
 			
-			if (GameState.score > 50) {
-				// if (!GameState.unlockedWindows.includes("storeWin")) unlockWindow("storeWin")
-			}
-
-			if (GameState.score > 100) {
-				// if (!GameState.unlockedWindows.includes("musicWin")) unlockWindow("musicWin")
-			}
-
 			// auto loop stuff
 			if (GameState.cursors >= 1) {
 				autoLoopTime += dt()
@@ -126,10 +112,6 @@ export function gamescene() {
 				}
 			}
 
-			// k.backgroundAudio = GameState.settings.keepAudioOnTabChange
-			// debug.log(k.backgroundAudio)
-			// debug
-			// if (isKeyPressed("h")) { GameState.timeUntilAutoLoopEnds--; debug.log(GameState.timeUntilAutoLoopEnds) } 
 			camRot(cam.rotation)
 			camScale(cam.scale)
 		})
@@ -235,16 +217,36 @@ export function gamescene() {
 			}
 		}, false);
 
-		document.getElementById("kanva").addEventListener("mouseout", (event) => {
-			if (GameState.settings.dropDragsOnMouseOut == true) {
-				if (curDraggin) {
-					curDraggin.trigger("dragEnd")
-					setCurDraggin(null)
-					mouse.releaseAndPlay()
-				}
-			}
+		document.getElementById("kanva").addEventListener("mouseout", () => {
+			// all of the objects that are draggable have this function
+			if (curDraggin) curDraggin.releaseDrop()
 		}, false);
+	
+		// # INTRO ANIMATIONS
+		// gameBg
+		tween(BLACK, arrayToColor(GameState.settings.bgColor), 0.5, (p) => gameBg.color = p, easings.easeOutQuad)
+		tween(-5, 5, 0.5, (p) => gameBg.movAngle = p, easings.easeOutQuad)
+		tween(1, GameState.settings.bgColor[3], 0.5, (p) => gameBg.color.a = p, easings.easeOutQuad)
 
-		if (k.debug) debugFunctions()
+		// hexagon
+		tween(vec2(center().x, center().y + 110), vec2(center().x, center().y + 55), 0.5, (p) => hexagon.pos = p, easings.easeOutQuad)
+		tween(0.25, 1, 1, (p) => hexagon.opacity = p, easings.easeOutQuad)
+		
+		// scoreCounter
+		tween(vec2(center().x, 80), vec2(center().x, 60), 0.5, (p) => scoreText.pos = p, easings.easeOutQuad).onEnd(() => {
+			scoreText.trigger("startAnimEnd")
+		})
+		tween(0.25, 1, 0.5, (p) => scoreText.opacity = p, easings.easeOutQuad)
+		tween(0.25, 1, 0.5, (p) => spsText.opacity = p, easings.easeOutQuad)
+
+		// buildingsText
+		tween(5, 10, 0.5, (p) => buildingsText.pos.x = p, easings.easeOutQuad)
+		tween(0.25, 1, 0.5, (p) => buildingsText.opacity = p, easings.easeOutQuad)
+
+		// folderObj
+		tween(width() - 30, width() - 40, 0.5, (p) => folderObj.pos.x = p, easings.easeOutQuad)
+		tween(0.25, 1, 0.5, (p) => folderObj.opacity = p, easings.easeOutQuad)
+
+		if (DEBUG) debugFunctions()
 	})
 }

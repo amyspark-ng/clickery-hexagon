@@ -18,8 +18,10 @@ To build:
 - MF - Code & Shaders
 - Khriz28 - Playtesting & Support
 
-### Extra:
+### Extra / Special Thanks:
 - [Lambda font](https://ggbot.itch.io/lambda-font)
+- Webadazzz <3
+- niceEli - Desktop support
 
 BROKE COMMIT HISTORY BY RENAMING COMMIT :(
 ![alt text](proof.png)

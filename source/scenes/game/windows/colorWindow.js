@@ -3,7 +3,7 @@ import { curDraggin, drag, setCurDraggin } from "../../../plugins/drag";
 import { waver } from "../../../plugins/wave";
 import { playSfx } from "../../../sound";
 import { hexagon } from "../hexagon";
-import { blendColors, bop, getSides } from "../utils";
+import { blendColors, bop, getPositionOfSide } from "../utils";
 import { gameBg, mouse } from "../additives";
 import { deactivateAllWindows } from "./windows-api/windowsAPI";
 
@@ -27,14 +27,14 @@ function typeToColor(type) {
 function GetbuttonPosBasedOnValue(value, type = "r", theOneBehind) {
 	let xPos;
 	
-	if (type != "a") xPos = map(value, 0, 255, getSides(theOneBehind).left, getSides(theOneBehind).right)
-	else xPos = map(value, 0, 1, getSides(theOneBehind).left, getSides(theOneBehind).right);
+	if (type != "a") xPos = map(value, 0, 255, getPositionOfSide(theOneBehind).left, getPositionOfSide(theOneBehind).right)
+	else xPos = map(value, 0, 1, getPositionOfSide(theOneBehind).left, getPositionOfSide(theOneBehind).right);
 
 	return xPos;
 }
 
 function getDraggingTune(pos, theOneBehind) {
-	draggingTune = map(pos, getSides(theOneBehind).left, getSides(theOneBehind).right, -100, 100)
+	draggingTune = map(pos, getPositionOfSide(theOneBehind).left, getPositionOfSide(theOneBehind).right, -100, 100)
 	draggingTune = clamp(draggingTune, -100, 100)
 	return draggingTune
 }
@@ -67,7 +67,7 @@ function addRgbSlider(winParent, posToAdd = vec2(0), coloredObj, type = "r") {
 			relativePosition = (relativePosition + 0.9) / 1.8;
 			relativePosition = clamp(relativePosition, 0, 1)
 			let mappedPosition = (relativePosition * 300) - 150;
-			mappedPosition = clamp(mappedPosition, getSides(theOneBehind).left, getSides(theOneBehind).right)
+			mappedPosition = clamp(mappedPosition, getPositionOfSide(theOneBehind).left, getPositionOfSide(theOneBehind).right)
 			tween(sliderButton.pos.x, mappedPosition, 0.2, p => sliderButton.pos.x = p, easings.easeOutQuint)
 			playSfx("hoverMiniButton", sliderButton.draggingTune)
 		}
@@ -90,14 +90,14 @@ function addRgbSlider(winParent, posToAdd = vec2(0), coloredObj, type = "r") {
 			draggingTune: 0,
 			update() {
 				if (type != "a") { // color
-					sliderInfo.value = map(this.pos.x, getSides(theOneBehind).left, getSides(theOneBehind).right, 0, 255)
+					sliderInfo.value = map(this.pos.x, getPositionOfSide(theOneBehind).left, getPositionOfSide(theOneBehind).right, 0, 255)
 					sliderInfo.value = clamp(sliderInfo.value, 0, 255)
 				}
 				else { // blendfactor
-					sliderInfo.value = map(this.pos.x, getSides(theOneBehind).left, getSides(theOneBehind).right, 0, 1)
+					sliderInfo.value = map(this.pos.x, getPositionOfSide(theOneBehind).left, getPositionOfSide(theOneBehind).right, 0, 1)
 					sliderInfo.value = clamp(sliderInfo.value, 0, 1)
 				}
-				this.pos.x = clamp(this.pos.x, getSides(theOneBehind).left, getSides(theOneBehind).right)
+				this.pos.x = clamp(this.pos.x, getPositionOfSide(theOneBehind).left, getPositionOfSide(theOneBehind).right)
 				if (isMousePressed("left")) {
 					if (curDraggin) {
 						return
@@ -159,7 +159,7 @@ function addRgbSlider(winParent, posToAdd = vec2(0), coloredObj, type = "r") {
 	sliderButton.onMouseMove(() => {
 		if (sliderButton.dragging) {
 			if (mousePos().x > lastSoundPos + 50 || mousePos().x < lastSoundPos - 50) {
-				if (mousePos().x > getSides(winParent).left && mousePos().x < getSides(winParent).right) {
+				if (mousePos().x > getPositionOfSide(winParent).left && mousePos().x < getPositionOfSide(winParent).right) {
 					sliderButton.draggingTune = getDraggingTune(sliderButton.pos.x, theOneBehind)
 					lastSoundPos = mousePos().x
 					playSfx("hoverMiniButton", sliderButton.draggingTune)
@@ -175,7 +175,7 @@ function addRgbSlider(winParent, posToAdd = vec2(0), coloredObj, type = "r") {
 
 	currentBar = winParent.add([
 		rect(0, 25, { radius: 5  }),
-		pos(getSides(theOneBehind).left, theOneBehind.pos.y),
+		pos(getPositionOfSide(theOneBehind).left, theOneBehind.pos.y),
 		anchor("left"),
 		color(sliderButton.color),
 		z(sliderButton.z - 1),
@@ -183,7 +183,7 @@ function addRgbSlider(winParent, posToAdd = vec2(0), coloredObj, type = "r") {
 		type + "slider",
 		{
 			update() {
-				this.width = map(sliderButton.pos.x, getSides(theOneBehind).left, getSides(theOneBehind).right, 0, theOneBehind.width)
+				this.width = map(sliderButton.pos.x, getPositionOfSide(theOneBehind).left, getPositionOfSide(theOneBehind).right, 0, theOneBehind.width)
 			}
 		}
 	])
@@ -199,7 +199,7 @@ function addRgbSlider(winParent, posToAdd = vec2(0), coloredObj, type = "r") {
 		area(),
 		"slider",
 		type + "slider",
-		pos(getSides(theOneBehind).right + 5, theOneBehind.pos.y),
+		pos(getPositionOfSide(theOneBehind).right + 5, theOneBehind.pos.y),
 		anchor("left"),
 		{	
 			update() {
@@ -289,14 +289,14 @@ export function colorWinContent(winParent, winType = "hexColorWin") {
 		bop(defaultButton)
 		if (winType == "hexColorWin") {
 			sliders.forEach(slider => {
-				tween(slider.button.pos.x, getSides(slider.bg).right, 0.2, (p) => slider.button.pos.x = p, easings.easeOutQuint)
+				tween(slider.button.pos.x, getPositionOfSide(slider.bg).right, 0.2, (p) => slider.button.pos.x = p, easings.easeOutQuint)
 			})
 		}
 
 		else {
 			let excludedSliders = [rSlider, gSlider, bSlider]
 			excludedSliders.forEach(slider => {
-				tween(slider.button.pos.x, getSides(slider.bg).left, 0.2, (p) => slider.button.pos.x = p, easings.easeOutQuint)
+				tween(slider.button.pos.x, getPositionOfSide(slider.bg).left, 0.2, (p) => slider.button.pos.x = p, easings.easeOutQuint)
 			})
 			tween(aSlider.button.pos.x, GetbuttonPosBasedOnValue(0.88, "a", aSlider.bg), 0.2, (p) => aSlider.button.pos.x = p, easings.easeOutQuint)
 		}
@@ -309,7 +309,7 @@ export function colorWinContent(winParent, winType = "hexColorWin") {
 	randomButton.onClick(() => {
 		bop(randomButton)
 		sliders.forEach(slider => {
-			tween(slider.button.pos.x, rand(getSides(slider.bg).left, getSides(slider.bg).right), 0.2, (p) => slider.button.pos.x = p, easings.easeOutQuint)
+			tween(slider.button.pos.x, rand(getPositionOfSide(slider.bg).left, getPositionOfSide(slider.bg).right), 0.2, (p) => slider.button.pos.x = p, easings.easeOutQuint)
 		})
 	})
 

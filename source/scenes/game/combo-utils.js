@@ -2,7 +2,7 @@ import { playSfx } from "../../sound"
 import { cam } from "./gamescene"
 import { COMBO_MINCLICKS, COMBO_MAX, COMBO_MAXCLICKS, clickVars, scoreVars } from "./hexagon"
 import { scoreText, spsText } from "./uicounters";
-import { blendColors, formatNumber, getSides } from "./utils";
+import { blendColors, formatNumber, getPositionOfSide } from "./utils";
 
 export function getClicksFromCombo(level) {
 	return Math.round(map(level, 2, COMBO_MAX, COMBO_MINCLICKS, COMBO_MAXCLICKS))

@@ -84,12 +84,7 @@ export function addMouse() {
 			},
 			
 			update() {
-				if (this.start) {
-					this.moveTo(mousePos(), this.speed)
-				}
-				else {
-					this.pos = mousePos()
-				}
+				this.pos = mousePos()
 			}
 		}
 	])
@@ -316,8 +311,6 @@ export function addToast(opts = { icon: "none", title: "Title", body: "Body", co
 			color(BLACK),
 			scale(),
 		]);
-
-		opts.icon ? titleText.scale.y = 1.1 : null;
 
 		let bodyText = toastBg.add([
 			text(opts.body, {

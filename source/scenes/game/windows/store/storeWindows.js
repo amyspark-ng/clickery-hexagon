@@ -1,6 +1,6 @@
 import { GameState } from "../../../../gamestate";
 import { playSfx } from "../../../../sound";
-import { bop, getPrice, getSides } from "../../utils";
+import { bop, getPrice, getPositionOfSide } from "../../utils";
 import { mouse } from "../../additives";
 import { addUpgrades } from "./upgrades";
 

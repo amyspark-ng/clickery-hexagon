@@ -3,6 +3,7 @@ import "kaplay/global";
 
 import { drawSeriousLoadScreen, loadEverything } from "./loader.js"
 
+export const DEBUG = true
 export const k = kaplay({
 	width: 1024,
 	height: 576,
@@ -11,23 +12,18 @@ export const k = kaplay({
 	logMax: 10,
 	backgroundAudio: true,
 	debugKey: "f1",
-	debug: true,
+	debug: DEBUG,
 	loadingScreen: true,
 	// stretch: true,
 	// letterbox: true,
 });
-
-loadEverything()
-
+export let ROOT = getTreeRoot()
+setBackground(BLACK)
 setCursor("none")
 
-export let kanvas = document.getElementById("kanva")
-export let gl = kanvas.getContext("2d")
-
-export let ROOT = getTreeRoot()
-
+loadEverything()
 onLoad(() => {
-	if (!k.debug) {
+	if (!DEBUG) {
 		let opacity = 1
 		tween(opacity, 0, 1, (p) => opacity = p, easings.linear)
 	

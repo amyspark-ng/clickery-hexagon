@@ -4,6 +4,7 @@ import { playSfx } from "../../../../sound";
 import { bop } from "../../utils";
 import { mouse } from "../../additives";
 import { folderObj, infoForWindows, isGenerallyHoveringAWindow, isDraggingAWindow, isPreciselyHoveringAWindow, manageWindow } from "./windowsAPI";
+import { GameState } from "../../../../gamestate";
 
 export function calculateXButtonPosition(index, buttonSpacing = 75) {
     return folderObj.pos.x - buttonSpacing * (index) - buttonSpacing;
@@ -27,6 +28,7 @@ export function addMinibutton(idxForInfo, taskbarIndex, posToAdd = vec2(), initi
 		drag(),
 		color(),
 		z(folderObj.z - 1),
+		"hoverOutsideWindow",
 		"minibutton",
 		infoForWindows[Object.keys(infoForWindows)[idxForInfo]].icon == "extra" ? "extraMinibutton" : "",
 		{
@@ -195,7 +197,7 @@ export function addMinibutton(idxForInfo, taskbarIndex, posToAdd = vec2(), initi
 				bop(this, 0.1)
 			},
 
-			drop() {
+			releaseDrop() {
 				curDraggin.trigger("dragEnd")
 				setCurDraggin(null)
 				mouse.releaseAndPlay("cursor")
@@ -276,6 +278,10 @@ export function addMinibutton(idxForInfo, taskbarIndex, posToAdd = vec2(), initi
 		}
 		// probably not
 		
+		// change it before they're swapped
+		GameState.taskbar[curDraggin.taskbarIndex] = currentMinibutton.windowKey
+		GameState.taskbar[currentMinibutton.taskbarIndex] = curDraggin.windowKey
+
 		swap(curDraggin, "taskbarIndex", currentMinibutton, "taskbarIndex")
 		curDraggin.destinedPosition = calculateXButtonPosition(curDraggin.taskbarIndex)
 		currentMinibutton.destinedPosition = calculateXButtonPosition(currentMinibutton.taskbarIndex)
@@ -293,7 +299,7 @@ export function addMinibutton(idxForInfo, taskbarIndex, posToAdd = vec2(), initi
 
 	currentMinibutton.onHover(() => {
 		if (curDraggin) return
-		if (!isGenerallyHoveringAWindow && !isDraggingAWindow) {
+		if (!isPreciselyHoveringAWindow && !isDraggingAWindow) {
 			currentMinibutton.startHover()
 			playSfx("hoverMiniButton", 100 * currentMinibutton.windowInfo.idx / 4)
 		}
@@ -337,7 +343,7 @@ export function addMinibutton(idxForInfo, taskbarIndex, posToAdd = vec2(), initi
 		else if (currentMinibutton.dragging) {
 			// release hold function
 			if (curDraggin == currentMinibutton) {
-				currentMinibutton.drop()
+				currentMinibutton.releaseDrop()
 			}
 		}
 	})

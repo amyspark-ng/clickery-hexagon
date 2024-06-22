@@ -1,5 +1,5 @@
 import { GameState } from "../../../../gamestate.js";
-import { blendColors, bop, getSides } from "../../utils.js";
+import { blendColors, bop, getPositionOfSide } from "../../utils.js";
 import { mouse } from "../../additives.js";
 import { drag, curDraggin, setCurDraggin } from "../../../../plugins/drag.js";
 import { playSfx } from "../../../../sound.js";
@@ -12,7 +12,6 @@ import { settingsWinContent } from "../settingsWindow.js";
 import { ascendWinContent } from "../ascendWindow.js";
 import { extraWinContent } from "../extraWindow.js";
 import { addMinibutton, calculateXButtonPosition } from "./windowsAPI-utils.js";
-import { hexagon } from "../../hexagon.js";
 import { creditsWinContent } from "../creditsWin.js";
 
 export let infoForWindows = {};
@@ -51,32 +50,22 @@ export function manageWindow(windowKey) {
 
 export function windowsDefinition() {
 	infoForWindows = {
-		// horizontal
 		"storeWin": { idx: 0, content: storeWinContent, lastPos: vec2(818, 280) },
-		// horizontal
 		"musicWin": { idx: 1, content: musicWinContent, lastPos: vec2(208, 96) },
-		// horizontal
 		"ascendWin": { idx: 2, content: ascendWinContent, lastPos: vec2(center().x, center().y) },
-		// horizontal
 		"statsWin": { idx: 3, content: emptyWinContent, lastPos: vec2(center().x, center().y) },
-		// vertical
 		"medalsWin": { idx: 4, content: emptyWinContent, lastPos: vec2(center().x, center().y) },
-		// vertical
 		"aboutWin": { idx: 5, content: emptyWinContent, lastPos: vec2(center().x, center().y) },
-		// vertical
 		"creditsWin": { idx: 6, content: creditsWinContent, lastPos: vec2(center().x, center().y) },
-		// vertical
 		"settingsWin": { idx: 7, content: settingsWinContent, lastPos: vec2(center().x, center().y) },
-		// vertical
 		"leaderboardsWin": { idx: 8, content: emptyWinContent, lastPos: vec2(center().x, center().y) },
-		// vertical
 		"hexColorWin": { idx: 9, content: colorWinContent, lastPos: vec2(208, 160) },
-		// vertical
 		"bgColorWin": { idx: 10, content: colorWinContent, lastPos: vec2(1024 - 200, 200) },
-		"extraWin": { idx: 11, icon: "extra", content: extraWinContent, lastPos: center(), verticalButton: true, },
+		"extraWin": { idx: 11, icon: "extra", content: extraWinContent, lastPos: center() },
 	}
 
-	GameState.taskbar = [ "storeWin", "musicWin", "ascendWin", "settingsWin" ]
+	GameState.unlockedWindows = Object.keys(infoForWindows)
+	GameState.taskbar = [ "storeWin", "musicWin", "ascendWin", "statsWin" ]
 }
 
 export function openWindow(windowKey = "") {
@@ -116,6 +105,14 @@ export function openWindow(windowKey = "") {
 				if (folded || !GameState.unlockedWindows.includes(windowKey)) return
 			},
 
+			releaseDrop() {
+				if (curDraggin && curDraggin == this) {
+					curDraggin.trigger("dragEnd")
+					setCurDraggin(null)
+					mouse.releaseAndPlay("cursor")
+				}
+			},
+
 			activate() {
 				this.use("active")
 
@@ -138,32 +135,32 @@ export function openWindow(windowKey = "") {
 
 			isMouseInClickingRange() {
 				let condition = 
-				(mousePos().y >= getSides(this).top) &&
-				(mousePos().y <= getSides(this).top + 25)
+				(mousePos().y >= getPositionOfSide(this).top) &&
+				(mousePos().y <= getPositionOfSide(this).top + 25)
 				return condition;
 			},
 
 			isMouseInPreciseRange() {
 				let condition = 
-				(mousePos().y >= getSides(this).top) && 
-				(mousePos().y <= getSides(this).bottom) &&
-				(mousePos().x <= getSides(this).right) &&
-				(mousePos().x >= getSides(this).left)
+				(mousePos().y >= getPositionOfSide(this).top) && 
+				(mousePos().y <= getPositionOfSide(this).bottom) &&
+				(mousePos().x <= getPositionOfSide(this).right) &&
+				(mousePos().x >= getPositionOfSide(this).left)
 				return condition;
 			},
 
 			isMouseInGeneralRange() {
 				let condition = 
-				(mousePos().y >= getSides(this).top - 10) && 
-				(mousePos().y <= getSides(this).bottom + 10) &&
-				(mousePos().x <= getSides(this).right + 10) &&
-				(mousePos().x >= getSides(this).left - 10)
+				(mousePos().y >= getPositionOfSide(this).top - 10) && 
+				(mousePos().y <= getPositionOfSide(this).bottom + 10) &&
+				(mousePos().x <= getPositionOfSide(this).right + 10) &&
+				(mousePos().x >= getPositionOfSide(this).left - 10)
 				return condition;
 			},
 
 			update() {
 				this.pos.x = clamp(this.pos.x, -151, 1180)
-				// debug.log(isPreciselyHoveringWindow)
+				this.pos.y = clamp(this.pos.y, this.height / 2, height() + (this.height / 2) - 36)
 			},
 		}
 	])
@@ -172,7 +169,6 @@ export function openWindow(windowKey = "") {
 	infoForWindows[windowKey].lastPos.y = clamp(infoForWindows[windowKey].lastPos.y, height() - windowObj.height / 2, -windowObj.height / 2)
 	windowObj.pos = infoForWindows[windowKey].lastPos
 
-	let xButtonSelection;
 	let xButton = windowObj.add([
 		text("X", {
 			font: "lambda",
@@ -212,30 +208,17 @@ export function openWindow(windowKey = "") {
 	})
 
 	windowObj.onHover(() => {
-		get("minibutton").forEach(minibutton => {
-			if (minibutton.isHovering() && !minibutton.dragging) {
-				minibutton.endHover()
-			}
+		get("hoverOutsideWindow", { recursive: true }).forEach((obj) => {
+			if (curDraggin) return
+			if (obj.isHovering()) obj.endHover()
 		})
-
-		if (hexagon.isHovering()) {
-			hexagon.endHover()
-		}
-
-		// check if hovering any window button, if it it's not start pointing, if yes don't point
-		if (!isDraggingAWindow && !xButton.isHovering()) mouse.play("cursor")
 	})
 
 	windowObj.onHoverEnd(() => {
-		get("minibutton").forEach(minibutton => {
-			if (minibutton.isHovering() && !minibutton.dragging) {
-				minibutton.startHover()
-			}
+		get("hoverOutsideWindow", { recursive: true }).forEach((obj) => {
+			if (curDraggin) return
+			if (obj.isHovering()) obj.startHover()
 		})
-
-		if (hexagon.isHovering()) {
-			hexagon.startHover()
-		}
 	})
 
 	windowObj.onMousePress(() => {
@@ -263,11 +246,7 @@ export function openWindow(windowKey = "") {
 	})
 
 	windowObj.onMouseRelease(() => {
-		if (curDraggin && curDraggin == windowObj) {
-			curDraggin.trigger("dragEnd")
-			setCurDraggin(null)
-			mouse.releaseAndPlay("cursor")
-		}
+		windowObj.releaseDrop()
 	})
 
 	windowObj.onKeyPress("escape", () => {
@@ -301,7 +280,13 @@ export function openWindow(windowKey = "") {
 }
 
 export function folderObjManaging() {
-	GameState.unlockedWindows = GameState.taskbar
+	// reset variables
+	folded = true
+	timeSinceFold = 0
+	isGenerallyHoveringAWindow = false;
+	isPreciselyHoveringAWindow = false;
+	isInClickingRangeOfAWindow = false;
+	isDraggingAWindow = false;
 
 	folderObj = add([
 		sprite("folderObj"),
@@ -309,8 +294,8 @@ export function folderObjManaging() {
 		area({ scale: vec2(1.2) }),
 		z(4),
 		anchor("center"),
-		"hover_outsideWindow",
 		"folderObj",
+		"hoverOutsideWindow",
 		{
 			defaultScale: vec2(1.2),
 			editingBar: false,
@@ -331,7 +316,7 @@ export function folderObjManaging() {
 						let yPos = initialY - buttonSpacing * index - 75;
 
 						tween(miniButton.pos.x, xPos, 0.32, (p) => miniButton.pos.x = p, easings.easeOutQuint)
-						if (infoForWindows[miniButton.windowKey].verticalButton == true) {
+						if (infoForWindows[miniButton.windowKey].icon == "extra") {
 							tween(miniButton.pos.y, yPos, 0.32, (p) => miniButton.pos.y = p, easings.easeOutQuint)
 						}
 					})
@@ -384,6 +369,14 @@ export function folderObjManaging() {
 				get("taskbaredit")[0]?.destroy()
 			},
 
+			startHover() {
+				mouse.play("point")
+			},
+			
+			endHover() {
+				mouse.play("cursor")
+			},
+
 			update() {
 				if (isKeyPressed("space") || (isMousePressed("left") && this.isHovering())) {
 					this.manageFold()
@@ -396,24 +389,29 @@ export function folderObjManaging() {
 		}
 	])
 
+	folderObj.onHover(() => {
+		folderObj.startHover()
+	})
+
+	folderObj.onHoverEnd(() => {
+		folderObj.endHover()
+	})
+
 	// this can't be attached to the buttons because you won't be able to call the event if the buttons don't exist
 	folderObj.onCharInput((key) => {
 		if (isKeyDown("control")) return
 
-		// Parse the key input to get the number pressed
+		// parse the key to number
 		const numberPressed = parseInt(key);
 		if (isNaN(numberPressed)) return; // If the key is not a number, return
 	
-		// Adjust for 1-based index (e.g., pressing '1' should access the first element)
+		// adjust it to 0, 1, 2, 3
 		const index = numberPressed - 1;
 	
-		// Ensure the number is within the range of GameState.taskbar indices
 		if (index >= 0 && index < GameState.taskbar.length) {
 			const windowKey = GameState.taskbar[index];
 	
-			// Check if the window is unlocked
 			// if (GameState.unlockedWindows.includes(windowKey)) {
-				// Open the window and handle UI updates
 				if (folded) folderObj.unfold();
 				manageWindow(windowKey);
 			// }
@@ -421,18 +419,6 @@ export function folderObjManaging() {
 	});
 
 	folderObj.on("winClose", () => {
-		let anyHovered = false
-		for (const hoverObj of get("hover_outsideWindow")) {
-			if (hoverObj.isHovering()) {
-				if (hoverObj.startHover) hoverObj.startHover()
-				anyHovered = true;
-				break;
-			}
-		}
-
-		if (anyHovered) mouse.play("point")
-		else mouse.play("cursor")
-
 		wait(0.05, () => {
 			// gets the topmost window
 			let allWindows = get("window", { recursive: true })

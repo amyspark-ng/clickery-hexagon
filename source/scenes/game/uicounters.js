@@ -10,6 +10,7 @@ export let buildingsText;
 export function uiCounters() {
 	scoreText = add([
 		text(GameState.score, {
+			// 46 width of char
 			size: 75,
 			font: "lambdao",
 		}),
@@ -17,8 +18,9 @@ export function uiCounters() {
 		rotate(0),
 		scale(1),
 		z(4),
+		opacity(1),
 		pos(center().x, 60),
-		waver({ maxAmplitude: 5, wave_speed: 0.5 }),
+		"scoreCounter",
 		{
 			defaultScale: 1,
 			scaleIncrease: 1,
@@ -32,9 +34,10 @@ export function uiCounters() {
 		}
 	])
 
-	scoreText.startWave()
-
-	// 46 width of char
+	scoreText.on("startAnimEnd", () => {
+		scoreText.use(waver({ maxAmplitude: 5, wave_speed: 0.5 }))		
+		scoreText.startWave()
+	})
 
 	spsText = scoreText.add([
 		text("0.0/s", {
@@ -43,7 +46,9 @@ export function uiCounters() {
 		}),
 		anchor("center"),
 		area(),
+		opacity(1),
 		pos(0, scoreText.pos.y - 14),
+		"scoreCounter",
 		// can't put text change here bc it would update to 0 each second
 		{
 			defaultYPos: scoreText.pos.y - 14,
@@ -83,6 +88,7 @@ export function uiCounters() {
 			lineSpacing: 1.5,
 			font: "lambdao"
 		}),
+		opacity(1),
 		anchor("left"),
 		pos(10, height() - 55),
 		waver({ maxAmplitude: 8, wave_speed: 0.8 }),

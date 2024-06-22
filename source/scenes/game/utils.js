@@ -1,6 +1,7 @@
 import { GameState } from "../../gamestate";
 import { addToast } from "./additives";
 import { autoLoopTime, cam, excessTime, panderitoIndex } from "./gamescene";
+import { hexagon } from "./hexagon";
 
 // definetely not chatgpt
 export function formatNumber(number = 0, short = true, isPrice = false) {
@@ -151,7 +152,7 @@ export function colorToArray(color) {
 	return [color.r, color.g, color.b]
 }
 
-export function getSides(obj) {
+export function getPositionOfSide(obj) {
 	return {
 		get left() {
 		  return obj.pos.x - obj.width * 0.5 
@@ -181,25 +182,26 @@ export function setVariable(obj, path, value) {
 }
 
 export function saveAnim() {
-	let floppy = add([
-		sprite("floppy"),
-		pos(width() - 50, height() - 50),
-		anchor("center"),
-		opacity(0),
-		scale(1),
-	])
+	// let floppy = add([
+	// 	sprite("floppy"),
+	// 	pos(width() - 50, height() - 50),
+	// 	anchor("center"),
+	// 	opacity(0),
+	// 	scale(1),
+	// ])
 
-	tween(floppy.pos.y, height() - 120, 0.5, (p) => floppy.pos.y = p, easings.easeOutBack )
-	tween(0, 1, 0.5, (p) => floppy.opacity = p, easings.easeOutBack )
+	// tween(floppy.pos.y, height() - 120, 0.5, (p) => floppy.pos.y = p, easings.easeOutBack )
+	// tween(0, 1, 0.5, (p) => floppy.opacity = p, easings.easeOutBack )
 	
-	wait(0.5, () => {
-		tween(vec2(1), vec2(1.1), 0.1, (p) => floppy.scale = p, easings.easeOutBack )
-		tween(1, 0, 0.5, (p) => floppy.opacity = p, easings.easeOutBack )
+	// wait(0.5, () => {
+	// 	tween(vec2(1), vec2(1.1), 0.1, (p) => floppy.scale = p, easings.easeOutBack )
+	// 	tween(1, 0, 0.5, (p) => floppy.opacity = p, easings.easeOutBack )
 	
-		wait(0.5, () => {
-			destroy(floppy)
-		})
-	})
+	// 	wait(0.5, () => {
+	// 		destroy(floppy)
+	// 	})
+	// })
+	addToast({ icon: "floppy", title: "Game saved!" })
 }
 
 export function bop(obj, howMuch = 0.1, bopEasing = easings.easeOutQuint) {
@@ -261,6 +263,10 @@ export function debugFunctions() {
 		else if (isKeyPressed("g")) addToast({ title: "Welcome back!", body: "Now with a body" })
 		else if (isKeyPressed("h")) addToast({ title: "Welcome back!", body: "Did you know there's actually a limit to how long these body texts can b-"})
 		else if (isKeyPressed("j")) addToast({ title: "Welcome back!", body: "Now with a body and an icon too", icon: "cursor" })
+		else if (isKeyDown("q")) {
+			hexagon.clickPress()
+			wait(0.1, () => hexagon.clickRelease())
+		}
 	})
 
 	// #region debug stuff

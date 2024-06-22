@@ -2,7 +2,7 @@ import { gamescene } from "./scenes/game/gamescene.js"
 import { introscene } from "./scenes/introScene.js"
 import { focuscene } from "./scenes/focuscene.js"
 import { ascendscene } from "./scenes/game/ascendscene.js"
-import { k } from "./main.js"
+import { DEBUG } from "./main.js"
 
 export function drawSeriousLoadScreen(progress, op = 1) {
 	function drawHexagon(opts = {
@@ -98,7 +98,7 @@ export function loadEverything() {
 	loadSprite("devky", "./image.png")
 	loadRoot("./assets/")
 	
-	if (!k.debug) {load(new Promise((res) => { setTimeout(() => { res() }, 5000) })) }
+	if (!DEBUG) {load(new Promise((res) => { setTimeout(() => { res() }, 5000) })) }
 
 	//#region SPRITES
 	// cursors
@@ -489,7 +489,7 @@ export function loadEverything() {
 
 	//#endregion
 
-	if (!k.debug) {load(new Promise((res) => { setTimeout(() => { res() }, 5000) })) }
+	if (!DEBUG) {load(new Promise((res) => { setTimeout(() => { res() }, 5000) })) }
 
 	// #region clickerius hernelius  
 	loadSpriteAtlas("sprites/ascendscene/hexAgony.png", {
@@ -561,7 +561,7 @@ export function loadEverything() {
 	//#endregion SPRITES
 
 	// #region SOUNDS
-	if (!k.debug) {load(new Promise((res) => { setTimeout(() => { res() }, 5000) })) }
+	if (!DEBUG) {load(new Promise((res) => { setTimeout(() => { res() }, 5000) })) }
 
 	loadSound("volumeChange", "sounds/volumeChange.mp3")
 	loadSound("whistle", "sounds/sfx/whistle.ogg")
@@ -585,23 +585,39 @@ export function loadEverything() {
 	// music
 	// don't load as music because then it won't play when the game loads
 	// only done on debug to make the game load quicker since im not listening the music really
-	if (!k.debug) {load(new Promise((res) => { setTimeout(() => { res() }, 5000) })) }
+	if (!DEBUG) {load(new Promise((res) => { setTimeout(() => { res() }, 5000) })) }
 
-	loadMusic("clicker.wav", "sounds/music/clicker.ogg")
-	loadMusic("menu.wav", "sounds/music/menu.ogg")
-	loadMusic("whatttt.wav", "sounds/music/whatttt.ogg")
-	loadMusic("simple.wav", "sounds/music/simple.ogg")
-	loadMusic("jazz.wav", "sounds/music/jazz.ogg")
-	loadMusic("sweet.wav", "sounds/music/sweet.ogg")
-	loadMusic("ok_instrumental", "sounds/music/ok_instrumental.ogg")
-	loadMusic("magic", "sounds/music/magic.ogg")
-	loadMusic("watchout", "sounds/music/watchout.ogg")
-	loadMusic("catnip", "sounds/music/catnip.ogg")
-	loadMusic("project_23", "sounds/music/project_23.wav")
+	if (!DEBUG) {
+		loadSound("clicker.wav", "sounds/music/clicker.ogg")
+		loadSound("menu.wav", "sounds/music/menu.ogg")
+		loadSound("whatttt.wav", "sounds/music/whatttt.ogg")
+		loadSound("simple.wav", "sounds/music/simple.ogg")
+		loadSound("jazz.wav", "sounds/music/jazz.ogg")
+		loadSound("sweet.wav", "sounds/music/sweet.ogg")
+		loadSound("ok_instrumental", "sounds/music/ok_instrumental.ogg")
+		loadSound("magic", "sounds/music/magic.ogg")
+		loadSound("watchout", "sounds/music/watchout.ogg")
+		loadSound("catnip", "sounds/music/catnip.ogg")
+		loadSound("project_23", "sounds/music/project_23.wav")
+	}
+
+	else {
+		loadMusic("clicker.wav", "sounds/music/clicker.ogg")
+		loadMusic("menu.wav", "sounds/music/menu.ogg")
+		loadMusic("whatttt.wav", "sounds/music/whatttt.ogg")
+		loadMusic("simple.wav", "sounds/music/simple.ogg")
+		loadMusic("jazz.wav", "sounds/music/jazz.ogg")
+		loadMusic("sweet.wav", "sounds/music/sweet.ogg")
+		loadMusic("ok_instrumental", "sounds/music/ok_instrumental.ogg")
+		loadMusic("magic", "sounds/music/magic.ogg")
+		loadMusic("watchout", "sounds/music/watchout.ogg")
+		loadMusic("catnip", "sounds/music/catnip.ogg")
+		loadMusic("project_23", "sounds/music/project_23.wav")
+	}
 	//#endregion MUSIC
 
 	// #region OTHER STUFF
-	if (!k.debug) {load(new Promise((res) => { setTimeout(() => { res() }, 5000) })) }
+	if (!DEBUG) {load(new Promise((res) => { setTimeout(() => { res() }, 5000) })) }
 
 	loadFont("apl386", "https://kaboomjs.com/examples/fonts/apl386.ttf", {
 		outline: 4,
@@ -627,7 +643,7 @@ export function loadEverything() {
 		filter: "linear"
 	})
 
-	if (!k.debug) {load(new Promise((res) => { setTimeout(() => { res() }, 5000) })) }
+	if (!DEBUG) {load(new Promise((res) => { setTimeout(() => { res() }, 5000) })) }
 	
 	// made by MF
 	loadShader("checkeredBg", null, `
@@ -676,7 +692,7 @@ export function loadEverything() {
 		}
 	`)
 	
-	if (!k.debug) {load(new Promise((res) => { setTimeout(() => { res() }, 5000) })) }
+	if (!DEBUG) {load(new Promise((res) => { setTimeout(() => { res() }, 5000) })) }
 
 	focuscene()
 	introscene()

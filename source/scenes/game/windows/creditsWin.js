@@ -18,6 +18,15 @@ export function creditsWinContent(winParent) {
 		"Khriz28": "Playtesting & Support",
 	}
 
+	let specialCredits = {
+		"bot-gg": "Code",
+		"Enysmo": "Music & SFX",
+		"DevkyRD": "Art & Design",
+		"MF": "Code & Shaders",
+		"lajbel": "Game Design",
+		"Khriz28": "Playtesting & Support",
+	}
+
 	function createCredits() {
 		let text = ""
 

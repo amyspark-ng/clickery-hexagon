@@ -1,11 +1,9 @@
 import { GameState } from "../../gamestate"
-import { drag } from "../../plugins/drag"
 import { positionSetter } from "../../plugins/positionSetter"
 import { waver } from "../../plugins/wave"
 import { playSfx } from "../../sound"
-import { addBackground, gameBg, addMouse, mouse } from "../game/additives"
-import { blendColors, bop, getRandomElementDifferentFrom } from "./utils"
-import { manageWindow, openWindow, windowsDefinition } from "./windows/windows-api/windowsAPI"
+import { gameBg } from "../game/additives"
+import { bop, getRandomElementDifferentFrom } from "./utils"
 
 let cameraScale = 1
 let mage;
@@ -310,8 +308,6 @@ function addMage() {
 
 export function ascendscene() {
 	return scene("ascendscene", () => {
-		addBackground()
-		addMouse()
 		addMage()
 
 		let dummyBg = add([
