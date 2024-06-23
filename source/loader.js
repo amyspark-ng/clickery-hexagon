@@ -578,6 +578,9 @@ export function loadEverything() {
 	loadSound("unhoverhex", "sounds/sfx/unhoverhex.wav")
 	loadSound("fold", "sounds/sfx/fold.wav")
 	loadSound("combo", "sounds/sfx/combo.wav")
+	loadSound("fullcombo", "sounds/sfx/fc.wav")
+	loadSound("gamesaved", "sounds/sfx/gamesaved.wav")
+	loadSound("unlockachievement", "sounds/sfx/achievementunlock.wav")
 
 	loadSound("plap", "sounds/sfx/plap.mp3")
 	loadSound("plop", "sounds/sfx/plop.mp3")

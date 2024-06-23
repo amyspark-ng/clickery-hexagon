@@ -1,9 +1,10 @@
 import { GameState } from "../../gamestate"
 import { curDraggin } from "../../plugins/drag"
-import { panderitoIndex } from "./gamescene"
+import { playSfx } from "../../sound"
 import { hexagon } from "./hexagon"
-import { arrayToColor, blendColors } from "./utils"
-import { isDraggingAWindow, isGenerallyHoveringAWindow, isPreciselyHoveringAWindow, manageWindow } from "./windows/windows-api/windowsAPI"
+import { scoreText } from "./uicounters"
+import { arrayToColor, blendColors, getPositionOfSide, getZBetween } from "./utils"
+import { isDraggingAWindow, isPreciselyHoveringAWindow, manageWindow } from "./windows/windows-api/windowsAPI"
 
 export let gameBg;
 export function addBackground() {
@@ -34,14 +35,14 @@ export function addBackground() {
 
 	gameBg.color.a = GameState.settings.bgColor[3]
 	gameBg.use(shader("checkeredBg", () => ({
-        "u_time": time() / 10,
-        "u_color1": blendColors(gameBg.col1D, gameBg.color, gameBg.color.a),
-        "u_color2": blendColors(gameBg.col2D, gameBg.color, gameBg.color.a),
-        "u_speed": vec2(-1, 2).scale(gameBg.speed),
-        "u_angle": gameBg.movAngle,
-        "u_scale": gameBg.uScale,
+		"u_time": time() / 10,
+		"u_color1": blendColors(gameBg.col1D, gameBg.color, gameBg.color.a),
+		"u_color2": blendColors(gameBg.col2D, gameBg.color, gameBg.color.a),
+		"u_speed": vec2(-1, 2).scale(gameBg.speed),
+		"u_angle": gameBg.movAngle,
+		"u_scale": gameBg.uScale,
 		"u_aspect": width() / height()
-    })))
+	})))
 }
 
 export let mouse;
@@ -118,324 +119,197 @@ export function addMouse() {
 	})
 }
 
-export function addGrid(opts = { timesX: 3, timesY: 2, parent: null, objectCreator: function() {  } }) {
-	for(let i = 0; i < opts.timesX * opts.timesY; i++) {
-		opts.objectCreator(parent, i)
-	}
-}
-
-export function addFlyingText(posToAdd, textToAdd) {
-	let texty = add([
-		text(textToAdd, {
-			font: 'apl386',
-			size: 20,
-		}),
-		pos(posToAdd.x - 40, posToAdd.y),
-		opacity(1),
-		anchor("center"),
-		{
-			update() {
-				this.pos.y -= 1
-				this.opacity -= 0.05
-			}
-		}
-	])
-}
-
-// left or right means from what side is it coming
-export function addToolTip(obj, textToAdd = "cooltext\nverycool", textSize = 20, left = true, down = true, xDistance = 0, yDistance = 100, speed = 1, xScale = 1, yScale = 1) {
-	let anchorAdd = ""
-	
-	let tooltip = add([
-		sprite("tooltip"),
-		pos(obj.worldPos()),
-		scale(0.01),
-		z(obj.z + 1),
-		opacity(0),
-		"tooltip",
-	])
-	
-	let texty = add([
-		text(textToAdd, {
-			size: textSize
-		}),
-		pos(),
-		scale(),
-		opacity(0),
-		anchor("left"),
-		z(tooltip.z + 1),
-		"tooltip",
-		"tooltiptext",
-	])
-	
-	// confusing i know
-	if (down) anchorAdd = "top"
-	else anchorAdd = "bot"
-
-	// not that confusing
-	if (left) anchorAdd += "left"
-	else anchorAdd += "right"
-	
-	if (left) tooltip.flipX = true
-	if (down) tooltip.flipY = true
-
-	tooltip.use(anchor(anchorAdd))
-
-	// tooltip positioning
-	tooltip.pos.x = obj.worldPos().x 
-	texty.pos.x = obj.worldPos().x
-
-	// this is actually down
-	if (down == true) {
-		tooltip.pos.y = obj.worldPos().y + ((obj.height / 2) * obj.scale.y) + yDistance
-		texty.pos.y = (tooltip.pos.y + (tooltip.height + 24) / 2)
-	}
-	
-	// up
-	else {
-		tooltip.pos.y = obj.worldPos().y - ((obj.height / 2) * obj.scale.y) - yDistance
-		texty.pos.y = ((tooltip.pos.y - (tooltip.height) / 2) - 7)
-	}
-	
-	// left side
-	if (left == false) {
-		texty.pos.x = (tooltip.pos.x - (tooltip.width * xScale) + 10) - xDistance
-	}
-	
-	else {
-		texty.pos.x = (tooltip.pos.x + 10) + xDistance
-	}
-
-	// since the smaller the number the faster it goes, i divide it
-	if (speed > 2) {
-		tooltip.opacity = 1
-		tooltip.scale.y = 1
-		tooltip.scale.x = 1
-	}
-
-	else {
-		// animating
-		tween(tooltip.opacity, 1, 0.25 / speed, (p) => tooltip.opacity = p, )
-		tween(tooltip.scale.y, yScale, 0.45 / speed, (p) => tooltip.scale.y = p, easings.easeOutQuint)
-		
-		wait(0.1, () => {
-			tween(tooltip.scale.x, xScale, 0.4 / speed, (p) => tooltip.scale.x = p, easings.easeOutQuint) 
-			wait(0.1, () => {
-				tween(texty.opacity, 1, 0.4, (p) => texty.opacity = p, easings.easeOutQuint)
-			})
-		})
-	}
-}
-
-export function endToolTip(speed = 1) {
-	get("tooltip").forEach(element => {
-		tween(element.opacity, 0, 0.05 / speed, (p) => element.opacity = p)
-		wait(0.08 / speed, () => {
-			destroy(element)
-		})
-	});
-}
-
 let maxLogs = 3;
 let toastQueue = [];
-export function addToast(opts = { icon: "none", title: "Title", body: "Body", color: WHITE }) {
-    let logs = get("toast", { recursive: true });
+const initialYPosition = 50;
 
-    function actuallyAddToast(idx, opt) {
-        let toastBg = add([
-            rect(280, 120, { radius: [0, 10, 10, 0] }),
-            pos(-200, 25 + idx * 150),
-            anchor("topleft"),
-            color(WHITE.darken(50)),
-			z(hexagon.z),
+export function addToast(opts = { time: 1, icon: "none", title: "Title", body: "Body", color: WHITE }) {
+	function actuallyAddToast(idx, opt) {
+		let logs = get("toast", { recursive: true });
+		let yOffset = initialYPosition;
+		for (let i = 0; i < idx; i++) {
+			yOffset += logs[i].height + 10; // Add spacing between logs
+		}
+
+		let toastBg = add([
+			rect(0, 0, { radius: [0, 10, 10, 0] }),
+			pos(-200, yOffset),
+			anchor("top"),
+			color(WHITE.darken(50)),
+			z(getZBetween(hexagon.z, scoreText.z)),
 			area(),
-            "toast",
-            {
-				running: true,
-                timeLeft: 2,
-                index: idx,
-                update() {
-                    this.timeLeft = map(toastProgressBar.width, 0, toastBg.width, 2, 0);
-                },
+			"toast",
+			{
+				index: idx,
 				close() {
 					tween(toastBg.pos.x, -toastBg.width, 0.8, (p) => (toastBg.pos.x = p), easings.easeOutQuint).onEnd(() => {
+						updateLogPositions();
 						destroy(toastBg);
 						processQueue();
 					});
 				},
-            },
-        ]);
+			},
+		]);
 
 		let drawShadow = onDraw(() => {
 			drawRect({
 				pos: vec2(toastBg.pos.x, toastBg.pos.y + 5),
 				width: toastBg.width,
+				anchor: toastBg.anchor,
 				height: toastBg.height,
-				color: BLACK,
-				radius: [0, 10, 10, 0],
-				z: toastBg.z - 1,
+				radius: toastBg.radius,
+				z: 1,
 				opacity: 0.5,
+				color: BLACK,
 			})
-		})
+		});
 
-		toastBg.onClick(() => {
-			toastBg.running = true
-			toastBg.close()
-			if (opt.title == "This is a title") {  }
-			else if (opt.title == "Unlocked store window") openWindow("storeWin")
-		})
+		toastBg.height = opts.icon ? 80 : 100;
 
-        // Add content to the toast
-		let icon;
-		if (opts.icon) {
-			icon = toastBg.add([
-				sprite("mupgrades", {
-					anim: "u_12",
-				}),
-				anchor("center"),
-				pos(40, 40),
-			])
+		toastBg.onMousePress("left", () => {
+			if (!toastBg.isHovering()) return;
+			toastBg.close();
+		});
 
-			icon.width = 60
-			icon.height = 60
-		}
-		
-		// position and scale them based on icon opts.icon ? x
-		let titleText = toastBg.add([
-			text(opts.title, {
-				font: "lambda",
-				size: opts.icon ? 35 : 40,
-				align: "left",
-			}),
-			pos(opts.icon ? icon.pos.x + 35 : 10, opts.icon ? icon.pos.y - 15 : 10),
-			color(BLACK),
-			scale(),
+		let spriteName = !opts.icon.includes(".") ? opts.icon : [opts.icon.split(".")[0], opts.icon.split(".")[1]];
+		let icon = add([
+			sprite(typeof spriteName == "string" ? spriteName : spriteName[0]),
+			anchor("center"),
+			pos(toastBg.pos.x - toastBg.width / 2 + 50, toastBg.pos.y),
+			z(toastBg.z + 1),
+			{
+				update() {
+					this.pos.x = toastBg.pos.x - toastBg.width / 2 + 50;
+					this.pos.y = toastBg.pos.y + toastBg.height / 2;
+				}
+			}
 		]);
 
-		let bodyText = toastBg.add([
+		typeof spriteName == "string" ?? icon.play(spriteName[1]);
+
+		icon.width = 60;
+		icon.height = 60;
+
+		let titleText = add([
+			text(opts.title, {
+				font: "lambda",
+				size: 40,
+				align: "left",
+				width: 500,
+			}),
+			pos(icon.pos.x + icon.width / 2 + 10, 0, toastBg.pos.y - toastBg.height / 2),
+			color(BLACK),
+			z(toastBg.z + 1),
+			{
+				update() {
+					this.pos.x = icon.pos.x + icon.width / 2 + 10;
+					this.pos.y = toastBg.pos.y + 5;
+				}
+			}
+		]);
+
+		let bodyText = add([
 			text(opts.body, {
 				font: "lambda",
 				size: 20,
 				align: "left",
-				width: toastBg.width - 10
+				width: 500,
 			}),
-			pos(opts.icon ? icon.pos.x - icon.width / 2 : 10, opts.icon ? icon.pos.y + icon.height / 2  + 15 : titleText.pos.y + titleText.height / 2 + 20),
+			pos(titleText.pos.x, titleText.pos.y + titleText.height),
 			color(BLACK),
+			z(toastBg.z + 1),
+			{
+				update() {
+					this.pos.x = titleText.pos.x;
+					this.pos.y = titleText.pos.y + titleText.height;
+				}
+			}
 		]);
 
-        let toastProgressBar = toastBg.add([
-            rect(toastBg.width, 10),
-            pos(0, toastBg.height),
+		let toastProgressBar = toastBg.add([
+			rect(toastBg.width, 10),
+			pos(0, toastBg.height),
 			color(opt.color),
 			opacity(0),
-        ]);
+		]);
 
-        tween(toastBg.pos.x, 0, 0.5, (p) => toastBg.pos.x = p, easings.easeOutQuint);
-        tween(toastProgressBar.width, 0, 2, (p) => toastProgressBar.width = p, easings.linear).onEnd(() => {
-			if (toastBg.running) toastBg.close()
+		toastBg.width = icon.width + 20;
+		toastBg.height = icon.height + 20;
+
+		if (titleText.width > bodyText.width) toastBg.width += titleText.width + 15;
+		else toastBg.width += bodyText.width + 10;
+
+		if (titleText.height > bodyText.height) toastBg.height = titleText.height + bodyText.height + 10;
+		else toastBg.height += bodyText.height - titleText.height + 10;
+
+		tween(-toastBg.width, toastBg.width / 2, 0.5, (p) => toastBg.pos.x = p, easings.easeOutQuint);
+
+		wait(opts.time ?? 3, () => {
+			toastBg.close();
 		});
 
 		toastBg.onDestroy(() => {
-			drawShadow.cancel()
-		})
-    }
+			drawShadow.cancel();
+			icon.destroy()
+			titleText.destroy();
+			bodyText.destroy();
+		});
 
-    function processQueue() {
-        let logs = get("toast", { recursive: true });
-        while (toastQueue.length > 0 && logs.length < maxLogs) {
-            let nextToast = toastQueue.shift();
-            let availableIndex = getAvailableIndex(logs);
-            if (availableIndex !== -1) {
-                actuallyAddToast(availableIndex, nextToast);
-                logs = get("toast", { recursive: true }); // update logs after adding a toast
-            }
-        }
-    }
-
-    function getAvailableIndex(logs) {
-        let occupiedIndices = logs.map(log => log.index);
-        for (let i = 0; i < maxLogs; i++) {
-            if (!occupiedIndices.includes(i)) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    logs = get("toast", { recursive: true }); // Update logs
-
-    if (logs.length >= maxLogs) {
-        toastQueue.push(opts);
-    } else {
-        let availableIndex = getAvailableIndex(logs);
-        if (availableIndex !== -1) {
-            actuallyAddToast(availableIndex, opts);
-        }
-    }
-
-    processQueue(); // Ensure the queue is processed if there are available slots
-}
-
-export function addPlusPercentageScore(posToAdd, amount, size = [40, 50]) {
-	let plusScoreText = add([
-		text("+" + formatNumber(amount, true, false) + "%", {
-			size: rand(size[0], size[1])
-		}),
-		pos(posToAdd),
-		rotate(0),
-		anchor("center"),
-		z(6),
-		{
-			// TODO: i like this, look at it !!!
-			// dir: vec2(rand(-200, 200), 200),
-			// update() {
-			// 	this.angle += this.dir.x / 100
-			// 	this.dir.y += 10
-			// 	this.move(this.dir)
-			// },
-			// update() {
-
-			// }
+		if (opts.title.includes("saved")) playSfx("gamesaved")
+		if (opts.title.includes("unlocked")) {
+			if (opts.title.includes("window")) playSfx("unlockachievement", { tune: 300, speedy: 100 })
+			else playSfx("unlockachievement")
 		}
-	])
+	}
 
-	// tween(plusScoreText.pos.y, plusScoreText.pos.y - 50, 1, (p) => plusScoreText.pos.y = p, )
-	// tween(1, 0, 1, (p) => plusScoreText.opacity = p, )
+	function updateLogPositions() {
+		let logs = get("toast", { recursive: true });
+		let yOffset = initialYPosition;
 
-	plusScoreText.pos.x = choose([
-		rand(posToAdd.x - 50, posToAdd.x - 40),
-		rand(posToAdd.x + 50, posToAdd.x + 40),
-	])
+		logs.forEach((log, idx) => {
+			tween(log.pos.y, yOffset, 0.5, (p) => log.pos.y = p, easings.easeOutQuint);
+			yOffset += log.height + 10;
+		});
+	}
 
-	plusScoreText.pos.y = choose([
-		rand(posToAdd.y - 10, posToAdd.y - 10),
-		rand(posToAdd.y + 10, posToAdd.y + 10),
-	])
+	function processQueue() {
+		let logs = get("toast", { recursive: true });
+		let totalHeight = logs.reduce((sum, log) => sum + log.height + 10, 0); // Calculate total height of logs
 
-	// animate plusscoretext
-	tween(
-		plusScoreText.pos.y,
-		plusScoreText.pos.y - 20,
-		0.25,
-		(p) => plusScoreText.pos.y = p,
-	);
-	tween(
-		1,
-		0,
-		0.25,
-		(p) => plusScoreText.opacity = p,
-	);
+		maxLogs = Math.floor(height() / totalHeight); // Update maxLogs based on total height
 
-	wait(0.25, () => {
-		tween(
-			plusScoreText.opacity,
-			0,
-			0.25,
-			(p) => plusScoreText.opacity = p,
-		);
-	});
+		while (toastQueue.length > 0 && logs.length < maxLogs) {
+			let nextToast = toastQueue.shift();
+			let availableIndex = getAvailableIndex(logs);
+			if (availableIndex !== -1) {
+				actuallyAddToast(availableIndex, nextToast);
+				logs = get("toast", { recursive: true }); // update logs after adding a toast
+			}
+		}
+	}
+
+	function getAvailableIndex(logs) {
+		let occupiedIndices = logs.map(log => log.index);
+		for (let i = 0; i < maxLogs; i++) {
+			if (!occupiedIndices.includes(i)) {
+				return i;
+			}
+		}
+		return -1;
+	}
+
+	let logs = get("toast", { recursive: true }); // Update logs
+
+	if (logs.length >= maxLogs) {
+		toastQueue.push(opts);
+	} 
 	
-	wait(0.25, () => {
-		destroy(plusScoreText);
-	});
+	else {
+		let availableIndex = getAvailableIndex(logs);
+		if (availableIndex !== -1) {
+			actuallyAddToast(availableIndex, opts);
+		}
+	}
+
+	processQueue(); // Ensure the queue is processed if there are available slots
 }

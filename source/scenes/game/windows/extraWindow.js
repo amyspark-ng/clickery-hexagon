@@ -240,6 +240,7 @@ export function makeGridMinibutton(idx, gridSlot, winParent) {
 				if (curDraggin) return
 
 				// click function
+				winParent.close()
 				manageWindow(gridMiniButton.windowKey)
 				bop(gridMiniButton)
 			}

@@ -102,7 +102,6 @@ export function openWindow(windowKey = "") {
 				})
 
 				infoForWindows[windowKey].lastPos = this.pos
-				if (folded || !GameState.unlockedWindows.includes(windowKey)) return
 			},
 
 			releaseDrop() {
@@ -230,7 +229,7 @@ export function openWindow(windowKey = "") {
 				return
 			}
 
-			if (windowObj.isMouseInGeneralRange()) {
+			if (windowObj.isMouseInPreciseRange()) {
 				if (windowObj.isMouseInClickingRange()) {
 					mouse.grab()
 					windowObj.pick()
@@ -250,6 +249,8 @@ export function openWindow(windowKey = "") {
 	})
 
 	windowObj.onKeyPress("escape", () => {
+		// if window is active and (window isn't an extra window and curDragging isn't gridMinibutton)
+		// can't close if is extra window and is dragging a button
 		if (windowObj.is("active") && !(windowObj.is("extraWin") && curDraggin?.is("gridMiniButton"))) windowObj.close()
 	})
 
@@ -271,9 +272,18 @@ export function openWindow(windowKey = "") {
 	correspondingMinibutton.window = windowObj
 	bop(correspondingMinibutton)
 
+	// manage some hovers
+	get("hoverOutsideWindow", { recursive: true }).forEach((obj) => {
+		if (obj.isHovering() && windowObj.isHovering()) obj.endHover()
+	})
+
 	windowObj.on("close", () => {
 		correspondingMinibutton.window = null
 		bop(correspondingMinibutton)
+	
+		get("hoverOutsideWindow", { recursive: true }).forEach((obj) => {
+			if (obj.isHovering()) obj.startHover()
+		})
 	})
 
 	return windowObj;
@@ -408,7 +418,13 @@ export function folderObjManaging() {
 		// adjust it to 0, 1, 2, 3
 		const index = numberPressed - 1;
 	
-		if (index >= 0 && index < GameState.taskbar.length) {
+		// silly
+		if (numberPressed == 0) {
+			if (folded) folderObj.unfold();
+			manageWindow("extraWin")
+		}
+
+		else if (index >= 0 && index < GameState.taskbar.length) {
 			const windowKey = GameState.taskbar[index];
 	
 			// if (GameState.unlockedWindows.includes(windowKey)) {
@@ -445,7 +461,8 @@ export function folderObjManaging() {
 		if (!curDraggin?.is("gridMiniButton")) return
 		if (curDraggin?.screenPos().dist(minibutton.screenPos()) > 120) return
 		let distanceToCurDragging = curDraggin?.screenPos().dist(minibutton.screenPos())
-	
+
+		minibutton.nervousSpinSpeed = 14
 		let blackness = map(distanceToCurDragging, 20, 120, 1, 0.25)
 		minibutton.opacity = map(distanceToCurDragging, 20, 120, 0.5, 1)
 		minibutton.scale.x = map(distanceToCurDragging, 20, 120, 0.8, 1)

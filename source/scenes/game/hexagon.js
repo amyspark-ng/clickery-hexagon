@@ -71,7 +71,6 @@ export function addHexagon() {
 			scale: GameState.settings.panderitoMode ? vec2(0.5, 1) : vec2(1.08, 1.08) 
 		}),		
 		z(2),
-		waver({ maxAmplitude: 5, wave_speed: 1 }),
 		"hexagon",
 		"hoverOutsideWindow",
 		{
@@ -91,8 +90,8 @@ export function addHexagon() {
 				else maxRotSpeed = 10
 				this.rotationSpeed = map(GameState.score, 0, scoreVars.scoreNeededToAscend, 0.01, maxRotSpeed)
 				this.rotationSpeed = clamp(this.rotationSpeed, 0.01, maxRotSpeed)
-				this.wave_speed = map(GameState.score, 0, scoreVars.scoreNeededToAscend, 1, 2)
-				this.wave_speed = clamp(this.wave_speed, 1, 2)
+				// this.wave_speed = map(GameState.score, 0, scoreVars.scoreNeededToAscend, 1, 2)
+				// this.wave_speed = clamp(this.wave_speed, 1, 2)
 				this.angle += this.rotationSpeed
 				
 				this.scale.x = wave((this.smallestScale * this.scaleIncrease), (this.biggestScale * this.scaleIncrease), time() * 1.15)
@@ -150,6 +149,7 @@ export function addHexagon() {
 					clickVars.maxedCombo = true
 					addConfetti({ pos: center() })
 					tween(-10, 0, 0.5, (p) => cam.rotation = p, easings.easeOutQuint)
+					playSfx("fullcombo", rand(-50, 50))
 				}
 
 				// debug.log(`${clickVars.consecutiveClicks} / ${COMBO_MAXCLICKS}`)
@@ -241,7 +241,11 @@ export function addHexagon() {
 							autoCursor.jump(300)
 			
 							wait(0.2, () => {
-								tween(1, 0, 0.25, (p) => autoCursor.opacity = p, )
+								// LOL!!!
+								let upwards = chance(0.1)
+								if (upwards) autoCursor.gravityScale = -1
+								
+								tween(1, 0, upwards ? 0.4 : 0.25, (p) => autoCursor.opacity = p, easings.linear)
 								if (autoCursor.pos.x > hexagon.pos.x) {
 									tween(autoCursor.angle, autoCursor.angle + 90, 1, (p) => autoCursor.angle = p, )
 									autoCursor.vel.x = rand(25, 50)
@@ -283,7 +287,10 @@ export function addHexagon() {
 		}
 	])
 
-	hexagon.startWave()
+	hexagon.on("startAnimEnd", () => {
+		hexagon.use(waver({ maxAmplitude: 5, wave_speed: 1 }))
+		hexagon.startWave()
+	})
 
 	hexagon.onHoverUpdate(() => {
 		if (!isGenerallyHoveringAWindow && !isDraggingAWindow && !hexagon.isBeingHoveredOn && !curDraggin?.is("minibutton")) {

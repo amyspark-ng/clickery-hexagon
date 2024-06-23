@@ -22,6 +22,7 @@ export let currentSongIdx = 0
 export let progressBar;
 export let timeText;
 
+// don't mess up with timeSinceSkip, don't reset when window enter
 export let timeSinceSkip = 0;
 let skipping = false;
 
@@ -32,6 +33,7 @@ export function setTimeSinceSkip(value = 0) {
 
 export function musicWinContent(winParent) {
 	currentSongIdx = GameState.settings.music.favoriteIdx == null ? 0 : GameState.settings.music.favoriteIdx
+	
 	let disc = winParent.add([
 		sprite("discs", {
 			anim: `${songs[Object.keys(songs)[currentSongIdx]].cover}`
@@ -168,7 +170,7 @@ export function musicWinContent(winParent) {
 	])
 
 	let pauseButton = winParent.add([
-		text(GameState.settings.music.muted ? ">" : "||", {
+		text("", {
 			size: 40
 		}),
 		pos(15, 60),
@@ -178,7 +180,13 @@ export function musicWinContent(winParent) {
 		"hoverObj",
 		"musicButton",
 		"windowButton",
-		"pauseButton"
+		"pauseButton",
+		{
+			update() {
+				if (musicHandler.paused && !musicHandler.winding) this.text = ">"
+				else this.text = "||"
+			}
+		}
 	])
 
 	let skipButton = winParent.add([
@@ -207,16 +215,22 @@ export function musicWinContent(winParent) {
 			tween(disc.angle, disc.angle - rand(75, 100), 0.5, (p) => disc.angle = p, easings.easeOutQuint)
 			if (currentSongIdx < 0) currentSongIdx = Object.keys(songs).length - 1
 		}
+
+		playSfx("clickButton", rand(-150, 50))
+		bop(backButton)
 	}
 
 	function skipButtonAction() {
 		currentSongIdx++
 		tween(disc.angle, disc.angle + rand(75, 100), 0.5, (p) => disc.angle = p, easings.easeOutQuint)
 		if (currentSongIdx >= Object.keys(songs).length) currentSongIdx = 0
+		
 		playSfx("clickButton", rand(-150, 50))
+		bop(skipButton)
 	}
 
 	function pauseButtonAction() {
+		if (musicHandler.winding) return
 		musicHandler.paused = !musicHandler.paused
 
 		// ^ only manages pause, do the other stuff below
@@ -224,7 +238,9 @@ export function musicWinContent(winParent) {
 		get("bpmChange", { recursive: true }).forEach(bpmChange => {
 			musicHandler.paused ? bpmChange.stopWave() : bpmChange.startWave()
 		})
+		
 		playSfx("clickButton", rand(-100, 100))
+		bop(pauseButton)
 	}
 
 	function generalBackSkipButtonAction() {
@@ -235,8 +251,6 @@ export function musicWinContent(winParent) {
 		scratchSong()
 		tween(progressBar.width, 0, 0.5, (p) => progressBar.width = p, easings.easeOutQuint)
 		tween(musicHandler.currentTime, 0, 0.5, (p) => musicHandler.currentTime = p, easings.easeOutQuint)
-		musicHandler.winding = true
-
 		tween(musicHandler.totalTime, songs[Object.keys(songs)[currentSongIdx]].duration, 0.5, (p) => musicHandler.totalTime = p, easings.easeOutQuint)
 		disc.play(songs[Object.keys(songs)[currentSongIdx]].cover)
 		GameState.settings.music.favoriteIdx = currentSongIdx
@@ -257,46 +271,35 @@ export function musicWinContent(winParent) {
 	// if the time since the skip is less than 1 it does nothing
 	get("musicButton", { recursive: true }).forEach(mBtn => mBtn.onClick(() => {
 		if (mBtn.is("backButton") || mBtn.is("skipButton")) {
-			generalBackSkipButtonAction()
-
-			if (mBtn.is("backButton")) {
-				backButtonAction()
-			}
+			if (mBtn.is("backButton")) backButtonAction()
 			
-			else if (mBtn.is("skipButton")) {
-				skipButtonAction()
-			}
+			else if (mBtn.is("skipButton")) skipButtonAction()
+			
+			generalBackSkipButtonAction() // goes after
 		}
 
 		else if (mBtn.is("pauseButton")) {
 			pauseButtonAction()
 		}
-
-		bop(mBtn)
 	}))
 	
 	get("bpmChange", { recursive: true }).forEach(bpmChange => {
 		if (!bpmChange.is("wave")) bpmChange.use(waver({ maxAmplitude: 5, wave_speed: songs[Object.keys(songs)[currentSongIdx]].speed, wave_tweenSpeed: 0.2 }))
 		if (!GameState.settings.music.muted || !musicHandler.paused ) bpmChange.startWave()
 	})
-	onUpdate("bpmChange", (bpmChange) => {
-		bpmChange.wave_speed = songs[Object.keys(songs)[currentSongIdx]].speed
+
+	onUpdate("bpmChange", (bpmChangeObj) => {
+		bpmChangeObj.wave_speed = songs[Object.keys(songs)[currentSongIdx]].speed
 	})
 	
 	// support for keys let's gooooo
-	winParent.onKeyPress("right", () => {
-		generalBackSkipButtonAction()
-		skipButtonAction()
+	winParent.onKeyPress((key) => {
+		if (key == "left") backButtonAction()
+		else if (key == "right") skipButtonAction()
+		if (key == "left" || key == "right") generalBackSkipButtonAction()
+
+		else if (key == "up") pauseButtonAction()
 	})
-
-	winParent.onKeyPress("left", () => {
-		generalBackSkipButtonAction()
-		backButtonAction()
-	}) 
-
-	winParent.onKeyPress("up", () => {
-		pauseButtonAction()
-	}) 
 
 	return;
 }

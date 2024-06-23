@@ -1,4 +1,5 @@
 import { GameState } from "../../gamestate";
+import { playSfx } from "../../sound";
 import { addToast } from "./additives";
 import { autoLoopTime, cam, excessTime, panderitoIndex } from "./gamescene";
 import { hexagon } from "./hexagon";
@@ -82,6 +83,10 @@ export function getRandomElementDifferentFrom(arr, element) {
     }
     const randomIndex = Math.floor(Math.random() * filteredArray.length);
     return filteredArray[randomIndex];
+}
+
+export function getZBetween(a, b) {
+	return Math.floor(a + b / 2)
 }
 
 // definetely not chatgpt again
@@ -201,7 +206,7 @@ export function saveAnim() {
 	// 		destroy(floppy)
 	// 	})
 	// })
-	addToast({ icon: "floppy", title: "Game saved!" })
+	addToast({ icon: "floppy", title: "Game saved!", body: `Time played: ${"00:00:00"}` })
 }
 
 export function bop(obj, howMuch = 0.1, bopEasing = easings.easeOutQuint) {
@@ -259,10 +264,28 @@ export function debugFunctions() {
 		else if (isKeyPressed("v")) GameState.delete()
 		else if (isKeyPressed("b")) GameState.cheat()
 		else if (isKeyPressed("r") && panderitoIndex != 6) go("gamescene")
+		else if (isKeyPressed("w")) hexagon.autoClick()
 		
-		else if (isKeyPressed("g")) addToast({ title: "Welcome back!", body: "Now with a body" })
-		else if (isKeyPressed("h")) addToast({ title: "Welcome back!", body: "Did you know there's actually a limit to how long these body texts can b-"})
-		else if (isKeyPressed("j")) addToast({ title: "Welcome back!", body: "Now with a body and an icon too", icon: "cursor" })
+		else if (isKeyPressed("h")) {
+			addToast({
+				title: "Achievement unlocked!",
+				body: "You've gotten the achievement",
+				icon: "mupgrades.u_12"
+			})
+		}
+
+		else if (isKeyPressed("j")) {
+			addToast({
+				title: "Window unlocked!",
+				body: "You've gotten a window",
+				icon: "icon_music"
+			})
+		}
+
+		// else if (isKeyPressed("g")) addToast({ title: "Welcome back!", body: "This is a long body text", icon: "mupgrades.u_12" })
+		// else if (isKeyPressed("h")) addToast({ title: "Welcome back!", body: "This is a longer body text, one that is longer", icon: "mupgrades.u_12" })
+		// else if (isKeyPressed("j")) addToast({ title: "Welcome back!", body: "This would be an even LONGER body text, one that is a LOT longer than the one before, very very long, im running out of really long messages so i'm trying to make it be very very very long ay no que rabia chris no aparece que fastidio con esta gente uno les organiza salidas y dicen que si y uno se pone de bobo a esperarlos y luego no aparecen siempre es la mmisma vaina con todo que rabia yo no vuelvo a organizar ninguna salida mejor no vuelvo a hacer nada con nadie los odio a todos me voy a mudar de pais yo no se ya que hacer", icon: "mupgrades.u_12"})
+		// else if (isKeyPressed("k")) addToast({ title: "Did you know? The bg will adjust to the text that has the longer width?", body: "This one has a longer title than body", icon: "mupgrades.u_12" })
 		else if (isKeyDown("q")) {
 			hexagon.clickPress()
 			wait(0.1, () => hexagon.clickRelease())

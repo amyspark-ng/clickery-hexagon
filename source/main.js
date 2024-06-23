@@ -2,6 +2,7 @@ import kaplay from "kaplay";
 import "kaplay/global";
 
 import { drawSeriousLoadScreen, loadEverything } from "./loader.js"
+import { GameState } from "./gamestate.js";
 
 export const DEBUG = true
 export const k = kaplay({
@@ -10,7 +11,7 @@ export const k = kaplay({
 	font: 'lambda',
 	canvas: document.getElementById("kanva"),
 	logMax: 10,
-	backgroundAudio: true,
+	backgroundAudio: GameState.settings.keepAudioOnTabChange,
 	debugKey: "f1",
 	debug: DEBUG,
 	loadingScreen: true,

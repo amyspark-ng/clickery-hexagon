@@ -85,13 +85,12 @@ export function gamescene() {
 		
 		setGravity(1600)
 
-		if (!GameState.settings.music.muted) {
-			playMusic(GameState.settings.music.favoriteIdx == null ? "clicker.wav" : Object.keys(songs)[GameState.settings.music.favoriteIdx])
-		}
+		// don't check anything for muted, it will play but no sound, that's good
+		playMusic(GameState.settings.music.favoriteIdx == null ? "clicker.wav" : Object.keys(songs)[GameState.settings.music.favoriteIdx])
 
 		// wait 60 seconds
 		wait(60, () => {
-			loop(60, () => {
+			loop(120, () => {
 				if (GameState.totalScore > 1) GameState.save(true)
 			})
 		})
@@ -149,6 +148,7 @@ export function gamescene() {
 					const timeOutsideTab = performance.now() - startTimeOutsideTab;
 					totalTimeOutsideTab += timeOutsideTab;
 		
+					if (!GameState.totalScore > 0) return;
 					// 60 being the seconds outside of screen to get the zzz screen
 					if (totalTimeOutsideTab / 1000 > 10) {
 						let black = add([
@@ -193,9 +193,9 @@ export function gamescene() {
 							// actual gainedScore
 							gainedScore = gainedScore * scoreVars.scorePerAutoClick
 		
-							// 120 being the seconds outside screen you have to be to get a "pop up"
-							if ((totalTimeOutsideTab / 1000) > 2) {
-								addToast({ icon: "cursor", title: "Welcome back!", body: `+${gainedScore} points!`, color: GREEN })
+							// 120 being the seconds outside screen you have to be to get a log
+							if ((totalTimeOutsideTab / 1000) > 120) {
+								addToast({ icon: "cursors.cursor", title: "Welcome back!", body: `+${gainedScore} of score!`, color: GREEN })
 							}
 				
 							tween(GameState.score, GameState.score + gainedScore, 0.25, (p) => GameState.score = p, easings.easeOutQuint)
@@ -229,7 +229,9 @@ export function gamescene() {
 		tween(1, GameState.settings.bgColor[3], 0.5, (p) => gameBg.color.a = p, easings.easeOutQuad)
 
 		// hexagon
-		tween(vec2(center().x, center().y + 110), vec2(center().x, center().y + 55), 0.5, (p) => hexagon.pos = p, easings.easeOutQuad)
+		tween(vec2(center().x, center().y + 110), vec2(center().x, center().y + 55), 0.5, (p) => hexagon.pos = p, easings.easeOutQuad).onEnd(() => {
+			hexagon.trigger("startAnimEnd")
+		})
 		tween(0.25, 1, 1, (p) => hexagon.opacity = p, easings.easeOutQuad)
 		
 		// scoreCounter

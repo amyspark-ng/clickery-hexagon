@@ -11,10 +11,11 @@ let trayVolElements;
 let volumeBars;
 
 export let sfxHandler;
-export function playSfx(sound = "clickPress", tune = 0) {
+export function playSfx(sound = "clickPress", opts = {tune: 0, speedy: 1}) {
 	sfxHandler = play(sound, {
 		volume: GameState.settings.sfx.volume,
-		detune: tune
+		detune: opts.tune ?? 0,
+		speed: opts.speedy ?? 1
 	})
 }
 

@@ -2,62 +2,66 @@
 # [Bookmarks](#bookmarks)
 # [Ideas](#ideas)
 
+-- MUSIC WORKS PRETTY FUCKIGN WEIRD WHEN DOING LOADMUSIC INSTEAD OF SOUND DON'T GET SCARED
 * Do "-" for issues, "*" for notes, "^" for comments on either
 
 # TODAY
+- Delete the log y position getting updated
+- Fix the playSfx functions that were already written to use opt
+	* Figure out why the sfx is not getting played with a different tune or speed 
+- Format actual working numbers
+	* SPSWORKING RELIES ON THIS ^
+- spstext doesn't work with the spsTextMode at all lol 
+	* It's completely broken
+	* Make it work with new shorten numbers setting (might not do)
+------------------------------------------
+- Re-design/make working toasts
+	* add toast condition where there's title but no body
+	* onsAdd support for ic
+	* Make the log the height of the icon and the width be determind by body width
+		* Change the queue stuff to support different heights
+
+# The day after
 - Keep working on store
 	* I have to tell devky to make the upgrade icons and the upgrade store element, then i can work on it 
 	* Rework tooltips for upgrades
-- Format actual working numbers
-	* Make it work with new shorten numbers setting (might not do)
-- Re-design/make working toasts
-	* add toast condition where there's title but no body
-	* Add support for icons
-	^ Manage to do text wrappings
-- when window closes check if any hoverOutsideWindow is being hovered and trigger their onHoverStart
-	* same for closing
 - Fix panderito hitbox
-- spstext doesn't work with the spsTextMode at all lol 
-	* It's completely broken
-
-### bugs
-
-# Soon
 - I REALLYYY need to fix the hover animations
 - and the mouse animations
-- and click priortiy
+	* Maybe do keep the tag system, just uhhhhhhhhhhhhhhhhhhhhhhhhhhhhh
+- Make working stats and make stats window
+- fix music waving speed
+- Why does medal look extremely big????
+
+# Pasado pasado mañana
+- Prototype medals window
+
+# Soon
+- and click priortiy (holy moly)
 
 # Issues!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ## General
-- REWRITING THE MOUSE SYSTEM IN PROGRESS:
-	* Unactive windows have some undesired behaviour (not unhovering hexagon)
-	* Buttons inside windows don't have hovers
-	* Minibuttons will play "cursor" sometims when hovering from the folderObj
-- Make pinch animation
-- music doesn't loop on gamescene
-cursor gets something when combo is high
-- volume works weirdly when muted (like if you mute it and lower it and increase it)
 
 ## Windows
-- You can click hexagon while hovering window for drag, then you drag it and it will not play clickRelease
 * For clicking behind object should check if any other window that is not the current one is active, if any other window is active the button should not work
-
-### Store
-* Store elements don't go darker with the unactive color because their color is being defined by score amount and price
-### Music
-* Change vynil to cd, looks better
-- fix music waving speed
-### Color
-* Sliders are not precise, too lazy to fix it probably
 
 # Ideas
 - Add achievement for making the hexagon black and the bg white (bad apple)
 - Do the funny thing with music title in clicker.wav like deltarune did
-- Random chance of cursor making something funny (going upwards that'd be funny)
 - Add an achievement for opening all windows in your taskbar at the same time
 - Make unactive windows grayscale
 - Discount powerup (very short)
-- when clicking run through every achievement in an object that has a clicking property and check if the score is higher or equal to another property there
+- when clicking run through every achievement in an object that has a clicking property and check if the score is higher or equal to a value property, so:
+```js
+	onClick(() => {
+		achivements.forEach((achievement) => {
+			if (!achievement.clicking) return;
+			if (GameState.score >= achievement.value && !gamestate.unlockedAchievements.100score) unlockAchievement(achivements.100score)
+		})
+	})
+```
+- ADD THE THING WHERE THE GNOME WALKS ACROSS THE SCREEN AND BE LIKE HOLY SHIT GUYS DID YOU SEE THAT?
+	* Every second have a chance of something% that triggers it
 
 # Missing
 - Ascend mechanic

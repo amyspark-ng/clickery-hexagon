@@ -1,11 +1,9 @@
 import { GameState } from "../../../gamestate";
 import { curDraggin, drag, setCurDraggin } from "../../../plugins/drag";
-import { waver } from "../../../plugins/wave";
 import { playSfx } from "../../../sound";
 import { hexagon } from "../hexagon";
 import { blendColors, bop, getPositionOfSide } from "../utils";
 import { gameBg, mouse } from "../additives";
-import { deactivateAllWindows } from "./windows-api/windowsAPI";
 
 let lastSoundPos;
 let draggingTune;
@@ -59,18 +57,11 @@ function addRgbSlider(winParent, posToAdd = vec2(0), coloredObj, type = "r") {
 	])
 
 	theOneBehind.onClick(() => {
-		if (!sliderButton.isHovering()) {
-			// calculation stuff
-			let objectRect = theOneBehind.screenArea().bbox();
-			let distanceFromCenter = mousePos().x - objectRect.pos.x - objectRect.width / 2;
-			let relativePosition = distanceFromCenter / (objectRect.width / 2);
-			relativePosition = (relativePosition + 0.9) / 1.8;
-			relativePosition = clamp(relativePosition, 0, 1)
-			let mappedPosition = (relativePosition * 300) - 150;
-			mappedPosition = clamp(mappedPosition, getPositionOfSide(theOneBehind).left, getPositionOfSide(theOneBehind).right)
-			tween(sliderButton.pos.x, mappedPosition, 0.2, p => sliderButton.pos.x = p, easings.easeOutQuint)
-			playSfx("hoverMiniButton", sliderButton.draggingTune)
-		}
+		if (sliderButton.isHovering()) return
+
+		let xPos = sliderButton.parent.fromScreen(mousePos()).x // thank you MF
+		tween(sliderButton.pos.x, xPos, 0.2, p => sliderButton.pos.x = p, easings.easeOutQuint)
+		playSfx("hoverMiniButton", sliderButton.draggingTune)
 	})
 
 	sliderButton = winParent.add([
