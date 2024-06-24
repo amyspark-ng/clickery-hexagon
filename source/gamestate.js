@@ -58,11 +58,10 @@ export let GameState = {
 	// },
 
 	stats: {
-		clicks: 0,
-		scoreGainedByClicks: 0,
+		timesClicked: 0,
 		powerupsClicked: 0,
-		flakesClicked: 0,
-		timePlayed: 0,
+		timesAscended: 0,
+		totalTimePlayed: 0,
 	},
 
 	settings: {

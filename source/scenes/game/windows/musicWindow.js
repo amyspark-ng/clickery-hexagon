@@ -31,6 +31,8 @@ export function setTimeSinceSkip(value = 0) {
 	timeSinceSkip = value
 }
 
+// such a nitpick! :/
+let angleOfDisc = 0
 export function musicWinContent(winParent) {
 	currentSongIdx = GameState.settings.music.favoriteIdx == null ? 0 : GameState.settings.music.favoriteIdx
 	
@@ -39,7 +41,7 @@ export function musicWinContent(winParent) {
 			anim: `${songs[Object.keys(songs)[currentSongIdx]].cover}`
 		}),
 		pos(-150, -20),
-		rotate(),
+		rotate(angleOfDisc),
 		anchor("center"),
 		scale(),
 		area(),
@@ -50,9 +52,10 @@ export function musicWinContent(winParent) {
 		"windowButton",
 		{
 			verPosition: -20,
+			spinSpeed: musicHandler.paused ? 0 : songs[Object.keys(songs)[currentSongIdx]].speed,
 			update() {
-				if (musicHandler.winding || skipping || musicHandler.paused) return
-				this.angle += songs[Object.keys(songs)[currentSongIdx]].speed
+				if (musicHandler.winding || skipping) return
+				this.angle += this.spinSpeed
 				if (Math.floor(this.angle % 360 == 0)) this.angle = 0
 			}
 		}
@@ -212,20 +215,18 @@ export function musicWinContent(winParent) {
 		
 		else {
 			currentSongIdx--
-			tween(disc.angle, disc.angle - rand(75, 100), 0.5, (p) => disc.angle = p, easings.easeOutQuint)
 			if (currentSongIdx < 0) currentSongIdx = Object.keys(songs).length - 1
 		}
 
-		playSfx("clickButton", rand(-150, 50))
+		playSfx("clickButton", {tune: rand(-150, 50)})
 		bop(backButton)
 	}
 
 	function skipButtonAction() {
 		currentSongIdx++
-		tween(disc.angle, disc.angle + rand(75, 100), 0.5, (p) => disc.angle = p, easings.easeOutQuint)
 		if (currentSongIdx >= Object.keys(songs).length) currentSongIdx = 0
 		
-		playSfx("clickButton", rand(-150, 50))
+		playSfx("clickButton", {tune: rand(-50, 150)})
 		bop(skipButton)
 	}
 
@@ -238,12 +239,13 @@ export function musicWinContent(winParent) {
 		get("bpmChange", { recursive: true }).forEach(bpmChange => {
 			musicHandler.paused ? bpmChange.stopWave() : bpmChange.startWave()
 		})
+		tween(disc.spinSpeed, musicHandler.paused ? 0 : songs[Object.keys(songs)[currentSongIdx]].speed, 1, (p) => disc.spinSpeed = p, easings.easeOutQuint)
 		
-		playSfx("clickButton", rand(-100, 100))
+		playSfx("clickButton", {tune: rand(-100, 100)})
 		bop(pauseButton)
 	}
 
-	function generalBackSkipButtonAction() {
+	function generalBackSkipButtonAction(action) {
 		if (skipping == false) {
 			skipping = true
 			get("bpmChange", { recursive: true }).forEach(element => { element.stopWave() });
@@ -252,6 +254,24 @@ export function musicWinContent(winParent) {
 		tween(progressBar.width, 0, 0.5, (p) => progressBar.width = p, easings.easeOutQuint)
 		tween(musicHandler.currentTime, 0, 0.5, (p) => musicHandler.currentTime = p, easings.easeOutQuint)
 		tween(musicHandler.totalTime, songs[Object.keys(songs)[currentSongIdx]].duration, 0.5, (p) => musicHandler.totalTime = p, easings.easeOutQuint)
+		
+		// is a different song
+		let idxOfNewSong = (action == 0 ? currentSongIdx + 1 : currentSongIdx - 1) // that's crazy
+		if (idxOfNewSong < 0) idxOfNewSong = Object.keys(songs).length - 1
+		if (idxOfNewSong >= Object.keys(songs).length) idxOfNewSong = 0
+
+		if (songs[Object.keys(songs)[idxOfNewSong]].cover != songs[Object.keys(songs)[currentSongIdx]].cover) {
+			tween(disc.angle, 0, 0.5, (p) => disc.angle = p, easings.easeOutQuint)
+			// goes back
+			if (action == 0) tween(1, -1, 0.5, (p) => disc.scale.x = p, easings.easeOutQuint)
+			// goes skip
+			else if (action == 1) tween(-1, 1, 0.5, (p) => disc.scale.x = p, easings.easeOutQuint)
+		}
+
+		else {
+			if (action == 0) tween(disc.angle, disc.angle - rand(75, 100), 0.5, (p) => disc.angle = p, easings.easeOutQuint)
+			else tween(disc.angle, disc.angle + rand(75, 100), 0.5, (p) => disc.angle = p, easings.easeOutQuint)
+		}
 		disc.play(songs[Object.keys(songs)[currentSongIdx]].cover)
 		GameState.settings.music.favoriteIdx = currentSongIdx
 		timeSinceSkip = 0
@@ -271,11 +291,11 @@ export function musicWinContent(winParent) {
 	// if the time since the skip is less than 1 it does nothing
 	get("musicButton", { recursive: true }).forEach(mBtn => mBtn.onClick(() => {
 		if (mBtn.is("backButton") || mBtn.is("skipButton")) {
-			if (mBtn.is("backButton")) backButtonAction()
+			let action;
+			if (mBtn.is("backButton")) {backButtonAction(); action = 0}
+			else if (mBtn.is("skipButton")) {skipButtonAction(); action = 1}
 			
-			else if (mBtn.is("skipButton")) skipButtonAction()
-			
-			generalBackSkipButtonAction() // goes after
+			generalBackSkipButtonAction(action) // goes after
 		}
 
 		else if (mBtn.is("pauseButton")) {
@@ -285,7 +305,7 @@ export function musicWinContent(winParent) {
 	
 	get("bpmChange", { recursive: true }).forEach(bpmChange => {
 		if (!bpmChange.is("wave")) bpmChange.use(waver({ maxAmplitude: 5, wave_speed: songs[Object.keys(songs)[currentSongIdx]].speed, wave_tweenSpeed: 0.2 }))
-		if (!GameState.settings.music.muted || !musicHandler.paused ) bpmChange.startWave()
+		if (!musicHandler.paused ) bpmChange.startWave()
 	})
 
 	onUpdate("bpmChange", (bpmChangeObj) => {
@@ -294,11 +314,16 @@ export function musicWinContent(winParent) {
 	
 	// support for keys let's gooooo
 	winParent.onKeyPress((key) => {
-		if (key == "left") backButtonAction()
-		else if (key == "right") skipButtonAction()
-		if (key == "left" || key == "right") generalBackSkipButtonAction()
+		let action;
+		if (key == "left") {backButtonAction(); action = 0}
+		else if (key == "right") {skipButtonAction(); action = 1}
+		if (key == "left" || key == "right") generalBackSkipButtonAction(action)
 
 		else if (key == "up") pauseButtonAction()
+	})
+
+	winParent.on("close", () => {
+		angleOfDisc = disc.angle
 	})
 
 	return;

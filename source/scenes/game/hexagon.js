@@ -106,7 +106,7 @@ export function addHexagon() {
 				this.clickPressTween = tween(this.scaleIncrease, 0.98, 0.35, (p) => this.scaleIncrease = p, easings.easeOutQuint)
 				this.isBeingClicked = true
 				mouse.grab()
-				playSfx("clickPress", rand(-50, 50))
+				playSfx("clickPress", {tune: rand(-50, 50)})
 			},
 
 			clickRelease() {
@@ -114,7 +114,7 @@ export function addHexagon() {
 				tween(this.scaleIncrease, this.isHovering() ? 1.05: 1, 0.35, (p) => this.scaleIncrease = p, easings.easeOutQuint)
 				this.isBeingClicked = false 
 				clickVars.clicksPerSecond++
-				playSfx("clickRelease", rand(-50, 50))
+				playSfx("clickRelease", {tune: rand(-50, 50)})
 				mouse.releaseAndPlay("point")
 
 				// # combo stuff
@@ -149,7 +149,7 @@ export function addHexagon() {
 					clickVars.maxedCombo = true
 					addConfetti({ pos: center() })
 					tween(-10, 0, 0.5, (p) => cam.rotation = p, easings.easeOutQuint)
-					playSfx("fullcombo", rand(-50, 50))
+					playSfx("fullcombo", {tune: rand(-50, 50)})
 				}
 
 				// debug.log(`${clickVars.consecutiveClicks} / ${COMBO_MAXCLICKS}`)
@@ -223,14 +223,14 @@ export function addHexagon() {
 						
 						// clickPress manual false
 						tween(hexagon.scaleIncrease, 0.98, 0.35, (p) => hexagon.scaleIncrease = p, easings.easeOutQuint)
-						playSfx("clickPress", rand(-50, 50))
+						playSfx("clickPress", {tune: rand(-50, 50)})
 			
 						wait(0.15, () => {
 							autoCursor.play("point")
 			
 							// clickRelease manual false
 							tween(hexagon.scaleIncrease, hexagon.isHovering() ? 1.05: 1, 0.35, (p) => hexagon.scaleIncrease = p, easings.easeOutQuint)
-							playSfx("clickRelease", rand(-50, 50))
+							playSfx("clickRelease", {tune: rand(-50, 50)})
 							
 							addPlusScoreText({posToAdd: autoCursor.pos, amount: scoreVars.scorePerAutoClick, manual: false})
 							GameState.addScore(scoreVars.scorePerAutoClick)
@@ -309,6 +309,7 @@ export function addHexagon() {
 		if (hexagon.isBeingHoveredOn) {
 			if (!isPreciselyHoveringAWindow && !isDraggingAWindow) {
 				hexagon.clickPress()
+				GameState.stats.timesClicked++
 			}
 		}
 	})

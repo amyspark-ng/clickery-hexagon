@@ -61,7 +61,7 @@ function addRgbSlider(winParent, posToAdd = vec2(0), coloredObj, type = "r") {
 
 		let xPos = sliderButton.parent.fromScreen(mousePos()).x // thank you MF
 		tween(sliderButton.pos.x, xPos, 0.2, p => sliderButton.pos.x = p, easings.easeOutQuint)
-		playSfx("hoverMiniButton", sliderButton.draggingTune)
+		playSfx("hoverMiniButton", {tune: sliderButton.draggingTune})
 	})
 
 	sliderButton = winParent.add([
@@ -137,7 +137,7 @@ function addRgbSlider(winParent, posToAdd = vec2(0), coloredObj, type = "r") {
 
 		readd(sliderButton)
 		sliderButton.dragging = true
-		playSfx("clickButton", rand(-50, 50))
+		playSfx("clickButton", {tune: rand(-50, 50)})
 		lastSoundPos = mousePos().x
 
 		// golly
@@ -153,7 +153,7 @@ function addRgbSlider(winParent, posToAdd = vec2(0), coloredObj, type = "r") {
 				if (mousePos().x > getPositionOfSide(winParent).left && mousePos().x < getPositionOfSide(winParent).right) {
 					sliderButton.draggingTune = getDraggingTune(sliderButton.pos.x, theOneBehind)
 					lastSoundPos = mousePos().x
-					playSfx("hoverMiniButton", sliderButton.draggingTune)
+					playSfx("hoverMiniButton", {tune: sliderButton.draggingTune})
 				}
 			}
 		}

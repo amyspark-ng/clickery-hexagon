@@ -174,7 +174,7 @@ export function addPlusScoreText(opts = {posToAdd: vec2(), amount: 1, manual: tr
 
 export function increaseCombo() {
 	scoreVars.combo = getComboFromClicks(clickVars.consecutiveClicks)
-	playSfx("combo", scoreVars.combo > 1 ? 100 * scoreVars.combo : 0)
+	playSfx("combo", {tune: scoreVars.combo > 1 ? 100 * scoreVars.combo : 0 })
 	tween(cam.scale, 0.95, 0.25 / 2, (p) => cam.scale = p, easings.easeOutQuint).onEnd(() => {
 		tween(cam.scale, 1, 0.25, (p) => cam.scale = p, easings.easeOutQuint)
 	})

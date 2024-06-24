@@ -8,6 +8,7 @@ import { folderObj, folderObjManaging, windowsDefinition } from "./windows/windo
 import { songs } from "./windows/musicWindow"
 import { curDraggin } from "../../plugins/drag"
 import { DEBUG } from "../../main"
+import { positionSetter } from "../../plugins/positionSetter"
 
 // debug
 
@@ -95,7 +96,26 @@ export function gamescene() {
 			})
 		})
 
+		// field of hopes and dreams reference
+		// when the ominus stuff ends do this
+		// wait(1, () => {
+		// 	let reference = add([
+		// 		text("♪ ~ Clicker.wav", {
+		// 			align: "right",
+		// 			font: "lambdao",
+		// 		}),
+		// 		pos(width(), -2),
+		// 	])
+		// 	tween(reference.pos.x, 733, 0.32, (p) => reference.pos.x = p, easings.easeOutCubic)
+			
+		// 	wait(4, () => {
+		// 		tween(reference.pos.x, width(), 0.32, (p) => reference.pos.x = p, easings.easeInCubic).onEnd(() => destroy(reference))
+		// 	})
+		// })
+
 		onUpdate(() => {
+			GameState.stats.totalTimePlayed += dt()
+			
 			GameState.score = clamp(GameState.score, 0, Infinity)
 			GameState.score = Math.round(GameState.score)
 			
@@ -113,6 +133,10 @@ export function gamescene() {
 
 			camRot(cam.rotation)
 			camScale(cam.scale)
+
+			// if (!gamestate.unlockedAchivements.include(achievements["gnome"]) && chance(0.01)) {
+				// debug.log("holy shit did you guys see that")
+			// }
 		})
 
 		// panderito checkin
@@ -147,7 +171,8 @@ export function gamescene() {
 					// If the tab was previously inactive, calculate the time outside the tab and update the total time
 					const timeOutsideTab = performance.now() - startTimeOutsideTab;
 					totalTimeOutsideTab += timeOutsideTab;
-		
+					GameState.stats.totalTimePlayed += totalTimeOutsideTab / 1000
+
 					if (!GameState.totalScore > 0) return;
 					// 60 being the seconds outside of screen to get the zzz screen
 					if (totalTimeOutsideTab / 1000 > 10) {
@@ -195,7 +220,7 @@ export function gamescene() {
 		
 							// 120 being the seconds outside screen you have to be to get a log
 							if ((totalTimeOutsideTab / 1000) > 120) {
-								addToast({ icon: "cursors.cursor", title: "Welcome back!", body: `+${gainedScore} of score!`, color: GREEN })
+								addToast({ icon: "cursors.cursor", title: "Welcome back!", body: `+${gainedScore} of score!${scoreVars.combo > 1 ? "\n(Combo is not applicable)" : ""}`, color: GREEN })
 							}
 				
 							tween(GameState.score, GameState.score + gainedScore, 0.25, (p) => GameState.score = p, easings.easeOutQuint)

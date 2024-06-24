@@ -1,5 +1,4 @@
 import { GameState } from "../../gamestate";
-import { playSfx } from "../../sound";
 import { addToast } from "./additives";
 import { autoLoopTime, cam, excessTime, panderitoIndex } from "./gamescene";
 import { hexagon } from "./hexagon";
@@ -46,6 +45,18 @@ export function formatNumber(number = 0, short = true, isPrice = false) {
 
 export function formatMusicTime(timeInSeconds) {
 	return `${Math.floor(timeInSeconds / 60)}:${Math.floor(timeInSeconds % 60) < 10 ? '0' + Math.floor(timeInSeconds % 60) : Math.floor(timeInSeconds % 60)}`
+}
+
+export function toHHMMSS(timeInSeconds) {
+    const hours = Math.floor(timeInSeconds / 3600);
+    const minutes = Math.floor((timeInSeconds % 3600) / 60);
+    const seconds = Math.floor(timeInSeconds % 60);
+
+    const formattedHours = hours > 0 ? `${hours}:` : '';
+    const formattedMinutes = hours > 0 ? `${minutes < 10 ? '0' + minutes : minutes}` : minutes;
+    const formattedSeconds = seconds < 10 ? '0' + seconds : seconds;
+
+    return `${formattedHours}${formattedMinutes}:${formattedSeconds}`;
 }
 
 export function percentage(number, percentageTo) {
@@ -187,26 +198,7 @@ export function setVariable(obj, path, value) {
 }
 
 export function saveAnim() {
-	// let floppy = add([
-	// 	sprite("floppy"),
-	// 	pos(width() - 50, height() - 50),
-	// 	anchor("center"),
-	// 	opacity(0),
-	// 	scale(1),
-	// ])
-
-	// tween(floppy.pos.y, height() - 120, 0.5, (p) => floppy.pos.y = p, easings.easeOutBack )
-	// tween(0, 1, 0.5, (p) => floppy.opacity = p, easings.easeOutBack )
-	
-	// wait(0.5, () => {
-	// 	tween(vec2(1), vec2(1.1), 0.1, (p) => floppy.scale = p, easings.easeOutBack )
-	// 	tween(1, 0, 0.5, (p) => floppy.opacity = p, easings.easeOutBack )
-	
-	// 	wait(0.5, () => {
-	// 		destroy(floppy)
-	// 	})
-	// })
-	addToast({ icon: "floppy", title: "Game saved!", body: `Time played: ${"00:00:00"}` })
+	addToast({ icon: "floppy", title: "Game saved!", body: `Time played: ${toHHMMSS(GameState.stats.totalTimePlayed)}` })
 }
 
 export function bop(obj, howMuch = 0.1, bopEasing = easings.easeOutQuint) {
@@ -266,7 +258,7 @@ export function debugFunctions() {
 		else if (isKeyPressed("r") && panderitoIndex != 6) go("gamescene")
 		else if (isKeyPressed("w")) hexagon.autoClick()
 		
-		else if (isKeyPressed("h")) {
+		else if (isKeyPressed("f")) {
 			addToast({
 				title: "Achievement unlocked!",
 				body: "You've gotten the achievement",
@@ -274,17 +266,17 @@ export function debugFunctions() {
 			})
 		}
 
-		else if (isKeyPressed("j")) {
+		else if (isKeyPressed("g")) {
 			addToast({
 				title: "Window unlocked!",
-				body: "You've gotten a window",
+				body: "Music window, now you can change the song that's playing",
 				icon: "icon_music"
 			})
 		}
 
 		// else if (isKeyPressed("g")) addToast({ title: "Welcome back!", body: "This is a long body text", icon: "mupgrades.u_12" })
 		// else if (isKeyPressed("h")) addToast({ title: "Welcome back!", body: "This is a longer body text, one that is longer", icon: "mupgrades.u_12" })
-		// else if (isKeyPressed("j")) addToast({ title: "Welcome back!", body: "This would be an even LONGER body text, one that is a LOT longer than the one before, very very long, im running out of really long messages so i'm trying to make it be very very very long ay no que rabia chris no aparece que fastidio con esta gente uno les organiza salidas y dicen que si y uno se pone de bobo a esperarlos y luego no aparecen siempre es la mmisma vaina con todo que rabia yo no vuelvo a organizar ninguna salida mejor no vuelvo a hacer nada con nadie los odio a todos me voy a mudar de pais yo no se ya que hacer", icon: "mupgrades.u_12"})
+		else if (isKeyPressed("j")) addToast({ title: "Welcome back!", body: "This would be an even LONGER body text, one that is a LOT longer than the one before, very very long, im running out of really long messages so i'm trying to make it be very very very long to see how it looks oh well what do i do how does a bastard orphan son a whore and a scottsman dropped in the middle of a forgotten spot in the caribbean empovrished and blah blah idk the lyrics to hamilton i forgot them i'll sing the parody - yes i'd like a hand tossed stuffed crust pepperoni pizza with sausage topped with a little extra of tomato sauce and in the middle put pineapple and spinach i hope you're taking notes cause this order's not finished for 10 dollars could you put some sallami on er plus a lot of olives and if its not a bother to thaw some frozen balogni go soak it in tap water then slap on spaghetti eggs bacon and avocado", icon: "mupgrades.u_12"})
 		// else if (isKeyPressed("k")) addToast({ title: "Did you know? The bg will adjust to the text that has the longer width?", body: "This one has a longer title than body", icon: "mupgrades.u_12" })
 		else if (isKeyDown("q")) {
 			hexagon.clickPress()

@@ -226,7 +226,7 @@ export function addMinibutton(idxForInfo, taskbarIndex, posToAdd = vec2(), initi
 				// goes to the slot that coincides with its taskbar index 
 				if (this.taskbarIndex == closestSlot.taskbarIndex) movingTween = tween(this.pos, closestSlot.pos, 0.32, (p) => this.pos = p, easings.easeOutQuint)
 				
-				playSfx("plop", 100 * this.windowInfo.idx / 4)
+				playSfx("plop", {tune: 100 * this.windowInfo.idx / 4})
 				this.z = folderObj.z - 1
 				
 				// destroys all slots except the current one
@@ -301,7 +301,7 @@ export function addMinibutton(idxForInfo, taskbarIndex, posToAdd = vec2(), initi
 		if (curDraggin) return
 		if (!isPreciselyHoveringAWindow && !isDraggingAWindow) {
 			currentMinibutton.startHover()
-			playSfx("hoverMiniButton", 100 * currentMinibutton.windowInfo.idx / 4)
+			playSfx("hoverMiniButton", {tune: 100 * currentMinibutton.windowInfo.idx / 4})
 		}
 	})
 

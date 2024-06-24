@@ -3,6 +3,7 @@ import { blendColors, bop, getPositionOfSide } from "../../utils.js";
 import { mouse } from "../../additives.js";
 import { drag, curDraggin, setCurDraggin } from "../../../../plugins/drag.js";
 import { playSfx } from "../../../../sound.js";
+import { addMinibutton, calculateXButtonPosition } from "./windowsAPI-utils.js";
 
 // window contents
 import { storeWinContent } from "../store/storeWindows.js";
@@ -11,8 +12,8 @@ import { colorWinContent } from "../colorWindow.js";
 import { settingsWinContent } from "../settingsWindow.js";
 import { ascendWinContent } from "../ascendWindow.js";
 import { extraWinContent } from "../extraWindow.js";
-import { addMinibutton, calculateXButtonPosition } from "./windowsAPI-utils.js";
 import { creditsWinContent } from "../creditsWin.js";
+import { statsWinContent } from "../statsWin.js";
 
 export let infoForWindows = {};
 export let isGenerallyHoveringAWindow = false;
@@ -53,7 +54,7 @@ export function windowsDefinition() {
 		"storeWin": { idx: 0, content: storeWinContent, lastPos: vec2(818, 280) },
 		"musicWin": { idx: 1, content: musicWinContent, lastPos: vec2(208, 96) },
 		"ascendWin": { idx: 2, content: ascendWinContent, lastPos: vec2(center().x, center().y) },
-		"statsWin": { idx: 3, content: emptyWinContent, lastPos: vec2(center().x, center().y) },
+		"statsWin": { idx: 3, content: statsWinContent, lastPos: vec2(center().x, center().y) },
 		"medalsWin": { idx: 4, content: emptyWinContent, lastPos: vec2(center().x, center().y) },
 		"aboutWin": { idx: 5, content: emptyWinContent, lastPos: vec2(center().x, center().y) },
 		"creditsWin": { idx: 6, content: creditsWinContent, lastPos: vec2(center().x, center().y) },

@@ -590,6 +590,7 @@ export function loadEverything() {
 	// only done on debug to make the game load quicker since im not listening the music really
 	if (!DEBUG) {load(new Promise((res) => { setTimeout(() => { res() }, 5000) })) }
 
+	// change from ! to "" to work with songs on debug mode
 	if (!DEBUG) {
 		loadSound("clicker.wav", "sounds/music/clicker.ogg")
 		loadSound("menu.wav", "sounds/music/menu.ogg")

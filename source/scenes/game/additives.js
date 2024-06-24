@@ -119,7 +119,7 @@ export function addMouse() {
 	})
 }
 
-let maxLogs = 3;
+let maxLogs = 100;
 let toastQueue = [];
 const initialYPosition = 50;
 
@@ -141,9 +141,17 @@ export function addToast(opts = { time: 1, icon: "none", title: "Title", body: "
 			"toast",
 			{
 				index: idx,
+				type: "",
+				add() {
+					if (opts.title.includes("unlocked")) {
+						if (opts.title.includes("window")) this.type = "window"
+						else this.type = "achievement"
+					}
+					else if (opts.title.includes("saved")) this.type = "save"
+				},
 				close() {
 					tween(toastBg.pos.x, -toastBg.width, 0.8, (p) => (toastBg.pos.x = p), easings.easeOutQuint).onEnd(() => {
-						updateLogPositions();
+						// updateLogPositions();
 						destroy(toastBg);
 						processQueue();
 					});
@@ -236,11 +244,18 @@ export function addToast(opts = { time: 1, icon: "none", title: "Title", body: "
 		toastBg.width = icon.width + 20;
 		toastBg.height = icon.height + 20;
 
-		if (titleText.width > bodyText.width) toastBg.width += titleText.width + 15;
-		else toastBg.width += bodyText.width + 10;
+		let titleTextWidth = formatText({ text: titleText.text, size: titleText.textSize }).width
+		let bodyTextWidth = formatText({ text: bodyText.text, size: bodyText.textSize }).width
 
-		if (titleText.height > bodyText.height) toastBg.height = titleText.height + bodyText.height + 10;
-		else toastBg.height += bodyText.height - titleText.height + 10;
+		titleTextWidth = clamp(titleTextWidth, 0, 500)
+		bodyTextWidth = clamp(bodyTextWidth, 0, 500)
+
+		if (titleTextWidth > bodyTextWidth) toastBg.width += titleTextWidth + 25;
+		else if (bodyTextWidth > titleTextWidth) toastBg.width += bodyTextWidth + 25;
+
+		// height
+		if (titleText.height > bodyText.height) toastBg.height = titleText.height + bodyText.height + 15;
+		else toastBg.height += bodyText.height - titleText.height + 15;
 
 		tween(-toastBg.width, toastBg.width / 2, 0.5, (p) => toastBg.pos.x = p, easings.easeOutQuint);
 
@@ -255,22 +270,19 @@ export function addToast(opts = { time: 1, icon: "none", title: "Title", body: "
 			bodyText.destroy();
 		});
 
-		if (opts.title.includes("saved")) playSfx("gamesaved")
-		if (opts.title.includes("unlocked")) {
-			if (opts.title.includes("window")) playSfx("unlockachievement", { tune: 300, speedy: 100 })
-			else playSfx("unlockachievement")
-		}
+		if (toastBg.type == "save") playSfx("gamesaved")
+		else if (toastBg.type == "achievement" || toastBg.type == "window") playSfx("unlockachievement", { tune: toastBg.index * 100 })
 	}
 
-	function updateLogPositions() {
-		let logs = get("toast", { recursive: true });
-		let yOffset = initialYPosition;
+	// function updateLogPositions() {
+	// 	let logs = get("toast", { recursive: true });
+	// 	let yOffset = initialYPosition;
 
-		logs.forEach((log, idx) => {
-			tween(log.pos.y, yOffset, 0.5, (p) => log.pos.y = p, easings.easeOutQuint);
-			yOffset += log.height + 10;
-		});
-	}
+	// 	logs.forEach((log, idx) => {
+	// 		tween(log.pos.y, yOffset, 0.5, (p) => log.pos.y = p, easings.easeOutQuint);
+	// 		yOffset += log.height + 10;
+	// 	});
+	// }
 
 	function processQueue() {
 		let logs = get("toast", { recursive: true });

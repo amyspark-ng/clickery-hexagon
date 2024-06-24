@@ -3,23 +3,15 @@
 # [Ideas](#ideas)
 
 -- MUSIC WORKS PRETTY FUCKIGN WEIRD WHEN DOING LOADMUSIC INSTEAD OF SOUND DON'T GET SCARED
+	* Time text not working, music not looping, etc
 * Do "-" for issues, "*" for notes, "^" for comments on either
 
 # TODAY
-- Delete the log y position getting updated
-- Fix the playSfx functions that were already written to use opt
-	* Figure out why the sfx is not getting played with a different tune or speed 
 - Format actual working numbers
-	* SPSWORKING RELIES ON THIS ^
+	* SPS WORKING RELIES ON THIS ^
 - spstext doesn't work with the spsTextMode at all lol 
 	* It's completely broken
 	* Make it work with new shorten numbers setting (might not do)
-------------------------------------------
-- Re-design/make working toasts
-	* add toast condition where there's title but no body
-	* onsAdd support for ic
-	* Make the log the height of the icon and the width be determind by body width
-		* Change the queue stuff to support different heights
 
 # The day after
 - Keep working on store
@@ -49,7 +41,6 @@
 - Add achievement for making the hexagon black and the bg white (bad apple)
 - Do the funny thing with music title in clicker.wav like deltarune did
 - Add an achievement for opening all windows in your taskbar at the same time
-- Make unactive windows grayscale
 - Discount powerup (very short)
 - when clicking run through every achievement in an object that has a clicking property and check if the score is higher or equal to a value property, so:
 ```js
