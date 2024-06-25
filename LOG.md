@@ -7,6 +7,8 @@
 * Do "-" for issues, "*" for notes, "^" for comments on either
 
 # TODAY
+- Make pickings faster on extra window
+- Make the area of the window bigger (X)
 - Format actual working numbers
 	* SPS WORKING RELIES ON THIS ^
 - spstext doesn't work with the spsTextMode at all lol 
@@ -21,9 +23,7 @@
 - I REALLYYY need to fix the hover animations
 - and the mouse animations
 	* Maybe do keep the tag system, just uhhhhhhhhhhhhhhhhhhhhhhhhhhhhh
-- Make working stats and make stats window
 - fix music waving speed
-- Why does medal look extremely big????
 
 # Pasado pasado mañana
 - Prototype medals window

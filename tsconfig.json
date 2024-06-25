@@ -6,5 +6,7 @@
         ],
         "declaration": true,
         "emitDeclarationOnly": true,
+        "allowImportingTsExtensions": true,
+        "lib": ["esnext", "dom"]
     }
 }
