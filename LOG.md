@@ -2,23 +2,22 @@
 # [Bookmarks](#bookmarks)
 # [Ideas](#ideas)
 
+this game is never getting done bruh
+
 -- MUSIC WORKS PRETTY FUCKIGN WEIRD WHEN DOING LOADMUSIC INSTEAD OF SOUND DON'T GET SCARED
 	* Time text not working, music not looping, etc
 * Do "-" for issues, "*" for notes, "^" for comments on either
 
-# TODAY
-- Make pickings faster on extra window
-- Make the area of the window bigger (X)
+# The day after
+- Do in store what happens when the upgrade is not a value one but a frequency one
+	* Add the blinking text somewhere where it says "Cursors now click every `freq` seconds"
+	* And if you try to buy the one above 5 seconds the tooltip will instead say, "you have to buy the previous one"
+
 - Format actual working numbers
 	* SPS WORKING RELIES ON THIS ^
 - spstext doesn't work with the spsTextMode at all lol 
 	* It's completely broken
 	* Make it work with new shorten numbers setting (might not do)
-
-# The day after
-- Keep working on store
-	* I have to tell devky to make the upgrade icons and the upgrade store element, then i can work on it 
-	* Rework tooltips for upgrades
 - Fix panderito hitbox
 - I REALLYYY need to fix the hover animations
 - and the mouse animations
@@ -27,6 +26,7 @@
 
 # Pasado pasado mañana
 - Prototype medals window
+- Prototype powerups
 
 # Soon
 - and click priortiy (holy moly)

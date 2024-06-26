@@ -1,7 +1,6 @@
 import { GameState } from "../../../../gamestate";
 import { playSfx } from "../../../../sound";
-import { bop, getPrice, getPositionOfSide } from "../../utils";
-import { mouse } from "../../additives";
+import { getPrice } from "../../utils";
 import { addUpgrades } from "./upgrades";
 
 let elements = {
@@ -18,6 +17,8 @@ let storePitchSeconds = 0;
 let storeTune = 0;
 
 let amountToBuy = 1
+
+let isHoveringUpgrade = false
 
 function addStoreElement(winParent, opts = { key: "null", pos: vec2(0, 20) }) {
 	// add a parent background object
@@ -66,42 +67,27 @@ function addStoreElement(winParent, opts = { key: "null", pos: vec2(0, 20) }) {
 				}
 			},
 
+			startHover() {
+				tween(this.scale, vec2(1.025), 0.15, (p) => this.scale = p, easings.easeOutQuad)
+				this.isBeingHoveredOn = true
+			},
+
+			endHover() {
+				tween(this.scale, vec2(1), 0.15, (p) => this.scale = p, easings.easeOutQuad)
+				this.isBeingHoveredOn = false
+			},
+
 			update() {
 				isKeyDown("shift") ? amountToBuy = 10 : amountToBuy = 1
 				if (this.is("clickersElement") || this.is("cursorsElement")) this.price = getPrice(elements[opts.key].basePrice, elements[opts.key].percentageIncrease, GameState[elements[opts.key].gamestateKey], amountToBuy)
 			},
-
-			draw() {
-				if (!this.isBeingClicked) return
-				if (timesBoughtWhileHolding < 2) return
-				if (GameState.score < this.price) return
-				if (timesBoughtWhileHolding < 12) {
-					drawCircle({
-						anchor: "center",
-						pos: vec2((this.pos.x - this.width / 2) + 5, this.pos.y - this.height / 2 - this.height + 10),
-						radius: 10,
-						color: WHITE,
-						fill: false,
-						end: map(timer, 0, timeUntilAnotherBuy, 1, 360),
-					})
-				}
-
-				else {
-					drawText({
-						text: "$",
-						pos: vec2((this.pos.x - this.width / 2) + 5, this.pos.y - this.height / 2 - this.height + 10),
-						size: 20,
-						anchor: "center",
-					})
-				}
-			}
 		}
 	])
 
 	if (opts.key == "powerupsElement" && !GameState.hasUnlockedPowerups) {
-		let chains = add([
+		// let chains = add([
 			// sprite("chains"),
-		])
+		// ])
 	}
 	
 	let stacksText = btn.add([
@@ -112,9 +98,14 @@ function addStoreElement(winParent, opts = { key: "null", pos: vec2(0, 20) }) {
 		pos(-100, 24),
 		color(BLACK),
 		z(btn.z + 1),
+		"stacksText",
 		{
 			update() {
-				this.text = "Stacked upgrades: 0"
+				let upgradeValue = 0
+				if (opts.key == "clickersElement") upgradeValue = GameState.clicksUpgradesValue
+				else if (opts.key == "cursorsElement") upgradeValue = GameState.cursorsUpgradesValue
+
+				this.text = `Stacked upgrades: ${upgradeValue}`
 			}
 		}
 	])
@@ -142,48 +133,55 @@ function addStoreElement(winParent, opts = { key: "null", pos: vec2(0, 20) }) {
 	let maxTime = 1.2
 	let timesBoughtWhileHolding = 0
 
-	btn.onMouseDown(() => {
-		// if (!winParent.is("active")) return
-		if (!btn.isHovering()) return
-		btn.isBeingClicked = true
-		if (!GameState.score >= btn.price) return
+	let downEvent = null;
+	btn.onMousePress("left", () => {
+		if (isHoveringUpgrade) return
+		if (!btn.isHovering()) return;
 
-		if (timesBoughtWhileHolding == 0) {
-			timeUntilAnotherBuy = maxTime
-		}
-
-		timer += dt()
-
-		timeUntilAnotherBuy = maxTime / (timesBoughtWhileHolding)
-		timeUntilAnotherBuy = clamp(timeUntilAnotherBuy, minTime, maxTime)
-
-		if (timesBoughtWhileHolding == 0) {
-			timesBoughtWhileHolding = 1
-			btn.buy(amountToBuy)
-		}
-
-		if (timer > timeUntilAnotherBuy) {
-			timer = 0
-			timesBoughtWhileHolding++	
-			btn.buy(amountToBuy)
-		}
-
-		if (timesBoughtWhileHolding > 10 && !get("smoke", { recursive: true })[0]) {
-			let smoke = winParent.add([
-				sprite("smoke"),
-				pos(btn.pos.x - btn.width / 2, btn.pos.y - btn.height / 2),
-				opacity(),
-				anchor("center"),
-				z(btn.z - 1),
-				"smoke",
-			])
-
-			smoke.fadeIn(1)
-			smoke.play("smoking")
-		}
+		downEvent = btn.onMouseDown(() => {
+			btn.isBeingClicked = true
+			if (!GameState.score >= btn.price) return
+	
+			if (timesBoughtWhileHolding == 0) {
+				timeUntilAnotherBuy = maxTime
+			}
+	
+			timer += dt()
+	
+			timeUntilAnotherBuy = maxTime / (timesBoughtWhileHolding)
+			timeUntilAnotherBuy = clamp(timeUntilAnotherBuy, minTime, maxTime)
+	
+			if (timesBoughtWhileHolding == 0) {
+				timesBoughtWhileHolding = 1
+				btn.buy(amountToBuy)
+			}
+	
+			if (timer > timeUntilAnotherBuy) {
+				timer = 0
+				timesBoughtWhileHolding++	
+				btn.buy(amountToBuy)
+			}
+	
+			if (timesBoughtWhileHolding > 10 && !get("smoke", { recursive: true })[0]) {
+				let smoke = winParent.add([
+					sprite("smoke"),
+					pos(btn.pos.x - btn.width / 2, btn.pos.y - btn.height / 2),
+					opacity(),
+					anchor("center"),
+					z(btn.z - 1),
+					"smoke",
+				])
+	
+				smoke.fadeIn(1)
+				smoke.play("smoking")
+			}
+		})
 	})
 
 	btn.onMouseRelease(() => {
+		downEvent?.cancel()
+		downEvent = null
+
 		if (!btn.isHovering()) return
 		btn.isBeingClicked = false
 		
@@ -201,6 +199,10 @@ function addStoreElement(winParent, opts = { key: "null", pos: vec2(0, 20) }) {
 		}
 	})
 
+	btn.onHover(() => {
+		btn.startHover()
+	})
+
 	btn.onHoverEnd(() => {
 		if (btn.isBeingClicked) {
 			btn.isBeingClicked = false
@@ -209,6 +211,7 @@ function addStoreElement(winParent, opts = { key: "null", pos: vec2(0, 20) }) {
 			timesBoughtWhileHolding = 0
 			timeUntilAnotherBuy = 2.25
 		}
+		btn.endHover()
 	})
 
 	return btn;
@@ -237,5 +240,7 @@ export function storeWinContent(winParent) {
 				storeTune = 0
 			}
 		}
+
+		isHoveringUpgrade = get("upgrade", { recursive: true }).some((upgrade) => upgrade.isHovering())
 	})
 }

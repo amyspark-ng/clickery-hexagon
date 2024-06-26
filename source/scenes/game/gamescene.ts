@@ -9,8 +9,6 @@ import { songs } from "./windows/musicWindow.ts"
 import { curDraggin } from "../../plugins/drag.js"
 import { DEBUG } from "../../main.ts"
 
-// debug
-
 let panderitoLetters = "panderito".split("")
 export let panderitoIndex = 0
 
@@ -20,6 +18,10 @@ let startTimeOutsideTab; // Variable to store the start time when the tab become
 export let excessTime = 0; // Time that has passed after autoLoopTime
 
 export let autoLoopTime = 0;
+
+let idleWaiter:any;
+let sleeping = false;
+let timeSlept = 0;
 
 export let cam = {
 	scale: 1,
@@ -72,6 +74,104 @@ export function togglePanderito() {
 	GameState.save(false)
 }
 
+// idle means the game was open but the player stoped moving
+function triggerZZZ(idle = true) {
+	if (idle) sleeping = true
+	
+	let black = add([
+		rect(width(), height()),
+		pos(center()),
+		anchor("center"),
+		color(BLACK),
+		z(mouse.z - 2),
+		opacity(1),
+	])
+	if (idle) black.fadeIn(0.5)
+
+	let sleepyText = add([
+		text("Z Z Z . . . ", {
+			size: 90,
+			font: "lambda",
+			transform: (idx) => ({
+				pos: vec2(0, wave(-4, 4, time() * 4 + idx * 0.5)),
+				scale: wave(1, 1.2, time() * 3 + idx),
+				angle: wave(-9, 9, time() * 3 + idx),
+			}),
+		}),
+		z(mouse.z - 1),
+		anchor("center"),
+		pos(center()),
+		opacity(1),
+	])
+	if (idle) sleepyText.fadeIn(0.5)
+
+	let events:any[];
+	function wakeUp() {
+		sleeping = false
+		wait(0.5, () => {
+			black.fadeOut(0.5)
+			sleepyText.fadeOut(0.5).onEnd(() => {
+				black?.destroy()
+				sleepyText?.destroy()
+				if (idle) welcomeBack(true)
+			})
+		})
+		events?.forEach(event => {
+			event.cancel()
+		});
+	}
+
+	if (idle) {
+		let mouse = onMouseMove(() => wakeUp())
+		let click = onClick(() => wakeUp())
+		let key = onKeyPress(() => wakeUp())
+		events = [mouse, click, key]
+	}
+
+	else wakeUp()
+}
+
+function welcomeBack(idle = false) {
+	if (GameState.cursors < 1) {addToast({ icon: "cursors.cursor", title: "Welcome back!", body: ":)" }); return}
+	
+	if (idle == false) {
+		autoLoopTime += totalTimeOutsideTab / 1000
+		excessTime = autoLoopTime - GameState.timeUntilAutoLoopEnds
+		let gainedScore = 0
+		if (excessTime >= 0) {
+			gainedScore = Math.floor(excessTime / GameState.timeUntilAutoLoopEnds); // can't add scorePerAutoClick here bc
+			excessTime -= GameState.timeUntilAutoLoopEnds * gainedScore // I use it before to shave off the extra time
+			// actual gainedScore
+			gainedScore = gainedScore * scoreVars.scorePerAutoClick
+	
+			// 120 being the seconds outside screen you have to be to get a log
+			if ((totalTimeOutsideTab / 1000) > (DEBUG ? 2 : 120)) {
+				addToast({ icon: "cursors.cursor", title: "Welcome back!", body: `+${gainedScore} of score!${scoreVars.combo > 1 ? "\n(Combo is not applicable)" : ""}` })
+			}
+	
+			tween(GameState.score, GameState.score + gainedScore, 0.25, (p) => GameState.score = p, easings.easeOutQuint)
+			tween(GameState.totalScore, GameState.totalScore + gainedScore, 0.25, (p) => GameState.totalScore = p, easings.easeOutQuint)
+		}
+	}
+
+	else {
+		// 120 being the seconds outside screen you have to be to get a log
+		if (timeSlept > (DEBUG ? 2 : 120)) {
+			addToast({ icon: "cursors.cursor", title: "Welcome back!", body: `+${scoreVars.autoScorePerSecond * timeSlept} of score!${scoreVars.combo > 1 ? "\n(Combo is not applicable)" : ""}` })
+			timeSlept = 0
+		}
+		// don't add no score because it is aded in the loop
+	}
+}
+
+function resetIdleTime() {
+	idleWaiter.cancel()
+	idleWaiter = wait((20), () => {
+		// true means it's idle
+		triggerZZZ(true)
+	})
+}
+
 export function gamescene() {
 	return scene("gamescene", () => {
 		GameState.load() // loadSave()
@@ -91,9 +191,15 @@ export function gamescene() {
 		// wait 60 seconds
 		wait(60, () => {
 			loop(120, () => {
-				if (GameState.totalScore > 1) GameState.save(true)
+				if (GameState.totalScore > 1) !DEBUG ?? GameState.save(true)
 			})
 		})
+
+		// check for idling
+		idleWaiter = wait(0, () => {})
+		onMouseMove(() => resetIdleTime())
+		onKeyPress(() => resetIdleTime())
+		onClick(() => resetIdleTime())
 
 		// field of hopes and dreams reference
 		// when the ominus stuff ends do this
@@ -129,6 +235,8 @@ export function gamescene() {
 					excessTime = 0
 				}
 			}
+
+			if (sleeping) timeSlept += dt()
 
 			camRot(cam.rotation)
 			camScale(vec2(cam.scale))
@@ -174,57 +282,14 @@ export function gamescene() {
 
 					if (!(GameState.totalScore > 0)) return;
 					// 60 being the seconds outside of screen to get the zzz screen
-					if (totalTimeOutsideTab / 1000 > 10) {
-						let black = add([
-							rect(width(), height()),
-							pos(center()),
-							anchor("center"),
-							color(BLACK),
-							z(mouse.z - 2),
-							opacity(1),
-						])
-		
-						let sleepyText = add([
-							text("Z Z Z . . . ", {
-								size: 90,
-								font: "lambda",
-								transform: (idx) => ({
-									pos: vec2(0, wave(-4, 4, time() * 4 + idx * 0.5)),
-									scale: wave(1, 1.2, time() * 3 + idx),
-									angle: wave(-9, 9, time() * 3 + idx),
-								}),
-							}),
-							z(mouse.z - 1),
-							anchor("center"),
-							pos(center()),
-							opacity(1),
-						])
-		
-						wait(0.5, () => {
-							tween(black.opacity, 0, 0.5, (p) => black.opacity = p, )
-							tween(sleepyText.opacity, 0, 0.5, (p) => sleepyText.opacity = p, )
-						})
+					if (totalTimeOutsideTab / 1000 > (DEBUG ? 2 : 60)) {
+						// false means it was out not idle
+						triggerZZZ(false)
 					} 
 		
 					if (GameState.cursors >= 1) {
-						// what the fuck
-						autoLoopTime += totalTimeOutsideTab / 1000
-						excessTime = autoLoopTime - GameState.timeUntilAutoLoopEnds
-						let gainedScore = 0
-						if (excessTime >= 0) {
-							gainedScore = Math.floor(excessTime / GameState.timeUntilAutoLoopEnds); // can't add scorePerAutoClick here bc
-							excessTime -= GameState.timeUntilAutoLoopEnds * gainedScore // I use it before to shave off the extra time
-							// actual gainedScore
-							gainedScore = gainedScore * scoreVars.scorePerAutoClick
-		
-							// 120 being the seconds outside screen you have to be to get a log
-							if ((totalTimeOutsideTab / 1000) > 120) {
-								addToast({ icon: "cursors.cursor", title: "Welcome back!", body: `+${gainedScore} of score!${scoreVars.combo > 1 ? "\n(Combo is not applicable)" : ""}` })
-							}
-				
-							tween(GameState.score, GameState.score + gainedScore, 0.25, (p) => GameState.score = p, easings.easeOutQuint)
-							tween(GameState.totalScore, GameState.totalScore + gainedScore, 0.25, (p) => GameState.totalScore = p, easings.easeOutQuint)
-						}
+						// false means it was out not idle
+						welcomeBack(false)
 					}
 				}
 			}

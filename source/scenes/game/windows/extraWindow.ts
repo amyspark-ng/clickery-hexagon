@@ -5,7 +5,7 @@ import { dummyShadow } from "../../../plugins/dummyShadow";
 import { playSfx } from "../../../sound";
 import { bop } from "../utils";
 import { mouse } from "../additives";
-import { buttonSpacing, folderObj, infoForWindows, manageWindow, openWindow } from "./windows-api/windowsAPI";
+import { buttonSpacing, infoForWindows, manageWindow, openWindow } from "./windows-api/windowsAPI";
 import { addMinibutton } from "./windows-api/windowsAPI-utils";
 
 export let gridContainer;
@@ -88,6 +88,7 @@ export function makeGridMinibutton(idx, gridSlot, winParent) {
 					}
 				}
 			},
+
 			startHover() {
 				playSfx("hoverMiniButton", {tune: 100 * idx / 4})
 				this.play("hover")
@@ -180,7 +181,7 @@ export function makeGridMinibutton(idx, gridSlot, winParent) {
 		if (!gridMiniButton.isHovering()) return
 		
 		waitingHold.cancel()
-		waitingHold = wait(0.1, () => {
+		waitingHold = wait(0.08, () => {
 			if (!gridMiniButton.isHovering()) return
 			// hold function
 			if (curDraggin) {
@@ -240,8 +241,8 @@ export function makeGridMinibutton(idx, gridSlot, winParent) {
 				if (curDraggin) return
 
 				// click function
-				winParent.close()
-				manageWindow(gridMiniButton.windowKey)
+				if (get(gridMiniButton.windowKey)[0]) winParent.close()
+				else {openWindow(gridMiniButton.windowKey); winParent.close()}
 				bop(gridMiniButton)
 			}
 		}

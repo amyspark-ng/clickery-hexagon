@@ -24,14 +24,16 @@ export let GameState = {
 	totalScore: 0,
 	
 	clickers: 0,
-	clicksUpgrades: 0, // multiplier for clicks
+	clicksUpgradesValue: 0, // multiplier for clicks
 	clickPercentage: 0, // percentage added
 
 	cursors: 0,
-	cursorUpgrades: 0, // multiplier for cursors
+	cursorsUpgradesValue: 0, // multiplier for cursors
 	cursorsPercentage: 0, // percentage added
 	timeUntilAutoLoopEnds: 10, // cursor frequency
 
+	upgradesBought: [],
+	
 	hasUnlockedPowerups: false,
 	powerupsBought: 0,
 	powerupsFrequency: 120,
@@ -42,8 +44,6 @@ export let GameState = {
 	generalUpgrades: 1, // general multiplier
 
 	ascendLevel: 0,
-
-	upgradesBought: new Array(16).fill(true),
 
 	medals: {
 		itstartedforyou: {

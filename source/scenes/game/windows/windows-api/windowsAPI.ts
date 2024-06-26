@@ -78,11 +78,11 @@ export function openWindow(windowKey = "") {
 		sprite(getSprite(windowKey) ? windowKey : "dumbTestWin"),
 		pos(infoForWindows[windowKey].lastPos),
 		anchor("center"),
-		opacity(0),
-		scale(0.8),
+		opacity(1),
+		scale(1),
 		z(10),
 		drag(),
-		area(),
+		area({ scale: vec2(1.04, 1) }),
 		"window",
 		`${windowKey}`,
 		{
@@ -265,8 +265,8 @@ export function openWindow(windowKey = "") {
 	// searches for the key
 
 	// animate it
-	tween(windowObj.opacity, 1, 0.32, (p) => windowObj.opacity = p, easings.easeOutQuint)
-	tween(windowObj.scale, vec2(1), 0.32, (p) => windowObj.scale = p, easings.easeOutQuint)
+	tween(0, 1, 0.32, (p) => windowObj.opacity = p, easings.easeOutQuint)
+	tween(vec2(0.8), vec2(1), 0.32, (p) => windowObj.scale = p, easings.easeOutQuint)
 	
 	// manage the minibutton
 	let correspondingMinibutton = get("minibutton").filter(minibutton => minibutton["windowKey"] === windowKey)[0]

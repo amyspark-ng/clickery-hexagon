@@ -23,6 +23,7 @@ export function playSfx(sound = "clickPress", opts?:sfxOpts) {
 		detune: opts?.tune || 0,
 		speed: opts?.speedy || 1,
 	})
+	return sfxHandler;
 }
 
 export let musicHandler:any;

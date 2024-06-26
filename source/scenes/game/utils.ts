@@ -246,6 +246,10 @@ export function debugTexts() {
 export function debugFunctions() {
 	debugTexts()
 	
+	window.globalThis.gamestate = function() {
+		console.log(GameState)
+	}
+
 	window.globalThis.taskbar = function() {
 		console.log(GameState.taskbar)
 	}

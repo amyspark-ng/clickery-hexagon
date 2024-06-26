@@ -49,7 +49,6 @@ export function addMouse() {
 	mouse = add([
 		sprite("cursors"),
 		pos(mousePos()),
-		scale(0.8),
 		color(WHITE),
 		stay(),
 		anchor(vec2(-0.5, -0.65)),
@@ -197,7 +196,7 @@ export function addToast(opts:toastOpts) {
 			}
 		]);
 
-		typeof spriteName == "string" ?? icon.play(spriteName[1]);
+		spriteName[1] ?? icon.play(spriteName[1]);
 
 		icon.width = 60;
 		icon.height = 60;
@@ -236,13 +235,6 @@ export function addToast(opts:toastOpts) {
 					this.pos.y = titleText.pos.y + titleText.height;
 				}
 			}
-		]);
-
-		let toastProgressBar = toastBg.add([
-			rect(toastBg.width, 10),
-			pos(0, toastBg.height),
-			color(opt.color),
-			opacity(0),
 		]);
 
 		toastBg.width = icon.width + 20;

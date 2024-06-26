@@ -152,7 +152,7 @@ export function addMinibutton(idxForInfo, taskbarIndex, posToAdd = vec2(), initi
 
 					// sets hitbox
 					if (this.pos.dist(folderObj.pos) > 65) {
-						this.area.scale = vec2(0.75, 1.1)
+						this.area.scale = !this.extraMb ? vec2(0.75, 1.1) : vec2(0.75, 0.8)
 						this.area.offset = vec2(2, 4)
 					}
 						
