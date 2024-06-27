@@ -9,15 +9,7 @@ this game is never getting done bruh
 * Do "-" for issues, "*" for notes, "^" for comments on either
 
 # The day after
-- Do in store what happens when the upgrade is not a value one but a frequency one
-	* Add the blinking text somewhere where it says "Cursors now click every `freq` seconds"
-	* And if you try to buy the one above 5 seconds the tooltip will instead say, "you have to buy the previous one"
-
-- Format actual working numbers
-	* SPS WORKING RELIES ON THIS ^
-- spstext doesn't work with the spsTextMode at all lol 
-	* It's completely broken
-	* Make it work with new shorten numbers setting (might not do)
+- Format actual working numbers (spsText and scoreText and priceText)
 - Fix panderito hitbox
 - I REALLYYY need to fix the hover animations
 - and the mouse animations

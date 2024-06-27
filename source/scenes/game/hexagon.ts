@@ -7,7 +7,7 @@ import { playSfx } from "../../sound.ts";
 import { isDraggingAWindow, isGenerallyHoveringAWindow, isPreciselyHoveringAWindow, manageWindow } from "./windows/windows-api/windowsAPI.ts";
 import { waver } from "../../plugins/wave.js";
 import { isDraggingASlider } from "./windows/colorWindow.ts";
-import { addPlusScoreText, comboBarContent, getClicksFromCombo, increaseCombo, maxBarWidth, startCombo } from "./combo-utils.ts";
+import { addPlusScoreText, getClicksFromCombo, increaseCombo, startCombo } from "./combo-utils.ts";
 import { addConfetti } from "../../plugins/confetti.js";
 import { curDraggin } from "../../plugins/drag.js";
 import { cam } from "./gamescene.ts";
@@ -15,8 +15,10 @@ import { cam } from "./gamescene.ts";
 export let scoreVars = {
 	scorePerClick: 1,
 	scorePerAutoClick: 0,
+
 	autoScorePerSecond: 0, // the score per second you're getting automatically
-	actualScorePerSecond: "0", // the actual and current score per second - used in the ui
+	scorePerSecond: null, // the total score per second
+	
 	scoreNeededToAscend: 1000000,
 	combo: 1,
 }
@@ -37,7 +39,7 @@ const hoverRotSpeedIncrease = 0.01 * 0.25
 let consecutiveClicksWaiting = null;
 let spsUpdaterTimer = 0; // to properly calculate sps
 
-export let hexagon;
+export let hexagon:any;
 
 let maxRotSpeed = 10
 export function addHexagon() {
@@ -74,7 +76,7 @@ export function addHexagon() {
 		"hexagon",
 		"hoverOutsideWindow",
 		{
-			isBeingHoveredOn: false,
+			isBeingHovered: false,
 			smallestScale: 0.985,
 			biggestScale: 1.0015,
 			defaultScale: vec2(1),
@@ -275,7 +277,7 @@ export function addHexagon() {
 				if (this.canClick) {
 					tween(this.scaleIncrease, 1.05, 0.35, (p) => this.scaleIncrease = p, easings.easeOutCubic);
 					this.rotationSpeed += hoverRotSpeedIncrease
-					this.isBeingHoveredOn = true
+					this.isBeingHovered = true
 					mouse.play("point")
 				}
 			},
@@ -285,7 +287,7 @@ export function addHexagon() {
 					tween(this.scaleIncrease, 1, 0.35, (p) => this.scaleIncrease = p, easings.easeOutCubic);
 					this.isBeingClicked = false
 					this.rotationSpeed = 0
-					this.isBeingHoveredOn = false
+					this.isBeingHovered = false
 					mouse.play("cursor")
 				}
 			}
@@ -297,21 +299,21 @@ export function addHexagon() {
 		hexagon.startWave()
 	})
 
-	hexagon.onHoverUpdate(() => {
-		if (!isGenerallyHoveringAWindow && !isDraggingAWindow && !hexagon.isBeingHoveredOn && !curDraggin?.is("minibutton")) {
+	hexagon.onHover(() => {
+		if (!isGenerallyHoveringAWindow && !isDraggingAWindow && !hexagon.isBeingHovered && !curDraggin) {
 			hexagon.startHover()
 		}
 	})
 
 	hexagon.onHoverEnd(() => {
 		if (isDraggingAWindow || isDraggingASlider) return
-		if (!isPreciselyHoveringAWindow && !curDraggin?.is("minibutton")) {
+		if (!isPreciselyHoveringAWindow && !curDraggin) {
 			hexagon.endHover()
 		}
 	});
 
 	hexagon.onMousePress("left", () => {
-		if (hexagon.isBeingHoveredOn) {
+		if (hexagon.isBeingHovered) {
 			if (!isPreciselyHoveringAWindow && !isDraggingAWindow) {
 				hexagon.clickPress()
 				GameState.stats.timesClicked++
@@ -320,7 +322,7 @@ export function addHexagon() {
 	})
 	
 	hexagon.onMouseRelease("left", () => {
-		if (hexagon.isBeingHoveredOn) {
+		if (hexagon.isBeingHovered) {
 			if (hexagon.canClick && hexagon.isBeingClicked && !isPreciselyHoveringAWindow&& !isDraggingAWindow) {
 				hexagon.clickRelease()
 			}
@@ -343,23 +345,22 @@ export function addHexagon() {
 		// scorePerAutoClick = GameState.cursorUpgrades > 0 ? GameState.cursors * GameState.cursorUpgrades : GameState.cursors
 		// scorePerAutoClick += Math.round(percentage(scorePerAutoClick, GameState.cursorsPercentage))
 
-		// sps
+		// # sps
+		// this is for when you leave the game
+		scoreVars.autoScorePerSecond = GameState.cursors / GameState.timeUntilAutoLoopEnds
+
+		scoreVars.scorePerSecond = ((clickVars.clicksPerSecond * scoreVars.scorePerClick) + scoreVars.autoScorePerSecond)
 		spsUpdaterTimer += dt();
 		if (spsUpdaterTimer > 1) {
 			spsUpdaterTimer = 0;
 
 			// shoutout to Candy&Carmel
 			let divideValue = GameState.settings.spsTextMode ? Math.pow(60, GameState.settings.spsTextMode-1) : 1;
-			spsText.value = (Number(scoreVars.actualScorePerSecond) / divideValue)
+			scoreVars.scorePerSecond = scoreVars.scorePerSecond / divideValue
 			clickVars.clicksPerSecond = 0;
-		}
 
-		// this is for when you leave the game
-		scoreVars.autoScorePerSecond = GameState.cursors / GameState.timeUntilAutoLoopEnds
-		// the other stuff
-		scoreVars.actualScorePerSecond = ((clickVars.clicksPerSecond * scoreVars.scorePerClick) + scoreVars.autoScorePerSecond).toString()
-		scoreVars.actualScorePerSecond = Number(scoreVars.actualScorePerSecond).toFixed(1);
-		scoreVars.actualScorePerSecond = formatNumber(Number(scoreVars.actualScorePerSecond), true, false)
+			spsText.value = scoreVars.scorePerSecond
+		}
 	})
 
 	loop(2.5, () => {

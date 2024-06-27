@@ -40,7 +40,7 @@ export function addUpgrades(elementParent) {
 			rect(45, 45, { radius: 10 }),
 			color(RED.lighten(rand(100, 150))),
 			anchor("center"),
-			scale(),
+			scale(1),
 			z(winParent.z + 1),
 			area(),
 			"upgrade",
@@ -48,7 +48,8 @@ export function addUpgrades(elementParent) {
 				type: elementParent.is("clickersElement") ? "k_" : "c_",
 				idx: i,
 				// is setted below
-				value: 0, 
+				value: null, 
+				freq: null, 
 				id: "",
 				price: 0,
 				
@@ -56,10 +57,10 @@ export function addUpgrades(elementParent) {
 				hasTooltip: false,
 				
 				update() {
-					this.area.scale = vec2(1)
+					this.area.scale = vec2(1 / this.scale.x, 1 / this.scale.y)
 				},
 
-				addTooltip() {
+				addTooltip(price:any, blink:any, alignmentForTooltip:any = "center") {
 					this.hasTooltip = true
 					let thisUpgrade = this;
 					let bg = add([
@@ -68,7 +69,7 @@ export function addUpgrades(elementParent) {
 						color(BLACK),
 						scale(),
 						pos(upgrade.screenPos().x, upgrade.screenPos().y + upgrade.height / 2 + 5),
-						anchor("center"),
+						anchor(alignmentForTooltip),
 						"tooltip",
 						{
 							update() {
@@ -79,38 +80,48 @@ export function addUpgrades(elementParent) {
 					])
 					tween(vec2(0.85), vec2(1), 0.15, (p) => bg.scale = p, easings.easeOutBack)
 
-					let displayText = prices[this.id];
+					let displayText = price;
 					if (GameState.upgradesBought.length == 0) displayText = displayText + " (Hold to buy)" 
 
 					let priceText = bg.add([
-						text(displayText, { align: "center", size: upgrade.height / 2}),
+						text(displayText, { align: alignmentForTooltip, size: upgrade.height / 2}),
 						color(WHITE),
 						z(this.z + 1),
 						pos(),
-						anchor("center"),
+						anchor(alignmentForTooltip),
 						"tooltip",
 					])
 
-					bg.width = formatText({ text: displayText, align: "center", size: priceText.textSize, }).width + 5
+					bg.width = formatText({ text: displayText, align: displayText.align, size: priceText.textSize, }).width + 5
 					bg.height = priceText.height + 2
 				
 					let stacksText = this.parent.get("stacksText")[0]
 					
 					// blinking
-					add([
-						text(`+${this.value}`, { align: "left", size: stacksText.textSize + 4 }),
-						pos(stacksText.screenPos().x + stacksText.width / 2 + 2, stacksText.screenPos().y - 2),
+					let alignment = thisUpgrade.value != null ? "left" : "right" as any;
+					let blinkingText = add([
+						text("+0", { align: alignment, size: stacksText.textSize + 4 }),
+						pos(),
 						color(BLACK),
-						anchor("left"),
+						anchor(alignment),
 						z(priceText.z + 1),
 						opacity(),
 						"tooltip",
 						{
 							update() {
+								this.text = blink
 								this.opacity = wave(0.25, 1, time() * 8)
 							}
 						}
 					])
+
+					if (thisUpgrade.value != null) {
+						blinkingText.pos = vec2(stacksText.screenPos().x + stacksText.width / 2 + 2, stacksText.screenPos().y - 2)
+					}
+					
+					else if (thisUpgrade.freq != null) {
+						blinkingText.pos = vec2(thisUpgrade.screenPos().x, thisUpgrade.screenPos().y)
+					}
 				},
 
 				endTooltip() {
@@ -126,21 +137,21 @@ export function addUpgrades(elementParent) {
 				},
 
 				startHover() {
-					if (this.parent.isBeingHoveredOn) this.parent.endHover()
+					this.parent.endHover()
 					tween(this.parent.opacity, 0.9, 0.15, (p) => this.parent.opacity = p, easings.easeOutQuad)
-					tween(this.scale, vec2(1.1), 0.15, (p) => this.scale = p, easings.easeOutQuad)
 					
-					if (!isUpgradeBought(this.id) && !this.hasTooltip) this.addTooltip()
+					tween(this.scale, vec2(1.1), 0.15, (p) => this.scale = p, easings.easeOutQuad)
+					let value = this.value != null ? this.value : this.freq;
+					let blink = this.value != null ? `+${this.value}` : `Cursors now click every ${this.freq} seconds`;
+					if (!isUpgradeBought(this.id) && !this.hasTooltip) this.addTooltip(value, blink)
 				},
 
 				endHover() {
-					if (!this.parent.isBeingHoveredOn && !isHoveringUpgrade) {
-						this.parent.startHover()
-						tween(this.parent.opacity, 1, 0.15, (p) => this.parent.opacity = p, easings.easeOutQuad)
-					}
+					this.parent.startHover()
+					tween(this.parent.opacity, 1, 0.15, (p) => this.parent.opacity = p, easings.easeOutQuad)
+
 					if (!isUpgradeBought(upgrade.id)) this.dropBuy()
 					tween(this.scale, vec2(1), 0.15, (p) => this.scale = p, easings.easeOutQuad)
-
 					if (!isUpgradeBought(this.id) && this.hasTooltip) this.endTooltip()
 				},
 
@@ -150,8 +161,11 @@ export function addUpgrades(elementParent) {
 					playSfx("kaching", { tune: 25 * this.idx })
 					tween(this.scale, vec2(1.1), 0.15, (p) => this.scale = p, easings.easeOutQuad)
 				
-					if (this.type = "k_") GameState.clicksUpgradesValue += this.value
-					else if (this.type = "c_") GameState.cursorsUpgradesValue += this.value
+					if (this.type == "k_") GameState.clicksUpgradesValue += this.value
+					else if (this.type == "c_") {
+						if (this.value != null) GameState.cursorsUpgradesValue += this.value
+						else if (this.freq != null) GameState.timeUntilAutoLoopEnds = this.freq
+					}
 				},
 
 				draw() {
@@ -159,10 +173,10 @@ export function addUpgrades(elementParent) {
 					drawRect({
 						width: this.width,
 						height: map(this.boughtProgress, 0, 100, this.height, 0),
-						anchor: "top",
+						anchor: "bot",
 						radius: this.radius,
 						color: BLACK,
-						pos: vec2(0, -this.height / 2),
+						pos: vec2(0, this.height / 2),
 						opacity: 0.5,
 					})
 				},
@@ -209,6 +223,12 @@ export function addUpgrades(elementParent) {
 		let downEvent = null;
 		upgrade.onMousePress("left", () => {
 			if (!upgrade.isHovering()) return;
+
+			if (upgrade.id == "c_2" && !isUpgradeBought("c_1")) {
+				upgrade.endTooltip()
+				upgrade.addTooltip("You have to buy the previous one", `Cursors now click every ${upgrade.freq} seconds`, "right")
+				return
+			}
 
 			downEvent = upgrade.onMouseDown(() => {
 				if (isUpgradeBought(upgrade.id)) return

@@ -155,7 +155,7 @@ export function volumeManager() {
 						}
 							
 						else {
-							volumeText.text = `VOLUME: ${(GameState.settings.volume * 100).toFixed(1)}%`
+							volumeText.text = `VOLUME: ${(GameState.settings.volume * 100).toFixed(0)}%`
 							bop(volumeBars[clamp(Math.floor(GameState.settings.volume * 10 - 1), 0, 10)], 0.05)
 						}
 
@@ -187,7 +187,7 @@ export function volumeManager() {
 					}
 
 					bop(volumeBars[clamp(Math.floor(GameState.settings.volume * 10 - 1), 0, 10)], 0.05)
-					volumeText.text = `VOLUME: ${(GameState.settings.volume * 100).toFixed(1)}%`
+					volumeText.text = `VOLUME: ${(GameState.settings.volume * 100).toFixed(0)}%`
 				}
 
 				else if (isKeyPressed("n") && panderitoIndex != 3) {

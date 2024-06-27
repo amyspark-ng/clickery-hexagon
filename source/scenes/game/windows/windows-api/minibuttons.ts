@@ -132,7 +132,7 @@ export function addMinibutton(idxForInfo, taskbarIndex, posToAdd = vec2(), initi
 					// no curdragging
 					else if (curDraggin == null) {
 						// this.opacity = lerp(this.opacity, 1, 0.1)
-						if (this.isHovering()) {
+						if (this.isBeingHovered) {
 							this.angle = wave(-8, 8, time () * 3)
 						}
 						
@@ -185,6 +185,8 @@ export function addMinibutton(idxForInfo, taskbarIndex, posToAdd = vec2(), initi
 				folderObj.addSlots()
 				playSfx("plap")
 				bop(this, 0.1)
+
+				if (this.window) this.window.close()
 			},
 
 			releaseDrop() {
@@ -229,7 +231,8 @@ export function addMinibutton(idxForInfo, taskbarIndex, posToAdd = vec2(), initi
 				movingTween.onEnd(() => {
 					let currentSlot = get(`slot_${this.taskbarIndex}`)[0]
 					currentSlot?.fadeOut(0.32).onEnd(() => currentSlot?.destroy())
-					if (this.isHovering()) {this.startHover()}
+					// isBeingHoveredOn doesn't work
+					if (this.isHovering() && !isGenerallyHoveringAWindow) {this.startHover()}
 				})
 
 				// reset their angles

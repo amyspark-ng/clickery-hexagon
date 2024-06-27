@@ -32,7 +32,7 @@ export let GameState = {
 	cursorsPercentage: 0, // percentage added
 	timeUntilAutoLoopEnds: 10, // cursor frequency
 
-	upgradesBought: [],
+	upgradesBought: ["c_0"],
 	
 	hasUnlockedPowerups: false,
 	powerupsBought: 0,

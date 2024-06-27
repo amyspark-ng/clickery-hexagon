@@ -6,7 +6,7 @@ import { playSfx } from "../../../sound";
 import { bop } from "../utils";
 import { mouse } from "../additives";
 import { buttonSpacing, infoForWindows, manageWindow, openWindow } from "./windows-api/windowsAPI";
-import { addMinibutton } from "./windows-api/windowsAPI-utils";
+import { addMinibutton } from "./windows-api/minibuttons";
 
 export let gridContainer;
 

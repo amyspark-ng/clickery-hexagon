@@ -54,13 +54,8 @@ export function uiCounters() {
 			defaultYPos: scoreText.pos.y - 14,
 			barYPos: (scoreText.pos.y - 14) + (scoreText.height / 4) + 5,
 			value: 0,
-			update() {
-				if (isMousePressed("left") && this.isHovering()) {
-					// 1 second, 2 minute, 3 hour
-					GameState.settings.spsTextMode++
-					if (GameState.settings.spsTextMode > 3) GameState.settings.spsTextMode = 1
-				}
 
+			formatSpsText(value:any, spsTextMode:any) {
 				let textThing = "/s"
 				switch (GameState.settings.spsTextMode) {
 					case 1:
@@ -77,7 +72,16 @@ export function uiCounters() {
 					break;
 				}
 
-				this.text = this.value + textThing
+				return value.toFixed(spsTextMode) + textThing
+			},
+			update() {
+				if (isMousePressed("left") && this.isHovering()) {
+					// 1 second, 2 minute, 3 hour
+					GameState.settings.spsTextMode++
+					if (GameState.settings.spsTextMode > 3) GameState.settings.spsTextMode = 1
+				}
+
+				this.text = this.formatSpsText(this.value, GameState.settings.spsTextMode)
 			}
 		}
 	])

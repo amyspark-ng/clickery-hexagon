@@ -191,7 +191,7 @@ export function gamescene() {
 		// wait 60 seconds
 		wait(60, () => {
 			loop(120, () => {
-				if (GameState.totalScore > 1) !DEBUG ?? GameState.save(true)
+				if (GameState.totalScore > 1) if (!DEBUG) GameState.save(true)
 			})
 		})
 
@@ -244,6 +244,8 @@ export function gamescene() {
 			// if (!gamestate.unlockedAchivements.include(achievements["gnome"]) && chance(0.01)) {
 				// debug.log("holy shit did you guys see that")
 			// }
+
+			if (isKeyPressed("shift") && isKeyPressed("r") && panderitoIndex != 6) go("gamescene")
 		})
 
 		// panderito checkin

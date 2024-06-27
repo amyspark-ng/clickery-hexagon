@@ -322,6 +322,7 @@ export function loadEverything() {
 			}
 		},
 	})
+	loadSprite("chains", "sprites/windows/storeWin/chains.png")
 	loadSprite("smoke", "sprites/windows/storeWin/smoke.png", {
 		sliceX: 3,
 		anims: {

@@ -3,7 +3,7 @@ import { blendColors, bop, getPositionOfSide } from "../../utils.ts";
 import { mouse } from "../../additives.ts";
 import { drag, curDraggin, setCurDraggin } from "../../../../plugins/drag.js";
 import { playSfx } from "../../../../sound.ts";
-import { addMinibutton, calculateXButtonPosition } from "./windowsAPI-utils.ts";
+import { addMinibutton, calculateXButtonPosition } from "./minibuttons.ts";
 
 // window contents
 import { storeWinContent } from "../store/storeWindows.ts";
@@ -422,6 +422,7 @@ export function folderObjManaging() {
 	// this can't be attached to the buttons because you won't be able to call the event if the buttons don't exist
 	folderObj.onCharInput((key) => {
 		if (isKeyDown("control")) return
+		if (curDraggin) return
 
 		// parse the key to number
 		const numberPressed = parseInt(key);
@@ -429,7 +430,10 @@ export function folderObjManaging() {
 	
 		// adjust it to 0, 1, 2, 3
 		const index = numberPressed - 1;
-	
+
+		// // if the window you're trying to open is the same as the minibutton that is being dragged don't open it!!
+		// if (curDraggin?.is("minibutton") && curDraggin?.idxForInfo == infoForWindows[curDraggin?.windowKey].idx) return
+
 		// silly
 		if (numberPressed == 0) {
 			if (folded) folderObj.unfold();

@@ -1,5 +1,7 @@
 import { GameState } from "../../gamestate";
-import { addToast } from "./additives";
+import { DEBUG } from "../../main";
+import { positionSetter } from "../../plugins/positionSetter";
+import { addToast, mouse } from "./additives";
 import { autoLoopTime, cam, excessTime, panderitoIndex } from "./gamescene";
 import { hexagon } from "./hexagon";
 
@@ -218,29 +220,39 @@ export function shrink(obj, howMuch) {
 }
 
 export function debugTexts() {
-	let texty = add([
+	let keys = {}
+
+	function createKeys() {
+		let text = Object.keys(keys).map((key) => `${key} ${keys[key]}`).join("\n")
+		return text
+	}
+
+	let debugTexts = add([
 		text("", {
-			size: 20
+			size: 18
 		}),
-		pos(-50, 60),
+		color(WHITE),
+		opacity(0.25),
 		anchor("topleft"),
+		fixed(),
+		z(mouse.z + 1),
 		"debugText",
 		{
 			update() {
-				this.text = `
-				timeUntilAutoLoopEnds: ${GameState.timeUntilAutoLoopEnds}
-				autoLoopTime: ${autoLoopTime.toFixed(4)}
-				excessTime: ${excessTime.toFixed(4)}
-				masterVolume: ${GameState.settings.volume}
-				sfx: ${GameState.settings.sfx.volume}
-				music: ${GameState.settings.music.volume}
-				`.trim()
+				if (isKeyPressed("tab")) this.hidden = !this.hidden
+
+				keys = {
+					"Auto loop time: ": autoLoopTime.toFixed(2),
+					"Time until auto loop ends: ": GameState.timeUntilAutoLoopEnds,
+					"Taskbar: ": GameState.taskbar,
+				}
+
+				this.text = createKeys()
 			}
 		}
 	])
 
-	texty.hidden = true
-	texty.paused = true
+	// this.hidden = false
 }
 
 export function debugFunctions() {

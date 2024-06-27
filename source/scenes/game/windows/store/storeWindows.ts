@@ -20,7 +20,7 @@ let amountToBuy = 1
 
 let isHoveringUpgrade = false
 
-function addStoreElement(winParent, opts = { key: "null", pos: vec2(0, 20) }) {
+function addStoreElement(winParent:any, opts = { key: "null", pos: vec2(0, 20) }) {
 	// add a parent background object
 	const btn = winParent.add([
 		sprite(opts.key),
@@ -36,14 +36,13 @@ function addStoreElement(winParent, opts = { key: "null", pos: vec2(0, 20) }) {
 		`${opts.key}`,
 		{
 			price: 0,
-			isBeingHoveredOn: false,
+			isBeingHovered: false,
 			isBeingClicked: false,
 			down: false,
-			buy: function(amount) {
+			buy(amount:number) {
 				if (winParent.dragging) return
 				if (this.is("clickersElement")) GameState.clickers += amount
 				else if (this.is("cursorsElement")) GameState.cursors += amount
-				else if (this.is("powerupsElement")) GameState.powerupsBought++
 
 				tween(GameState.score, GameState.score - this.price, 0.32, (p) => GameState.score = p)
 
@@ -69,27 +68,22 @@ function addStoreElement(winParent, opts = { key: "null", pos: vec2(0, 20) }) {
 
 			startHover() {
 				tween(this.scale, vec2(1.025), 0.15, (p) => this.scale = p, easings.easeOutQuad)
-				this.isBeingHoveredOn = true
+				this.isBeingHovered = true
 			},
 
 			endHover() {
 				tween(this.scale, vec2(1), 0.15, (p) => this.scale = p, easings.easeOutQuad)
-				this.isBeingHoveredOn = false
+				this.isBeingHovered = false
 			},
 
 			update() {
 				isKeyDown("shift") ? amountToBuy = 10 : amountToBuy = 1
 				if (this.is("clickersElement") || this.is("cursorsElement")) this.price = getPrice(elements[opts.key].basePrice, elements[opts.key].percentageIncrease, GameState[elements[opts.key].gamestateKey], amountToBuy)
+				this.area.scale = vec2(1 / this.scale.x, 1 / this.scale.y)
 			},
 		}
 	])
 
-	if (opts.key == "powerupsElement" && !GameState.hasUnlockedPowerups) {
-		// let chains = add([
-			// sprite("chains"),
-		// ])
-	}
-	
 	let stacksText = btn.add([
 		text("Stacked upgrades: 0", {
 			size: 14,
@@ -101,11 +95,9 @@ function addStoreElement(winParent, opts = { key: "null", pos: vec2(0, 20) }) {
 		"stacksText",
 		{
 			update() {
-				let upgradeValue = 0
-				if (opts.key == "clickersElement") upgradeValue = GameState.clicksUpgradesValue
-				else if (opts.key == "cursorsElement") upgradeValue = GameState.cursorsUpgradesValue
-
-				this.text = `Stacked upgrades: ${upgradeValue}`
+				if (opts.key == "clickersElement") this.text = `Stacked upgrades: ${GameState.clicksUpgradesValue}`
+				else if (opts.key = "cursorsElement") this.text = `Stacked upgrades: ${GameState.cursorsUpgradesValue}`
+				else this.text = "what the hell"
 			}
 		}
 	])
@@ -217,9 +209,120 @@ function addStoreElement(winParent, opts = { key: "null", pos: vec2(0, 20) }) {
 	return btn;
 }
 
-let clickersElement;
-let cursorsElement;
-let powerupsElement;
+function addPowerupElement(winParent:any, posToAdd:any, hasUnlockedPowerups:boolean) {
+	let chains;
+	// add a parent background object
+	const btn = winParent.add([
+		sprite("powerupsElement"),
+		pos(posToAdd),
+		area(),
+		color(),
+		opacity(1),
+		scale(1),
+		anchor("center"),
+		z(winParent.z + 1),
+		"hoverObj",
+		"storeElement",
+		"powerupsElement",
+		{
+			isBeingHovered: false,
+			boughtProgress: 0,
+			startHover() {
+				tween(this.scale, vec2(1.025), 0.15, (p) => this.scale = p, easings.easeOutQuad)
+				this.isBeingHovered = true
+			},
+			endHover() {
+				tween(this.scale, vec2(1), 0.15, (p) => this.scale = p, easings.easeOutQuad)
+				this.isBeingHovered = false
+			},
+			dropUnlock() {
+				tween(btn.boughtProgress, 0, 0.15, (p) => btn.boughtProgress = p)
+				tween(this.scale, vec2(1.025), 0.15, (p) => this.scale = p, easings.easeOutQuad)
+				tween(chains.opacity, 1, 0.15, (p) => chains.opacity = p, easings.easeOutQuad)
+			},
+			unlock() {
+				GameState.hasUnlockedPowerups = true
+				playSfx("kaching")
+				this.destroy()
+				addPowerupElement(winParent, posToAdd, true)
+			},
+			buy() {
+				debug.log("buy powerup")
+			},
+			update() {
+				this.area.scale = vec2(1 / this.scale.x, 1 / this.scale.y)
+			}
+		}
+	])
+
+	btn.onHover(() => {
+		btn.startHover()
+	})
+
+	btn.onHoverEnd(() => {
+		btn.endHover()
+	})
+
+	if (!hasUnlockedPowerups) {
+		btn.onDraw(() => {
+			drawRect({
+				width: btn.width,
+				height: map(btn.boughtProgress, 0, 100, btn.height, 0),
+				anchor: "bot",
+				color: BLACK,
+				pos: vec2(0, btn.height / 2),
+				radius: 5,
+				opacity: 0.8,
+			})
+		})
+
+		chains = btn.add([
+			sprite("chains"),
+			pos(),
+			anchor("center"),
+			opacity(1),
+		])
+
+		let downEvent = null;
+		btn.onMousePress("left", () => {
+			downEvent?.cancel()
+			if (!btn.isHovering()) return;
+
+			downEvent = btn.onMouseDown("left", () => {
+				if (btn.boughtProgress < 100) {
+					btn.boughtProgress += 1.5
+					btn.scale.x = map(btn.boughtProgress, 0, 100, 1.025, 0.9)
+					btn.scale.y = map(btn.boughtProgress, 0, 100, 1.025, 0.9)
+					chains.opacity = map(btn.boughtProgress, 0, 100, 1, 0.25)
+				}
+	
+				if (btn.boughtProgress >= 100 && !GameState.hasUnlockedPowerups) {
+					btn.unlock()
+				}
+			})
+		})
+
+		btn.onMouseRelease("left", () => {
+			if (!btn.isHovering()) return;
+
+			btn.dropUnlock()
+		})
+	}
+
+	else {
+		btn.onMousePress("left", () => {
+			if (!btn.isHovering()) return;
+
+			btn.buy()
+		})
+	}
+
+	return btn;
+}
+
+let clickersElement:any;
+let cursorsElement:any;
+let powerupsElement:any;
 
 export function storeWinContent(winParent) {
 
@@ -227,7 +330,7 @@ export function storeWinContent(winParent) {
 	addUpgrades(clickersElement)
 	cursorsElement = addStoreElement(winParent, { key: "cursorsElement", pos: vec2(0, (clickersElement.pos.y + clickersElement.height) + 15) })
 	addUpgrades(cursorsElement)
-	powerupsElement = addStoreElement(winParent, { key: "powerupsElement", pos: vec2(0, (cursorsElement.pos.y + cursorsElement.height) + 15) })
+	powerupsElement = addPowerupElement(winParent, vec2(0, (cursorsElement.pos.y + cursorsElement.height) + 15), GameState.hasUnlockedPowerups)
 
 	storeElements = [clickersElement, cursorsElement, powerupsElement]
 
@@ -242,5 +345,11 @@ export function storeWinContent(winParent) {
 		}
 
 		isHoveringUpgrade = get("upgrade", { recursive: true }).some((upgrade) => upgrade.isHovering())
+	})
+
+	winParent.on("close", () => {
+		winParent.get("*", { recursive: true }).forEach(element => {
+			if (element.endHover) element.endHover()
+		});
 	})
 }
