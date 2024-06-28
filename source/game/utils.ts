@@ -1,6 +1,6 @@
-import { GameState } from "../../gamestate";
-import { DEBUG } from "../../main";
-import { positionSetter } from "../../plugins/positionSetter";
+import { GameState } from "../gamestate";
+import { DEBUG } from "../main";
+import { positionSetter } from "../plugins/positionSetter";
 import { addToast, mouse } from "./additives";
 import { autoLoopTime, cam, excessTime, panderitoIndex } from "./gamescene";
 import { hexagon } from "./hexagon";
@@ -252,7 +252,7 @@ export function debugTexts() {
 		}
 	])
 
-	// this.hidden = false
+	debugTexts.hidden = true
 }
 
 export function debugFunctions() {

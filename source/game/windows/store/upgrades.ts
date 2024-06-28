@@ -1,5 +1,5 @@
-import { GameState } from "../../../../gamestate";
-import { playSfx } from "../../../../sound";
+import { GameState } from "../../../gamestate";
+import { playSfx } from "../../../sound";
 import { bop } from "../../utils";
 
 export let isHoveringUpgrade = false;

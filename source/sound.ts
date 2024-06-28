@@ -2,8 +2,8 @@
 import { Key } from "kaplay";
 import { GameState } from "./gamestate.ts"
 import { positionSetter } from "./plugins/positionSetter.js";
-import { panderitoIndex } from "./scenes/game/gamescene.ts";
-import { bop } from "./scenes/game/utils.ts";
+import { panderitoIndex } from "./game/gamescene.ts";
+import { bop } from "./game/utils.ts";
 
 let bg:any;
 let volumeText:any;

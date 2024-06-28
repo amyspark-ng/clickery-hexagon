@@ -1,6 +1,6 @@
 // # Initial code by MeowcaTheoRange / modified by amyspark-ng
 
-import { blendColors } from "../scenes/game/utils";
+import { blendColors } from "../game/utils";
 
 var sprIter = 0;
 export function trail(objSprite = "", amount = 10, spreadBetweenClones = 1, colorNew = BLUE, startAlpha = 1, endAlpha = 0.5, startScale = 0.9, endScale = 0.5) {

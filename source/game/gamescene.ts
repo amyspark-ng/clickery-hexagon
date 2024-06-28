@@ -1,13 +1,13 @@
-import { GameState } from "../../gamestate.ts"
+import { GameState } from "../gamestate.ts"
 import { scoreVars, addHexagon, hexagon } from "./hexagon.ts"
 import { buildingsText, scoreText, spsText, uiCounters } from "./uicounters.ts"
-import { arrayToColor, debugFunctions } from "./utils.ts"
+import { arrayToColor, debugFunctions, toHHMMSS } from "./utils.ts"
 import { addToast, gameBg, mouse } from "./additives.ts"
-import { playMusic } from "../../sound.ts"
+import { playMusic } from "../sound.ts"
 import { folderObj, folderObjManaging, windowsDefinition } from "./windows/windows-api/windowsAPI.ts"
 import { songs } from "./windows/musicWindow.ts"
-import { curDraggin } from "../../plugins/drag.js"
-import { DEBUG } from "../../main.ts"
+import { curDraggin } from "../plugins/drag.js"
+import { DEBUG } from "../main.ts"
 
 let panderitoLetters = "panderito".split("")
 export let panderitoIndex = 0
@@ -132,6 +132,13 @@ function triggerZZZ(idle = true) {
 }
 
 function welcomeBack(idle = false) {
+	let welcomebacktoast = get("toast").filter(toast => toast.type == "welcome")
+	if (welcomebacktoast.length > 0) {
+		welcomebacktoast.forEach(toast => {
+			toast.destroy()
+		})
+	}
+	
 	if (GameState.cursors < 1) {addToast({ icon: "cursors.cursor", title: "Welcome back!", body: ":)" }); return}
 	
 	if (idle == false) {
@@ -146,7 +153,7 @@ function welcomeBack(idle = false) {
 	
 			// 120 being the seconds outside screen you have to be to get a log
 			if ((totalTimeOutsideTab / 1000) > (DEBUG ? 2 : 120)) {
-				addToast({ icon: "cursors.cursor", title: "Welcome back!", body: `+${gainedScore} of score!${scoreVars.combo > 1 ? "\n(Combo is not applicable)" : ""}` })
+				addToast({ icon: "cursors.cursor", title: "Welcome back!", body: `+${gainedScore} of score!\nAnd you were out for ${toHHMMSS(totalTimeOutsideTab / 1000)} ${(totalTimeOutsideTab / 1000) > 60 ? "min" : "sec"} ${scoreVars.combo > 1 ? "\n(Combo is not applicable)" : ""}` })
 			}
 	
 			tween(GameState.score, GameState.score + gainedScore, 0.25, (p) => GameState.score = p, easings.easeOutQuint)
@@ -175,6 +182,14 @@ function resetIdleTime() {
 export function gamescene() {
 	return scene("gamescene", () => {
 		GameState.load() // loadSave()
+
+		layers([
+			"powerups",
+			"windows",
+			"ui",
+			"hexagon",
+			"background",
+		], "hexagon")
 
 		cam.scale = 1
 

@@ -1,4 +1,4 @@
-import { playSfx } from "../../sound"
+import { playSfx } from "../sound"
 import { cam } from "./gamescene"
 import { COMBO_MINCLICKS, COMBO_MAX, COMBO_MAXCLICKS, clickVars, scoreVars } from "./hexagon"
 import { scoreText, spsText } from "./uicounters";

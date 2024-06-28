@@ -1,6 +1,6 @@
-import { GameState } from "../../gamestate"
-import { curDraggin } from "../../plugins/drag"
-import { playSfx } from "../../sound"
+import { GameState } from "../gamestate"
+import { curDraggin } from "../plugins/drag"
+import { playSfx } from "../sound"
 import { hexagon } from "./hexagon"
 import { arrayToColor, blendColors, getPositionOfSide, getZBetween } from "./utils"
 import { isDraggingAWindow, isPreciselyHoveringAWindow, manageWindow } from "./windows/windows-api/windowsAPI"
@@ -147,11 +147,12 @@ export function addToast(opts:toastOpts) {
 				index: idx,
 				type: "",
 				add() {
-					if (opts.title.includes("unlocked")) {
-						if (opts.title.includes("window")) this.type = "window"
+					if (opts.title.toLocaleLowerCase().includes("unlocked")) {
+						if (opts.title.toLocaleLowerCase().includes("window")) this.type = "window"
 						else this.type = "achievement"
 					}
-					else if (opts.title.includes("saved")) this.type = "save"
+					else if (opts.title.toLocaleLowerCase().includes("saved")) this.type = "save"
+					else if (opts.title.toLocaleLowerCase().includes("welcome")) this.type = "welcome"
 				},
 				close() {
 					tween(toastBg.pos.x, -toastBg.width, 0.8, (p) => (toastBg.pos.x = p), easings.easeOutQuint).onEnd(() => {

@@ -1,8 +1,8 @@
-import { GameState } from "../../../gamestate";
-import { ROOT } from "../../../main";
-import { curDraggin, drag, setCurDraggin } from "../../../plugins/drag";
-import { dummyShadow } from "../../../plugins/dummyShadow";
-import { playSfx } from "../../../sound";
+import { GameState } from "../../gamestate";
+import { ROOT } from "../../main";
+import { curDraggin, drag, setCurDraggin } from "../../plugins/drag";
+import { dummyShadow } from "../../plugins/dummyShadow";
+import { playSfx } from "../../sound";
 import { bop } from "../utils";
 import { mouse } from "../additives";
 import { buttonSpacing, infoForWindows, manageWindow, openWindow } from "./windows-api/windowsAPI";

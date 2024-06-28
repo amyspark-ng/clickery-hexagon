@@ -1,7 +1,7 @@
 import { GameState } from "../gamestate.ts";
 import { DEBUG } from "../main";
 import { volumeManager } from "../sound";
-import { addBackground, addMouse, gameBg } from "./game/additives.ts";
+import { addBackground, addMouse, gameBg } from "../game/additives.ts";
 
 function scaryIntro() {
 	// gameBg.color.a = 1

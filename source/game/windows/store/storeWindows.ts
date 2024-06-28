@@ -1,5 +1,5 @@
-import { GameState } from "../../../../gamestate";
-import { playSfx } from "../../../../sound";
+import { GameState } from "../../../gamestate";
+import { playSfx } from "../../../sound";
 import { getPrice } from "../../utils";
 import { addUpgrades } from "./upgrades";
 

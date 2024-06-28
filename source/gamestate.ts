@@ -1,4 +1,4 @@
-import { saveAnim } from "./scenes/game/utils"
+import { saveAnim } from "./game/utils"
 
 // lajbel you genius
 class VolumeData {

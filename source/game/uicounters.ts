@@ -1,5 +1,5 @@
-import { GameState } from "../../gamestate.ts";
-import { waver } from "../../plugins/wave.js";
+import { GameState } from "../gamestate.ts";
+import { waver } from "../plugins/wave.js";
 import { formatNumber } from "./utils.ts";
 
 export let scoreText:any;

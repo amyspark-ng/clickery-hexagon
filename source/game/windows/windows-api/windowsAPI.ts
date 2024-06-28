@@ -1,8 +1,8 @@
-import { GameState } from "../../../../gamestate.ts";
+import { GameState } from "../../../gamestate.ts";
 import { blendColors, bop, getPositionOfSide } from "../../utils.ts";
 import { mouse } from "../../additives.ts";
-import { drag, curDraggin, setCurDraggin } from "../../../../plugins/drag.js";
-import { playSfx } from "../../../../sound.ts";
+import { drag, curDraggin, setCurDraggin } from "../../../plugins/drag.js";
+import { playSfx } from "../../../sound.ts";
 import { addMinibutton, calculateXButtonPosition } from "./minibuttons.ts";
 
 // window contents

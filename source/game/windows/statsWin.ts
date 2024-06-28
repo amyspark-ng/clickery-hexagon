@@ -1,4 +1,4 @@
-import { GameState } from "../../../gamestate";
+import { GameState } from "../../gamestate";
 import { toHHMMSS } from "../utils";
 import { infoForWindows } from "./windows-api/windowsAPI";
 

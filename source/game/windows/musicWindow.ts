@@ -1,6 +1,6 @@
-import { GameState } from "../../../gamestate";
-import { waver } from "../../../plugins/wave";
-import { musicHandler, playMusic, playSfx, scratchSong } from "../../../sound";
+import { GameState } from "../../gamestate";
+import { waver } from "../../plugins/wave";
+import { musicHandler, playMusic, playSfx, scratchSong } from "../../sound";
 import { bop, formatMusicTime } from "../utils";
 
 export let songs = {

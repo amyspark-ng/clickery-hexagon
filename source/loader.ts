@@ -1,7 +1,7 @@
-import { gamescene } from "./scenes/game/gamescene.ts"
+import { gamescene } from "./game/gamescene.ts"
 import { introscene } from "./scenes/introScene.ts"
 import { focuscene } from "./scenes/focuscene.js"
-import { ascendscene } from "./scenes/game/ascendscene.ts"
+import { ascendscene } from "./scenes/ascendscene.ts"
 import { DEBUG } from "./main.js"
 
 export function drawSeriousLoadScreen(progress, op = 1) {

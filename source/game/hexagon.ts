@@ -1,15 +1,15 @@
 
-import { GameState } from "../../gamestate.ts";
+import { GameState } from "../gamestate.ts";
 import { scoreText, spsText } from "./uicounters.ts";
 import { formatNumber, arrayToColor } from "./utils.ts";
 import { mouse } from "./additives.ts";
-import { playSfx } from "../../sound.ts";
+import { playSfx } from "../sound.ts";
 import { isDraggingAWindow, isGenerallyHoveringAWindow, isPreciselyHoveringAWindow, manageWindow } from "./windows/windows-api/windowsAPI.ts";
-import { waver } from "../../plugins/wave.js";
+import { waver } from "../plugins/wave.js";
 import { isDraggingASlider } from "./windows/colorWindow.ts";
 import { addPlusScoreText, getClicksFromCombo, increaseCombo, startCombo } from "./combo-utils.ts";
-import { addConfetti } from "../../plugins/confetti.js";
-import { curDraggin } from "../../plugins/drag.js";
+import { addConfetti } from "../plugins/confetti.js";
+import { curDraggin } from "../plugins/drag.js";
 import { cam } from "./gamescene.ts";
 
 export let scoreVars = {

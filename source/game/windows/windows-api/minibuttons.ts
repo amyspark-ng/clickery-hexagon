@@ -1,10 +1,10 @@
-import { curDraggin, drag, setCurDraggin } from "../../../../plugins/drag";
-import { dummyShadow } from "../../../../plugins/dummyShadow";
-import { playSfx } from "../../../../sound";
+import { curDraggin, drag, setCurDraggin } from "../../../plugins/drag";
+import { dummyShadow } from "../../../plugins/dummyShadow";
+import { playSfx } from "../../../sound";
 import { bop } from "../../utils";
 import { mouse } from "../../additives";
 import { folderObj, infoForWindows, isGenerallyHoveringAWindow, isDraggingAWindow, isPreciselyHoveringAWindow, manageWindow, folded, buttonSpacing } from "./windowsAPI";
-import { GameState } from "../../../../gamestate";
+import { GameState } from "../../../gamestate";
 
 export function calculateXButtonPosition(index, buttonSpacing = 75) {
     return folderObj.pos.x - buttonSpacing * (index) - buttonSpacing;

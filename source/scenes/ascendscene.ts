@@ -1,9 +1,9 @@
-import { GameState } from "../../gamestate"
-import { positionSetter } from "../../plugins/positionSetter"
-import { waver } from "../../plugins/wave"
-import { playSfx } from "../../sound"
-import { gameBg } from "./additives"
-import { bop, getRandomElementDifferentFrom } from "./utils"
+import { GameState } from "../gamestate"
+import { positionSetter } from "../plugins/positionSetter"
+import { waver } from "../plugins/wave"
+import { playSfx } from "../sound"
+import { gameBg } from "../game/additives"
+import { bop, getRandomElementDifferentFrom } from "../game/utils"
 
 let cameraScale = 1
 let mage;

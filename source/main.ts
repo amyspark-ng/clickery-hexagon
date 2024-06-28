@@ -19,7 +19,6 @@ export const k = kaplay({
 	// letterbox: true,
 });
 export let ROOT = getTreeRoot()
-setBackground(BLACK)
 setCursor("none")
 
 loadEverything()
