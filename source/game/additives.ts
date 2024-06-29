@@ -1,5 +1,6 @@
 import { GameState } from "../gamestate"
 import { curDraggin } from "../plugins/drag"
+import { trail } from "../plugins/trail"
 import { playSfx } from "../sound"
 import { hexagon } from "./hexagon"
 import { arrayToColor, blendColors, getPositionOfSide, getZBetween } from "./utils"
@@ -13,7 +14,7 @@ export function addBackground() {
 		anchor("center"),
 		scale(8),
 		color(arrayToColor(GameState.settings.bgColor)),
-		z(-1),
+		layer("background"),
 		stay(),
 		{
 			speed: 0.1,
@@ -53,7 +54,8 @@ export function addMouse() {
 		stay(),
 		anchor(vec2(-0.5, -0.65)),
 		fixed(),
-		z(100),
+		layer("mouse"),
+		z(0),
 		{
 			intro: false,
 			speed: 5000, // 5000 is the optimal for actual mouse movement
@@ -115,13 +117,24 @@ export function addMouse() {
 	onHoverEnd("hover_insideWindow", () => {
 		mouse.play("cursor")
 	})
+
+	mouse.use(trail({
+		amount: 10,
+		spriteName: "bean",
+		spreadBetweenClones: 100,
+		colorNew: BLUE,
+		startAlpha: 1,
+		endAlpha: 1,
+		startScale: vec2(1),
+		endScale: vec2(1)
+	}))
 }
 
 let maxLogs = 100;
 let toastQueue = [];
 const initialYPosition = 50;
 
-type toastOpts = {
+export type toastOpts = {
 	title?: string,
 	body?: string,
 	icon?: string,
@@ -140,8 +153,9 @@ export function addToast(opts:toastOpts) {
 			pos(-200, yOffset),
 			anchor("top"),
 			color(WHITE.darken(50)),
-			z(mouse.z - 2),
 			area(),
+			layer("logs"),
+			z(0),
 			"toast",
 			{
 				index: idx,
@@ -188,6 +202,7 @@ export function addToast(opts:toastOpts) {
 			sprite(typeof spriteName == "string" ? spriteName : spriteName[0]),
 			anchor("center"),
 			pos(toastBg.pos.x - toastBg.width / 2 + 50, toastBg.pos.y),
+			layer("logs"),
 			z(toastBg.z + 1),
 			{
 				update() {
@@ -197,7 +212,7 @@ export function addToast(opts:toastOpts) {
 			}
 		]);
 
-		spriteName[1] ?? icon.play(spriteName[1]);
+		if (spriteName[1] && typeof spriteName != "string") icon.play(spriteName[1]);
 
 		icon.width = 60;
 		icon.height = 60;
@@ -211,6 +226,7 @@ export function addToast(opts:toastOpts) {
 			}),
 			pos(icon.pos.x + icon.width / 2 + 10, toastBg.pos.y - toastBg.height / 2),
 			color(BLACK),
+			layer("logs"),
 			z(toastBg.z + 1),
 			{
 				update() {
@@ -229,6 +245,7 @@ export function addToast(opts:toastOpts) {
 			}),
 			pos(titleText.pos.x, titleText.pos.y + titleText.height),
 			color(BLACK),
+			layer("logs"),
 			z(toastBg.z + 1),
 			{
 				update() {

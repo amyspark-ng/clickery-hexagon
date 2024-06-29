@@ -2,7 +2,7 @@ import { GameState } from "../gamestate.ts"
 import { scoreVars, addHexagon, hexagon } from "./hexagon.ts"
 import { buildingsText, scoreText, spsText, uiCounters } from "./uicounters.ts"
 import { arrayToColor, debugFunctions, toHHMMSS } from "./utils.ts"
-import { addToast, gameBg, mouse } from "./additives.ts"
+import { addToast, gameBg, mouse, toastOpts } from "./additives.ts"
 import { playMusic } from "../sound.ts"
 import { folderObj, folderObjManaging, windowsDefinition } from "./windows/windows-api/windowsAPI.ts"
 import { songs } from "./windows/musicWindow.ts"
@@ -32,6 +32,16 @@ export function togglePanderito() {
 	GameState.settings.panderitoMode = !GameState.settings.panderitoMode
 	panderitoIndex = 0
 
+	let block = add([
+		rect(width(), 100),
+		pos(center()),
+		anchor("center"),
+		opacity(0.5),
+		color(BLACK),
+		layer("mouse"),
+		z(mouse.z - 2),
+	])
+
 	let panderitoText = add([
 		text(`Panderito mode: ${GameState.settings.panderitoMode ? "ACTIVATED" : "DEACTIVATED"}`, {
 			size: 26,
@@ -39,17 +49,9 @@ export function togglePanderito() {
 		}),
 		pos(center()),
 		anchor("center"),
-		z(999),
+		layer("mouse"),
+		z(mouse.z - 1),
 		opacity(1),
-	])
-
-	let block = add([
-		rect(width(), 100),
-		pos(center()),
-		anchor("center"),
-		opacity(0.5),
-		color(BLACK),
-		z(998),
 	])
 
 	wait(0.8, () => {
@@ -83,6 +85,7 @@ function triggerZZZ(idle = true) {
 		pos(center()),
 		anchor("center"),
 		color(BLACK),
+		layer("mouse"),
 		z(mouse.z - 2),
 		opacity(1),
 	])
@@ -99,6 +102,7 @@ function triggerZZZ(idle = true) {
 			}),
 		}),
 		z(mouse.z - 1),
+		layer("mouse"),
 		anchor("center"),
 		pos(center()),
 		opacity(1),
@@ -132,16 +136,32 @@ function triggerZZZ(idle = true) {
 }
 
 function welcomeBack(idle = false) {
+	function addWelcomeBackToast(score:any, timeInSeconds:number) {
+		let body = `You were out for: ${toHHMMSS(timeInSeconds)} ${timeInSeconds > 60 ? "mins" : "secs"}`; 
+		if (score != null) body += `\nYou gained: ${score}` 
+		
+		let hasCombo = scoreVars.combo > 1
+		let hasPowerup = get("poweruptimer")?.length > 0
+		let applicationMessage = "\n"
+		
+		if (hasCombo) applicationMessage += `(Combo is not applicable)`
+		else if (hasPowerup) applicationMessage += "(Power-ups are not applicable)"
+		else if (hasCombo && hasPowerup) applicationMessage += "(Combo nor Power-ups are applicable)"
+		
+		addToast({ icon: "cursors.cursor", title: "Welcome back!", body: body })
+		debug.log("que")
+	}
+	
 	let welcomebacktoast = get("toast").filter(toast => toast.type == "welcome")
 	if (welcomebacktoast.length > 0) {
 		welcomebacktoast.forEach(toast => {
 			toast.destroy()
 		})
 	}
-	
-	if (GameState.cursors < 1) {addToast({ icon: "cursors.cursor", title: "Welcome back!", body: ":)" }); return}
-	
+
 	if (idle == false) {
+		if (GameState.cursors < 1) {addWelcomeBackToast(null, totalTimeOutsideTab / 1000); return;}
+		
 		autoLoopTime += totalTimeOutsideTab / 1000
 		excessTime = autoLoopTime - GameState.timeUntilAutoLoopEnds
 		let gainedScore = 0
@@ -153,7 +173,7 @@ function welcomeBack(idle = false) {
 	
 			// 120 being the seconds outside screen you have to be to get a log
 			if ((totalTimeOutsideTab / 1000) > (DEBUG ? 2 : 120)) {
-				addToast({ icon: "cursors.cursor", title: "Welcome back!", body: `+${gainedScore} of score!\nAnd you were out for ${toHHMMSS(totalTimeOutsideTab / 1000)} ${(totalTimeOutsideTab / 1000) > 60 ? "min" : "sec"} ${scoreVars.combo > 1 ? "\n(Combo is not applicable)" : ""}` })
+				addWelcomeBackToast(gainedScore, totalTimeOutsideTab / 1000)
 			}
 	
 			tween(GameState.score, GameState.score + gainedScore, 0.25, (p) => GameState.score = p, easings.easeOutQuint)
@@ -162,9 +182,11 @@ function welcomeBack(idle = false) {
 	}
 
 	else {
+		if (GameState.cursors < 1) {addWelcomeBackToast(null, timeSlept); return;}
+		
 		// 120 being the seconds outside screen you have to be to get a log
 		if (timeSlept > (DEBUG ? 2 : 120)) {
-			addToast({ icon: "cursors.cursor", title: "Welcome back!", body: `+${scoreVars.autoScorePerSecond * timeSlept} of score!${scoreVars.combo > 1 ? "\n(Combo is not applicable)" : ""}` })
+			addWelcomeBackToast(Math.round(scoreVars.scorePerAutoClick * timeSlept), timeSlept)
 			timeSlept = 0
 		}
 		// don't add no score because it is aded in the loop
@@ -182,14 +204,6 @@ function resetIdleTime() {
 export function gamescene() {
 	return scene("gamescene", () => {
 		GameState.load() // loadSave()
-
-		layers([
-			"powerups",
-			"windows",
-			"ui",
-			"hexagon",
-			"background",
-		], "hexagon")
 
 		cam.scale = 1
 
@@ -304,10 +318,8 @@ export function gamescene() {
 						triggerZZZ(false)
 					} 
 		
-					if (GameState.cursors >= 1) {
-						// false means it was out not idle
-						welcomeBack(false)
-					}
+					// false means it was out not idle
+					welcomeBack(false)
 				}
 			}
 		}

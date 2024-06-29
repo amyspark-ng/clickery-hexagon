@@ -1,9 +1,8 @@
 import { GameState } from "../gamestate";
-import { DEBUG } from "../main";
-import { positionSetter } from "../plugins/positionSetter";
 import { addToast, mouse } from "./additives";
-import { autoLoopTime, cam, excessTime, panderitoIndex } from "./gamescene";
+import { autoLoopTime, cam, panderitoIndex } from "./gamescene";
 import { hexagon } from "./hexagon";
+import { spawnPowerup, powerupTypes } from "./powerups";
 
 // definetely not chatgpt
 export function formatNumber(number = 0, short = true, isPrice = false) {
@@ -203,6 +202,10 @@ export function saveAnim() {
 	addToast({ icon: "floppy", title: "Game saved!", body: `Time played: ${toHHMMSS(GameState.stats.totalTimePlayed)}` })
 }
 
+export function randomPos() {
+	return vec2(rand(0, width()), rand(0, height()))
+}
+
 export function bop(obj, howMuch = 0.1, bopEasing = easings.easeOutQuint) {
 	if (!obj.is("scale")) obj.use(scale(1))
 	if (!obj.bopDefScale) obj.bopDefScale = obj.scale
@@ -273,30 +276,18 @@ export function debugFunctions() {
 		else if (isKeyPressed("b")) GameState.cheat()
 		else if (isKeyPressed("r") && panderitoIndex != 6) go("gamescene")
 		else if (isKeyPressed("w")) hexagon.autoClick()
-		
-		else if (isKeyPressed("f")) {
-			addToast({
-				title: "Achievement unlocked!",
-				body: "You've gotten the achievement",
-				icon: "mupgrades.u_12"
-			})
-		}
-
-		else if (isKeyPressed("g")) {
-			addToast({
-				title: "Window unlocked!",
-				body: "Music window, now you can change the song that's playing",
-				icon: "icon_music"
-			})
-		}
-
-		// else if (isKeyPressed("g")) addToast({ title: "Welcome back!", body: "This is a long body text", icon: "mupgrades.u_12" })
-		// else if (isKeyPressed("h")) addToast({ title: "Welcome back!", body: "This is a longer body text, one that is longer", icon: "mupgrades.u_12" })
-		else if (isKeyPressed("j")) addToast({ time: 10, title: "Welcome back!", body: "This would be an even LONGER body text, one that is a LOT longer than the one before, very very long, im running out of really long messages so i'm trying to make it be very very very long to see how it looks oh well what do i do how does a bastard orphan son a whore and a scottsman dropped in the middle of a forgotten spot in the caribbean empovrished and blah blah idk the lyrics to hamilton i forgot them i'll sing the parody - yes i'd like a hand tossed stuffed crust pepperoni pizza with sausage topped with a little extra of tomato sauce and in the middle put pineapple and spinach i hope you're taking notes cause this order's not finished for 10 dollars could you put some sallami on er plus a lot of olives and if its not a bother to thaw some frozen balogni go soak it in tap water then slap on spaghetti eggs bacon and avocado", icon: "mupgrades.u_12"})
-		// else if (isKeyPressed("k")) addToast({ title: "This would be an even LONGER body text, one that is a LOT longer than the one before, very very long, im running out of really long messages so i'm trying to make it be very very very long to see how it looks oh well what do i do how does a bastard orphan son a whore and a scottsman dropped in the middle of a forgotten spot in the caribbean empovrished and blah blah idk the lyrics to hamilton i forgot them i'll sing the parody - yes i'd like a hand tossed stuffed crust pepperoni pizza with sausage topped with a little extra of tomato sauce and in the middle put pineapple and spinach i hope you're taking notes cause this order's not finished for 10 dollars could you put some sallami on er plus a lot of olives and if its not a bother to thaw some frozen balogni go soak it in tap water then slap on spaghetti eggs bacon and avocado", body: "Welcome back", icon: "mupgrades.u_12"})
 		else if (isKeyDown("q")) {
 			hexagon.clickPress()
 			wait(0.1, () => hexagon.clickRelease())
+		}
+	
+		else if (isKeyPressed("f")) {
+			spawnPowerup({
+				pos: mousePos(),
+				type: choose(Object.keys(powerupTypes)),
+				time: 10,
+				multiplier: 4
+			})
 		}
 	})
 

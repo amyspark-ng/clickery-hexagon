@@ -24,9 +24,9 @@ export function addMinibutton(idxForInfo, taskbarIndex, posToAdd = vec2(), initi
 		scale(1),
 		opacity(1),
 		rotate(0),
-		timer(),
 		drag(),
 		color(),
+		layer("ui"),
 		z(folderObj.z - 1),
 		"hoverOutsideWindow",
 		"minibutton",
@@ -43,9 +43,7 @@ export function addMinibutton(idxForInfo, taskbarIndex, posToAdd = vec2(), initi
 			defaultScale: vec2(1),
 			dragHasSurpassed: false,
 			destinedPosition: initialDestPosition,
-			beingHeld: false,
 			isBeingHovered: false,
-			holdTimer: 0,
 			extraMb: infoForWindows[Object.keys(infoForWindows)[idxForInfo]].icon == "extra" ? true : null,
 			shut: get("extraWin")[0] ? false : true,
 			startHover() {
@@ -76,8 +74,6 @@ export function addMinibutton(idxForInfo, taskbarIndex, posToAdd = vec2(), initi
 				mouse.play("cursor")
 
 				// reset some stuff
-				this.holdTimer = 0
-				this.beingHeld = false
 				this.isBeingHovered = false
 
 				if (this.extraMb || this.dragging) return
@@ -181,6 +177,7 @@ export function addMinibutton(idxForInfo, taskbarIndex, posToAdd = vec2(), initi
 				mouse.grab()
 				this.pick()
 
+				this.layer = "mouse"
 				this.z = mouse.z - 1
 				folderObj.addSlots()
 				playSfx("plap")
@@ -193,7 +190,9 @@ export function addMinibutton(idxForInfo, taskbarIndex, posToAdd = vec2(), initi
 				curDraggin.trigger("dragEnd")
 				setCurDraggin(null)
 				mouse.releaseAndPlay("cursor")
-	
+				this.layer = "ui"
+				this.z = folderObj.z - 1
+
 				let closestSlot = null;
 				let closestDistance = Infinity;
 				
@@ -232,7 +231,8 @@ export function addMinibutton(idxForInfo, taskbarIndex, posToAdd = vec2(), initi
 					let currentSlot = get(`slot_${this.taskbarIndex}`)[0]
 					currentSlot?.fadeOut(0.32).onEnd(() => currentSlot?.destroy())
 					// isBeingHoveredOn doesn't work
-					if (this.isHovering() && !isGenerallyHoveringAWindow) {this.startHover()}
+					if (this.isHovering() && !isGenerallyHoveringAWindow) this.startHover()
+					else this.endHover()
 				})
 
 				// reset their angles
@@ -311,7 +311,7 @@ export function addMinibutton(idxForInfo, taskbarIndex, posToAdd = vec2(), initi
 		if (currentMinibutton.extraMb) return
 
 		holdWaiting.cancel()
-		holdWaiting = wait(0.1, () => {
+		holdWaiting = wait(0.185, () => {
 			if (!currentMinibutton.isBeingHovered) return;
 			currentMinibutton.pickFromTaskbar()
 		})

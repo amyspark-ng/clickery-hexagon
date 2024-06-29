@@ -583,6 +583,7 @@ export function loadEverything() {
 
 	loadSound("plap", "sounds/sfx/plap.mp3")
 	loadSound("plop", "sounds/sfx/plop.mp3")
+	loadSound("powerup", "sounds/sfx/powerup.wav")
 
 	// music
 	// don't load as music because then it won't play when the game loads

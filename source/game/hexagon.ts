@@ -15,9 +15,11 @@ import { cam } from "./gamescene.ts";
 export let scoreVars = {
 	scorePerClick: 1,
 	scorePerAutoClick: 0,
-
+	pu_ClicksMultiplier: 1,
+	
 	autoScorePerSecond: 0, // the score per second you're getting automatically
 	scorePerSecond: null, // the total score per second
+	pu_CursorsMultiplier: 1,
 	
 	scoreNeededToAscend: 1000000,
 	combo: 1,
@@ -45,6 +47,9 @@ let maxRotSpeed = 10
 export function addHexagon() {
 	// reset variables
 	scoreVars.combo = 1
+	scoreVars.pu_ClicksMultiplier = 1
+	scoreVars.pu_CursorsMultiplier = 1
+
 	clickVars.consecutiveClicks = 0
 	clickVars.constantlyClicking = false
 	clickVars.comboDropped = true
@@ -72,7 +77,8 @@ export function addHexagon() {
 			offset: vec2(-512, -293),
 			scale: GameState.settings.panderitoMode ? vec2(0.5, 1) : vec2(1.08, 1.08) 
 		}),		
-		z(2),
+		z(0),
+		layer("hexagon"),
 		"hexagon",
 		"hoverOutsideWindow",
 		{
@@ -171,9 +177,8 @@ export function addHexagon() {
 					sprite("cursors"),
 					pos(),
 					scale(0.8),
-					z(2.1),
 					rotate(0),
-					z(4),
+					layer("ui"),
 					area({ collisionIgnore: ["cursor"] }),
 					body(),
 					opacity(1),
@@ -335,12 +340,25 @@ export function addHexagon() {
 		}
 	})
 
+	function getScorePerClick() {
+		let value:number;
+		// clickers start at 0 that's why i have to add 1
+		if (GameState.clicksUpgradesValue < 2) {
+			value = 1 + GameState.clickers
+		}
+
+		else {
+			value = (1 + GameState.clickers) * GameState.clicksUpgradesValue
+		}
+		return value * scoreVars.pu_ClicksMultiplier;
+	}
+
 	// score setting stuff
 	hexagon.onUpdate(() => {
-		scoreVars.scorePerClick = GameState.clickers + 1
-		scoreVars.scorePerAutoClick = GameState.cursors
+		scoreVars.scorePerClick = getScorePerClick()
 
-		// scorePerClick = GameState.clicksUpgrades > 0 ? GameState.clickers * GameState.clicksUpgrades : GameState.clickers
+		scoreVars.scorePerAutoClick = GameState.cursors * GameState.cursorsUpgradesValue * scoreVars.pu_CursorsMultiplier
+
 		// scorePerClick += Math.round(percentage(scorePerClick, GameState.clickPercentage))
 		// scorePerAutoClick = GameState.cursorUpgrades > 0 ? GameState.cursors * GameState.cursorUpgrades : GameState.cursors
 		// scorePerAutoClick += Math.round(percentage(scorePerAutoClick, GameState.cursorsPercentage))

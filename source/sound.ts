@@ -13,7 +13,7 @@ let volumeBars:any;
 
 type sfxOpts = {
 	tune?: number,
-	speedy?: number
+	speedy?: number,
 }
 
 export let sfxHandler:any;
@@ -59,7 +59,8 @@ export function addSoundElements() {
 		color(BLACK),
 		stay(),
 		opacity(0.75),
-		z(999999999),
+		layer("sound"),
+		z(0),
 		"trayVolElement",
 		{
 			upYPos: -80,
@@ -74,7 +75,8 @@ export function addSoundElements() {
 		pos(0, bg.height - 12),
 		anchor("center"),
 		scale(0.6),
-		z(9999999999),
+		layer("sound"),
+		z(1),
 		"trayVolElement",
 	])
 
@@ -84,6 +86,8 @@ export function addSoundElements() {
 		pos(0, -64),
 		positionSetter(),
 		anchor("center"),
+		layer("sound"),
+		z(1),
 		"trayVolElement",
 	])
 
@@ -98,7 +102,8 @@ export function addSoundElements() {
 			rect(10, bg.height - 40, { radius: 1 }),
 			opacity(0),
 			anchor("center"),
-			z(99999999999),
+			layer("sound"),
+			z(1),
 			"trayVolElement",
 			"trayVolBar",
 			{

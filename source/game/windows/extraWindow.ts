@@ -72,6 +72,7 @@ export function makeGridMinibutton(idx, gridSlot, winParent) {
 		color(WHITE),
 		scale(0),
 		drag(),
+		layer("windows"),
 		z(winParent.z + 1),
 		area(),
 		rotate(0),
@@ -113,7 +114,8 @@ export function makeGridMinibutton(idx, gridSlot, winParent) {
 					curDraggin.trigger("dragEnd")
 					setCurDraggin(null)
 					mouse.releaseAndPlay("cursor")
-					
+					gridMiniButton.layer = "windows"
+
 					// wtf???
 					let thisThing = this;
 
@@ -197,6 +199,7 @@ export function makeGridMinibutton(idx, gridSlot, winParent) {
 			gridMiniButton.pos = toScreen(mousePos())
 			gridMiniButton.z = mouse.z - 1
 
+			gridMiniButton.layer = "mouse"
 			mouse.grab()
 			gridMiniButton.pick()
 			playSfx("plap")

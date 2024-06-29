@@ -8,20 +8,19 @@ this game is never getting done bruh
 	* Time text not working, music not looping, etc
 * Do "-" for issues, "*" for notes, "^" for comments on either
 
-# The day after
+# Current TODO (small stuff mostly)
 - Format actual working numbers (spsText and scoreText and priceText)
-- Fix panderito hitbox
+- Fix panderito hitbox (just make it bigger damn angle stuff)
+- fix music waving speed
+
+# Next features
+- Prototype achievements
+
+# Complex stuff
+- and click priortiy (holy moly)
 - I REALLYYY need to fix the hover animations
 - and the mouse animations
 	* Maybe do keep the tag system, just uhhhhhhhhhhhhhhhhhhhhhhhhhhhhh
-- fix music waving speed
-
-# Pasado pasado mañana
-- Prototype medals window
-- Prototype powerups
-
-# Soon
-- and click priortiy (holy moly)
 
 # Issues!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ## General
@@ -43,6 +42,7 @@ this game is never getting done bruh
 		})
 	})
 ```
+- When doing achievements i need to add a timeAfter property that waits a time to actually add the toast that indicates you unlocked it
 - ADD THE THING WHERE THE GNOME WALKS ACROSS THE SCREEN AND BE LIKE HOLY SHIT GUYS DID YOU SEE THAT?
 	* Every second have a chance of something% that triggers it
 

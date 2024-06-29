@@ -19,7 +19,20 @@ export const k = kaplay({
 	// letterbox: true,
 });
 export let ROOT = getTreeRoot()
+setBackground(BLACK)
 setCursor("none")
+
+// the one on the bottom is the one that gets rendered first
+layers([
+	"background",
+	"hexagon",
+	"ui",
+	"windows",
+	"powerups",
+	"logs",
+	"sound",
+	"mouse",
+], "background")
 
 loadEverything()
 onLoad(() => {

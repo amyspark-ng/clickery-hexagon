@@ -4,11 +4,11 @@ import { COMBO_MINCLICKS, COMBO_MAX, COMBO_MAXCLICKS, clickVars, scoreVars } fro
 import { scoreText, spsText } from "./uicounters";
 import { blendColors, formatNumber, getPositionOfSide } from "./utils";
 
-export function getClicksFromCombo(level) {
+export function getClicksFromCombo(level:number) {
 	return Math.round(map(level, 2, COMBO_MAX, COMBO_MINCLICKS, COMBO_MAXCLICKS))
 }
 
-export function getComboFromClicks(clicks) {
+export function getComboFromClicks(clicks:number) {
 	return Math.round(map(clicks, COMBO_MINCLICKS, COMBO_MAXCLICKS, 2, COMBO_MAX))
 }
 
@@ -25,6 +25,8 @@ export function addComboBar() {
 		opacity(1),
 		outline(3.5, BLACK),
 		z(scoreText.z - 1),
+		layer("ui"),
+		z(0),
 		"comboBar",
 		{
 			update() {
@@ -42,8 +44,9 @@ export function addComboBar() {
 		pos(-barFrame.width / 2, barFrame.pos.y),
 		anchor("left"),
 		color(WHITE),
-		z(barFrame.z - 1),
 		opacity(1),
+		layer("ui"),
+		z(barFrame.z - 1),
 		"comboBar",
 		{
 			update() {
@@ -124,7 +127,7 @@ export function addPlusScoreText(opts = {posToAdd: vec2(), amount: 1, manual: tr
 		pos(opts.posToAdd),
 		rotate(0),
 		anchor("center"),
-		z(4),
+		layer("ui"),
 		"plusScoreText",
 		{
 			update() {

@@ -8,7 +8,6 @@ export function ascendWinContent(winParent) {
 		}),
 		color(WHITE),
 		pos(0, 0),
-		z(10),
 		opacity(1),
 		area(),
 	])
