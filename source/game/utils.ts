@@ -1,8 +1,9 @@
+import { Color } from "kaplay";
 import { GameState } from "../gamestate";
 import { addToast, mouse } from "./additives";
 import { autoLoopTime, cam, panderitoIndex } from "./gamescene";
 import { hexagon } from "./hexagon";
-import { spawnPowerup, powerupTypes } from "./powerups";
+import { spawnPowerup, powerups } from "./powerups";
 
 // definetely not chatgpt
 export function formatNumber(number = 0, short = true, isPrice = false) {
@@ -143,7 +144,7 @@ export function timeOutSideOfWindowManaging() {
 }
 
 // im aware kaboom has Color.mult, i like blend more
-export function blendColors(color1, color2, blendFactor) {
+export function blendColors(color1:Color, color2:Color, blendFactor:number) {
     // Extract RGB components from color structures
     const rgb1 = [color1.r, color1.g, color1.b];
     const rgb2 = [color2.r, color2.g, color2.b];
@@ -284,8 +285,8 @@ export function debugFunctions() {
 		else if (isKeyPressed("f")) {
 			spawnPowerup({
 				pos: mousePos(),
-				type: choose(Object.keys(powerupTypes)),
-				time: 10,
+				type: choose(Object.keys(powerups)),
+				time: 5,
 				multiplier: 4
 			})
 		}

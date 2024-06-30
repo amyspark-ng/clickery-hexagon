@@ -7,19 +7,18 @@ import { playSfx } from "../sound.ts";
 import { isDraggingAWindow, isGenerallyHoveringAWindow, isPreciselyHoveringAWindow, manageWindow } from "./windows/windows-api/windowsAPI.ts";
 import { waver } from "../plugins/wave.js";
 import { isDraggingASlider } from "./windows/colorWindow.ts";
-import { addPlusScoreText, getClicksFromCombo, increaseCombo, startCombo } from "./combo-utils.ts";
+import { addPlusScoreText, getClicksFromCombo, increaseCombo, maxComboAnim, startCombo } from "./combo-utils.ts";
 import { addConfetti } from "../plugins/confetti.js";
 import { curDraggin } from "../plugins/drag.js";
 import { cam } from "./gamescene.ts";
+import { powerups } from "./powerups.ts";
 
 export let scoreVars = {
 	scorePerClick: 1,
 	scorePerAutoClick: 0,
-	pu_ClicksMultiplier: 1,
 	
 	autoScorePerSecond: 0, // the score per second you're getting automatically
 	scorePerSecond: null, // the total score per second
-	pu_CursorsMultiplier: 1,
 	
 	scoreNeededToAscend: 1000000,
 	combo: 1,
@@ -47,8 +46,6 @@ let maxRotSpeed = 10
 export function addHexagon() {
 	// reset variables
 	scoreVars.combo = 1
-	scoreVars.pu_ClicksMultiplier = 1
-	scoreVars.pu_CursorsMultiplier = 1
 
 	clickVars.consecutiveClicks = 0
 	clickVars.constantlyClicking = false
@@ -156,17 +153,21 @@ export function addHexagon() {
 	
 					if (scoreVars.combo == 10 && clickVars.maxedCombo == false) {
 						clickVars.maxedCombo = true
+						maxComboAnim()
+
 						addConfetti({ pos: center() })
 						tween(-10, 0, 0.5, (p) => cam.rotation = p, easings.easeOutQuint)
 						playSfx("fullcombo", {tune: rand(-50, 50)})
 					}
 				}
 
-				// debug.log(`${clickVars.consecutiveClicks} / ${COMBO_MAXCLICKS}`)
-
 				// # actual score additions
-				addPlusScoreText({posToAdd: mousePos(), amount: scoreVars.scorePerClick, manual: true})
-				GameState.addScore(scoreVars.scorePerClick * scoreVars.combo)
+				addPlusScoreText({
+					pos: mousePos(),
+					value: scoreVars.scorePerClick,
+					cursorRelated: false,
+				})
+				GameState.addScore((scoreVars.scorePerClick * powerups["clicks"].multiplier) * scoreVars.combo)
 				tween(scoreText.scaleIncrease, 1.05, 0.2, (p) => scoreText.scaleIncrease = p, easings.easeOutQuint).onEnd(() => {
 					tween(scoreText.scaleIncrease, 1, 0.2, (p) => scoreText.scaleIncrease = p, easings.easeOutQuint)
 				})
@@ -245,8 +246,12 @@ export function addHexagon() {
 							tween(hexagon.scaleIncrease, hexagon.isHovering() ? 1.05: 1, 0.35, (p) => hexagon.scaleIncrease = p, easings.easeOutQuint)
 							playSfx("clickRelease", {tune: rand(-50, 50)})
 							
-							addPlusScoreText({posToAdd: autoCursor.pos, amount: scoreVars.scorePerAutoClick, manual: false})
-							GameState.addScore(scoreVars.scorePerAutoClick)
+							addPlusScoreText({
+								pos: autoCursor.pos,
+								value: scoreVars.scorePerAutoClick,
+								cursorRelated: true,
+							})
+							GameState.addScore(scoreVars.scorePerAutoClick * powerups["cursors"].multiplier)
 			
 							// has done its bidding, time to roll and dissapear
 							autoCursor.gravityScale = 1
@@ -340,7 +345,9 @@ export function addHexagon() {
 		}
 	})
 
-	function getScorePerClick() {
+	// # vanilla means clicks and upgrades included but not powerups/combo
+	// SPC = Score per Click / SPAC = Score per Auto Click
+	function getVanillaSPC() {
 		let value:number;
 		// clickers start at 0 that's why i have to add 1
 		if (GameState.clicksUpgradesValue < 2) {
@@ -350,22 +357,30 @@ export function addHexagon() {
 		else {
 			value = (1 + GameState.clickers) * GameState.clicksUpgradesValue
 		}
-		return value * scoreVars.pu_ClicksMultiplier;
+		return value;
+	}
+
+	function getVanillaSPAC() {
+		// DONT ADD POWERUPS they're not applicable for outside time
+		let value:number;
+		if (GameState.cursorsUpgradesValue < 2) {
+			value = GameState.cursors
+		}
+
+		else {
+			value = GameState.cursors * GameState.cursorsUpgradesValue
+		}
+		return value;
 	}
 
 	// score setting stuff
 	hexagon.onUpdate(() => {
-		scoreVars.scorePerClick = getScorePerClick()
-
-		scoreVars.scorePerAutoClick = GameState.cursors * GameState.cursorsUpgradesValue * scoreVars.pu_CursorsMultiplier
-
-		// scorePerClick += Math.round(percentage(scorePerClick, GameState.clickPercentage))
-		// scorePerAutoClick = GameState.cursorUpgrades > 0 ? GameState.cursors * GameState.cursorUpgrades : GameState.cursors
-		// scorePerAutoClick += Math.round(percentage(scorePerAutoClick, GameState.cursorsPercentage))
+		scoreVars.scorePerClick = getVanillaSPC()
+		scoreVars.scorePerAutoClick = getVanillaSPAC()
 
 		// # sps
 		// this is for when you leave the game
-		scoreVars.autoScorePerSecond = GameState.cursors / GameState.timeUntilAutoLoopEnds
+		scoreVars.autoScorePerSecond = scoreVars.scorePerAutoClick / GameState.timeUntilAutoLoopEnds
 
 		scoreVars.scorePerSecond = ((clickVars.clicksPerSecond * scoreVars.scorePerClick) + scoreVars.autoScorePerSecond)
 		spsUpdaterTimer += dt();

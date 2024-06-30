@@ -8,6 +8,6 @@
   },
   "dependencies": {
     "esbuild": "^0.20.2",
-    "kaplay": "3001.0.0-alpha.16"
+    "kaplay": "https://pkg.pr.new/marklovers/kaplay@166"
   }
 }

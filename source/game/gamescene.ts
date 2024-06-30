@@ -8,6 +8,7 @@ import { folderObj, folderObjManaging, windowsDefinition } from "./windows/windo
 import { songs } from "./windows/musicWindow.ts"
 import { curDraggin } from "../plugins/drag.js"
 import { DEBUG } from "../main.ts"
+import { powerupManagement } from "./powerups.ts"
 
 let panderitoLetters = "panderito".split("")
 export let panderitoIndex = 0
@@ -138,27 +139,20 @@ function triggerZZZ(idle = true) {
 function welcomeBack(idle = false) {
 	function addWelcomeBackToast(score:any, timeInSeconds:number) {
 		let body = `You were out for: ${toHHMMSS(timeInSeconds)} ${timeInSeconds > 60 ? "mins" : "secs"}`; 
-		if (score != null) body += `\nYou gained: ${score}` 
+		if (score != null) body += `\n+${score}` 
 		
 		let hasCombo = scoreVars.combo > 1
 		let hasPowerup = get("poweruptimer")?.length > 0
-		let applicationMessage = "\n"
+		let applicationMessage = ""
 		
-		if (hasCombo) applicationMessage += `(Combo is not applicable)`
-		else if (hasPowerup) applicationMessage += "(Power-ups are not applicable)"
-		else if (hasCombo && hasPowerup) applicationMessage += "(Combo nor Power-ups are applicable)"
-		
+		if (hasCombo) applicationMessage += `\n(Combo is not applicable)`
+		else if (hasPowerup) applicationMessage += "\n(Power-ups are not applicable)"
+		else if (hasCombo && hasPowerup) applicationMessage += "\n(Combo nor Power-ups are applicable)"
+		body += applicationMessage
+
 		addToast({ icon: "cursors.cursor", title: "Welcome back!", body: body })
-		debug.log("que")
 	}
 	
-	let welcomebacktoast = get("toast").filter(toast => toast.type == "welcome")
-	if (welcomebacktoast.length > 0) {
-		welcomebacktoast.forEach(toast => {
-			toast.destroy()
-		})
-	}
-
 	if (idle == false) {
 		if (GameState.cursors < 1) {addWelcomeBackToast(null, totalTimeOutsideTab / 1000); return;}
 		
@@ -275,6 +269,8 @@ export function gamescene() {
 			// }
 
 			if (isKeyPressed("shift") && isKeyPressed("r") && panderitoIndex != 6) go("gamescene")
+			
+			powerupManagement()		
 		})
 
 		// panderito checkin

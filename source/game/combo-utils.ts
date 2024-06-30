@@ -1,3 +1,4 @@
+import { Vec2 } from "kaplay";
 import { playSfx } from "../sound"
 import { cam } from "./gamescene"
 import { COMBO_MINCLICKS, COMBO_MAX, COMBO_MAXCLICKS, clickVars, scoreVars } from "./hexagon"
@@ -98,14 +99,19 @@ export function addComboBar() {
 	return barFrame;
 }
 
-export function addPlusScoreText(opts = {posToAdd: vec2(), amount: 1, manual: true }) {
-	let size;
-	if (opts.manual) size = [40, 50]
+type plusScoreOpts = {
+	pos: Vec2,
+	value:number,
+	cursorRelated:boolean,
+}
+export function addPlusScoreText(opts:plusScoreOpts) {
+	let size:number[];
+	if (!opts.cursorRelated) size = [40, 50]
 	else size = [32.5, 40]
-
 	let textBlendFactor = 0;
+
 	let plusScoreText = add([
-		text(`${opts.manual ? "[combo]" : ""}+${formatNumber(opts.amount, true, false)}`, {
+		text("", {
 			size: rand(size[0], size[1]),
 			font: "lambdao",
 			styles: {
@@ -124,26 +130,28 @@ export function addPlusScoreText(opts = {posToAdd: vec2(), amount: 1, manual: tr
 			}
 		}),
 		opacity(1),
-		pos(opts.posToAdd),
+		pos(opts.pos),
 		rotate(0),
 		anchor("center"),
 		layer("ui"),
 		"plusScoreText",
 		{
 			update() {
-				if (!opts.manual) return
+				if (opts.cursorRelated) return
 				textBlendFactor = map(scoreVars.combo, 1, 10, 0, 1)
 			}
 		}
 	])
 
-	if (opts.manual) {
+	plusScoreText.text = `+${formatNumber(opts.value, true, false)}`
+	if (scoreVars.combo > 1 && !opts.cursorRelated) {
+		plusScoreText.text = plusScoreText.text.replace (/^/,'[combo]');
 		if (scoreVars.combo > 1) plusScoreText.text += `x${Math.floor(scoreVars.combo)}`
-		plusScoreText.text += "[/combo]"
+		plusScoreText.text += `[/combo]`;
 	}
-
-	plusScoreText.pos.x = opts.posToAdd.x + 2
-	plusScoreText.pos.y = opts.posToAdd.y - 18
+	
+	plusScoreText.pos.x = opts.pos.x + 2
+	plusScoreText.pos.y = opts.pos.y - 18
 
 	// animate plusscoretext
 	tween(
@@ -172,8 +180,74 @@ export function addPlusScoreText(opts = {posToAdd: vec2(), amount: 1, manual: tr
 		destroy(plusScoreText);
 	});
 
-	if (plusScoreText.pos.x > opts.posToAdd.x) plusScoreText.anchor = "left"
+	if (plusScoreText.pos.x > opts.pos.x) plusScoreText.anchor = "left"
 	else plusScoreText.anchor = "right"
+
+	if (scoreVars.combo > 1 && !opts.cursorRelated) {
+		let totalScore = plusScoreText.add([
+			text("", {
+				font: "lambdao",
+				size: plusScoreText.textSize * 0.8
+			}),
+			pos(plusScoreText.width / 2, plusScoreText.height - 2),
+			anchor(plusScoreText.anchor),
+			opacity(),
+			{
+				update() {
+					this.opacity = plusScoreText.opacity
+				}
+			}
+		])
+
+		totalScore.text = `(${formatNumber(opts.value * scoreVars.combo, true, false)})`
+	}
+}
+
+export function maxComboAnim() {
+	let blendFactor = 0
+	let words = ["MAX COMBO", "MAX COMBO!!", "YOO-HOO!!!", "YEEEOUCH!!", "FINISH IT"]
+	let maxComboText = add([
+		text(`[combo]${choose(words)}[/combo]`, {
+			font: "lambdao",
+			size: 55,
+			align: "center",
+			styles: {
+				"combo": (idx) => ({
+					pos: vec2(0, wave(-4, 4, time() * 6 + idx * 0.5)),
+					color: blendColors(
+						WHITE,
+						hsl2rgb((time() * 0.2 + idx * 0.1) % 1, 0.7, 0.8),
+						blendFactor
+					),
+				})
+			}
+		}),
+		pos(vec2(mousePos().x, mousePos().y - 65)),
+		layer("ui"),
+		color(),
+		scale(),
+		opacity(),
+		anchor("center"),		
+		timer(),
+		{
+			update() {
+				this.pos.y -= 1
+
+				blendFactor = 1
+				// if (time() % 0.25 > (0.1 / 2)) blendFactor = 1
+				// else blendFactor = 0
+			}
+		}
+	])
+
+	let timeToDie = 2
+	maxComboText.tween(vec2(0.5), vec2(1), 0.1, (p) => maxComboText.scale = p, easings.easeOutElastic)
+	maxComboText.tween(0.5, 1, 0.1, (p) => maxComboText.opacity = p, easings.easeOutQuint).onEnd(() => {
+		maxComboText.tween(maxComboText.opacity, 0, timeToDie, (p) => maxComboText.opacity = p, easings.easeOutQuint)
+		maxComboText.wait(timeToDie, () => {
+			destroy(maxComboText)
+		})
+	})
 }
 
 export function increaseCombo() {

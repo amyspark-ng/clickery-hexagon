@@ -8,27 +8,30 @@ this game is never getting done bruh
 	* Time text not working, music not looping, etc
 * Do "-" for issues, "*" for notes, "^" for comments on either
 
-# Current TODO (small stuff mostly)
+# ISSUES (hell)
+## Current TODO (small stuff mostly)
 - Format actual working numbers (spsText and scoreText and priceText)
-- Fix panderito hitbox (just make it bigger damn angle stuff)
-- fix music waving speed
 
-# Next features
+- Do stuff what happens when you're holding down the hexagon and a cursor clicks
+- Instead of doing time holding, do `times bought in last x seconds` for spawning the smoke animation
+
+- fix music waving speed
+- Fix panderito hitbox (just make it bigger damn angle stuff)
+- Fix weird workings of the combo bar content 
+- The sps, spm and sph don't work at all fym i get 80 per second and 1.33 per minute :skull:
+
+## Next features
 - Prototype achievements
 
-# Complex stuff
+## Complex stuff
 - and click priortiy (holy moly)
+	* For clicking behind object should check if any other window that is not the current one is active, if any other window is active the button should not work
 - I REALLYYY need to fix the hover animations
 - and the mouse animations
 	* Maybe do keep the tag system, just uhhhhhhhhhhhhhhhhhhhhhhhhhhhhh
 
-# Issues!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-## General
-
-## Windows
-* For clicking behind object should check if any other window that is not the current one is active, if any other window is active the button should not work
-
-# Ideas
+# IDEAS (good)
+- maybe the vignette for powerups could be a small gradient on top of the backgroudn that has color depending on the powerup on the bottom part of the screen
 - Add achievement for making the hexagon black and the bg white (bad apple)
 - Do the funny thing with music title in clicker.wav like deltarune did
 - Add an achievement for opening all windows in your taskbar at the same time

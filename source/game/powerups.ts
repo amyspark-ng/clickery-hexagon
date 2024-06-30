@@ -1,7 +1,6 @@
 import { Vec2 } from "kaplay"
 import { waver } from "../plugins/wave";
 import { playSfx } from "../sound";
-import { scoreVars } from "./hexagon";
 
 /*
 types of powerups
@@ -13,47 +12,24 @@ types of powerups
 	bad: could have the opposite of the effects before, or could increase them by A LOT
 */
 
-function exPU_Clicks(multiplier: number) {
-	scoreVars.pu_ClicksMultiplier = multiplier
-}
-
-function edPu_Clicks() {
-	scoreVars.pu_ClicksMultiplier = 1
-}
-
-function exPU_Cursors() {
-}
-
-function exPU_Time() {
-}
-
-function exPU_Awesome() {
-}
-
-function exPU_Store() {
-}
-
-function exPU_Bad() {
-}
-
-export let powerupTypes = {
-	"clicks": { sprite: "cursors.cursor", execution: exPU_Clicks, reset: edPu_Clicks },
-	"cursors": { sprite: "cursors.point", execution: exPU_Cursors, },
-	"time": { sprite: "cursors.wait", execution: exPU_Time, },
-	"awesome": { sprite: "cursors.check", execution: exPU_Awesome, },
-	"store": { sprite: "icon_store", execution: exPU_Store, },
-	"bad": { sprite: "icon_about", execution: exPU_Bad, },
+export let powerups = {
+	"clicks": { sprite: "cursors.cursor", multiplier: 1, removalTime: null, color: [199, 228, 255] },
+	"cursors": { sprite: "cursors.point", multiplier: 1, removalTime: null, color: [199, 252, 197] },
+	"time": { sprite: "cursors.wait", multiplier: 1, removalTime: null, color: [247, 242, 193] },
+	"awesome": { sprite: "cursors.check", multiplier: 1, removalTime: null, color: [227, 190, 247]} ,
+	"store": { sprite: "icon_store", multiplier: 1, removalTime: null, color: [195, 250, 162] },
+	"bad": { sprite: "icon_about", multiplier: 1, removalTime: null, color: [250, 178, 162] },
 }
 
 type powerupOpt = {
+	type: string;
 	pos: Vec2,
-	type: string,
-	time: number,
-	multiplier: number,
+	multiplier?: number,
+	time?: number,
 }
 
 export function spawnPowerup(opts:powerupOpt) {
-	let spriteName = powerupTypes[opts.type].sprite
+	let spriteName = powerups[opts.type].sprite
 	spriteName = spriteName.includes(".") ? spriteName.split(".") : spriteName;
 
 	let powerup = add([
@@ -117,18 +93,46 @@ export function spawnPowerup(opts:powerupOpt) {
 					destroy(blink)
 				})
 			},
+			addTimer() {
+				let thisPowerup = this
+				let timer = add([
+					text(""),
+					pos(this.pos),
+					anchor("center"),
+					"poweruptimer",
+					`${this.type}_putimer`,
+					{
+						update() {
+							if (powerups[thisPowerup.type].removalTime != null) {
+								this.text = `${thisPowerup.type}:` + powerups[thisPowerup.type].removalTime.toFixed(1)
+							}
+						}
+					}
+				])
+			},
 			click() {
 				this.dieAnim()
-				powerupTypes[this.type].execution(opts.multiplier)
 				playSfx("powerup")
 			
-				wait(opts.time, () => {
-					debug.log("powerup ended")
-					
-					if (powerupTypes[this.type].reset) {
-						powerupTypes[this.type].reset()
-					}
-				})
+				// # multipliers
+				let multiplier = 0
+				if (!opts.multiplier) {
+					if (this.type == "clicks" || this.type == "cursors") multiplier = randi(2, 7)
+					else if (this.type == "awesome") multiplier = randi(15, 20)
+					else if (this.type == "bad") multiplier = rand(0.15, 0.5)
+					else if (this.type == "store") multiplier = rand(0.15, 0.5)
+					else if (this.type == "time") multiplier = rand(1, 1)
+				}
+				else {
+					multiplier = 10
+				}
+
+				powerups[this.type].multiplier = multiplier
+
+				// # time
+				powerups[this.type].removalTime = opts.time || 10
+				// if there's already a timer don't add a new one!
+				if (get(`${this.type}_putimer`).length == 0) this.addTimer() 
 			}
 		}
 	])
@@ -153,4 +157,18 @@ export function spawnPowerup(opts:powerupOpt) {
 	powerup.onClick(() => {
 		powerup.click()
 	})
+}
+
+export function powerupManagement() {
+	for (let powerup in powerups) {
+		if (powerups[powerup].removalTime != null) {
+			powerups[powerup].removalTime -= dt()
+		
+			if (powerups[powerup].removalTime < 0) {
+				powerups[powerup].removalTime = null
+				get(`${powerup}_putimer`)?.forEach(timer => timer.destroy())
+				powerups[powerup].multiplier = 1
+			}
+		}
+	}
 }

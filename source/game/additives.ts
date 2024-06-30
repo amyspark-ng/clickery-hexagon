@@ -13,7 +13,7 @@ export function addBackground() {
 		pos(center()),
 		anchor("center"),
 		scale(8),
-		color(arrayToColor(GameState.settings.bgColor)),
+		color(Color.fromArray(GameState.settings.bgColor)),
 		layer("background"),
 		stay(),
 		{
@@ -45,7 +45,7 @@ export function addBackground() {
 	})))
 }
 
-export let mouse;
+export let mouse:any;
 export function addMouse() {
 	mouse = add([
 		sprite("cursors"),
@@ -119,16 +119,10 @@ export function addMouse() {
 	})
 
 	mouse.use(trail({
-		amount: 10,
-		spriteName: "bean",
-		spreadBetweenClones: 100,
-		colorNew: BLUE,
-		startAlpha: 1,
-		endAlpha: 1,
-		startScale: vec2(1),
-		endScale: vec2(1)
+		sprite: mouse.sprite,
+		color: BLUE
 	}))
-}
+}1 
 
 let maxLogs = 100;
 let toastQueue = [];
@@ -154,6 +148,7 @@ export function addToast(opts:toastOpts) {
 			anchor("top"),
 			color(WHITE.darken(50)),
 			area(),
+			fixed(),
 			layer("logs"),
 			z(0),
 			"toast",
@@ -161,12 +156,12 @@ export function addToast(opts:toastOpts) {
 				index: idx,
 				type: "",
 				add() {
-					if (opts.title.toLocaleLowerCase().includes("unlocked")) {
-						if (opts.title.toLocaleLowerCase().includes("window")) this.type = "window"
+					if (opts.title.toLowerCase().includes("unlocked")) {
+						if (opts.title.toLowerCase().includes("window")) this.type = "window"
 						else this.type = "achievement"
 					}
-					else if (opts.title.toLocaleLowerCase().includes("saved")) this.type = "save"
-					else if (opts.title.toLocaleLowerCase().includes("welcome")) this.type = "welcome"
+					else if (opts.title.toLowerCase().includes("saved")) this.type = "save"
+					else if (opts.title.toLowerCase().includes("welcome")) this.type = "welcome"
 				},
 				close() {
 					tween(toastBg.pos.x, -toastBg.width, 0.8, (p) => (toastBg.pos.x = p), easings.easeOutQuint).onEnd(() => {
@@ -186,6 +181,7 @@ export function addToast(opts:toastOpts) {
 				height: toastBg.height,
 				radius: toastBg.radius,
 				opacity: 0.5,
+				fixed: true,
 				color: BLACK,
 			})
 		});
@@ -202,6 +198,7 @@ export function addToast(opts:toastOpts) {
 			sprite(typeof spriteName == "string" ? spriteName : spriteName[0]),
 			anchor("center"),
 			pos(toastBg.pos.x - toastBg.width / 2 + 50, toastBg.pos.y),
+			fixed(),
 			layer("logs"),
 			z(toastBg.z + 1),
 			{
@@ -225,6 +222,7 @@ export function addToast(opts:toastOpts) {
 				width: 500,
 			}),
 			pos(icon.pos.x + icon.width / 2 + 10, toastBg.pos.y - toastBg.height / 2),
+			fixed(),
 			color(BLACK),
 			layer("logs"),
 			z(toastBg.z + 1),
@@ -244,6 +242,7 @@ export function addToast(opts:toastOpts) {
 				width: 500,
 			}),
 			pos(titleText.pos.x, titleText.pos.y + titleText.height),
+			fixed(),
 			color(BLACK),
 			layer("logs"),
 			z(toastBg.z + 1),
