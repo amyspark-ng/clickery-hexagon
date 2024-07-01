@@ -75,7 +75,7 @@ export function musicWinContent(winParent) {
 		anchor("left"),
 		{
 			update() {
-				this.text = `${songs[Object.keys(songs)[currentSongIdx]].idx + 1}. ${songs[Object.keys(songs)[currentSongIdx]].name} ${musicHandler.paused && !musicHandler.winding? "(PAUSED)" : ""}\nby Enysmo`
+				this.text = `${songs[Object.keys(songs)[currentSongIdx]].idx + 1}. ${songs[Object.keys(songs)[currentSongIdx]].name} ${musicHandler.paused && !musicHandler.winding? "(PAUSED)" : ""}`
 			}
 		}
 	])

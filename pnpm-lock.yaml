@@ -9,8 +9,8 @@ dependencies:
     specifier: ^0.20.2
     version: 0.20.2
   kaplay:
-    specifier: https://pkg.pr.new/marklovers/kaplay@166
-    version: '@pkg.pr.new/marklovers/kaplay@166'
+    specifier: 3001.0.0-alpha.16
+    version: 3001.0.0-alpha.16
 
 packages:
 
@@ -252,8 +252,6 @@ packages:
       '@esbuild/win32-x64': 0.20.2
     dev: false
 
-  '@pkg.pr.new/marklovers/kaplay@166':
-    resolution: {tarball: https://pkg.pr.new/marklovers/kaplay@166}
-    name: kaplay
-    version: 3001.0.0-alpha.16
+  /kaplay@3001.0.0-alpha.16:
+    resolution: {integrity: sha512-x9tnlR0GSRwTMlioL1bYpptM2p4xTlBr+97+YK18oxuFxmuf/ZSr5KVlKtZw1G1nqNkvXzVhuVk3MURfky8amg==}
     dev: false

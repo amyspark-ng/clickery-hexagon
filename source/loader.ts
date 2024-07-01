@@ -623,16 +623,6 @@ export function loadEverything() {
 	// #region OTHER STUFF
 	if (!DEBUG) {load(new Promise<void>((res) => { setTimeout(() => { res() }, 5000) })) }
 
-	loadFont("apl386", "https://kaboomjs.com/examples/fonts/apl386.ttf", {
-		outline: 4,
-		filter: "linear",
-	});
-
-	loadFont("apl386_white", "https://kaboomjs.com/examples/fonts/apl386.ttf", {
-		outline: 0,
-		filter: "linear",
-	});
-	
 	loadFont("emulogic", "./assets/emulogic.ttf", {
 		outline: 10,
 		filter: "linear"

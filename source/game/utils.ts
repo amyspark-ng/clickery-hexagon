@@ -102,47 +102,6 @@ export function getZBetween(a, b) {
 	return Math.floor(a + b / 2)
 }
 
-// definetely not chatgpt again
-export function timeOutSideOfWindowManaging() {
-	let isTabActive = true; // Variable to track if the tab is currently active
-	let totalTimeOutsideTab = 0; // Variable to store the total time the user has been outside of the tab
-	let startTimeOutsideTab; // Variable to store the start time when the tab becomes inactive
-	
-	// Function to handle tab visibility change
-	function handleVisibilityChange() {
-		if (document.hidden) {
-			// Tab becomes inactive
-			totalTimeOutsideTab = 0
-			isTabActive = false;
-			startTimeOutsideTab = performance.now(); // Store the start time when the tab becomes inactive
-		}
-		
-		else {
-			// Tab becomes active
-			if (!isTabActive) {
-				// If the tab was previously inactive, calculate the time outside the tab and update the total time
-				const timeOutsideTab = performance.now() - startTimeOutsideTab;
-				totalTimeOutsideTab += timeOutsideTab;
-			}
-			isTabActive = true;
-		}
-	}
-	
-	// Listen for visibility change events
-	document.addEventListener("visibilitychange", handleVisibilityChange);
-	
-	// Function to get the total time outside of the tab
-	function getTotalTimeOutsideTab() {
-	  // If the tab is currently inactive, calculate the time outside the tab until now
-		if (!isTabActive) {
-			return (totalTimeOutsideTab + performance.now() - startTimeOutsideTab) / 1000; // Convert milliseconds to seconds
-		} 
-		else {
-			return totalTimeOutsideTab / 1000; // Convert milliseconds to seconds
-		}
-	}
-}
-
 // im aware kaboom has Color.mult, i like blend more
 export function blendColors(color1:Color, color2:Color, blendFactor:number) {
     // Extract RGB components from color structures
@@ -238,6 +197,7 @@ export function debugTexts() {
 		color(WHITE),
 		opacity(0.25),
 		anchor("topleft"),
+		layer("mouse"),
 		fixed(),
 		z(mouse.z + 1),
 		"debugText",
@@ -249,6 +209,7 @@ export function debugTexts() {
 					"Auto loop time: ": autoLoopTime.toFixed(2),
 					"Time until auto loop ends: ": GameState.timeUntilAutoLoopEnds,
 					"Taskbar: ": GameState.taskbar,
+					"Hexagon.ScaleIncrease": hexagon.scaleIncrease
 				}
 
 				this.text = createKeys()
@@ -287,7 +248,6 @@ export function debugFunctions() {
 				pos: mousePos(),
 				type: choose(Object.keys(powerups)),
 				time: 5,
-				multiplier: 4
 			})
 		}
 	})

@@ -1,6 +1,7 @@
 import { GameState } from "../../../gamestate";
 import { playSfx } from "../../../sound";
-import { getPrice } from "../../utils";
+import { powerups, spawnPowerup } from "../../powerups";
+import { getPrice, randomPos } from "../../utils";
 import { addUpgrades } from "./upgrades";
 
 let elements = {
@@ -20,6 +21,22 @@ let amountToBuy = 1
 
 let isHoveringUpgrade = false
 
+function addSmoke(winParent:any, btn:any) {
+	let smoke = winParent.add([
+		sprite("smoke"),
+		pos(btn.pos.x - btn.width / 2, btn.pos.y - btn.height / 2),
+		opacity(),
+		anchor("center"),
+		z(btn.z - 1),
+		"smoke",
+	])
+
+	smoke.fadeIn(1)
+	smoke.play("smoking")
+	return smoke;
+}
+
+let buyTimer:any;
 function addStoreElement(winParent:any, opts = { key: "null", pos: vec2(0, 20) }) {
 	// add a parent background object
 	const btn = winParent.add([
@@ -39,6 +56,7 @@ function addStoreElement(winParent:any, opts = { key: "null", pos: vec2(0, 20) }
 			isBeingHovered: false,
 			isBeingClicked: false,
 			down: false,
+			timesBoughtConsecutively: 0,
 			buy(amount:number) {
 				if (winParent.dragging) return
 				if (this.is("clickersElement")) GameState.clickers += amount
@@ -64,6 +82,24 @@ function addStoreElement(winParent:any, opts = { key: "null", pos: vec2(0, 20) }
 						});
 					})
 				}
+
+				if (this.timesBoughtConsecutively < 6) this.timesBoughtConsecutively++ 
+				buyTimer?.cancel()
+				buyTimer = wait(0.75, () => {
+					this.timesBoughtConsecutively = 0
+					
+					// if there's smoke
+					let smoke = get("smoke", { recursive: true })[0]
+					if (smoke) {
+						smoke.unuse("smoke")
+						smoke.fadeOut(1)
+						tween(smoke.pos.y, smoke.pos.y - 15, 0.5, (p) => smoke.pos.y = p)
+					}
+				})
+
+				if (this.timesBoughtConsecutively == 5) {
+					addSmoke(winParent, this)
+				}
 			},
 
 			startHover() {
@@ -78,7 +114,7 @@ function addStoreElement(winParent:any, opts = { key: "null", pos: vec2(0, 20) }
 
 			update() {
 				isKeyDown("shift") ? amountToBuy = 10 : amountToBuy = 1
-				if (this.is("clickersElement") || this.is("cursorsElement")) this.price = getPrice(elements[opts.key].basePrice, elements[opts.key].percentageIncrease, GameState[elements[opts.key].gamestateKey], amountToBuy)
+				if (this.is("clickersElement") || this.is("cursorsElement")) this.price = getPrice(elements[opts.key].basePrice * powerups["store"].multiplier, elements[opts.key].percentageIncrease, GameState[elements[opts.key].gamestateKey], amountToBuy)
 				this.area.scale = vec2(1 / this.scale.x, 1 / this.scale.y)
 			},
 		}
@@ -123,7 +159,7 @@ function addStoreElement(winParent:any, opts = { key: "null", pos: vec2(0, 20) }
 	let minTime = 0.08
 	let timeUntilAnotherBuy = 1.2
 	let maxTime = 1.2
-	let timesBoughtWhileHolding = 0
+	let hold_timesBought = 0
 
 	let downEvent = null;
 	btn.onMousePress("left", () => {
@@ -134,38 +170,24 @@ function addStoreElement(winParent:any, opts = { key: "null", pos: vec2(0, 20) }
 			btn.isBeingClicked = true
 			if (!GameState.score >= btn.price) return
 	
-			if (timesBoughtWhileHolding == 0) {
+			if (hold_timesBought == 0) {
 				timeUntilAnotherBuy = maxTime
 			}
 	
 			timer += dt()
 	
-			timeUntilAnotherBuy = maxTime / (timesBoughtWhileHolding)
+			timeUntilAnotherBuy = maxTime / (hold_timesBought)
 			timeUntilAnotherBuy = clamp(timeUntilAnotherBuy, minTime, maxTime)
 	
-			if (timesBoughtWhileHolding == 0) {
-				timesBoughtWhileHolding = 1
+			if (hold_timesBought == 0) {
+				hold_timesBought = 1
 				btn.buy(amountToBuy)
 			}
 	
 			if (timer > timeUntilAnotherBuy) {
 				timer = 0
-				timesBoughtWhileHolding++	
+				hold_timesBought++	
 				btn.buy(amountToBuy)
-			}
-	
-			if (timesBoughtWhileHolding > 10 && !get("smoke", { recursive: true })[0]) {
-				let smoke = winParent.add([
-					sprite("smoke"),
-					pos(btn.pos.x - btn.width / 2, btn.pos.y - btn.height / 2),
-					opacity(),
-					anchor("center"),
-					z(btn.z - 1),
-					"smoke",
-				])
-	
-				smoke.fadeIn(1)
-				smoke.play("smoking")
 			}
 		})
 	})
@@ -179,16 +201,8 @@ function addStoreElement(winParent:any, opts = { key: "null", pos: vec2(0, 20) }
 		
 		// if (!winParent.is("active")) return
 		timer = 0
-		timesBoughtWhileHolding = 0
+		hold_timesBought = 0
 		timeUntilAnotherBuy = 2.25
-		
-		// if there's smoke
-		let smoke = get("smoke", { recursive: true })[0]
-		if (smoke) {
-			smoke.unuse("smoke")
-			smoke.fadeOut(1)
-			tween(smoke.pos.y, smoke.pos.y - 15, 0.5, (p) => smoke.pos.y = p)
-		}
 	})
 
 	btn.onHover(() => {
@@ -200,16 +214,17 @@ function addStoreElement(winParent:any, opts = { key: "null", pos: vec2(0, 20) }
 			btn.isBeingClicked = false
 			// if (!winParent.is("active")) return
 			timer = 0
-			timesBoughtWhileHolding = 0
+			hold_timesBought = 0
 			timeUntilAnotherBuy = 2.25
 		}
 		btn.endHover()
 	})
 
+	buyTimer = wait(0, () => {})
 	return btn;
 }
 
-function addPowerupElement(winParent:any, posToAdd:any, hasUnlockedPowerups:boolean) {
+function addPowerupStoreElement(winParent:any, posToAdd:any, hasUnlockedPowerups:boolean) {
 	let chains;
 	// add a parent background object
 	const btn = winParent.add([
@@ -244,10 +259,15 @@ function addPowerupElement(winParent:any, posToAdd:any, hasUnlockedPowerups:bool
 				GameState.hasUnlockedPowerups = true
 				playSfx("kaching")
 				this.destroy()
-				addPowerupElement(winParent, posToAdd, true)
+				addPowerupStoreElement(winParent, posToAdd, true)
 			},
 			buy() {
-				debug.log("buy powerup")
+				let randomPowerup = choose(Object.keys(powerups).filter(p => p != "awesome"))
+				spawnPowerup({
+					type: randomPowerup,
+					pos: randomPos()
+				})
+				playSfx("kaching")
 			},
 			update() {
 				this.area.scale = vec2(1 / this.scale.x, 1 / this.scale.y)
@@ -330,7 +350,7 @@ export function storeWinContent(winParent) {
 	addUpgrades(clickersElement)
 	cursorsElement = addStoreElement(winParent, { key: "cursorsElement", pos: vec2(0, (clickersElement.pos.y + clickersElement.height) + 15) })
 	addUpgrades(cursorsElement)
-	powerupsElement = addPowerupElement(winParent, vec2(0, (cursorsElement.pos.y + cursorsElement.height) + 15), GameState.hasUnlockedPowerups)
+	powerupsElement = addPowerupStoreElement(winParent, vec2(0, (cursorsElement.pos.y + cursorsElement.height) + 15), GameState.hasUnlockedPowerups)
 
 	storeElements = [clickersElement, cursorsElement, powerupsElement]
 

@@ -84,6 +84,7 @@ export function addHexagon() {
 			biggestScale: 1.0015,
 			defaultScale: vec2(1),
 			scaleIncrease: 1,
+			maxScaleIncrease: 1,
 			stretchScaleIncrease: 1,
 			canClick: true,
 			isBeingClicked: false,
@@ -108,16 +109,20 @@ export function addHexagon() {
 			},
 			
 			clickPress() {
-				this.clickPressTween = tween(this.scaleIncrease, 0.98, 0.35, (p) => this.scaleIncrease = p, easings.easeOutQuint)
+				this.maxScaleIncrease = 0.98
+				
+				this.clickPressTween = tween(this.scaleIncrease, this.maxScaleIncrease, 0.35, (p) => this.scaleIncrease = p, easings.easeOutQuint)
 				this.isBeingClicked = true
 				mouse.grab()
 				playSfx("clickPress", {tune: rand(-50, 50)})
 			},
 
 			clickRelease() {
+				this.maxScaleIncrease = this.isBeingHovered ? 1.05 : 1
+				
 				this.clickPressTween.cancel()
-				tween(this.scaleIncrease, this.isHovering() ? 1.05: 1, 0.35, (p) => this.scaleIncrease = p, easings.easeOutQuint)
-				this.isBeingClicked = false 
+				tween(this.scaleIncrease, this.maxScaleIncrease, 0.35, (p) => this.scaleIncrease = p, easings.easeOutQuint)
+				this.isBeingClicked = false
 				clickVars.clicksPerSecond++
 				playSfx("clickRelease", {tune: rand(-50, 50)})
 				mouse.releaseAndPlay("point")
@@ -236,14 +241,14 @@ export function addHexagon() {
 						autoCursor.play("grab")
 						
 						// clickPress manual false
-						tween(hexagon.scaleIncrease, 0.98, 0.35, (p) => hexagon.scaleIncrease = p, easings.easeOutQuint)
+						tween(hexagon.scaleIncrease, this.maxScaleIncrease * 0.98, 0.35, (p) => hexagon.scaleIncrease = p, easings.easeOutQuint)
 						playSfx("clickPress", {tune: rand(-50, 50)})
-			
+
 						wait(0.15, () => {
 							autoCursor.play("point")
 			
 							// clickRelease manual false
-							tween(hexagon.scaleIncrease, hexagon.isHovering() ? 1.05: 1, 0.35, (p) => hexagon.scaleIncrease = p, easings.easeOutQuint)
+							tween(hexagon.scaleIncrease, hexagon.maxScaleIncrease, 0.35, (p) => hexagon.scaleIncrease = p, easings.easeOutQuint)
 							playSfx("clickRelease", {tune: rand(-50, 50)})
 							
 							addPlusScoreText({
@@ -289,6 +294,7 @@ export function addHexagon() {
 					this.rotationSpeed += hoverRotSpeedIncrease
 					this.isBeingHovered = true
 					mouse.play("point")
+					this.maxScaleIncrease = 1.05
 				}
 			},
 
@@ -299,6 +305,7 @@ export function addHexagon() {
 					this.rotationSpeed = 0
 					this.isBeingHovered = false
 					mouse.play("cursor")
+					this.maxScaleIncrease = 1
 				}
 			}
 		}
@@ -360,6 +367,11 @@ export function addHexagon() {
 		return value;
 	}
 
+	function getFullSPC() {
+		if (GameState.clicksUpgradesValue < 2) return ((1 + GameState.clickers) * powerups["clicks"].multiplier) * scoreVars.combo
+		else return (((1 + GameState.clickers) * GameState.clicksUpgradesValue) * powerups["clicks"].multiplier) * scoreVars.combo
+	}
+
 	function getVanillaSPAC() {
 		// DONT ADD POWERUPS they're not applicable for outside time
 		let value:number;
@@ -373,6 +385,11 @@ export function addHexagon() {
 		return value;
 	}
 
+	function getFullSPAC() {
+		if (GameState.cursorsUpgradesValue < 2) return GameState.cursors * powerups["cursors"].multiplier 
+		else return (GameState.cursors * GameState.cursorsUpgradesValue) * powerups["cursors"].multiplier
+	}
+
 	// score setting stuff
 	hexagon.onUpdate(() => {
 		scoreVars.scorePerClick = getVanillaSPC()
@@ -382,7 +399,7 @@ export function addHexagon() {
 		// this is for when you leave the game
 		scoreVars.autoScorePerSecond = scoreVars.scorePerAutoClick / GameState.timeUntilAutoLoopEnds
 
-		scoreVars.scorePerSecond = ((clickVars.clicksPerSecond * scoreVars.scorePerClick) + scoreVars.autoScorePerSecond)
+		scoreVars.scorePerSecond = ((clickVars.clicksPerSecond * getFullSPC()) + (scoreVars.autoScorePerSecond * getFullSPAC()))
 		spsUpdaterTimer += dt();
 		if (spsUpdaterTimer > 1) {
 			spsUpdaterTimer = 0;

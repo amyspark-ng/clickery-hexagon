@@ -11,7 +11,6 @@ export function creditsWinContent(winParent) {
 
 	let credits = {
 		"amyspark-ng": "Code",
-		"Enysmo": "Music & SFX",
 		"DevkyRD": "Art & Design",
 		"MF": "Code & Shaders",
 		"lajbel": "Game Design",

@@ -6,19 +6,27 @@ this game is never getting done bruh
 
 -- MUSIC WORKS PRETTY FUCKIGN WEIRD WHEN DOING LOADMUSIC INSTEAD OF SOUND DON'T GET SCARED
 	* Time text not working, music not looping, etc
+
 * Do "-" for issues, "*" for notes, "^" for comments on either
+
+<!-- KABOOM -->
+- there might be a bug in the loop function
 
 # ISSUES (hell)
 ## Current TODO (small stuff mostly)
+- Make powerups spawn naturally
+* some loop related to powerups is crashing the game (might not be there anymore we'll see)
 - Format actual working numbers (spsText and scoreText and priceText)
 
-- Do stuff what happens when you're holding down the hexagon and a cursor clicks
-- Instead of doing time holding, do `times bought in last x seconds` for spawning the smoke animation
+- Fix updateTime animation in powerup timers
+- Add multiplier number to powerup timers
 
 - fix music waving speed
 - Fix panderito hitbox (just make it bigger damn angle stuff)
 - Fix weird workings of the combo bar content 
 - The sps, spm and sph don't work at all fym i get 80 per second and 1.33 per minute :skull:
+- make background faster depending on scoreUntilAscend
+- tweak hexagon speed depending on scoreUntilAscend
 
 ## Next features
 - Prototype achievements
@@ -31,17 +39,26 @@ this game is never getting done bruh
 	* Maybe do keep the tag system, just uhhhhhhhhhhhhhhhhhhhhhhhhhhhhh
 
 # IDEAS (good)
+- Little side to side when doing the param pam pam pam in the combo animation
 - maybe the vignette for powerups could be a small gradient on top of the backgroudn that has color depending on the powerup on the bottom part of the screen
 - Add achievement for making the hexagon black and the bg white (bad apple)
 - Do the funny thing with music title in clicker.wav like deltarune did
 - Add an achievement for opening all windows in your taskbar at the same time
 - Discount powerup (very short)
 - when clicking run through every achievement in an object that has a clicking property and check if the score is higher or equal to a value property, so:
-```js
-	onClick(() => {
-		achivements.forEach((achievement) => {
-			if (!achievement.clicking) return;
-			if (GameState.score >= achievement.value && !gamestate.unlockedAchievements.100score) unlockAchievement(achivements.100score)
+```ts
+
+	let achievements = {
+		scoreGaining: {
+			"100score": {
+				predicate: "GameState.score >= 100" 
+			}
+		}
+	}
+
+	hexagon.clickRelease(() => {
+		achivements.scoreGaining.forEach((achievement) => {
+			if (!GameState.achievements.includes(achievement) && achievement.predicate == true) unlockAchievement("100score")
 		})
 	})
 ```
@@ -51,8 +68,6 @@ this game is never getting done bruh
 
 # Missing
 - Ascend mechanic
-	* Everything
-- Powerups
 	* Everything
 - Medals/Achievmeents
 	* Everything

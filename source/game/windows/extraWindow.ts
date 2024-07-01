@@ -13,7 +13,7 @@ export let gridContainer;
 let currentClosest;
 
 // Function to update the closest minibutton
-export function updateClosestMinibuttonToDrag() {
+function updateClosestMinibuttonToDrag() {
     // Get all minibuttons
     const minibuttons = get("minibutton").filter(minibutton => !minibutton.extraMb);
 

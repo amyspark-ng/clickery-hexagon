@@ -12,7 +12,6 @@ To build:
 
 ## CREDITS:
 - AmySpark - Code
-- Enysmo - Sound & Music
 - DevkyRD - Art & Design
 - lajbel - Code & Design
 - MF - Code & Shaders
