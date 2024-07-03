@@ -5,20 +5,40 @@ import { bop } from "../../utils";
 import { mouse } from "../../additives";
 import { folderObj, infoForWindows, isGenerallyHoveringAWindow, isDraggingAWindow, isPreciselyHoveringAWindow, manageWindow, folded, buttonSpacing } from "./windowsAPI";
 import { GameState } from "../../../gamestate";
+import { destroyExclamation } from "../../unlockables";
+import { Vec2 } from "kaplay";
 
-export function calculateXButtonPosition(index, buttonSpacing = 75) {
+export function getXPosFolder(index, buttonSpacing = 75) {
     return folderObj.pos.x - buttonSpacing * (index) - buttonSpacing;
 }
 
-export function addMinibutton(idxForInfo, taskbarIndex, posToAdd = vec2(), initialDestPosition = vec2()) {
+type minibuttonOpt = {
+	idxForInfo:number;
+	taskbarIndex:number;
+	initialPosition:Vec2,
+	destPosition?:Vec2;
+	moveToPosition?:boolean;
+}
+
+export function addMinibutton(opts:minibuttonOpt) {
 	let quad;
+
+	// @ts-ignore
 	getSprite("bean")?.then(quady => {
 		quad = quady
 	})
 	
+	let destinedPosition:Vec2;
+	if (opts.destPosition) destinedPosition = opts.destPosition
+	else {
+		let extraMb = infoForWindows[Object.keys(infoForWindows)[opts.idxForInfo]].icon ? true : false
+		if (extraMb) destinedPosition = vec2(folderObj.pos.x, folderObj.pos.y - buttonSpacing)  
+		else destinedPosition = vec2(getXPosFolder(opts.taskbarIndex), folderObj.pos.y) 
+	}
+
 	let currentMinibutton = add([
 		sprite("white_noise"),
-		pos(posToAdd),
+		pos(opts.initialPosition),
 		anchor("center"),
 		area({ scale: vec2(0) }),
 		scale(1),
@@ -28,46 +48,48 @@ export function addMinibutton(idxForInfo, taskbarIndex, posToAdd = vec2(), initi
 		color(),
 		layer("ui"),
 		z(folderObj.z - 1),
+		`${Object.keys(infoForWindows)[opts.idxForInfo]}`,
 		"hoverOutsideWindow",
 		"minibutton",
-		infoForWindows[Object.keys(infoForWindows)[idxForInfo]].icon == "extra" ? "extraMinibutton" : "",
+		infoForWindows[Object.keys(infoForWindows)[opts.idxForInfo]].icon == "extra" ? "extraMinibutton" : "",
 		{
-			idxForInfo: idxForInfo,
-			taskbarIndex: taskbarIndex,
-			window: get(`${Object.keys(infoForWindows)[idxForInfo]}`, { recursive: true })[0] ?? null,
-			windowInfo: infoForWindows[Object.keys(infoForWindows)[idxForInfo]],
-			windowKey: Object.keys(infoForWindows)[idxForInfo],
+			idxForInfo: opts.idxForInfo,
+			taskbarIndex: opts.taskbarIndex,
+			window: get(`${Object.keys(infoForWindows)[opts.idxForInfo]}`, { recursive: true })[0] ?? null,
+			windowInfo: infoForWindows[Object.keys(infoForWindows)[opts.idxForInfo]],
+			windowKey: Object.keys(infoForWindows)[opts.idxForInfo],
 			nervousSpinSpeed: 10,
 			saturation: 0,
 			saturationColor: WHITE,
 			defaultScale: vec2(1),
 			dragHasSurpassed: false,
-			destinedPosition: initialDestPosition,
+			destinedPosition: destinedPosition,
 			isBeingHovered: false,
-			extraMb: infoForWindows[Object.keys(infoForWindows)[idxForInfo]].icon == "extra" ? true : null,
+			extraMb: infoForWindows[Object.keys(infoForWindows)[opts.idxForInfo]].icon == "extra" ? true : null,
 			shut: get("extraWin")[0] ? false : true,
 			startHover() {
 				if (folded) return
 				if (isDraggingAWindow) return
-				tween(currentMinibutton.pos.y, initialDestPosition.y - 5, 0.32, (p) => currentMinibutton.pos.y = p, easings.easeOutQuint)
-				tween(currentMinibutton.scale, vec2(1.05), 0.32, (p) => currentMinibutton.scale = p, easings.easeOutQuint)
-				
+				tween(this.pos.y, this.destinedPosition.y - 5, 0.32, (p) => this.pos.y = p, easings.easeOutQuint)
+				tween(this.scale, vec2(1.05), 0.32, (p) => this.scale = p, easings.easeOutQuint)
+				playSfx("hoverMiniButton", {detune: 100 * this.windowInfo.idx / 4})
+
 				if (this.extraMb) this.shut ? this.play("shut_hover") : this.play("open_hover")
 				else this.play("hover")
 				mouse.play("point")
 				this.isBeingHovered = true
 
 				if (this.extraMb || this.dragging) return
-				tween(currentMinibutton.pos.x, calculateXButtonPosition(this.taskbarIndex), 0.32, (p) => currentMinibutton.pos.x = p, easings.easeOutQuint)
+				tween(this.pos.x, getXPosFolder(this.taskbarIndex), 0.32, (p) => this.pos.x = p, easings.easeOutQuint)
 			},
 
 			endHover() {
 				if (folded) return
 				if (isDraggingAWindow) return
-				tween(currentMinibutton.pos.y, initialDestPosition.y, 0.32, (p) => currentMinibutton.pos.y = p, easings.easeOutQuint)
-				tween(currentMinibutton.angle, 0, 0.32, (p) => currentMinibutton.angle = p, easings.easeOutQuint)
-				tween(currentMinibutton.scale, vec2(1), 0.32, (p) => currentMinibutton.scale = p, easings.easeOutQuint)
-				currentMinibutton.defaultScale = vec2(1.05)
+				tween(this.pos.y, this.destinedPosition.y, 0.32, (p) => this.pos.y = p, easings.easeOutQuint)
+				tween(this.angle, 0, 0.32, (p) => this.angle = p, easings.easeOutQuint)
+				tween(this.scale, vec2(1), 0.32, (p) => this.scale = p, easings.easeOutQuint)
+				this.defaultScale = vec2(1.05)
 				
 				if (this.extraMb) this.shut ? this.play("shut_default") : this.play("open_default")
 				else this.play("default")
@@ -77,7 +99,7 @@ export function addMinibutton(idxForInfo, taskbarIndex, posToAdd = vec2(), initi
 				this.isBeingHovered = false
 
 				if (this.extraMb || this.dragging) return
-				tween(currentMinibutton.pos.x, calculateXButtonPosition(this.taskbarIndex), 0.32, (p) => currentMinibutton.pos.x = p, easings.easeOutQuint)
+				tween(this.pos.x, getXPosFolder(this.taskbarIndex), 0.32, (p) => this.pos.x = p, easings.easeOutQuint)
 			},
 			
 			update() {
@@ -156,6 +178,14 @@ export function addMinibutton(idxForInfo, taskbarIndex, posToAdd = vec2(), initi
 						this.area.scale = vec2(0)
 					}
 				}
+
+				if (this.extraMb) {
+					this.destinedPosition = vec2(folderObj.pos.x, folderObj.pos.y - buttonSpacing)
+				}
+
+				else {
+					this.destinedPosition = vec2(getXPosFolder(this.taskbarindex), folderObj.pos.y)
+				}
 			},
 
 			drawInspect() {
@@ -169,6 +199,15 @@ export function addMinibutton(idxForInfo, taskbarIndex, posToAdd = vec2(), initi
 				})
 			},
 
+			click() {
+				// click function
+				manageWindow(currentMinibutton.windowKey)
+				bop(currentMinibutton)
+
+				// unlocking stuff
+				destroyExclamation(currentMinibutton)
+			},
+
 			pickFromTaskbar() {
 				if (curDraggin) {
 					return
@@ -180,7 +219,7 @@ export function addMinibutton(idxForInfo, taskbarIndex, posToAdd = vec2(), initi
 				this.layer = "mouse"
 				this.z = mouse.z - 1
 				folderObj.addSlots()
-				playSfx("plap")
+				playSfx("plap", {detune: 100 * this.windowInfo.idx / 4})
 				bop(this, 0.1)
 
 				if (this.window) this.window.close()
@@ -200,11 +239,11 @@ export function addMinibutton(idxForInfo, taskbarIndex, posToAdd = vec2(), initi
 				const minibuttonSlots = get("minibuttonslot");
 				
 				// Check the distance to each minibutton
-				minibuttonSlots.forEach(foreachslot => {
-					const distance = currentMinibutton.screenPos().dist(foreachslot.screenPos());
+				minibuttonSlots.forEach(slot => {
+					const distance = currentMinibutton.screenPos().dist(slot.screenPos());
 					if (distance < closestDistance) {
 						closestDistance = distance;
-						closestSlot = foreachslot;
+						closestSlot = slot;
 					}
 				});
 				
@@ -217,7 +256,7 @@ export function addMinibutton(idxForInfo, taskbarIndex, posToAdd = vec2(), initi
 				// goes to the slot that coincides with its taskbar index 
 				if (this.taskbarIndex == closestSlot.taskbarIndex) movingTween = tween(this.pos, closestSlot.pos, 0.32, (p) => this.pos = p, easings.easeOutQuint)
 				
-				playSfx("plop", {tune: 100 * this.windowInfo.idx / 4})
+				playSfx("plop", {detune: 100 * this.windowInfo.idx / 4})
 				this.z = folderObj.z - 1
 				
 				// destroys all slots except the current one
@@ -244,7 +283,7 @@ export function addMinibutton(idxForInfo, taskbarIndex, posToAdd = vec2(), initi
 	])
 
 	// SPRITE
-	currentMinibutton.use(sprite(`icon_${infoForWindows[Object.keys(infoForWindows)[idxForInfo]].icon || Object.keys(infoForWindows)[idxForInfo].replace("Win", "")}`))
+	currentMinibutton.use(sprite(`icon_${infoForWindows[Object.keys(infoForWindows)[opts.idxForInfo]].icon || Object.keys(infoForWindows)[opts.idxForInfo].replace("Win", "")}`))
 	if (currentMinibutton.extraMb) {
 		if (currentMinibutton.shut) currentMinibutton.play("shut_default")
 		else currentMinibutton.play("open_default")
@@ -252,9 +291,13 @@ export function addMinibutton(idxForInfo, taskbarIndex, posToAdd = vec2(), initi
 	else currentMinibutton.play("default")
 
 	// animate them
-    tween(currentMinibutton.pos.x, initialDestPosition.x, 0.32, (p) => currentMinibutton.pos.x = p, easings.easeOutQuint)
-    tween(currentMinibutton.pos.y, initialDestPosition.y, 0.32, (p) => currentMinibutton.pos.y = p, easings.easeOutQuint)
-
+	currentMinibutton.opacity = 0
+    tween(currentMinibutton.opacity, 1, 0.32, (p) => currentMinibutton.opacity = p, easings.easeOutQuad)
+	
+	if (opts.moveToPosition == true) {
+		tween(currentMinibutton.pos, currentMinibutton.destinedPosition, 0.32, (p) => currentMinibutton.pos = p, easings.easeOutBack)
+	}
+	
 	// currentMinibutton is the one being swapped to met the curDragging wish
 	currentMinibutton.on("dragHasSurpassed", (left) => {
 		currentMinibutton.dragHasSurpassed = true
@@ -275,11 +318,9 @@ export function addMinibutton(idxForInfo, taskbarIndex, posToAdd = vec2(), initi
 		GameState.taskbar[currentMinibutton.taskbarIndex] = curDraggin.windowKey
 
 		swap(curDraggin, "taskbarIndex", currentMinibutton, "taskbarIndex")
-		curDraggin.destinedPosition = calculateXButtonPosition(curDraggin.taskbarIndex)
-		currentMinibutton.destinedPosition = calculateXButtonPosition(currentMinibutton.taskbarIndex)
 
-		// sets to the new position based on taskbarindex
-		tween(currentMinibutton.pos.x, calculateXButtonPosition(currentMinibutton.taskbarIndex), 0.32, (p) => currentMinibutton.pos.x = p, easings.easeOutBack)
+		// sets position based on the new taskbarindex
+		tween(currentMinibutton.pos.x, getXPosFolder(currentMinibutton.taskbarIndex), 0.32, (p) => currentMinibutton.pos.x = p, easings.easeOutBack)
 	})
 
 	currentMinibutton.use(shader("saturate", () => ({
@@ -293,7 +334,6 @@ export function addMinibutton(idxForInfo, taskbarIndex, posToAdd = vec2(), initi
 		if (curDraggin) return
 		if (!isPreciselyHoveringAWindow && !isDraggingAWindow) {
 			currentMinibutton.startHover()
-			playSfx("hoverMiniButton", {tune: 100 * currentMinibutton.windowInfo.idx / 4})
 		}
 	})
 
@@ -314,6 +354,9 @@ export function addMinibutton(idxForInfo, taskbarIndex, posToAdd = vec2(), initi
 		holdWaiting = wait(0.185, () => {
 			if (!currentMinibutton.isBeingHovered) return;
 			currentMinibutton.pickFromTaskbar()
+		
+			// unlocking stuff
+			destroyExclamation(currentMinibutton)
 		})
 	})
 
@@ -326,10 +369,8 @@ export function addMinibutton(idxForInfo, taskbarIndex, posToAdd = vec2(), initi
 		if (!currentMinibutton.dragging) {
 			if (curDraggin) return
 			
-			// click function
 			if (isPreciselyHoveringAWindow || isDraggingAWindow) return
-			manageWindow(currentMinibutton.windowKey)
-			bop(currentMinibutton)
+			currentMinibutton.click()
 		}
 
 		// was dragging

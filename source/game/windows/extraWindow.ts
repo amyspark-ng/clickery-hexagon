@@ -5,7 +5,7 @@ import { dummyShadow } from "../../plugins/dummyShadow";
 import { playSfx } from "../../sound";
 import { bop } from "../utils";
 import { mouse } from "../additives";
-import { buttonSpacing, infoForWindows, manageWindow, openWindow } from "./windows-api/windowsAPI";
+import { buttonSpacing, folderObj, infoForWindows, manageWindow, openWindow } from "./windows-api/windowsAPI";
 import { addMinibutton } from "./windows-api/minibuttons";
 
 export let gridContainer;
@@ -91,7 +91,7 @@ export function makeGridMinibutton(idx, gridSlot, winParent) {
 			},
 
 			startHover() {
-				playSfx("hoverMiniButton", {tune: 100 * idx / 4})
+				playSfx("hoverMiniButton", {detune: 100 * idx / 4})
 				this.play("hover")
 				
 				selection = gridSlot.add([
@@ -141,7 +141,14 @@ export function makeGridMinibutton(idx, gridSlot, winParent) {
 
 					const goToTaskbar = function() {
 						// add the new minibutton to the minibutton list
-						let newMinibutton = addMinibutton(idx, closestMinibutton.taskbarIndex, thisThing.pos, closestMinibutton.pos)
+						
+						let newMinibutton = addMinibutton({
+							idxForInfo: idx,
+							taskbarIndex: closestMinibutton.taskbarIndex,
+							initialPosition: thisThing.pos,
+							destPosition: closestMinibutton.pos
+						})
+
 						GameState.taskbar[closestMinibutton.taskbarIndex] = newMinibutton.windowKey
 						
 						// Snap the button to the closest minibutton
@@ -308,7 +315,10 @@ export function extraWinContent(winParent) {
 
 		// if the button is not on the taskbar
 		if (!GameState.taskbar.includes(Object.keys(infoForWindows)[i])) {
-			gridContainer.add(makeGridMinibutton(i, shadowOne, winParent))
+			// if the button is unlocked
+			if (GameState.unlockedWindows.includes(Object.keys(infoForWindows)[i])) {
+				gridContainer.add(makeGridMinibutton(i, shadowOne, winParent))
+			}
 		}
 	}
 

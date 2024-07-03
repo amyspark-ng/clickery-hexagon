@@ -160,7 +160,7 @@ export function addUpgrades(elementParent) {
 				buy() {
 					this.endTooltip()	
 					GameState.upgradesBought.push(this.id)
-					playSfx("kaching", { tune: 25 * this.idx })
+					playSfx("kaching", { detune: 25 * this.idx })
 					tween(this.scale, vec2(1.1), 0.15, (p) => this.scale = p, easings.easeOutQuad)
 				
 					if (this.type == "k_") GameState.clicksUpgradesValue += this.value
@@ -225,6 +225,7 @@ export function addUpgrades(elementParent) {
 		let downEvent = null;
 		upgrade.onMousePress("left", () => {
 			if (!upgrade.isHovering()) return;
+			if (isUpgradeBought(upgrade.id)) {bop(upgrade); return}
 
 			if (upgrade.id == "c_2" && !isUpgradeBought("c_1")) {
 				upgrade.endTooltip()
@@ -253,10 +254,6 @@ export function addUpgrades(elementParent) {
 			upgrade.dropBuy()
 			downEvent?.cancel()
 			downEvent = null
-		})
-
-		upgrade.onClick(() => {
-			if (isUpgradeBought(upgrade.id)) bop(upgrade)
 		})
 
 		upgrade.onHover(() => {

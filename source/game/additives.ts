@@ -284,7 +284,7 @@ export function addToast(opts:toastOpts) {
 		});
 
 		if (toastBg.type == "save") playSfx("gamesaved")
-		else if (toastBg.type == "achievement" || toastBg.type == "window") playSfx("unlockachievement", { tune: toastBg.index * 100 })
+		else if (toastBg.type == "achievement" || toastBg.type == "window") playSfx("unlockachievement", { detune: toastBg.index * 100 })
 	}
 
 	// function updateLogPositions() {

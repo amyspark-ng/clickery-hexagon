@@ -585,13 +585,16 @@ export function loadEverything() {
 	loadSound("plop", "sounds/sfx/plop.mp3")
 	loadSound("powerup", "sounds/sfx/powerup.wav")
 
+	loadSound("ominus", "sounds/sfx/ominus.mp3")
+	loadSound("biglight", "sounds/sfx/biglight.mp3")
+
 	// music
 	// don't load as music because then it won't play when the game loads
 	// only done on debug to make the game load quicker since im not listening the music really
 	if (!DEBUG) {load(new Promise<void>((res) => { setTimeout(() => { res() }, 5000) })) }
 
 	// change from ! to "" to work with songs on debug mode
-	if (DEBUG) {
+	if (DEBUG == true) {
 		loadSound("clicker.wav", "sounds/music/clicker.ogg")
 		loadSound("menu.wav", "sounds/music/menu.ogg")
 		loadSound("whatttt.wav", "sounds/music/whatttt.ogg")
@@ -605,7 +608,7 @@ export function loadEverything() {
 		loadSound("project_23", "sounds/music/project_23.wav")
 	}
 
-	else {
+	else if (DEBUG == false) {
 		loadMusic("clicker.wav", "sounds/music/clicker.ogg")
 		loadMusic("menu.wav", "sounds/music/menu.ogg")
 		loadMusic("whatttt.wav", "sounds/music/whatttt.ogg")

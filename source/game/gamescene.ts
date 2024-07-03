@@ -1,14 +1,15 @@
 import { GameState } from "../gamestate.ts"
 import { scoreVars, addHexagon, hexagon } from "./hexagon.ts"
 import { buildingsText, scoreText, spsText, uiCounters } from "./uicounters.ts"
-import { arrayToColor, debugFunctions, toHHMMSS } from "./utils.ts"
-import { addToast, gameBg, mouse, toastOpts } from "./additives.ts"
-import { playMusic } from "../sound.ts"
+import { arrayToColor, debugFunctions, randomPos, toHHMMSS } from "./utils.ts"
+import { addToast, gameBg, mouse } from "./additives.ts"
+import { playMusic, playSfx } from "../sound.ts"
 import { folderObj, folderObjManaging, windowsDefinition } from "./windows/windows-api/windowsAPI.ts"
 import { songs } from "./windows/musicWindow.ts"
 import { curDraggin } from "../plugins/drag.js"
-import { DEBUG } from "../main.ts"
-import { powerupManagement } from "./powerups.ts"
+import { DEBUG, ROOT } from "../main.ts"
+import { powerupManagement, powerups, spawnPowerup } from "./powerups.ts"
+import { storeWindowsConditionNumber } from "./unlockables.ts"
 
 let panderitoLetters = "panderito".split("")
 export let panderitoIndex = 0
@@ -32,6 +33,14 @@ export let cam = {
 export function togglePanderito() {
 	GameState.settings.panderitoMode = !GameState.settings.panderitoMode
 	panderitoIndex = 0
+
+	// if !gamestate.unlockedachievements.includes("panderitommode") {
+		addToast({ 
+			title: "Achievement unlocked!",
+			body: "Panderito mode",
+			icon: "panderito",		
+		})
+	// }
 
 	let block = add([
 		rect(width(), 100),
@@ -195,9 +204,11 @@ function resetIdleTime() {
 	})
 }
 
+export let hasStartedGame:boolean;
 export function gamescene() {
 	return scene("gamescene", () => {
 		GameState.load() // loadSave()
+		hasStartedGame = GameState.totalScore > 1
 
 		cam.scale = 1
 
@@ -208,45 +219,61 @@ export function gamescene() {
 		
 		setGravity(1600)
 
-		// don't check anything for muted, it will play but no sound, that's good
-		playMusic(GameState.settings.music.favoriteIdx == null ? "clicker.wav" : Object.keys(songs)[GameState.settings.music.favoriteIdx])
+		ROOT.on("gamestart", () => {
+			// wait 60 seconds
+			wait(60, () => {
+				loop(120, () => {
+					if (GameState.totalScore > 1) if (!DEBUG) GameState.save(true)
+				})
+			})
 
-		// wait 60 seconds
-		wait(60, () => {
-			loop(120, () => {
-				if (GameState.totalScore > 1) if (!DEBUG) GameState.save(true)
+			wait(60, () => {
+				loop(60, () => {
+					if (chance(0.25)) {
+						if (GameState.hasUnlockedPowerups) {
+							spawnPowerup({
+								type: choose(Object.keys(powerups)),
+								pos: randomPos()
+							})
+						}
+					}
+				})
+			})
+
+			// check for idling
+			idleWaiter = wait(0, () => {})
+			onMouseMove(() => resetIdleTime())
+			onKeyPress(() => resetIdleTime())
+			onClick(() => resetIdleTime())
+
+			// panderito checkin
+			onCharInput((ch) => {
+				if (!hasStartedGame) return
+				if (ch == panderitoLetters[panderitoIndex]) {
+					panderitoIndex++
+				}
+			
+				else {
+					panderitoIndex = 0	
+				}
+			
+				if (panderitoIndex == panderitoLetters.length) {
+					togglePanderito()
+				}
 			})
 		})
 
-		// check for idling
-		idleWaiter = wait(0, () => {})
-		onMouseMove(() => resetIdleTime())
-		onKeyPress(() => resetIdleTime())
-		onClick(() => resetIdleTime())
-
-		// field of hopes and dreams reference
-		// when the ominus stuff ends do this
-		// wait(1, () => {
-		// 	let reference = add([
-		// 		text("♪ ~ Clicker.wav", {
-		// 			align: "right",
-		// 			font: "lambdao",
-		// 		}),
-		// 		pos(width(), -2),
-		// 	])
-		// 	tween(reference.pos.x, 733, 0.32, (p) => reference.pos.x = p, easings.easeOutCubic)
-			
-		// 	wait(4, () => {
-		// 		tween(reference.pos.x, width(), 0.32, (p) => reference.pos.x = p, easings.easeInCubic).onEnd(() => destroy(reference))
-		// 	})
-		// })
-
 		onUpdate(() => {
+			camRot(cam.rotation)
+			camScale(vec2(cam.scale))
+			if (isKeyDown("shift") && isKeyPressed("r") && panderitoIndex != 6) go("gamescene")
+			if (isKeyDown("shift") && isKeyPressed("s")) GameState.save()
+			
 			GameState.stats.totalTimePlayed += dt()
 			
 			GameState.score = clamp(GameState.score, 0, Infinity)
 			GameState.score = Math.round(GameState.score)
-			
+
 			// auto loop stuff
 			if (GameState.cursors >= 1) {
 				autoLoopTime += dt()
@@ -261,36 +288,17 @@ export function gamescene() {
 
 			if (sleeping) timeSlept += dt()
 
-			camRot(cam.rotation)
-			camScale(vec2(cam.scale))
-
 			// if (!gamestate.unlockedAchivements.include(achievements["gnome"]) && chance(0.01)) {
 				// debug.log("holy shit did you guys see that")
 			// }
 
-			if (isKeyPressed("shift") && isKeyPressed("r") && panderitoIndex != 6) go("gamescene")
-			
 			powerupManagement()		
-		})
-
-		// panderito checkin
-		onCharInput((ch) => {
-			if (ch == panderitoLetters[panderitoIndex]) {
-				panderitoIndex++
-			}
-		
-			else {
-				panderitoIndex = 0	
-			}
-		
-			if (panderitoIndex == panderitoLetters.length) {
-				togglePanderito()
-			}
 		})
 
 		// #region OUTSIDE OF TAB STUFF
 		// Function to handle tab visibility change
 		function handleVisibilityChange() {
+			if (!hasStartedGame) return;
 			if (document.hidden) {
 				// Tab becomes inactive
 				totalTimeOutsideTab = 0
@@ -336,33 +344,121 @@ export function gamescene() {
 			if (curDraggin && curDraggin.releaseDrop) curDraggin.releaseDrop()
 		}, false);
 	
-		// # INTRO ANIMATIONS
-		// gameBg
-		tween(BLACK, arrayToColor(GameState.settings.bgColor), 0.5, (p) => gameBg.color = p, easings.easeOutQuad)
-		tween(-5, 5, 0.5, (p) => gameBg.movAngle = p, easings.easeOutQuad)
-		tween(1, GameState.settings.bgColor[3], 0.5, (p) => gameBg.color.a = p, easings.easeOutQuad)
+		let introAnimations = {
+			intro_hopes() {
+				// field of hopes and dreams reference
+				// when the ominus stuff ends do this
+				let reference = add([
+					text("♪ ~ Clicker.wav", {
+						align: "right",
+						font: "lambdao",
+					}),
+					opacity(),
+					pos(width(), -2),
+				])
+				tween(reference.pos.x, 733, 0.32, (p) => reference.pos.x = p, easings.easeOutCubic)
+				tween(0, 1, 0.32, (p) => reference.opacity = p, easings.easeOutCubic)
+				
+				wait(4, () => {
+					tween(reference.pos.x, width(), 0.32, (p) => reference.pos.x = p, easings.easeInCubic).onEnd(() => destroy(reference))
+					tween(1, 0, 0.32, (p) => reference.opacity = p, easings.easeOutCubic)
+				})
+			},
+			intro_playMusic() {
+				// don't check anything for muted, it will play but no sound, that's good
+				playMusic(GameState.settings.music.favoriteIdx == null ? "clicker.wav" : Object.keys(songs)[GameState.settings.music.favoriteIdx])
+			},
+			intro_hexagon() {
+				tween(vec2(center().x, center().y + 110), vec2(center().x, center().y + 55), 0.5, (p) => hexagon.pos = p, easings.easeOutQuad).onEnd(() => {
+					hexagon.trigger("startAnimEnd")
+				})
+				tween(0.25, 1, 1, (p) => hexagon.opacity = p, easings.easeOutQuad)
+			},
+			intro_gameBg() {
+				tween(BLACK, arrayToColor(GameState.settings.bgColor), 0.5, (p) => gameBg.color = p, easings.easeOutQuad)
+				tween(-5, 5, 0.5, (p) => gameBg.movAngle = p, easings.easeOutQuad)
+				tween(1, GameState.settings.bgColor[3], 0.5, (p) => gameBg.color.a = p, easings.easeOutQuad)
+			},
+			intro_scoreCounter() {
+				// scoreCounter
+				tween(vec2(center().x, 80), vec2(center().x, 60), 0.5, (p) => scoreText.pos = p, easings.easeOutQuad).onEnd(() => {
+					scoreText.trigger("startAnimEnd")
+				})
+				tween(0.25, 1, 0.5, (p) => scoreText.opacity = p, easings.easeOutQuad)
+			},
+			intro_spsText() {
+				tween(0.25, 1, 0.5, (p) => spsText.opacity = p, easings.easeOutQuad)
+			},
+			intro_buildingsText() {
+				// buildingsText
+				tween(5, 10, 0.5, (p) => buildingsText.pos.x = p, easings.easeOutQuad)
+				tween(0.25, 1, 0.5, (p) => buildingsText.opacity = p, easings.easeOutQuad)
+			},
+			intro_folderObj() {
+				// folderObj
+				tween(width() - 30, width() - 40, 0.5, (p) => folderObj.pos.x = p, easings.easeOutQuad)
+				tween(0.25, 1, 0.5, (p) => folderObj.opacity = p, easings.easeOutQuad)
+			}
+		}
 
-		// hexagon
-		tween(vec2(center().x, center().y + 110), vec2(center().x, center().y + 55), 0.5, (p) => hexagon.pos = p, easings.easeOutQuad).onEnd(() => {
-			hexagon.trigger("startAnimEnd")
-		})
-		tween(0.25, 1, 1, (p) => hexagon.opacity = p, easings.easeOutQuad)
-		
-		// scoreCounter
-		tween(vec2(center().x, 80), vec2(center().x, 60), 0.5, (p) => scoreText.pos = p, easings.easeOutQuad).onEnd(() => {
-			scoreText.trigger("startAnimEnd")
-		})
-		tween(0.25, 1, 0.5, (p) => scoreText.opacity = p, easings.easeOutQuad)
-		tween(0.25, 1, 0.5, (p) => spsText.opacity = p, easings.easeOutQuad)
+		if (hasStartedGame) {
+			Object.values(introAnimations).filter(animation => !animation.name.includes("hopes")).forEach((animation) => {
+				animation()
+			})
+			hexagon.canClick = true
+			ROOT.trigger("gamestart")
+		}
 
-		// buildingsText
-		tween(5, 10, 0.5, (p) => buildingsText.pos.x = p, easings.easeOutQuad)
-		tween(0.25, 1, 0.5, (p) => buildingsText.opacity = p, easings.easeOutQuad)
+		else {
+			let black = add([
+				rect(width(), height()),
+				pos(center()),
+				anchor("center"),
+				color(BLACK),
+				opacity(),
+				layer("mouse"),
+				z(mouse.z - 1)
+			])
 
-		// folderObj
-		tween(width() - 30, width() - 40, 0.5, (p) => folderObj.pos.x = p, easings.easeOutQuad)
-		tween(0.25, 1, 0.5, (p) => folderObj.opacity = p, easings.easeOutQuad)
+			wait(2, () => {
+				black.destroy()
+				let ominus = playSfx("ominus", { loop: true })
+				playSfx("biglight")
+				hexagon.canClick = true
+				spsText.opacity = 0
+				scoreText.opacity = 0
+				buildingsText.opacity = 0
+				folderObj.opacity = 0
+				
+				hexagon.on("clickrelease", () => {
+					switch (GameState.totalScore + 1) {
+						case 1:
+							ominus.stop()
+							gameBg.color.a = 0.84
+							introAnimations.intro_scoreCounter()
+						break;
+					
+						case 2: 
+							introAnimations.intro_playMusic()
+							introAnimations.intro_hopes()
+							introAnimations.intro_spsText()
+						break;
 
-		if (DEBUG) debugFunctions()
+						case 3: 
+							introAnimations.intro_buildingsText()
+						break;
+
+						case storeWindowsConditionNumber:
+							introAnimations.intro_folderObj()
+							hasStartedGame = true;
+							ROOT.trigger("gamestart")
+						break;
+					}
+				})
+			})
+		}
+
+		// if (DEBUG) debugFunctions()
+		debugFunctions()
 	})
 }

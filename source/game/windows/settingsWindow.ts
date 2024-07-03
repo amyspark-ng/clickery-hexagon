@@ -181,7 +181,7 @@ export function addCheckbox(opts:checkBoxOpt, parent:any) {
 
 		setVariable(GameState, opts.variable, !getVariable(GameState, opts.variable))
 
-		playSfx("clickButton", {tune: getVariable(GameState, opts.variable) == true ? 150 : -150})
+		playSfx("clickButton", {detune: getVariable(GameState, opts.variable) == true ? 150 : -150})
 		if (opts.variable == "settings.fullscreen") setFullscreen(getVariable(GameState, "settings.fullscreen"))
 	}))
 
@@ -282,7 +282,7 @@ export function settingsWinContent(winParent) {
 			if (!setWinBut.isHovering()) return
 			
 			// don't call playSfx openWin here because it is already called openWindow
-			if (setWinBut.is("panderitoButton")) playSfx("clickButton", {tune: rand(-100, 100)})
+			if (setWinBut.is("panderitoButton")) playSfx("clickButton", {detune: rand(-100, 100)})
 			// bop(setWinBut, setWinBut.is("panderitoButton") ? 2 : 1)
 			setWinBut.action()
 		})

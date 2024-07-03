@@ -218,7 +218,7 @@ export function musicWinContent(winParent) {
 			if (currentSongIdx < 0) currentSongIdx = Object.keys(songs).length - 1
 		}
 
-		playSfx("clickButton", {tune: rand(-150, 50)})
+		playSfx("clickButton", {detune: rand(-150, 50)})
 		bop(backButton)
 	}
 
@@ -226,7 +226,7 @@ export function musicWinContent(winParent) {
 		currentSongIdx++
 		if (currentSongIdx >= Object.keys(songs).length) currentSongIdx = 0
 		
-		playSfx("clickButton", {tune: rand(-50, 150)})
+		playSfx("clickButton", {detune: rand(-50, 150)})
 		bop(skipButton)
 	}
 
@@ -241,7 +241,7 @@ export function musicWinContent(winParent) {
 		})
 		tween(disc.spinSpeed, musicHandler.paused ? 0 : songs[Object.keys(songs)[currentSongIdx]].speed, 1, (p) => disc.spinSpeed = p, easings.easeOutQuint)
 		
-		playSfx("clickButton", {tune: rand(-100, 100)})
+		playSfx("clickButton", {detune: rand(-100, 100)})
 		bop(pauseButton)
 	}
 

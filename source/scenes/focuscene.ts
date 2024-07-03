@@ -10,17 +10,10 @@ function scaryIntro() {
 
 export function focuscene() {
 	return scene("focuscene", () => {
-		// set up some things in the game
-		addBackground()
-		addMouse()
-		gameBg.movAngle = -5
-		gameBg.color = BLACK
 		tween(1, 0.95, 0.25, (p) => gameBg.color.a = p, easings.linear)
-		
-		volumeManager()
 
-		// if debug ignore the focus scene and just go to the game
-		if (DEBUG) {go("gamescene")}
+		// // if debug ignore the focus scene and just go to the game
+		// if (DEBUG) {go("gamescene")}
 
 		// draw some stuff
 		let y_posToDrawText = center().y + 5

@@ -4,6 +4,7 @@ import { addToast, mouse } from "./additives";
 import { autoLoopTime, cam, panderitoIndex } from "./gamescene";
 import { hexagon } from "./hexagon";
 import { spawnPowerup, powerups } from "./powerups";
+import { checkForUnlockable } from "./unlockables";
 
 // definetely not chatgpt
 export function formatNumber(number = 0, short = true, isPrice = false) {
@@ -166,7 +167,7 @@ export function randomPos() {
 	return vec2(rand(0, width()), rand(0, height()))
 }
 
-export function bop(obj, howMuch = 0.1, bopEasing = easings.easeOutQuint) {
+export function bop(obj:any, howMuch = 0.1, bopEasing = easings.easeOutQuint) {
 	if (!obj.is("scale")) obj.use(scale(1))
 	if (!obj.bopDefScale) obj.bopDefScale = obj.scale
 
@@ -236,7 +237,6 @@ export function debugFunctions() {
 		if (isKeyPressed("c")) GameState.save(true)
 		else if (isKeyPressed("v")) GameState.delete()
 		else if (isKeyPressed("b")) GameState.cheat()
-		else if (isKeyPressed("r") && panderitoIndex != 6) go("gamescene")
 		else if (isKeyPressed("w")) hexagon.autoClick()
 		else if (isKeyDown("q")) {
 			hexagon.clickPress()
@@ -244,11 +244,12 @@ export function debugFunctions() {
 		}
 	
 		else if (isKeyPressed("f")) {
-			spawnPowerup({
-				pos: mousePos(),
-				type: choose(Object.keys(powerups)),
-				time: 5,
-			})
+			checkForUnlockable()
+			// spawnPowerup({
+			// 	pos: mousePos(),
+			// 	type: choose(Object.keys(powerups)),
+			// 	time: 5,
+			// })
 		}
 	})
 

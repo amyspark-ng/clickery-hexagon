@@ -252,7 +252,7 @@ export function maxComboAnim() {
 
 export function increaseCombo() {
 	scoreVars.combo = getComboFromClicks(clickVars.consecutiveClicks)
-	playSfx("combo", {tune: scoreVars.combo > 1 ? 100 * scoreVars.combo : 0 })
+	playSfx("combo", {detune: scoreVars.combo > 1 ? 100 * scoreVars.combo : 0 })
 	tween(cam.scale, 0.95, 0.25 / 2, (p) => cam.scale = p, easings.easeOutQuint).onEnd(() => {
 		tween(cam.scale, 1, 0.25, (p) => cam.scale = p, easings.easeOutQuint)
 	})

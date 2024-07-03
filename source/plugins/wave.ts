@@ -10,20 +10,20 @@ type WaveCompOpt = {
 	wave_speed?: number,
 }
 
-export function waver(WaveCompOpt: WaveCompOpt) {
+export function waver(WaveCompOpt?: WaveCompOpt) {
 	return {
 		// Name of the component
 		id: "wave",
 		// This component requires the "pos" component to work
 		require: [ "pos" ],
 		amplitude: 0,
-		wave_tweenSpeed: WaveCompOpt.wave_tweenSpeed || 0.32,
-		wave_startTweenSpeed: WaveCompOpt.wave_tweenSpeed || 0.32,
-		wave_endTweenSpeed: WaveCompOpt.wave_tweenSpeed || 0.32,
-		minAmplitude: WaveCompOpt.minAmplitude || 0,
-		maxAmplitude: WaveCompOpt.maxAmplitude || 50,
+		wave_tweenSpeed: WaveCompOpt?.wave_tweenSpeed || 0.32,
+		wave_startTweenSpeed: WaveCompOpt?.wave_tweenSpeed || 0.32,
+		wave_endTweenSpeed: WaveCompOpt?.wave_tweenSpeed || 0.32,
+		minAmplitude: WaveCompOpt?.minAmplitude || 0,
+		maxAmplitude: WaveCompOpt?.maxAmplitude || 50,
 		wave_verPosition: 0,
-		wave_speed: WaveCompOpt.wave_speed || 1,
+		wave_speed: WaveCompOpt?.wave_speed || 1,
 		isWaving: false,
 		add() {
 			this.wave_verPosition = this.pos.y

@@ -3,7 +3,7 @@ import { blendColors, bop, getPositionOfSide } from "../../utils.ts";
 import { mouse } from "../../additives.ts";
 import { drag, curDraggin, setCurDraggin } from "../../../plugins/drag.js";
 import { playSfx } from "../../../sound.ts";
-import { addMinibutton, calculateXButtonPosition } from "./minibuttons.ts";
+import { addMinibutton, getXPosFolder } from "./minibuttons.ts";
 
 // window contents
 import { storeWinContent } from "../store/storeWindows.ts";
@@ -14,6 +14,7 @@ import { ascendWinContent } from "../ascendWindow.ts";
 import { extraWinContent } from "../extraWindow.ts";
 import { creditsWinContent } from "../creditsWin.ts";
 import { statsWinContent } from "../statsWin.ts";
+import { hasStartedGame } from "../../gamescene.ts";
 
 export let infoForWindows = {};
 export let isGenerallyHoveringAWindow = false;
@@ -34,8 +35,8 @@ export function deactivateAllWindows() {
 export function manageWindow(windowKey) {
 	if (!infoForWindows.hasOwnProperty(windowKey)) throw new Error("No such window for: " + windowKey);
 
-	let maybeWindow = get(windowKey)[0]
-	// if window even exists in the first place
+	let maybeWindow = get(windowKey).filter(obj => !obj.is("minibutton"))[0]
+	// if window even exists in the first place (not a button)
 	if (maybeWindow) {
 		// if it isn't it means that it's being closed
 		if (maybeWindow.is("window")) {
@@ -64,9 +65,6 @@ export function windowsDefinition() {
 		"bgColorWin": { idx: 10, content: colorWinContent, lastPos: vec2(1024 - 200, 200) },
 		"extraWin": { idx: 11, icon: "extra", content: extraWinContent, lastPos: center() },
 	}
-
-	GameState.unlockedWindows = Object.keys(infoForWindows)
-	GameState.taskbar = [ "storeWin", "musicWin", "ascendWin", "statsWin" ]
 }
 
 export function openWindow(windowKey = "") {
@@ -292,6 +290,7 @@ export function openWindow(windowKey = "") {
 	return windowObj;
 }
 
+let movingMinibuttons:boolean;
 export function folderObjManaging() {
 	// reset variables
 	folded = true
@@ -300,6 +299,7 @@ export function folderObjManaging() {
 	isPreciselyHoveringAWindow = false;
 	isInClickingRangeOfAWindow = false;
 	isDraggingAWindow = false;
+	movingMinibuttons = false;
 
 	folderObj = add([
 		sprite("folderObj"),
@@ -318,33 +318,24 @@ export function folderObjManaging() {
 				timeSinceFold = 0
 				playSfx("fold")
 
-				// Initial x position for the buttons
-				let initialX = folderObj.pos.x;
-				let initialY = folderObj.pos.y;
-				
-				// Iterate over the sorted taskbar array to create buttons
-				// There are already minibuttons
-				if (get("minibutton").length > 0) {
-					get("miniButton").forEach((miniButton, index) => {
-						let xPos = initialX - buttonSpacing * index - 75;
-						let yPos = initialY - buttonSpacing * index - 75;
-
-						tween(miniButton.pos.x, xPos, 0.32, (p) => miniButton.pos.x = p, easings.easeOutQuint)
-						if (infoForWindows[miniButton.windowKey].icon == "extra") {
-							tween(miniButton.pos.y, yPos, 0.32, (p) => miniButton.pos.y = p, easings.easeOutQuint)
-						}
-					})
-				}
-
-				// There are not, create them
-				else {
+				// if there's no minibutton
+				if (get("minibutton").length == 0) {
 					GameState.taskbar.forEach((key, taskbarIndex) => {
-						let i = infoForWindows[key].idx;
-						addMinibutton(i, taskbarIndex, folderObj.pos, vec2(calculateXButtonPosition(taskbarIndex), folderObj.pos.y));
+						let idxForInfo = infoForWindows[key].idx;
+						
+						let newminibutton = addMinibutton({
+							idxForInfo: idxForInfo,
+							taskbarIndex: taskbarIndex,
+							initialPosition: folderObj.pos,
+						})
 					});
-				
-					// adds the extra minibutton
-					addMinibutton(11, 1, folderObj.pos, vec2(folderObj.pos.x, folderObj.pos.y - buttonSpacing));
+					
+					movingMinibuttons = true
+					get("minibutton").forEach((miniButton) => {
+						tween(miniButton.pos, miniButton.destinedPosition, 0.32, (p) => miniButton.pos = p, easings.easeOutBack).then(() => {
+							movingMinibuttons = false;
+						})
+					})
 				}
 			},
 			
@@ -352,9 +343,12 @@ export function folderObjManaging() {
 				folded = true
 				
 				// return them to folderObj pos
-				get("minibutton").forEach(miniButtonFoldTween => {
-					tween(miniButtonFoldTween.pos, folderObj.pos, 0.32, (p) => miniButtonFoldTween.pos = p, easings.easeOutQuint).then(() => {
-						destroy(miniButtonFoldTween)
+				movingMinibuttons = true
+				get("minibutton").forEach(minibutton => {
+					tween(minibutton.opacity, 0, 0.32, (p) => minibutton.opacity = p, easings.easeOutQuad)
+					tween(minibutton.pos, folderObj.pos, 0.32, (p) => minibutton.pos = p, easings.easeOutBack).then(() => {
+						destroy(minibutton)
+						movingMinibuttons = false
 					})
 				});
 
@@ -364,6 +358,7 @@ export function folderObjManaging() {
 			manageFold() {
 				if (folded) folderObj.unfold()
 				else folderObj.fold()
+				this.trigger("managefold", folded)
 			},
 
 			addSlots() {
@@ -371,7 +366,7 @@ export function folderObjManaging() {
 					// add slots
 					add([
 						rect(20, 20, { radius: 4 }),
-						pos(calculateXButtonPosition(index), folderObj.pos.y),
+						pos(getXPosFolder(index), folderObj.pos.y),
 						color(BLACK),
 						anchor("center"),
 						opacity(0.5),
@@ -400,11 +395,17 @@ export function folderObjManaging() {
 			},
 
 			update() {
+				this.flipX = folded ? true : false
+				
+				this.area.scale = hasStartedGame == false ? vec2(0) : vec2(1.2) 
+				
 				if (curDraggin?.is("gridMiniButton") || curDraggin?.is("minibutton")) return
-				if (isKeyPressed("space") || (isMousePressed("left") && this.isHovering())) {
-					this.manageFold()
-					this.deleteSlots()
-					bop(this)
+				if (!movingMinibuttons) {
+					if (isKeyPressed("space") || (isMousePressed("left") && this.isHovering())) {
+						this.manageFold()
+						this.deleteSlots()
+						bop(this)
+					}
 				}
 
 				if (timeSinceFold < 0.25) timeSinceFold += dt()
@@ -445,10 +446,13 @@ export function folderObjManaging() {
 		else if (index >= 0 && index < GameState.taskbar.length) {
 			const windowKey = GameState.taskbar[index];
 	
-			// if (GameState.unlockedWindows.includes(windowKey)) {
+			if (GameState.unlockedWindows.includes(windowKey)) {
 				if (folded) folderObj.unfold();
-				manageWindow(windowKey);
-			// }
+				
+				let minibutton = get(windowKey)?.filter(obj => obj.is("minibutton"))[0]
+				if (minibutton) minibutton.click()
+				else manageWindow(windowKey)
+			}
 		}
 	});
 

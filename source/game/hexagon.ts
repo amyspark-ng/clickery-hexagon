@@ -12,6 +12,7 @@ import { addConfetti } from "../plugins/confetti.js";
 import { curDraggin } from "../plugins/drag.js";
 import { cam } from "./gamescene.ts";
 import { powerups } from "./powerups.ts";
+import { checkForUnlockable } from "./unlockables.ts";
 
 export let scoreVars = {
 	scorePerClick: 1,
@@ -86,7 +87,7 @@ export function addHexagon() {
 			scaleIncrease: 1,
 			maxScaleIncrease: 1,
 			stretchScaleIncrease: 1,
-			canClick: true,
+			canClick: false,
 			isBeingClicked: false,
 			rotationSpeed: 0.01,
 			clickPressTween: null,
@@ -106,6 +107,8 @@ export function addHexagon() {
 				if (this.angle >= 360) {
 					this.angle = 0
 				}
+				
+				this.canClick == false ? this.area.scale = vec2(0) : this.area.scale = vec2(1.08)
 			},
 			
 			clickPress() {
@@ -114,17 +117,18 @@ export function addHexagon() {
 				this.clickPressTween = tween(this.scaleIncrease, this.maxScaleIncrease, 0.35, (p) => this.scaleIncrease = p, easings.easeOutQuint)
 				this.isBeingClicked = true
 				mouse.grab()
-				playSfx("clickPress", {tune: rand(-50, 50)})
+				playSfx("clickPress", {detune: rand(-50, 50)})
 			},
 
 			clickRelease() {
+				this.trigger("clickrelease")
 				this.maxScaleIncrease = this.isBeingHovered ? 1.05 : 1
 				
 				this.clickPressTween.cancel()
 				tween(this.scaleIncrease, this.maxScaleIncrease, 0.35, (p) => this.scaleIncrease = p, easings.easeOutQuint)
 				this.isBeingClicked = false
 				clickVars.clicksPerSecond++
-				playSfx("clickRelease", {tune: rand(-50, 50)})
+				playSfx("clickRelease", {detune: rand(-50, 50)})
 				mouse.releaseAndPlay("point")
 
 				// # combo stuff
@@ -162,7 +166,7 @@ export function addHexagon() {
 
 						addConfetti({ pos: center() })
 						tween(-10, 0, 0.5, (p) => cam.rotation = p, easings.easeOutQuint)
-						playSfx("fullcombo", {tune: rand(-50, 50)})
+						playSfx("fullcombo", {detune: rand(-50, 50)})
 					}
 				}
 
@@ -242,14 +246,14 @@ export function addHexagon() {
 						
 						// clickPress manual false
 						tween(hexagon.scaleIncrease, this.maxScaleIncrease * 0.98, 0.35, (p) => hexagon.scaleIncrease = p, easings.easeOutQuint)
-						playSfx("clickPress", {tune: rand(-50, 50)})
+						playSfx("clickPress", {detune: rand(-50, 50)})
 
 						wait(0.15, () => {
 							autoCursor.play("point")
 			
 							// clickRelease manual false
 							tween(hexagon.scaleIncrease, hexagon.maxScaleIncrease, 0.35, (p) => hexagon.scaleIncrease = p, easings.easeOutQuint)
-							playSfx("clickRelease", {tune: rand(-50, 50)})
+							playSfx("clickRelease", {detune: rand(-50, 50)})
 							
 							addPlusScoreText({
 								pos: autoCursor.pos,
@@ -347,6 +351,8 @@ export function addHexagon() {
 	})
 
 	hexagon.onMousePress("right", () => {
+		if (!GameState.unlockedWindows.includes("hexColorWin")) return;
+
 		if (hexagon.isHovering()) {
 			manageWindow("hexColorWin")
 		}
@@ -411,6 +417,10 @@ export function addHexagon() {
 
 			spsText.value = scoreVars.scorePerSecond
 		}
+	})
+
+	hexagon.on("clickrelease", () => {
+		checkForUnlockable()
 	})
 
 	loop(2.5, () => {

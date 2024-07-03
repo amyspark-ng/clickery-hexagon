@@ -3,8 +3,10 @@ import "kaplay/global";
 
 import { drawSeriousLoadScreen, loadEverything } from "./loader.ts"
 import { GameState } from "./gamestate.ts";
+import { addBackground, addMouse, gameBg } from "./game/additives.ts";
+import { volumeManager } from "./sound.ts";
 
-export const DEBUG = true
+export const DEBUG:boolean = false
 export const k = kaplay({
 	width: 1024,
 	height: 576,
@@ -13,7 +15,7 @@ export const k = kaplay({
 	logMax: 10,
 	backgroundAudio: GameState.settings.keepAudioOnTabChange,
 	debugKey: "f1",
-	debug: DEBUG,
+	debug: true,
 	loadingScreen: true,
 	// stretch: true,
 	// letterbox: true,
@@ -36,6 +38,12 @@ layers([
 
 loadEverything()
 onLoad(() => {
+	addBackground()
+	gameBg.movAngle = -5
+	gameBg.color = BLACK
+
+	volumeManager()
+
 	if (!DEBUG) {
 		let opacity = 1
 		tween(opacity, 0, 1, (p) => opacity = p, easings.linear)
@@ -46,8 +54,18 @@ onLoad(() => {
 	
 		wait(1, () => {
 			drawEvent.cancel()
-			go("focuscene")
+			ROOT.trigger("rungame")
 		})
 	}
-	else go("focuscene")
+	
+	else {
+		addMouse()
+		go("gamescene")
+	}
+	
+	ROOT.on("rungame", () => {
+		addMouse()
+		if (!isFocused()) go("focuscene")
+		else go("gamescene")
+	})
 })

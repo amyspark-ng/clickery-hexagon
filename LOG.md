@@ -14,7 +14,9 @@ this game is never getting done bruh
 
 # ISSUES (hell)
 ## Current TODO (small stuff mostly)
-- Make powerups spawn naturally
+- Fix everything related to debug (add something for when the game is on debug (a text on a corner or something))
+- Figure out why fold sfx is so loud
+	* Make it higher when opening and deep when closing
 * some loop related to powerups is crashing the game (might not be there anymore we'll see)
 - Format actual working numbers (spsText and scoreText and priceText)
 

@@ -68,7 +68,7 @@ function addStoreElement(winParent:any, opts = { key: "null", pos: vec2(0, 20) }
 				storePitchSeconds = 0;
 				if (hasBoughtRecently == true) storeTune += 25;
 				storeTune = clamp(storeTune, -100, 500)
-				playSfx("kaching", { tune: storeTune })
+				playSfx("kaching", { detune: storeTune })
 				
 				if (this.isBeingClicked) {
 					this.play("down")

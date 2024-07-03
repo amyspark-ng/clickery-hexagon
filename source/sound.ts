@@ -1,5 +1,5 @@
 
-import { Key } from "kaplay";
+import { AudioPlayOpt, Key } from "kaplay";
 import { GameState } from "./gamestate.ts"
 import { positionSetter } from "./plugins/positionSetter.js";
 import { panderitoIndex } from "./game/gamescene.ts";
@@ -11,17 +11,13 @@ let speaker:any;
 let trayVolElements:any;
 let volumeBars:any;
 
-type sfxOpts = {
-	tune?: number,
-	speedy?: number,
-}
-
 export let sfxHandler:any;
-export function playSfx(sound = "clickPress", opts?:sfxOpts) {
+export function playSfx(sound = "clickPress", opts?:AudioPlayOpt) {
 	sfxHandler = play(sound, {
 		volume: GameState.settings.sfx.volume,
-		detune: opts?.tune || 0,
-		speed: opts?.speedy || 1,
+		detune: opts?.detune || 0,
+		speed: opts?.speed || 1,
+		loop: opts?.loop || false,
 	})
 	return sfxHandler;
 }
@@ -158,7 +154,7 @@ export function volumeManager() {
 							// no need to mute other things because their volume 
 							// is being managed by the volume() function globally lol!
 						}
-							
+						
 						else {
 							volumeText.text = `VOLUME: ${(GameState.settings.volume * 100).toFixed(0)}%`
 							bop(volumeBars[clamp(Math.floor(GameState.settings.volume * 10 - 1), 0, 10)], 0.05)

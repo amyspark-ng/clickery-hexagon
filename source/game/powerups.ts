@@ -1,6 +1,7 @@
 import { Vec2 } from "kaplay"
 import { waver } from "../plugins/wave";
 import { playSfx } from "../sound";
+import { GameState } from "../gamestate";
 
 /*
 types of powerups
@@ -169,7 +170,8 @@ export function spawnPowerup(opts:powerupOpt) {
 			click() {
 				this.dieAnim()
 				playSfx("powerup")
-			
+				GameState.stats.powerupsClicked++
+
 				// # multipliers
 				let multiplier = 0
 				if (!opts.multiplier) {
