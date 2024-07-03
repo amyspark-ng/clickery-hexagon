@@ -170,8 +170,8 @@ function welcomeBack(idle = false) {
 			// actual gainedScore
 			gainedScore = gainedScore * scoreVars.scorePerAutoClick
 	
-			// 120 being the seconds outside screen you have to be to get a log
-			if ((totalTimeOutsideTab / 1000) > 120) {
+			// SECONDS FOR LOG
+			if ((totalTimeOutsideTab / 1000) > 60) {
 				addWelcomeBackToast(gainedScore, totalTimeOutsideTab / 1000)
 			}
 	
@@ -183,8 +183,8 @@ function welcomeBack(idle = false) {
 	else {
 		if (GameState.cursors < 1) {addWelcomeBackToast(null, timeSlept); return;}
 		
-		// 120 being the seconds outside screen you have to be to get a log
-		if (timeSlept > 120) {
+		// SECONDS FOR LOG
+		if (timeSlept > 60) {
 			addWelcomeBackToast(Math.round(scoreVars.scorePerAutoClick * timeSlept), timeSlept)
 			timeSlept = 0
 		}
@@ -257,6 +257,35 @@ export function gamescene() {
 					togglePanderito()
 				}
 			})
+
+			// gnome
+			loop(1, () => {
+				if (chance(0.0025))
+				if (!isAchievementUnlocked("gnome")) {
+					let gnome = add([
+						sprite("gnome"),
+						pos(),
+						layer("mouse"),
+						scale(1.25),
+						z(mouse.z - 1),
+						anchor("center"),
+						{
+							update() {
+								this.angle = wave(-10, 10, time() / 2)
+							}
+						}
+					])
+		
+					playSfx("gnome")
+					
+					tween(0, width(), 0.1, (p) => gnome.pos.x = p, easings.linear)
+					tween(0, height(), 0.1, (p) => gnome.pos.y = p, easings.linear).onEnd(() => {
+						destroy(gnome)
+					})
+
+					unlockAchievement("gnome")
+				}
+			})
 		})
 
 		onUpdate(() => {
@@ -284,10 +313,6 @@ export function gamescene() {
 
 			if (sleeping) timeSlept += dt()
 
-			// if (!gamestate.unlockedAchivements.include(achievements["gnome"]) && chance(0.01)) {
-				// debug.log("holy shit did you guys see that")
-			// }
-
 			powerupManagement()		
 		})
 
@@ -312,8 +337,8 @@ export function gamescene() {
 					GameState.stats.totalTimePlayed += totalTimeOutsideTab / 1000
 
 					if (!(GameState.totalScore > 0)) return;
-					// 60 being the seconds outside of screen to get the zzz screen
-					if (totalTimeOutsideTab / 1000 > 60) {
+					// 30 being the seconds outside of screen to get the zzz screen
+					if (totalTimeOutsideTab / 1000 > 30) {
 						// false means it was out not idle
 						triggerZZZ(false)
 						// false means it was out not idle
@@ -452,6 +477,10 @@ export function gamescene() {
 				})
 			})
 		}
+
+		onMousePress("middle", () => {
+			unlockAchievement("tapachievementslot")
+		})
 
 		if (DEBUG) debugFunctions()
 	})

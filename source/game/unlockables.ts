@@ -8,6 +8,7 @@ import { ROOT } from '../main';
 import { addToast } from './additives';
 
 export let storeWindowsConditionNumber = 25
+
 export let unlockables = {
 	"windows": {
 		"storeWin": {
@@ -32,11 +33,12 @@ export let unlockables = {
 			condition: () => GameState.score >= 56
 		},
 	},
+	
 	"achievements": {
 		"100score": {
 			text: "Get 100 score, it starts....",
 			icon: "icon_about",
-			condition: () => GameState.score >= 100
+			condition: () => GameState.score >= 100,
 		},
 		"maxedcombo": {
 			text: "Max combo for the first time, FULL COMBO!!!!!!",
@@ -49,6 +51,15 @@ export let unlockables = {
 		"panderitomode": {
 			text: "Panderito, panderito mode",
 			icon: "panderito"
+		},
+		"tapachievementslot": {
+			text: "Tap this achievement slot, easy enough",
+			icon: "cursors.point",
+		},
+		"gnome": {
+			text: "HOLY SHIT DID YOU GUYS SEE THAT???",
+			icon: "gnome",
+			timeAfter: 2.5,
 		}
 	}
 }
@@ -89,13 +100,17 @@ export function checkForUnlockable() {
 }
 
 export function unlockAchievement(achievement:string) {
-	addToast({
-		icon: unlockables["achievements"][achievement].icon,
-		title: "Unlocked Achievement!",
-		body: `${unlockables["achievements"][achievement].text}`,
+	let waitTime = unlockables["achievements"][achievement].timeAfter || 0
+	
+	wait(waitTime, () => {
+		addToast({
+			icon: unlockables["achievements"][achievement].icon,
+			title: "Unlocked Achievement!",
+			body: `${unlockables["achievements"][achievement].text}`,
+		})
+	
+		GameState.unlockedAchievements.push(achievement)
 	})
-
-	GameState.unlockedAchievements.push(achievement)
 }
 
 export function destroyExclamation(obj) {

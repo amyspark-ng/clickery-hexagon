@@ -2,6 +2,7 @@ import { Vec2 } from "kaplay"
 import { waver } from "../plugins/wave";
 import { playSfx } from "../sound";
 import { GameState } from "../gamestate";
+import { parseAnimation } from "./utils";
 
 /*
 types of powerups
@@ -35,9 +36,8 @@ function getPosBasedOnIndex(index:number, timerSpacing = 65) {
 }
 
 function addTimer(opts:{ sprite: string, type: string }) {
-	let spriteName = !opts.sprite.includes(".") ? opts.sprite : [opts.sprite.split(".")[0], opts.sprite.split(".")[1]];
 	let timerObj = add([
-		sprite(typeof spriteName == "string" ? spriteName : spriteName[0]),
+		sprite("white_noise"),
 		pos(0, 40),
 		anchor("center"),
 		opacity(1),
@@ -79,7 +79,7 @@ function addTimer(opts:{ sprite: string, type: string }) {
 
 	timerObj.pos.x = getPosBasedOnIndex(timerObj.index)
 
-	if (spriteName[1] && typeof spriteName != "string") timerObj.play(spriteName[1]);
+	parseAnimation(timerObj, opts.sprite)
 
 	timerObj.width = 60
 	timerObj.height = 60
@@ -102,11 +102,8 @@ function addTimer(opts:{ sprite: string, type: string }) {
 }
 
 export function spawnPowerup(opts:powerupOpt) {
-	let spriteName = powerups[opts.type].sprite
-	spriteName = spriteName.includes(".") ? spriteName.split(".") : spriteName;
-
 	let powerup = add([
-		sprite(typeof spriteName == "string" ? spriteName : spriteName[0]),
+		sprite("white_noise"),
 		pos(opts.pos),
 		scale(3),
 		area(),
@@ -139,7 +136,7 @@ export function spawnPowerup(opts:powerupOpt) {
 				
 				// little blink shadow
 				let blink = add([
-					sprite(typeof spriteName == "string" ? spriteName : spriteName[0]),
+					sprite("white_noise"),
 					pos(this.pos),
 					scale(this.scale),
 					anchor(this.anchor),
@@ -155,7 +152,7 @@ export function spawnPowerup(opts:powerupOpt) {
 					}
 				])
 
-				if (spriteName[1] && typeof spriteName != "string") blink.play(spriteName[1]);
+				parseAnimation(blink, powerups[opts.type].sprite)
 
 				let timeToLeave = 0.75
 				blink.loop(timeToLeave / 12, () => {
@@ -199,7 +196,7 @@ export function spawnPowerup(opts:powerupOpt) {
 	])
 
 	// other stuff
-	if (spriteName[1] && typeof spriteName != "string") powerup.play(spriteName[1]);
+	parseAnimation(powerup, powerups[opts.type].sprite)
 	powerup.startWave()
 
 	// spawn anim

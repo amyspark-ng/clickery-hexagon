@@ -556,12 +556,15 @@ export function loadEverything() {
 			"dumb": 1,
 		}
 	})
+
+	loadSprite("gnome", "sprites/gnome.png")
 	//#endregion
 	//#endregion SPRITES
 
 	// #region SOUNDS
 	if (!DEBUG) {load(new Promise<void>((res) => { setTimeout(() => { res() }, 5000) })) }
 
+	loadSound("gnome", "sounds/gnome.ogg")
 	loadSound("volumeChange", "sounds/volumeChange.mp3")
 	loadSound("whistle", "sounds/sfx/whistle.ogg")
 	loadSound("mage_e", "sounds/mage_e.mp3")

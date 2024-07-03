@@ -3,7 +3,7 @@ import { curDraggin } from "../plugins/drag"
 import { trail } from "../plugins/trail"
 import { playSfx } from "../sound"
 import { hexagon } from "./hexagon"
-import { arrayToColor, blendColors, getPositionOfSide, getZBetween } from "./utils"
+import { arrayToColor, blendColors, getPositionOfSide, getZBetween, parseAnimation } from "./utils"
 import { isDraggingAWindow, isPreciselyHoveringAWindow, manageWindow } from "./windows/windows-api/windowsAPI"
 
 export let gameBg;
@@ -134,6 +134,7 @@ export type toastOpts = {
 	icon?: string,
 	time?: number,
 }
+
 export function addToast(opts:toastOpts) {
 	function actuallyAddToast(idx, opt) {
 		let logs = get("toast", { recursive: true });
@@ -193,9 +194,8 @@ export function addToast(opts:toastOpts) {
 			toastBg.close();
 		});
 
-		let spriteName = !opts.icon.includes(".") ? opts.icon : [opts.icon.split(".")[0], opts.icon.split(".")[1]];
 		let icon = add([
-			sprite(typeof spriteName == "string" ? spriteName : spriteName[0]),
+			sprite("white_noise"),
 			anchor("center"),
 			pos(toastBg.pos.x - toastBg.width / 2 + 50, toastBg.pos.y),
 			fixed(),
@@ -209,7 +209,7 @@ export function addToast(opts:toastOpts) {
 			}
 		]);
 
-		if (spriteName[1] && typeof spriteName != "string") icon.play(spriteName[1]);
+		parseAnimation(icon, opts.icon)
 
 		icon.width = 60;
 		icon.height = 60;

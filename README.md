@@ -21,6 +21,3 @@ To build:
 - [Lambda font](https://ggbot.itch.io/lambda-font)
 - Webadazzz <3
 - niceEli - Desktop support
-
-BROKE COMMIT HISTORY BY RENAMING COMMIT :(
-![alt text](proof.png)

@@ -147,6 +147,14 @@ export function getPositionOfSide(obj) {
 	}
 }
 
+export function parseAnimation(obj, anim) {
+	let spriteName = !anim.includes(".") ? anim : [anim.split(".")[0], anim.split(".")[1]];
+	obj.unuse("sprite")
+	obj.use(sprite(typeof spriteName == "string" ? spriteName : spriteName[0]))
+	if (typeof spriteName == "string") return; 
+	if (spriteName[1] && typeof spriteName != "string") obj.play(spriteName[1]);
+}
+
 export function getVariable(obj, path) {
 	const parts = path.split(".")
 	const target = parts.slice(0, -1).reduce((o, p) => o[p], obj)
