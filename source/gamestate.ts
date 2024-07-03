@@ -1,24 +1,5 @@
 import { saveAnim } from "./game/utils"
 
-// lajbel you genius
-class VolumeData {
-	volume:number;
-	muted:boolean;
-	favoriteIdx:number;
-	constructor(defaultVolume = 1, muted = false, favoriteIdx = null) {
-		this.volume = defaultVolume;
-		this.muted = muted;
-		this.favoriteIdx = favoriteIdx // this is exclusively for music
-	}
-}
-
-// class medalData {
-// 	constructor(name, ng_id,  = 1, muted = false) {
-// 		this.volume = defaultVolume;
-// 		this.muted = muted;
-// 	}
-// }
-
 export let GameState = {
 	score: 0,
 	totalScore: 0,
@@ -45,20 +26,10 @@ export let GameState = {
 
 	ascendLevel: 0,
 
-	medals: {
-		itstartedforyou: {
-			id: 0,
-			ng_id: 10834,
-			unlocked: false,
-		}
-	},
+	unlockedAchievements: [],
 
 	unlockedWindows: [],
 	taskbar: [],
-
-	// medals: {
-	// 	start: new medalData("It starts", 3484, false, "itstarts")
-	// },
 
 	stats: {
 		timesClicked: 0,
@@ -68,8 +39,8 @@ export let GameState = {
 	},
 
 	settings: {
-		sfx: new VolumeData(1, false),
-		music: new VolumeData(1, false),
+		sfx: { volume: 1, muted: false },
+		music: { volume: 1, muted: false, favoriteIdx: 0 },
 		volume: 1,
 		hexColor: [255, 255, 255],
 		bgColor: [0, 0, 0, 0.84],

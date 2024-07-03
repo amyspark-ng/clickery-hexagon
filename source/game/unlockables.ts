@@ -5,6 +5,7 @@ import { waver } from '../plugins/wave';
 import { addMinibutton} from './windows/windows-api/minibuttons';
 import { bop } from './utils';
 import { ROOT } from '../main';
+import { addToast } from './additives';
 
 export let storeWindowsConditionNumber = 25
 export let unlockables = {
@@ -13,7 +14,7 @@ export let unlockables = {
 			condition: () => GameState.score >= storeWindowsConditionNumber
 		},
 		"musicWin": {
-			condition: () => GameState.score >= 54
+			condition: () => GameState.score >= 50
 		},
 		"statsWin": {
 			condition: () => GameState.score >= 54
@@ -33,35 +34,68 @@ export let unlockables = {
 	},
 	"achievements": {
 		"100score": {
+			text: "Get 100 score, it starts....",
+			icon: "icon_about",
 			condition: () => GameState.score >= 100
 		},
+		"maxedcombo": {
+			text: "Max combo for the first time, FULL COMBO!!!!!!",
+			icon: "hexagon",
+		},
+		"allwindowsontaskbar": {
+			text: "Open all the windows in your taskbar, cpu usage too high",
+			icon: "hexagon",
+		},
 		"panderitomode": {
-			
+			text: "Panderito, panderito mode",
+			icon: "panderito"
 		}
 	}
 }
 
+export function hasUnlockedWindow(window) {
+	return GameState.unlockedWindows.includes(window)
+}
+
+export function isAchievementUnlocked(achievement) {
+	return GameState.unlockedAchievements.includes(achievement)
+}
+
+// the ones that don't have a condition is because they're unlocked at rare cases
 export function checkForUnlockable() {
 	Object.keys(unlockables).forEach(unlockabletype => {
 		if (unlockabletype == "windows") {
-			Object.keys(unlockables["windows"]).forEach(unlockableWindow => {
-				if (!GameState.unlockedWindows.includes(unlockableWindow) && unlockables["windows"][unlockableWindow].condition()) {
+			// gets all the windows unlockable
+			//  and filters the one that are not already unlocked AND have a condition
+			Object.keys(unlockables["windows"]).filter(window => !hasUnlockedWindow(window) && unlockables["windows"][window].condition).forEach(unlockableWindow => {
+				// if condition is met
+				if (unlockables["windows"][unlockableWindow].condition()) {
 					unlockWindow(unlockableWindow)
 				}
 			})
 		}
 
 		else if (unlockabletype == "achievements") {
-			Object.keys(unlockables["achievements"]).forEach(unlockableAchievement => {
-				// if !gamestate.unlockedAchievements.includes(unlockableachievement) && unlockables condition
-				// unlockachievement
-
-				// if (!GameState.unlockedWindows.includes(unlockableWindow) && unlockables["windows"][unlockableWindow].condition()) {
-				// 	unlockWindow(unlockableWindow)
-				// }
+			// gets all the achievements unlockable
+			// and filters the one that are not already unlocked AND have a condition
+			Object.keys(unlockables["achievements"]).filter(achievement => !isAchievementUnlocked(achievement) && unlockables["achievements"][achievement].condition).forEach(unlockableAchievement => {
+				// if condition is met
+				if (unlockables["achievements"][unlockableAchievement].condition()) {
+					unlockAchievement(unlockableAchievement)
+				}
 			})
 		}
 	});
+}
+
+export function unlockAchievement(achievement:string) {
+	addToast({
+		icon: unlockables["achievements"][achievement].icon,
+		title: "Unlocked Achievement!",
+		body: `${unlockables["achievements"][achievement].text}`,
+	})
+
+	GameState.unlockedAchievements.push(achievement)
 }
 
 export function destroyExclamation(obj) {
@@ -70,7 +104,7 @@ export function destroyExclamation(obj) {
 	});
 }
 
-export function unlockWindow(windowUnlocked) {
+export function unlockWindow(window:string) {
 	function addExclamation(obj:any) {
 		if (obj.get("exclamation").length == 0) {
 			let exclamation = obj.add([
@@ -99,11 +133,11 @@ export function unlockWindow(windowUnlocked) {
 	}
 
 	// does the actual stuff
-	GameState.unlockedWindows.push(windowUnlocked)
+	GameState.unlockedWindows.push(window)
 	playSfx("hoverhex")
 	
 	if (GameState.taskbar.length < 4) {
-		GameState.taskbar.push(windowUnlocked)
+		GameState.taskbar.push(window)
 	}
 
 	else {
@@ -129,7 +163,7 @@ export function unlockWindow(windowUnlocked) {
 			}
 
 			if (folded == false) {
-				get(windowUnlocked)?.filter(minibutton => minibutton.is("minibutton"))?.forEach((minibutton) => {
+				get(window)?.filter(minibutton => minibutton.is("minibutton"))?.forEach((minibutton) => {
 					addExclamation(minibutton)
 				})
 				manageFoldEvent.cancel()
@@ -139,11 +173,11 @@ export function unlockWindow(windowUnlocked) {
 
 	// unfolded, yikes!!
 	else {
-		if (windowUnlocked == "extraWin" || GameState.taskbar.includes(windowUnlocked)) {
-			let newIndex = GameState.taskbar.indexOf(windowUnlocked)
+		if (window == "extraWin" || GameState.taskbar.includes(window)) {
+			let newIndex = GameState.taskbar.indexOf(window)
 
 			let newMinibutton = addMinibutton({
-				idxForInfo: infoForWindows[windowUnlocked].idx,
+				idxForInfo: infoForWindows[window].idx,
 				taskbarIndex: newIndex,
 				initialPosition: folderObj.pos,
 				moveToPosition: true,

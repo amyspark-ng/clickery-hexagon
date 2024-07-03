@@ -191,6 +191,15 @@ export function debugTexts() {
 		return text
 	}
 
+	let debugText = add([
+		text("DEBUG", { size: 18 }),
+		anchor("botleft"),
+		opacity(0.25),
+		pos(0, height()),
+		fixed(),
+		layer("mouse"),
+	])
+
 	let debugTexts = add([
 		text("", {
 			size: 18
@@ -200,6 +209,7 @@ export function debugTexts() {
 		anchor("topleft"),
 		layer("mouse"),
 		fixed(),
+		pos(),
 		z(mouse.z + 1),
 		"debugText",
 		{

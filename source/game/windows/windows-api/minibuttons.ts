@@ -72,7 +72,6 @@ export function addMinibutton(opts:minibuttonOpt) {
 				if (isDraggingAWindow) return
 				tween(this.pos.y, this.destinedPosition.y - 5, 0.32, (p) => this.pos.y = p, easings.easeOutQuint)
 				tween(this.scale, vec2(1.05), 0.32, (p) => this.scale = p, easings.easeOutQuint)
-				playSfx("hoverMiniButton", {detune: 100 * this.windowInfo.idx / 4})
 
 				if (this.extraMb) this.shut ? this.play("shut_hover") : this.play("open_hover")
 				else this.play("hover")
@@ -333,7 +332,8 @@ export function addMinibutton(opts:minibuttonOpt) {
 	currentMinibutton.onHover(() => {
 		if (curDraggin) return
 		if (!isPreciselyHoveringAWindow && !isDraggingAWindow) {
-			currentMinibutton.startHover()
+			currentMinibutton.startHover() // don't add the sound here because then it gets called whenever a window is closed
+			playSfx("hoverMiniButton", {detune: 100 * currentMinibutton.windowInfo.idx / 4})
 		}
 	})
 

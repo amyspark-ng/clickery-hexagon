@@ -2,21 +2,18 @@
 # [Bookmarks](#bookmarks)
 # [Ideas](#ideas)
 
-this game is never getting done bruh
-
--- MUSIC WORKS PRETTY FUCKIGN WEIRD WHEN DOING LOADMUSIC INSTEAD OF SOUND DON'T GET SCARED
-	* Time text not working, music not looping, etc
+this game MIGHT be getting done
 
 * Do "-" for issues, "*" for notes, "^" for comments on either
 
-<!-- KABOOM -->
+<!-- KAPLAY -->
 - there might be a bug in the loop function
 
 # ISSUES (hell)
 ## Current TODO (small stuff mostly)
-- Fix everything related to debug (add something for when the game is on debug (a text on a corner or something))
-- Figure out why fold sfx is so loud
-	* Make it higher when opening and deep when closing
+- add something for when the game is on debug (a text on a corner or something)
+- add parseAnimation object that takes a string ("mouse.point") and an object to play the anim on
+
 * some loop related to powerups is crashing the game (might not be there anymore we'll see)
 - Format actual working numbers (spsText and scoreText and priceText)
 

@@ -15,6 +15,7 @@ import { extraWinContent } from "../extraWindow.ts";
 import { creditsWinContent } from "../creditsWin.ts";
 import { statsWinContent } from "../statsWin.ts";
 import { hasStartedGame } from "../../gamescene.ts";
+import { isAchievementUnlocked, unlockAchievement } from "../../unlockables.ts";
 
 export let infoForWindows = {};
 export let isGenerallyHoveringAWindow = false;
@@ -287,6 +288,27 @@ export function openWindow(windowKey = "") {
 		})
 	})
 
+	// check for achievement
+	if (GameState.taskbar.length > 3) {
+		if (!isAchievementUnlocked("allwindowsontaskbar")) {
+			if (get("window").length == GameState.taskbar.length) {
+				let windows = []
+				get("window").forEach((window) => {
+					windows.push(window.windowKey)
+				})
+				
+				let gamestateTaskbarClone = GameState.taskbar.slice()
+
+				// @ts-ignore
+				const isEqual = (a, b) => new Set(a).symmetricDifference(new Set(b)).size == 0
+
+				if (isEqual(gamestateTaskbarClone, windows)) {
+					unlockAchievement("allwindowsontaskbar")
+				}
+			}
+		}
+	}
+
 	return windowObj;
 }
 
@@ -352,7 +374,7 @@ export function folderObjManaging() {
 					})
 				});
 
-				playSfx("fold")
+				playSfx("fold", { detune: -150 })
 			},
 
 			manageFold() {

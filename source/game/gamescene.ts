@@ -9,7 +9,7 @@ import { songs } from "./windows/musicWindow.ts"
 import { curDraggin } from "../plugins/drag.js"
 import { DEBUG, ROOT } from "../main.ts"
 import { powerupManagement, powerups, spawnPowerup } from "./powerups.ts"
-import { storeWindowsConditionNumber } from "./unlockables.ts"
+import { isAchievementUnlocked, storeWindowsConditionNumber, unlockAchievement } from "./unlockables.ts"
 
 let panderitoLetters = "panderito".split("")
 export let panderitoIndex = 0
@@ -34,13 +34,9 @@ export function togglePanderito() {
 	GameState.settings.panderitoMode = !GameState.settings.panderitoMode
 	panderitoIndex = 0
 
-	// if !gamestate.unlockedachievements.includes("panderitommode") {
-		addToast({ 
-			title: "Achievement unlocked!",
-			body: "Panderito mode",
-			icon: "panderito",		
-		})
-	// }
+	if (!isAchievementUnlocked("panderitomode")) {
+		unlockAchievement("panderitomode")
+	}
 
 	let block = add([
 		rect(width(), 100),
@@ -175,7 +171,7 @@ function welcomeBack(idle = false) {
 			gainedScore = gainedScore * scoreVars.scorePerAutoClick
 	
 			// 120 being the seconds outside screen you have to be to get a log
-			if ((totalTimeOutsideTab / 1000) > (DEBUG ? 2 : 120)) {
+			if ((totalTimeOutsideTab / 1000) > 120) {
 				addWelcomeBackToast(gainedScore, totalTimeOutsideTab / 1000)
 			}
 	
@@ -188,7 +184,7 @@ function welcomeBack(idle = false) {
 		if (GameState.cursors < 1) {addWelcomeBackToast(null, timeSlept); return;}
 		
 		// 120 being the seconds outside screen you have to be to get a log
-		if (timeSlept > (DEBUG ? 2 : 120)) {
+		if (timeSlept > 120) {
 			addWelcomeBackToast(Math.round(scoreVars.scorePerAutoClick * timeSlept), timeSlept)
 			timeSlept = 0
 		}
@@ -223,7 +219,7 @@ export function gamescene() {
 			// wait 60 seconds
 			wait(60, () => {
 				loop(120, () => {
-					if (GameState.totalScore > 1) if (!DEBUG) GameState.save(true)
+					if (GameState.totalScore > 1) if (DEBUG == false) GameState.save(true)
 				})
 			})
 
@@ -317,13 +313,12 @@ export function gamescene() {
 
 					if (!(GameState.totalScore > 0)) return;
 					// 60 being the seconds outside of screen to get the zzz screen
-					if (totalTimeOutsideTab / 1000 > (DEBUG ? 2 : 60)) {
+					if (totalTimeOutsideTab / 1000 > 60) {
 						// false means it was out not idle
 						triggerZZZ(false)
+						// false means it was out not idle
+						welcomeBack(false)
 					} 
-		
-					// false means it was out not idle
-					welcomeBack(false)
 				}
 			}
 		}
@@ -431,7 +426,7 @@ export function gamescene() {
 				folderObj.opacity = 0
 				
 				hexagon.on("clickrelease", () => {
-					switch (GameState.totalScore + 1) {
+					switch (GameState.totalScore) {
 						case 1:
 							ominus.stop()
 							gameBg.color.a = 0.84
@@ -458,7 +453,6 @@ export function gamescene() {
 			})
 		}
 
-		// if (DEBUG) debugFunctions()
-		debugFunctions()
+		if (DEBUG) debugFunctions()
 	})
 }

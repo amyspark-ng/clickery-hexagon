@@ -6,7 +6,7 @@ import { GameState } from "./gamestate.ts";
 import { addBackground, addMouse, gameBg } from "./game/additives.ts";
 import { volumeManager } from "./sound.ts";
 
-export const DEBUG:boolean = false
+export const DEBUG:boolean = true
 export const k = kaplay({
 	width: 1024,
 	height: 576,
@@ -15,7 +15,7 @@ export const k = kaplay({
 	logMax: 10,
 	backgroundAudio: GameState.settings.keepAudioOnTabChange,
 	debugKey: "f1",
-	debug: true,
+	debug: DEBUG,
 	loadingScreen: true,
 	// stretch: true,
 	// letterbox: true,

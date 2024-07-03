@@ -12,7 +12,7 @@ import { addConfetti } from "../plugins/confetti.js";
 import { curDraggin } from "../plugins/drag.js";
 import { cam } from "./gamescene.ts";
 import { powerups } from "./powerups.ts";
-import { checkForUnlockable } from "./unlockables.ts";
+import { checkForUnlockable, isAchievementUnlocked, unlockAchievement } from "./unlockables.ts";
 
 export let scoreVars = {
 	scorePerClick: 1,
@@ -121,7 +121,6 @@ export function addHexagon() {
 			},
 
 			clickRelease() {
-				this.trigger("clickrelease")
 				this.maxScaleIncrease = this.isBeingHovered ? 1.05 : 1
 				
 				this.clickPressTween.cancel()
@@ -167,6 +166,10 @@ export function addHexagon() {
 						addConfetti({ pos: center() })
 						tween(-10, 0, 0.5, (p) => cam.rotation = p, easings.easeOutQuint)
 						playSfx("fullcombo", {detune: rand(-50, 50)})
+					
+						if (!isAchievementUnlocked("maxedcombo")) {
+							unlockAchievement("maxedcombo")
+						}
 					}
 				}
 
@@ -180,6 +183,7 @@ export function addHexagon() {
 				tween(scoreText.scaleIncrease, 1.05, 0.2, (p) => scoreText.scaleIncrease = p, easings.easeOutQuint).onEnd(() => {
 					tween(scoreText.scaleIncrease, 1, 0.2, (p) => scoreText.scaleIncrease = p, easings.easeOutQuint)
 				})
+				this.trigger("clickrelease")
 			},
 
 			autoClick() {

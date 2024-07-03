@@ -36,10 +36,8 @@ export function focuscene() {
 		})
 
 		onClick(() => {
-			// do scary intro!!
-			// oh right the splash screen
-			if (!(GameState.totalScore > 0)) go("gamescene")
-			else go("gamescene")
+			gameBg.color.a = 1
+			go("gamescene")
 		})
 	})	
 }

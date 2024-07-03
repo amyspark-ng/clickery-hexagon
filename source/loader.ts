@@ -593,34 +593,18 @@ export function loadEverything() {
 	// only done on debug to make the game load quicker since im not listening the music really
 	if (!DEBUG) {load(new Promise<void>((res) => { setTimeout(() => { res() }, 5000) })) }
 
-	// change from ! to "" to work with songs on debug mode
-	if (DEBUG == true) {
-		loadSound("clicker.wav", "sounds/music/clicker.ogg")
-		loadSound("menu.wav", "sounds/music/menu.ogg")
-		loadSound("whatttt.wav", "sounds/music/whatttt.ogg")
-		loadSound("simple.wav", "sounds/music/simple.ogg")
-		loadSound("jazz.wav", "sounds/music/jazz.ogg")
-		loadSound("sweet.wav", "sounds/music/sweet.ogg")
-		loadSound("ok_instrumental", "sounds/music/ok_instrumental.ogg")
-		loadSound("magic", "sounds/music/magic.ogg")
-		loadSound("watchout", "sounds/music/watchout.ogg")
-		loadSound("catnip", "sounds/music/catnip.ogg")
-		loadSound("project_23", "sounds/music/project_23.wav")
-	}
+	loadSound("clicker.wav", "sounds/music/clicker.ogg")
+	loadSound("menu.wav", "sounds/music/menu.ogg")
+	loadSound("whatttt.wav", "sounds/music/whatttt.ogg")
+	loadSound("simple.wav", "sounds/music/simple.ogg")
+	loadSound("jazz.wav", "sounds/music/jazz.ogg")
+	loadSound("sweet.wav", "sounds/music/sweet.ogg")
+	loadSound("ok_instrumental", "sounds/music/ok_instrumental.ogg")
+	loadSound("magic", "sounds/music/magic.ogg")
+	loadSound("watchout", "sounds/music/watchout.ogg")
+	loadSound("catnip", "sounds/music/catnip.ogg")
+	loadSound("project_23", "sounds/music/project_23.wav")
 
-	else if (DEBUG == false) {
-		loadMusic("clicker.wav", "sounds/music/clicker.ogg")
-		loadMusic("menu.wav", "sounds/music/menu.ogg")
-		loadMusic("whatttt.wav", "sounds/music/whatttt.ogg")
-		loadMusic("simple.wav", "sounds/music/simple.ogg")
-		loadMusic("jazz.wav", "sounds/music/jazz.ogg")
-		loadMusic("sweet.wav", "sounds/music/sweet.ogg")
-		loadMusic("ok_instrumental", "sounds/music/ok_instrumental.ogg")
-		loadMusic("magic", "sounds/music/magic.ogg")
-		loadMusic("watchout", "sounds/music/watchout.ogg")
-		loadMusic("catnip", "sounds/music/catnip.ogg")
-		loadMusic("project_23", "sounds/music/project_23.wav")
-	}
 	//#endregion MUSIC
 
 	// #region OTHER STUFF
