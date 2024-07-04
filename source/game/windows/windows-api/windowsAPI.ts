@@ -16,6 +16,7 @@ import { creditsWinContent } from "../creditsWin.ts";
 import { statsWinContent } from "../statsWin.ts";
 import { hasStartedGame } from "../../gamescene.ts";
 import { isAchievementUnlocked, unlockAchievement } from "../../unlockables.ts";
+import { medalsWinContent } from "../medalsWin.ts";
 
 export let infoForWindows = {};
 export let isGenerallyHoveringAWindow = false;
@@ -57,7 +58,7 @@ export function windowsDefinition() {
 		"musicWin": { idx: 1, content: musicWinContent, lastPos: vec2(208, 96) },
 		"ascendWin": { idx: 2, content: ascendWinContent, lastPos: vec2(center().x, center().y) },
 		"statsWin": { idx: 3, content: statsWinContent, lastPos: vec2(center().x, center().y) },
-		"medalsWin": { idx: 4, content: emptyWinContent, lastPos: vec2(center().x, center().y) },
+		"medalsWin": { idx: 4, content: medalsWinContent, lastPos: vec2(center().x, center().y) },
 		"aboutWin": { idx: 5, content: emptyWinContent, lastPos: vec2(center().x, center().y) },
 		"creditsWin": { idx: 6, content: creditsWinContent, lastPos: vec2(center().x, center().y) },
 		"settingsWin": { idx: 7, content: settingsWinContent, lastPos: vec2(center().x, center().y) },

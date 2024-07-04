@@ -6,39 +6,154 @@ import { addMinibutton} from './windows/windows-api/minibuttons';
 import { bop } from './utils';
 import { ROOT } from '../main';
 import { addToast } from './additives';
-
-export let storeWindowsConditionNumber = 25
+import { addConfetti } from '../plugins/confetti';
 
 export let unlockables = {
 	"windows": {
 		"storeWin": {
-			condition: () => GameState.score >= storeWindowsConditionNumber
+			condition: () => GameState.score >= 25
 		},
-		"musicWin": {
+		"settingsWin": {
 			condition: () => GameState.score >= 50
 		},
 		"statsWin": {
-			condition: () => GameState.score >= 54
+			condition: () => GameState.score >= 60
 		},
-		"ascendWin": {
-			condition: () => GameState.score >= 56
-		},
-		"settingsWin": {
-			condition: () => GameState.score >= 56
+		"musicWin": {
+			condition: () => GameState.score >= 150
 		},
 		"medalsWin": {
-			condition: () => GameState.score >= 56
+			condition: () => GameState.score >= 105
 		},
 		"creditsWin": {
-			condition: () => GameState.score >= 56
+			condition: () => GameState.score >= 200
+		},
+		"ascendWin": {
+			condition: () => GameState.score >= 1000000
 		},
 	},
 	
 	"achievements": {
 		"100score": {
 			text: "Get 100 score, it starts....",
-			icon: "icon_about",
+			icon: "upgrades.k_0",
 			condition: () => GameState.score >= 100,
+		},
+		"200score": {
+			text: "Get 100 score, it starts....",
+			icon: "icon_about",
+		},
+		"300score": {
+			text: "Get 100 score, it starts....",
+			icon: "icon_about",
+		},
+		"400score": {
+			text: "Get 100 score, it starts....",
+			icon: "icon_about",
+		},
+		"500score": {
+			text: "Get 100 score, it starts....",
+			icon: "icon_about",
+		},
+		"600score": {
+			text: "Get 100 score, it starts....",
+			icon: "icon_about",
+		},
+		"700score": {
+			text: "Get 100 score, it starts....",
+			icon: "icon_about",
+		},
+		"800score": {
+			text: "Get 100 score, it starts....",
+			icon: "icon_about",
+		},
+		"900score": {
+			text: "Get 100 score, it starts....",
+			icon: "icon_about",
+		},
+		"1000score": {
+			text: "Get 100 score, it starts....",
+			icon: "icon_about",
+		},
+		"11000score": {
+			text: "Get 100 score, it starts....",
+			icon: "icon_about",
+		},
+		"ifichangethename": {
+			text: "Get 100 score, it starts....",
+			icon: "icon_about",
+		},
+		"willitappearlater": {
+			text: "Get 100 score, it starts....",
+			icon: "icon_about",
+		},
+		"44444ff": {
+			text: "Get 100 score, it starts....",
+			icon: "icon_about",
+		},
+		"gggfdgdgf": {
+			text: "Get 100 score, it starts....",
+			icon: "icon_about",
+		},
+		"gfsgssfdfs": {
+			text: "Get 100 score, it starts....",
+			icon: "icon_about",
+		},
+		"rgdgffdgfd": {
+			text: "Get 100 score, it starts....",
+			icon: "icon_about",
+		},
+		"gfgggggf": {
+			text: "Get 100 score, it starts....",
+			icon: "icon_about",
+		},
+		"dfgdfdgfdg": {
+			text: "Get 100 score, it starts....",
+			icon: "icon_about",
+		},
+		"dgfdgfdgf": {
+			text: "Get 100 score, it starts....",
+			icon: "icon_about",
+		},
+		"gdgdfdf": {
+			text: "Get 100 score, it starts....",
+			icon: "icon_about",
+		},
+		"gdgdfssffsfdf": {
+			text: "Get 100 score, it starts....",
+			icon: "icon_about",
+		},
+		"sffffsfsfs": {
+			text: "Get 100 score, it starts....",
+			icon: "icon_about",
+		},
+		"rggrsrg": {
+			text: "Get 100 score, it starts....",
+			icon: "icon_about",
+		},
+		"drdgrrd": {
+			text: "Get 100 score, it starts....",
+			icon: "icon_about",
+		},
+		"gdgdff": {
+			text: "Get 100 score, it starts....",
+			icon: "icon_about",
+		},
+		"ffdddfs": {
+			text: "Get 100 score, it starts....",
+			icon: "icon_about",
+		},
+		"sgfsgg": {
+			text: "Get 100 score, it starts....",
+			icon: "icon_about",
+		},
+		"dfdfdfdff": {
+			text: "Get 100 score, it starts....",
+			icon: "icon_about",
+		},
+		"drdfrfdfdf": {
+			text: "Get 100 score, it starts....",
+			icon: "icon_about",
 		},
 		"maxedcombo": {
 			text: "Max combo for the first time, FULL COMBO!!!!!!",
@@ -46,7 +161,7 @@ export let unlockables = {
 		},
 		"allwindowsontaskbar": {
 			text: "Open all the windows in your taskbar, cpu usage too high",
-			icon: "hexagon",
+			icon: "icon_extra.open_default",
 		},
 		"panderitomode": {
 			text: "Panderito, panderito mode",
@@ -60,6 +175,12 @@ export let unlockables = {
 			text: "HOLY SHIT DID YOU GUYS SEE THAT???",
 			icon: "gnome",
 			timeAfter: 2.5,
+		},
+		"allachievements": {
+			text: "Complete all the achievements, CONGRATS!!!!!",
+			icon: "osaka",
+			timeAfter: 1,
+			condition: () => GameState.unlockedAchievements.length == Object.keys(unlockables["achievements"]).length - 1
 		}
 	}
 }
@@ -110,6 +231,10 @@ export function unlockAchievement(achievement:string) {
 		})
 	
 		GameState.unlockedAchievements.push(achievement)
+
+		if (achievement == "allachievements") {
+			addConfetti({ pos: mousePos() })
+		}
 	})
 }
 

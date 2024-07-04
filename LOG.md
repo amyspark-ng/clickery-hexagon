@@ -12,9 +12,11 @@ this game MIGHT be getting done
 # ISSUES (hell)
 The ones that have a * at the end are crucial for beta release
 ## Current TODO (small stuff mostly)
-- make window.active a thing, instead of checking for tag, gets annoying quick
-
-- Format actual working numbers (spsText and scoreText and priceText) * 
+- If the new window is inside a folder add the exclamation to that new button
+	* Maybe make a on("windowopen") event that passes the window name as a parameter, and when you unlock a window check for onwindowopen of folder and get the minibutton of the new unlocked one and add the exclamation
+- make window.active a thing, instead of checking for tag, got annoying quick
+- delete a welcomeback log if it's already preexisting when you come back
+- Format actual working numbers (spsText and scoreText and priceText) *
 
 - Fix updateTime animation in powerup timers *
 - Add multiplier number to powerup timers *

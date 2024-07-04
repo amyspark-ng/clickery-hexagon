@@ -9,7 +9,7 @@ import { songs } from "./windows/musicWindow.ts"
 import { curDraggin } from "../plugins/drag.js"
 import { DEBUG, ROOT } from "../main.ts"
 import { powerupManagement, powerups, spawnPowerup } from "./powerups.ts"
-import { isAchievementUnlocked, storeWindowsConditionNumber, unlockAchievement } from "./unlockables.ts"
+import { isAchievementUnlocked, unlockables, unlockAchievement } from "./unlockables.ts"
 
 let panderitoLetters = "panderito".split("")
 export let panderitoIndex = 0
@@ -468,7 +468,7 @@ export function gamescene() {
 							introAnimations.intro_buildingsText()
 						break;
 
-						case storeWindowsConditionNumber:
+						case 25:
 							introAnimations.intro_folderObj()
 							hasStartedGame = true;
 							ROOT.trigger("gamestart")
