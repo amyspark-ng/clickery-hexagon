@@ -1,6 +1,6 @@
 import { GameState } from "../../../gamestate";
 import { playSfx } from "../../../sound";
-import { bop } from "../../utils";
+import { blendColors, bop, randomPos } from "../../utils";
 
 export let isHoveringUpgrade = false;
 
@@ -35,10 +35,12 @@ export function addUpgrades(elementParent) {
 		if (i == 3) {desiredPos.y += spacing.y; desiredPos.x = initialPos.x}
 		desiredPos.x += spacing.x
 		
-		let upgrade = elementParent.add([
+		let elementColor = elementParent.is("clickersElement") ? rgb(49, 156, 222) : rgb(49, 222, 58)
+		let newColor = blendColors(WHITE, elementColor, map(i, 0, 6, 0.5, 1))
+		let upgradeObj = elementParent.add([
 			pos(desiredPos),
 			rect(45, 45, { radius: 10 }),
-			color(RED.lighten(rand(100, 150))),
+			color(newColor),
 			anchor("center"),
 			scale(1),
 			z(winParent.z + 1),
@@ -69,7 +71,7 @@ export function addUpgrades(elementParent) {
 						color(BLACK),
 						layer("windows"),
 						scale(),
-						pos(upgrade.screenPos().x, upgrade.screenPos().y + upgrade.height / 2 + 5),
+						pos(upgradeObj.screenPos().x, upgradeObj.screenPos().y + upgradeObj.height / 2 + 5),
 						anchor(alignmentForTooltip),
 						"tooltip",
 						{
@@ -85,7 +87,7 @@ export function addUpgrades(elementParent) {
 					if (GameState.upgradesBought.length == 0) displayText = displayText + " (Hold to buy)" 
 
 					let priceText = bg.add([
-						text(displayText, { align: alignmentForTooltip, size: upgrade.height / 2}),
+						text(displayText, { align: alignmentForTooltip, size: upgradeObj.height / 2}),
 						color(WHITE),
 						z(this.z + 1),
 						pos(),
@@ -143,16 +145,16 @@ export function addUpgrades(elementParent) {
 					tween(this.parent.opacity, 0.9, 0.15, (p) => this.parent.opacity = p, easings.easeOutQuad)
 					
 					tween(this.scale, vec2(1.1), 0.15, (p) => this.scale = p, easings.easeOutQuad)
-					let value = this.value != null ? this.value : this.freq;
+					// let value = this.value != null ? this.value : this.freq;
 					let blink = this.value != null ? `+${this.value}` : `Cursors now click every ${this.freq} seconds`;
-					if (!isUpgradeBought(this.id) && !this.hasTooltip) this.addTooltip(value, blink)
+					if (!isUpgradeBought(this.id) && !this.hasTooltip) this.addTooltip(this.price, blink)
 				},
 
 				endHover() {
 					this.parent.startHover()
 					tween(this.parent.opacity, 1, 0.15, (p) => this.parent.opacity = p, easings.easeOutQuad)
 
-					if (!isUpgradeBought(upgrade.id)) this.dropBuy()
+					if (!isUpgradeBought(upgradeObj.id)) this.dropBuy()
 					tween(this.scale, vec2(1), 0.15, (p) => this.scale = p, easings.easeOutQuad)
 					if (!isUpgradeBought(this.id) && this.hasTooltip) this.endTooltip()
 				},
@@ -171,7 +173,14 @@ export function addUpgrades(elementParent) {
 				},
 
 				draw() {
-					if (isUpgradeBought(upgrade.id)) return
+					drawText({
+						text: this.freq != null ? `${this.freq}s` : `x${this.value}`,
+						anchor: "center",
+						size: this.height / 2,
+						align: "center",
+					})
+					
+					if (isUpgradeBought(upgradeObj.id)) return
 					drawRect({
 						width: this.width,
 						height: map(this.boughtProgress, 0, 100, this.height, 0),
@@ -184,84 +193,100 @@ export function addUpgrades(elementParent) {
 				},
 			}
 		])
-		upgrade.id = upgrade.type + upgrade.idx
-		upgrade.price = prices[upgrade.id]
+		upgradeObj.id = upgradeObj.type + upgradeObj.idx
+		upgradeObj.price = prices[upgradeObj.id]
 		
-		if (upgrade.type == "k_") {
-			upgrade.value = 2 ** (upgrade.idx + 1)
+		if (upgradeObj.type == "k_") {
+			upgradeObj.value = 2 ** (upgradeObj.idx + 1)
 		}
 
-		else if (upgrade.type == "c_") {
-			if (upgrade.idx > 0 && upgrade.idx < 3) {
-				switch (upgrade.idx) {
+		else if (upgradeObj.type == "c_") {
+			if (upgradeObj.idx > 0 && upgradeObj.idx < 3) {
+				switch (upgradeObj.idx) {
 					case 0:
-						upgrade.freq = 10
+						upgradeObj.freq = 10
 					break;
 					case 1:
-						upgrade.freq = 5
+						upgradeObj.freq = 5
 					break;
 					case 2:
-						upgrade.freq = 1
+						upgradeObj.freq = 1
 					break;
 				}
 			}
 
 			// is multiplier upgrades
 			else {
-				switch (upgrade.idx) {
+				switch (upgradeObj.idx) {
 					case 3:
-						upgrade.value = 8;
+						upgradeObj.value = 8;
 					break;
 					case 4:
-						upgrade.value = 16;
+						upgradeObj.value = 16;
 					break;
 					case 5:
-						upgrade.value = 36;
+						upgradeObj.value = 36;
 					break;
 				}
 			}
 		}
 
 		let downEvent = null;
-		upgrade.onMousePress("left", () => {
-			if (!upgrade.isHovering()) return;
-			if (isUpgradeBought(upgrade.id)) {bop(upgrade); return}
+		upgradeObj.onMousePress("left", () => {
+			if (!upgradeObj.isHovering()) return;
+			if (isUpgradeBought(upgradeObj.id)) {bop(upgradeObj); return}
 
-			if (upgrade.id == "c_2" && !isUpgradeBought("c_1")) {
-				upgrade.endTooltip()
-				upgrade.addTooltip("You have to buy the previous one", `Cursors now click every ${upgrade.freq} seconds`, "right")
+			if (upgradeObj.id == "c_2" && !isUpgradeBought("c_1")) {
+				upgradeObj.endTooltip()
+				upgradeObj.addTooltip("You have to buy the previous one", `Cursors now click every ${upgradeObj.freq} seconds`, "right")
 				return
 			}
 
-			downEvent = upgrade.onMouseDown(() => {
-				if (isUpgradeBought(upgrade.id)) return
-				if (!upgrade.isHovering()) return
+			downEvent = upgradeObj.onMouseDown(() => {
+				if (isUpgradeBought(upgradeObj.id)) return
+				if (!upgradeObj.isHovering()) return
 	
-				if (upgrade.boughtProgress < 100) {
-					upgrade.boughtProgress += 1.5
-					upgrade.scale.x = map(upgrade.boughtProgress, 0, 100, 1.1, 0.85)
-					upgrade.scale.y = map(upgrade.boughtProgress, 0, 100, 1.1, 0.85)
+				if (upgradeObj.boughtProgress < 100) {
+					upgradeObj.boughtProgress += 1.5
+					upgradeObj.scale.x = map(upgradeObj.boughtProgress, 0, 100, 1.1, 0.85)
+					upgradeObj.scale.y = map(upgradeObj.boughtProgress, 0, 100, 1.1, 0.85)
 				}
 	
-				if (upgrade.boughtProgress >= 100) {
-					upgrade.buy()
+				if (upgradeObj.boughtProgress >= 100) {
+					upgradeObj.buy()
 				}
 			})
 		})
 
-		upgrade.onMouseRelease(() => {
-			if (isUpgradeBought(upgrade.id)) return
-			upgrade.dropBuy()
+		upgradeObj.onMouseRelease(() => {
+			if (isUpgradeBought(upgradeObj.id)) return
+			upgradeObj.dropBuy()
 			downEvent?.cancel()
 			downEvent = null
 		})
 
-		upgrade.onHover(() => {
-			upgrade.startHover()
+		upgradeObj.onHover(() => {
+			upgradeObj.startHover()
 		})
 
-		upgrade.onHoverEnd(() => {
-			upgrade.endHover()
+		upgradeObj.onHoverEnd(() => {
+			upgradeObj.endHover()
+		})
+
+		let drawShadow = elementParent.onDraw(() => {
+			// drawRect({
+			// 	width: upgradeObj.width,
+			// 	height: upgradeObj.height,
+			// 	color: BLACK,
+			// 	pos: vec2(upgradeObj.pos.x, upgradeObj.pos.y + 4),
+			// 	radius: upgradeObj.radius,
+			// 	opacity: 0.75,
+			// 	anchor: "center",
+			// })
+		})
+
+		upgradeObj.onDestroy(() => {
+			drawShadow.cancel()
 		})
 	}
 }

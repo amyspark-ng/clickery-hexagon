@@ -10,26 +10,20 @@ this game MIGHT be getting done
 - there might be a bug in the loop function
 
 # ISSUES (hell)
-The ones that have a * at the end are crucial for beta release
 ## Current TODO (small stuff mostly)
-- If the new window is inside a folder add the exclamation to that new button
-	* Maybe make a on("windowopen") event that passes the window name as a parameter, and when you unlock a window check for onwindowopen of folder and get the minibutton of the new unlocked one and add the exclamation
-- make window.active a thing, instead of checking for tag, got annoying quick
-- delete a welcomeback log if it's already preexisting when you come back
-- Format actual working numbers (spsText and scoreText and priceText) *
+- So in the end what do i do with the increaseComboAnim, or do i do nothing??
+- make window.active a thing instead of checking for tag, got annoying quick
+- Format actual working numbers (spsText and scoreText and priceText)
 
-- Fix updateTime animation in powerup timers *
-- Add multiplier number to powerup timers *
+- Fix updateTime animation in powerup timers
+- Add multiplier number to powerup timers
 
-- fix music waving speed *
-- Fix panderito hitbox (just make it bigger damn angle stuff) *
-- Fix weird workings of the combo bar content *
-- The sps, spm and sph don't work at all fym i get 80 per second and 1.33 per minute :skull: *
-- make background faster depending on scoreUntilAscend *
-- tweak hexagon speed depending on scoreUntilAscend *
+- fix music waving speed
+- Fix panderito hitbox (just make it bigger damn angle stuff)
+- Fix weird workings of the combo bar content
+- The sps, spm and sph don't work at all fym i get 80 per second and 1.33 per minute :skull:
 
 ## Next features
-- Medal window
 - Prototype ascending (when)
 
 ## Complex stuff

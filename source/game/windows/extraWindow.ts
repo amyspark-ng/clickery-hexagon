@@ -334,6 +334,10 @@ export function extraWinContent(winParent) {
 		extraMinibutton.shut = false
 		extraMinibutton.play(`open_${extraMinibutton.isHovering() ? "hover" : "default"}`)
 	}
+
+	let winUnlockEvent = ROOT.on("winUnlock", (window) => {
+		let newMinibutton = gridContainer.add(makeGridMinibutton(infoForWindows[window].idx, get(`gridShadow_${infoForWindows[window].idx}`, { recursive: true })[0], winParent))
+	})
 	
 	winParent.on("close", () => {
 		let extraMinibutton = get("extraMinibutton")[0]
@@ -341,5 +345,6 @@ export function extraWinContent(winParent) {
 			extraMinibutton.shut = true
 			extraMinibutton.play(`shut_${extraMinibutton.isHovering() ? "hover" : "default"}`)
 		}
+		winUnlockEvent?.cancel()
 	})
 }

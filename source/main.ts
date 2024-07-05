@@ -17,6 +17,7 @@ export const k = kaplay({
 	debugKey: "f1",
 	debug: DEBUG,
 	loadingScreen: true,
+	crisp: false,
 	// stretch: true,
 	// letterbox: true,
 });

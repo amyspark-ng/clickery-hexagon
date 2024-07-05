@@ -17,6 +17,8 @@ import { statsWinContent } from "../statsWin.ts";
 import { hasStartedGame } from "../../gamescene.ts";
 import { isAchievementUnlocked, unlockAchievement } from "../../unlockables.ts";
 import { medalsWinContent } from "../medalsWin.ts";
+import { ROOT } from "../../../main.ts";
+import { positionSetter } from "../../../plugins/positionSetter.js";
 
 export let infoForWindows = {};
 export let isGenerallyHoveringAWindow = false;
@@ -54,7 +56,7 @@ export function manageWindow(windowKey) {
 
 export function windowsDefinition() {
 	infoForWindows = {
-		"storeWin": { idx: 0, content: storeWinContent, lastPos: vec2(818, 280) },
+		"storeWin": { idx: 0, content: storeWinContent, lastPos: vec2(264, 285) },
 		"musicWin": { idx: 1, content: musicWinContent, lastPos: vec2(208, 96) },
 		"ascendWin": { idx: 2, content: ascendWinContent, lastPos: vec2(center().x, center().y) },
 		"statsWin": { idx: 3, content: statsWinContent, lastPos: vec2(center().x, center().y) },
@@ -84,6 +86,7 @@ export function openWindow(windowKey = "") {
 		z(0),
 		drag(),
 		area({ scale: vec2(1.04, 1) }),
+		positionSetter(),
 		"window",
 		`${windowKey}`,
 		{
@@ -309,6 +312,8 @@ export function openWindow(windowKey = "") {
 			}
 		}
 	}
+
+	ROOT.trigger("winOpen", windowKey)
 
 	return windowObj;
 }

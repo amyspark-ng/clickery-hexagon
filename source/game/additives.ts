@@ -2,7 +2,8 @@ import { GameState } from "../gamestate"
 import { curDraggin } from "../plugins/drag"
 import { trail } from "../plugins/trail"
 import { playSfx } from "../sound"
-import { hexagon } from "./hexagon"
+import { hexagon, scoreVars } from "./hexagon"
+import { isWindowUnlocked } from "./unlockables"
 import { arrayToColor, blendColors, getPositionOfSide, getZBetween, parseAnimation } from "./utils"
 import { isDraggingAWindow, isPreciselyHoveringAWindow, manageWindow } from "./windows/windows-api/windowsAPI"
 
@@ -24,6 +25,7 @@ export function addBackground() {
 			col2D: rgb(190, 190, 190),
 			update() {
 				if (isMousePressed("right")) {
+					if (!isWindowUnlocked("bgColorWin")) return
 					// doesn't check for hovering this because you will always be hovering it lol
 					if (!hexagon?.isHovering() && !get("folderObj")[0]?.isHovering() && !get("minibutton")[0]?.isHovering() && !get("window")[0]?.isHovering() && !isDraggingAWindow) {
 						manageWindow("bgColorWin")

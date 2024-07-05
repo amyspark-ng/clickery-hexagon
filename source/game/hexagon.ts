@@ -7,7 +7,7 @@ import { playSfx } from "../sound.ts";
 import { isDraggingAWindow, isGenerallyHoveringAWindow, isPreciselyHoveringAWindow, manageWindow } from "./windows/windows-api/windowsAPI.ts";
 import { waver } from "../plugins/wave.js";
 import { isDraggingASlider } from "./windows/colorWindow.ts";
-import { addPlusScoreText, getClicksFromCombo, increaseCombo, maxComboAnim, startCombo } from "./combo-utils.ts";
+import { addPlusScoreText, getClicksFromCombo, increaseCombo, increaseComboAnim, maxComboAnim, startCombo } from "./combo-utils.ts";
 import { addConfetti } from "../plugins/confetti.js";
 import { curDraggin } from "../plugins/drag.js";
 import { cam } from "./gamescene.ts";
@@ -93,8 +93,8 @@ export function addHexagon() {
 			clickPressTween: null,
 			stretched: true,
 			update() {
-				if (this.isHovering()) maxRotSpeed = 13
-				else maxRotSpeed = 10
+				if (this.isHovering()) maxRotSpeed = 4.75
+				else maxRotSpeed = 4
 				this.rotationSpeed = map(GameState.score, 0, scoreVars.scoreNeededToAscend, 0.01, maxRotSpeed)
 				this.rotationSpeed = clamp(this.rotationSpeed, 0.01, maxRotSpeed)
 				// this.wave_speed = map(GameState.score, 0, scoreVars.scoreNeededToAscend, 1, 2)
@@ -155,6 +155,7 @@ export function addHexagon() {
 						for (let i = 2; i < COMBO_MAX + 1; i++) {
 							if (clickVars.consecutiveClicks == getClicksFromCombo(i)) {
 								increaseCombo()
+								increaseComboAnim()
 							}
 						}
 					}
@@ -176,7 +177,7 @@ export function addHexagon() {
 				// # actual score additions
 				addPlusScoreText({
 					pos: mousePos(),
-					value: scoreVars.scorePerClick,
+					value: scoreVars.scorePerClick * scoreVars.combo,
 					cursorRelated: false,
 				})
 				GameState.addScore((scoreVars.scorePerClick * powerups["clicks"].multiplier) * scoreVars.combo)

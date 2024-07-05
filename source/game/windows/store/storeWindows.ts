@@ -165,6 +165,7 @@ function addStoreElement(winParent:any, opts = { key: "null", pos: vec2(0, 20) }
 	btn.onMousePress("left", () => {
 		if (isHoveringUpgrade) return
 		if (!btn.isHovering()) return;
+		if (GameState.score < btn.price) return;
 
 		downEvent = btn.onMouseDown(() => {
 			btn.isBeingClicked = true
@@ -333,6 +334,7 @@ function addPowerupStoreElement(winParent:any, posToAdd:any, hasUnlockedPowerups
 		btn.onMousePress("left", () => {
 			if (!btn.isHovering()) return;
 
+			if (GameState.score < btn.price) return;
 			btn.buy()
 		})
 	}

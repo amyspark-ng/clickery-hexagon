@@ -101,7 +101,7 @@ export function uiCounters() {
 		{
 			update() {
 				this.text = `${GameState.cursors}<\n${GameState.clickers + 1}x`
-			}
+			},
 		}
 	])
 

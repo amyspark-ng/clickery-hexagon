@@ -146,7 +146,7 @@ export function addPlusScoreText(opts:plusScoreOpts) {
 	plusScoreText.text = `+${formatNumber(opts.value, true, false)}`
 	if (scoreVars.combo > 1 && !opts.cursorRelated) {
 		plusScoreText.text = plusScoreText.text.replace (/^/,'[combo]');
-		if (scoreVars.combo > 1) plusScoreText.text += `x${Math.floor(scoreVars.combo)}`
+		// if (scoreVars.combo > 1) plusScoreText.text += `x${Math.floor(scoreVars.combo)}`
 		plusScoreText.text += `[/combo]`;
 	}
 	
@@ -184,23 +184,64 @@ export function addPlusScoreText(opts:plusScoreOpts) {
 	else plusScoreText.anchor = "right"
 
 	if (scoreVars.combo > 1 && !opts.cursorRelated) {
-		let totalScore = plusScoreText.add([
-			text("", {
-				font: "lambdao",
-				size: plusScoreText.textSize * 0.8
-			}),
-			pos(plusScoreText.width / 2, plusScoreText.height - 2),
-			anchor(plusScoreText.anchor),
-			opacity(),
-			{
-				update() {
-					this.opacity = plusScoreText.opacity
-				}
-			}
-		])
+		// let totalScore = plusScoreText.add([
+		// 	text("", {
+		// 		font: "lambdao",
+		// 		size: plusScoreText.textSize * 0.8
+		// 	}),
+		// 	pos(plusScoreText.width / 2, plusScoreText.height - 2),
+		// 	anchor(plusScoreText.anchor),
+		// 	opacity(),
+		// 	{
+		// 		update() {
+		// 			this.opacity = plusScoreText.opacity
+		// 		}
+		// 	}
+		// ])
 
-		totalScore.text = `(${formatNumber(opts.value * scoreVars.combo, true, false)})`
+		// totalScore.text = `(${formatNumber(opts.value * scoreVars.combo, true, false)})`
 	}
+}
+
+export function increaseComboAnim() {
+	let blendFactor = 0
+	let increaseComboText = add([
+		text(`x${scoreVars.combo}`, {
+			font: "lambdao",
+			size: 48,
+			align: "center",
+			styles: {
+				"combo": (idx) => ({
+					pos: vec2(0, wave(-4, 4, time() * 6 + idx * 0.5)),
+					color: blendColors(
+						WHITE,
+						hsl2rgb((time() * 0.2 + idx * 0.1) % 1, 0.7, 0.8),
+						blendFactor
+					),
+				})
+			}
+		}),
+		pos(mousePos().x, mousePos().y - 65),
+		scale(),
+		opacity(),
+		layer("ui"),
+		color(),
+		timer(),
+		{
+			update() {
+				blendFactor = map(scoreVars.combo, 0, 10, 0, 1)
+			}
+		}
+	])
+
+	let timeToDie = 2
+	increaseComboText.tween(vec2(0.5), vec2(1), 0.1, (p) => increaseComboText.scale = p, easings.easeOutElastic)
+	increaseComboText.tween(0.5, 1, 0.1, (p) => increaseComboText.opacity = p, easings.easeOutQuint).onEnd(() => {
+		increaseComboText.tween(increaseComboText.opacity, 0, timeToDie, (p) => increaseComboText.opacity = p, easings.easeOutQuint)
+		increaseComboText.wait(timeToDie, () => {
+			destroy(increaseComboText)
+		})
+	})
 }
 
 export function maxComboAnim() {

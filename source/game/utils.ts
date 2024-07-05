@@ -1,10 +1,10 @@
 import { Color } from "kaplay";
 import { GameState } from "../gamestate";
 import { addToast, mouse } from "./additives";
-import { autoLoopTime, cam, panderitoIndex } from "./gamescene";
+import { autoLoopTime, cam, panderitoIndex, triggerGnome } from "./gamescene";
 import { hexagon } from "./hexagon";
 import { spawnPowerup, powerups } from "./powerups";
-import { checkForUnlockable } from "./unlockables";
+import { checkForUnlockable, unlockWindow } from "./unlockables";
 
 // definetely not chatgpt
 export function formatNumber(number = 0, short = true, isPrice = false) {
@@ -263,11 +263,14 @@ export function debugFunctions() {
 	
 		else if (isKeyPressed("f")) {
 			checkForUnlockable()
-			// spawnPowerup({
-			// 	pos: mousePos(),
-			// 	type: choose(Object.keys(powerups)),
-			// 	time: 5,
-			// })
+		}
+
+		else if (isKeyPressed("p")) {
+			unlockWindow("hexColorWin")
+		}
+		
+		else if (isKeyPressed("h")) {
+			triggerGnome()
 		}
 	})
 

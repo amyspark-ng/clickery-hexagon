@@ -158,6 +158,13 @@ function welcomeBack(idle = false) {
 		addToast({ icon: "cursors.cursor", title: "Welcome back!", body: body })
 	}
 	
+	let welcomeBackToasts = get("toast").filter(toast => toast.type == "welcome")
+	if (welcomeBackToasts.length > 0) {
+		welcomeBackToasts.forEach(toast => {
+			toast.destroy()
+		})
+	}
+
 	if (idle == false) {
 		if (GameState.cursors < 1) {addWelcomeBackToast(null, totalTimeOutsideTab / 1000); return;}
 		
@@ -198,6 +205,31 @@ function resetIdleTime() {
 		// true means it's idle
 		triggerZZZ(true)
 	})
+}
+
+export function triggerGnome() {
+	let gnome = add([
+		sprite("gnome"),
+		pos(),
+		layer("mouse"),
+		scale(1.25),
+		z(mouse.z - 1),
+		anchor("center"),
+		{
+			update() {
+				this.angle = wave(-10, 10, time() / 2)
+			}
+		}
+	])
+
+	playSfx("gnome")
+	
+	tween(0, width(), 0.1, (p) => gnome.pos.x = p, easings.linear)
+	tween(0, height(), 0.1, (p) => gnome.pos.y = p, easings.linear).onEnd(() => {
+		destroy(gnome)
+	})
+
+	unlockAchievement("gnome")
 }
 
 export let hasStartedGame:boolean;
@@ -259,32 +291,13 @@ export function gamescene() {
 			})
 
 			// gnome
-			loop(1, () => {
-				if (chance(0.0025))
-				if (!isAchievementUnlocked("gnome")) {
-					let gnome = add([
-						sprite("gnome"),
-						pos(),
-						layer("mouse"),
-						scale(1.25),
-						z(mouse.z - 1),
-						anchor("center"),
-						{
-							update() {
-								this.angle = wave(-10, 10, time() / 2)
-							}
-						}
-					])
-		
-					playSfx("gnome")
-					
-					tween(0, width(), 0.1, (p) => gnome.pos.x = p, easings.linear)
-					tween(0, height(), 0.1, (p) => gnome.pos.y = p, easings.linear).onEnd(() => {
-						destroy(gnome)
-					})
-
-					unlockAchievement("gnome")
-				}
+			wait(60, () => {
+				loop(1, () => {
+					if (chance(0.0025))
+					if (!isAchievementUnlocked("gnome")) {
+						triggerGnome()
+					}
+				})
 			})
 		})
 
@@ -477,10 +490,6 @@ export function gamescene() {
 				})
 			})
 		}
-
-		onMousePress("middle", () => {
-			unlockAchievement("tapachievementslot")
-		})
 
 		if (DEBUG) debugFunctions()
 	})
