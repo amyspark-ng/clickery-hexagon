@@ -1,13 +1,15 @@
 import { GameState } from "../../../gamestate";
+import { ROOT } from "../../../main";
+import { positionSetter } from "../../../plugins/positionSetter";
 import { playSfx } from "../../../sound";
 import { powerups, spawnPowerup } from "../../powerups";
 import { getPrice, randomPos } from "../../utils";
 import { addUpgrades } from "./upgrades";
 
-let elements = {
+let storeElementsInfo = {
 	"clickersElement": { gamestateKey: "clickers", basePrice: 25, percentageIncrease: 15 },
 	"cursorsElement": { gamestateKey: "cursors", basePrice: 50, percentageIncrease: 25 },
-	"powerupsElement": { gamestateKey: "powerupsBought", basePrice: 1000, percentageIncrease: 50 },
+	"powerupsElement": { gamestateKey: "powerupsBought", basePrice: 1000, percentageIncrease: 50, unlockPrice: 10000 },
 }
 
 let storeElements = [];
@@ -114,7 +116,7 @@ function addStoreElement(winParent:any, opts = { key: "null", pos: vec2(0, 20) }
 
 			update() {
 				isKeyDown("shift") ? amountToBuy = 10 : amountToBuy = 1
-				if (this.is("clickersElement") || this.is("cursorsElement")) this.price = getPrice(elements[opts.key].basePrice * powerups["store"].multiplier, elements[opts.key].percentageIncrease, GameState[elements[opts.key].gamestateKey], amountToBuy)
+				if (this.is("clickersElement") || this.is("cursorsElement")) this.price = getPrice(storeElementsInfo[opts.key].basePrice * powerups["store"].multiplier, storeElementsInfo[opts.key].percentageIncrease, GameState[storeElementsInfo[opts.key].gamestateKey], amountToBuy)
 				this.area.scale = vec2(1 / this.scale.x, 1 / this.scale.y)
 			},
 		}
@@ -261,6 +263,7 @@ function addPowerupStoreElement(winParent:any, posToAdd:any, hasUnlockedPowerups
 				playSfx("kaching")
 				this.destroy()
 				addPowerupStoreElement(winParent, posToAdd, true)
+				ROOT.trigger("powerupunlock")
 			},
 			buy() {
 				let randomPowerup = choose(Object.keys(powerups).filter(p => p != "awesome"))
@@ -338,6 +341,21 @@ function addPowerupStoreElement(winParent:any, posToAdd:any, hasUnlockedPowerups
 			btn.buy()
 		})
 	}
+
+	let priceText = btn.add([
+		text("$" + storeElementsInfo["powerupsElement"].unlockPrice, {
+			size: 30,
+			align: "center",
+		}),
+		color(),
+		pos(-41, 39),
+		{
+			update() {
+				if (GameState.score >= storeElementsInfo["powerupsElement"].unlockPrice) this.color = GREEN
+				else this.color = RED
+			}
+		}
+	])
 
 	return btn;
 }

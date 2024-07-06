@@ -3,7 +3,6 @@
 export function positionSetter() {
 	return {
 		id: "setterAnimation",
-		require: [ "pos" ],
 		distance: 1,
 		update() {
 			if (this.parent.is("setterAnimation")) return
@@ -35,6 +34,7 @@ export function positionSetter() {
 		},
 
 		add() {
+			if (!this.is("pos")) this.use(pos())
 			// this.use(area())
 			// this.use(drag())
 		}

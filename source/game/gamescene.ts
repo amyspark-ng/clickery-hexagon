@@ -255,18 +255,28 @@ export function gamescene() {
 				})
 			})
 
-			wait(60, () => {
-				loop(60, () => {
-					if (chance(0.25)) {
-						if (GameState.hasUnlockedPowerups) {
-							spawnPowerup({
-								type: choose(Object.keys(powerups)),
-								pos: randomPos()
-							})
+			function naturalPowerupSpawningManagement() {
+				wait(60, () => {
+					loop(60, () => {
+						if (chance(0.25)) {
+							if (GameState.hasUnlockedPowerups) {
+								spawnPowerup({
+									type: choose(Object.keys(powerups)),
+									pos: randomPos()
+								})
+							}
 						}
-					}
+					})
 				})
-			})
+			}
+
+			if (!GameState.hasUnlockedPowerups) {
+				ROOT.on("powerupunlock", () => {
+					naturalPowerupSpawningManagement()
+				})
+			}
+
+			else naturalPowerupSpawningManagement()
 
 			// check for idling
 			idleWaiter = wait(0, () => {})

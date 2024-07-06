@@ -96,15 +96,12 @@ export function medalsWinContent(winParent) {
 		addMedal(indexToGrid(i), medalInfo)
 	}
 
-	winParent.onKeyPress("down", () => {
-		// if the index of the last one is the index of the last achievement
-		// get the topleft medal
-		let botrightest = medalsContainer.get("medal").reduce(function(prev, curr) {
-			return (prev.screenPos().x > curr.screenPos().x) && (prev.screenPos().y > curr.screenPos().y) ? prev : curr;
-		});
+	function scrollDown() {
+		// if the idx of last medal is the same as the last medal in the unlockables.achievements
+		let allMedals = medalsContainer.get("medal") // have to reverse the one before idk why
+		let sortedMedals = allMedals.sort((a, b) => b.achievementIdx - a.achievementIdx).reverse();		
+		if (sortedMedals[sortedMedals.length - 1].achievementIdx == Object.keys(unlockables.achievements).length - 1) return
 
-		if (botrightest.achievementIdx == allAchivementsNames().length - 1) return;
-		
 		medalsContainer.get("medal").filter(medal => medal.row == 1).forEach(medal => {
 			destroy(medal)
 		})
@@ -126,16 +123,13 @@ export function medalsWinContent(winParent) {
 				addMedal({ row: totalRows, column: indexToGrid(indexOfLastAchievementInList + 1 + i).column }, medalsInfo[i])
 			}
 		})
-	})
+	}
 
-	winParent.onKeyPress("up", () => {
-		let topleftest = medalsContainer.get("medal").reduce(function(prev, curr) {
-			return (prev.screenPos().x < curr.screenPos().x) && (prev.screenPos().y < curr.screenPos().y) ? prev : curr;
-		});
+	function scrollUp() {
+		let allMedals = medalsContainer.get("medal") // have to reverse the one before idk why
+		let sortedMedals = allMedals.sort((a, b) => b.achievementIdx - a.achievementIdx).reverse();		
+		if (sortedMedals[0].achievementIdx == 0) return
 
-		console.log(topleftest.achievementId)
-		// if (topleftest.achievementIdx == 0) return;
-		
 		// get the last ones
 		medalsContainer.get("medal").filter(medal => medal.row == totalRows).forEach(medal => {
 			destroy(medal)
@@ -156,5 +150,18 @@ export function medalsWinContent(winParent) {
 				addMedal({ row: 1, column: indexToGrid(i).column }, previousMedalsInfo[i])
 			}
 		})
+	}
+
+	winParent.onKeyPress("down", () => {
+		scrollDown()
+	})
+
+	winParent.onKeyPress("up", () => {
+		scrollUp()
+	})
+
+	winParent.onScroll((delta) => {
+		if (delta.y > 0) scrollDown()
+		else if (delta.y < 0) scrollUp()	
 	})
 }

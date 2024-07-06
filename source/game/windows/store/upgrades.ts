@@ -26,7 +26,7 @@ function isUpgradeBought(id:string):boolean {
 export function addUpgrades(elementParent) {
 	let winParent = elementParent.parent;
 	
-	let initialPos = vec2(-27.5)
+	let initialPos = vec2(-27.5, -31.5)
 	let desiredPos = vec2(initialPos.x, initialPos.y)
 	let spacing = vec2(55)
 
@@ -93,6 +93,14 @@ export function addUpgrades(elementParent) {
 						pos(),
 						anchor(alignmentForTooltip),
 						"tooltip",
+						{
+							update() {
+								if (typeof price == "number") {
+									if (GameState.score >= price) this.color = GREEN
+									else this.color = RED
+								}
+							}
+						}
 					])
 
 					bg.width = formatText({ text: displayText, align: displayText.align, size: priceText.textSize, }).width + 5
@@ -201,7 +209,7 @@ export function addUpgrades(elementParent) {
 		}
 
 		else if (upgradeObj.type == "c_") {
-			if (upgradeObj.idx > 0 && upgradeObj.idx < 3) {
+			if (upgradeObj.idx > -1 && upgradeObj.idx < 3) {
 				switch (upgradeObj.idx) {
 					case 0:
 						upgradeObj.freq = 10
@@ -234,7 +242,7 @@ export function addUpgrades(elementParent) {
 		let downEvent = null;
 		upgradeObj.onMousePress("left", () => {
 			if (!upgradeObj.isHovering()) return;
-			if (isUpgradeBought(upgradeObj.id)) {bop(upgradeObj); return}
+			if (isUpgradeBought(upgradeObj.id) || GameState.score < upgradeObj.price) {bop(upgradeObj); return}
 
 			if (upgradeObj.id == "c_2" && !isUpgradeBought("c_1")) {
 				upgradeObj.endTooltip()

@@ -86,7 +86,7 @@ export function openWindow(windowKey = "") {
 		z(0),
 		drag(),
 		area({ scale: vec2(1.04, 1) }),
-		positionSetter(),
+		// positionSetter(),
 		"window",
 		`${windowKey}`,
 		{
