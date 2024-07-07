@@ -217,9 +217,7 @@ export function settingsWinContent(winParent) {
 	])
 
 	let fullscreenCheckbox = addCheckbox({ pos: vec2(-144, 38), variable: "settings.fullscreen", title: "Fullscreen", titleSize: 35}, otherCheckboxesBg)
-	let shortNumbers = addCheckbox({ pos: vec2(-144, fullscreenCheckbox.pos.y + 60), variable: "settings.shortNumbers", title: "Shorten numbers", titleSize: 30}, otherCheckboxesBg)
-	let dropDragsOnMouseOut = addCheckbox({ pos: vec2(-144, shortNumbers.pos.y + 60), variable: "settings.dropDragsOnMouseOut", title: "Drop objects on mouse exit", titleSize: 25}, otherCheckboxesBg)
-	let keepBackgroundAudio = addCheckbox({ pos: vec2(-144, dropDragsOnMouseOut.pos.y + 60), variable: "settings.keepAudioOnTabChange", title: "Keep audio on tab change", titleSize: 25}, otherCheckboxesBg)
+	let commaAndDot = addCheckbox({ pos: vec2(-144, fullscreenCheckbox.pos.y + 60), variable: "settings.commaInsteadOfDot", title: "Use commas for decimals", titleSize: 30}, otherCheckboxesBg)
 
 	// other buttons
 	// bg

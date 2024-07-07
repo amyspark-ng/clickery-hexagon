@@ -81,9 +81,9 @@ export function medalsWinContent(winParent) {
 		})
 
 		medalObj.onHover(() => {
-			debug.log(medalObj.achievementIdx)
+			// debug.log(medalObj.achievementIdx)
 			// debug.log(`row: ${medalObj.row}, column: ${medalObj.column}`)	
-			// console.log(medalObj.achievementId)
+			// debug.log(medalObj.achievementId)
 		})
 	}
 

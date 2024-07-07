@@ -46,7 +46,7 @@ export let GameState = {
 		bgColor: [0, 0, 0, 0.84],
 		keepAudioOnTabChange: true,
 		dropDragsOnMouseOut: true,
-		shortNumbers: false,
+		commaInsteadOfDot: false,
 		fullscreen: false,
 		panderitoMode: false,
 		spsTextMode: 1,

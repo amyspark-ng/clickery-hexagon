@@ -131,6 +131,18 @@ export let unlockables = {
 		{"name":"500score",
 			"text":"Empty text", "icon":"icon_about"
 		},
+		{"name":"allclickupgrades",
+			"text":"Buy all click upgrades",
+			"icon":"icon_store",
+			"timeAfter": 1,
+			condition: () => GameState.clicksUpgradesValue == 126
+		},
+		{"name":"buyallupgrades",
+			"text":"Buy all available upgrades",
+			"icon":"icon_store",
+			"timeAfter": 1,
+			condition: () => isAchievementUnlocked("allclickupgrades") && GameState.cursorsUpgradesValue == (8 + 16 + 36) && GameState.timeUntilAutoLoopEnds == 1
+		},
 		{"name":"maxedcombo",
 			"text": "Max combo for the first time, FULL COMBO!!!!", 
 			"icon": "hexagon",
@@ -157,7 +169,7 @@ export let unlockables = {
 			"text": "Complete all achievements, congrats!!!", 
 			"icon": "osaka",
 			"timeAfter": 1,
-			"condition": () => GameState.unlockedAchievements.length == Object.keys(unlockables["achievements"]).length - 1
+			condition: () => GameState.unlockedAchievements.length == Object.keys(unlockables["achievements"]).length - 1
 		},
 	], 
 }

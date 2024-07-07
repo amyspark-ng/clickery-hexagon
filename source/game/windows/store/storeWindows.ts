@@ -3,7 +3,7 @@ import { ROOT } from "../../../main";
 import { positionSetter } from "../../../plugins/positionSetter";
 import { playSfx } from "../../../sound";
 import { powerups, spawnPowerup } from "../../powerups";
-import { getPrice, randomPos } from "../../utils";
+import { formatNumber, getPrice, randomPos } from "../../utils";
 import { addUpgrades } from "./upgrades";
 
 let storeElementsInfo = {
@@ -150,7 +150,7 @@ function addStoreElement(winParent:any, opts = { key: "null", pos: vec2(0, 20) }
 		z(btn.z + 1),
 		{
 			update() {
-				this.text = `$${btn.price}`
+				this.text = `${formatNumber(btn.price, { price: true, fixAmount: 2 })}`
 				if (GameState.score >= btn.price) this.color = GREEN
 				else this.color = RED
 			}
@@ -165,6 +165,8 @@ function addStoreElement(winParent:any, opts = { key: "null", pos: vec2(0, 20) }
 
 	let downEvent = null;
 	btn.onMousePress("left", () => {
+		if (!winParent.active) return
+		
 		if (isHoveringUpgrade) return
 		if (!btn.isHovering()) return;
 		if (GameState.score < btn.price) return;
@@ -196,6 +198,8 @@ function addStoreElement(winParent:any, opts = { key: "null", pos: vec2(0, 20) }
 	})
 
 	btn.onMouseRelease(() => {
+		if (!winParent.active) return
+		
 		downEvent?.cancel()
 		downEvent = null
 
@@ -209,10 +213,14 @@ function addStoreElement(winParent:any, opts = { key: "null", pos: vec2(0, 20) }
 	})
 
 	btn.onHover(() => {
+		if (!winParent.active) return
+		
 		btn.startHover()
 	})
 
 	btn.onHoverEnd(() => {
+		if (!winParent.active) return
+		
 		if (btn.isBeingClicked) {
 			btn.isBeingClicked = false
 			// if (!winParent.is("active")) return
@@ -280,10 +288,14 @@ function addPowerupStoreElement(winParent:any, posToAdd:any, hasUnlockedPowerups
 	])
 
 	btn.onHover(() => {
+		if (!winParent.active) return
+		
 		btn.startHover()
 	})
 
 	btn.onHoverEnd(() => {
+		if (!winParent.active) return
+		
 		btn.endHover()
 	})
 
@@ -309,6 +321,8 @@ function addPowerupStoreElement(winParent:any, posToAdd:any, hasUnlockedPowerups
 
 		let downEvent = null;
 		btn.onMousePress("left", () => {
+			if (!winParent.active) return
+		
 			downEvent?.cancel()
 			if (!btn.isHovering()) return;
 
@@ -327,6 +341,8 @@ function addPowerupStoreElement(winParent:any, posToAdd:any, hasUnlockedPowerups
 		})
 
 		btn.onMouseRelease("left", () => {
+			if (!winParent.active) return
+		
 			if (!btn.isHovering()) return;
 
 			btn.dropUnlock()
@@ -335,6 +351,8 @@ function addPowerupStoreElement(winParent:any, posToAdd:any, hasUnlockedPowerups
 
 	else {
 		btn.onMousePress("left", () => {
+			if (!winParent.active) return
+		
 			if (!btn.isHovering()) return;
 
 			if (GameState.score < btn.price) return;
@@ -343,7 +361,7 @@ function addPowerupStoreElement(winParent:any, posToAdd:any, hasUnlockedPowerups
 	}
 
 	let priceText = btn.add([
-		text("$" + storeElementsInfo["powerupsElement"].unlockPrice, {
+		text(formatNumber(storeElementsInfo.powerupsElement.unlockPrice, { price: true }), {
 			size: 30,
 			align: "center",
 		}),

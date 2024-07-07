@@ -1,6 +1,6 @@
 import { GameState } from "../gamestate.ts";
 import { waver } from "../plugins/wave.js";
-import { formatNumber } from "./utils.ts";
+import { formatNumber, simpleNumberFormatting } from "./utils.ts";
 
 export let scoreText:any;
 export let spsText:any;
@@ -25,7 +25,7 @@ export function uiCounters() {
 			defaultScale: 1,
 			scaleIncrease: 1,
 			update() {
-				this.text = `${formatNumber(Math.round(GameState.score), false, false)}` 
+				this.text = `${formatNumber(Math.round(GameState.score))}` 
 				this.angle = wave(-2.8, 2.8, time() * 1.25)
 				this.scale.x = wave(0.95 * this.scaleIncrease, 1.08 * this.scaleIncrease, time() * 1.15)
 				this.scale.y = wave(0.95 * this.scaleIncrease, 1.08 * this.scaleIncrease, time() * 1.15)
@@ -56,6 +56,7 @@ export function uiCounters() {
 			barYPos: (scoreText.pos.y - 14) + (scoreText.height / 4) + 5,
 			value: 0,
 
+			// value is the raw (number) score per second (with time accounted for)
 			formatSpsText(value:any, spsTextMode:any) {
 				let textThing = "/s"
 				switch (GameState.settings.spsTextMode) {
@@ -73,7 +74,8 @@ export function uiCounters() {
 					break;
 				}
 
-				return value.toFixed(spsTextMode) + textThing
+				let valueToReturn = formatNumber(value, { letterSuffixes: false })
+				return valueToReturn + textThing
 			},
 			update() {
 				if (isMousePressed("left") && this.isHovering()) {
@@ -87,12 +89,9 @@ export function uiCounters() {
 		}
 	])
 
+	let buildingTextTextOpts = { size: 40, lineSpacing: 1.5, font: "lambdao" }
 	buildingsText = add([
-		text(`${GameState.cursors}<\n${GameState.clickers + 1}x`, {
-			size: 40,
-			lineSpacing: 1.5,
-			font: "lambdao"
-		}),
+		text(`${simpleNumberFormatting(GameState.cursors)}<\n${simpleNumberFormatting(GameState.clickers + 1)}`, buildingTextTextOpts),
 		opacity(1),
 		anchor("left"),
 		layer("ui"),
@@ -100,8 +99,33 @@ export function uiCounters() {
 		waver({ maxAmplitude: 8, wave_speed: 0.8 }),
 		{
 			update() {
-				this.text = `${GameState.cursors}<\n${GameState.clickers + 1}x`
+				this.text = `${simpleNumberFormatting(GameState.cursors)}\n${simpleNumberFormatting(GameState.clickers + 1)}`
 			},
+
+			draw() {
+				let clickersWidth = formatText({ text: `${simpleNumberFormatting(GameState.clickers + 1)}`, ...buildingTextTextOpts }).width	
+				let cursorsWidth = formatText({ text: `${simpleNumberFormatting(GameState.cursors)}`, ...buildingTextTextOpts }).width	
+				
+				// clickers
+				drawSprite({
+					sprite: "cursors",
+					frame: 0,
+					pos: vec2(this.pos.x + clickersWidth + 5, 28),
+					anchor: "center",
+					scale: 0.75,
+					opacity: 0.9
+				})
+
+				// cursors
+				drawSprite({
+					sprite: "cursors",
+					frame: 1,
+					pos: vec2(this.pos.x + cursorsWidth + 5, -17),
+					anchor: "center",
+					scale: 0.75,
+					opacity: 0.9
+				})
+			}
 		}
 	])
 

@@ -19,11 +19,10 @@ import { isAchievementUnlocked, unlockAchievement } from "../../unlockables.ts";
 import { medalsWinContent } from "../medalsWin.ts";
 import { ROOT } from "../../../main.ts";
 import { positionSetter } from "../../../plugins/positionSetter.js";
+import { dummyShadow } from "../../../plugins/dummyShadow.js";
 
 export let infoForWindows = {};
-export let isGenerallyHoveringAWindow = false;
-export let isPreciselyHoveringAWindow = false;
-export let isInClickingRangeOfAWindow = false;
+export let isHoveringAWindow = false;
 export let isDraggingAWindow = false;
 
 export let folderObj;
@@ -33,7 +32,7 @@ let timeSinceFold = 0;
 export const buttonSpacing = 75;
 
 export function deactivateAllWindows() {
-	get("active").forEach(element => { element.deactivate() });
+	get("window").filter(window => window.active == true).forEach(element => { element.deactivate() });
 }
 
 export function manageWindow(windowKey) {
@@ -66,7 +65,7 @@ export function windowsDefinition() {
 		"settingsWin": { idx: 7, content: settingsWinContent, lastPos: vec2(center().x, center().y) },
 		"leaderboardsWin": { idx: 8, content: emptyWinContent, lastPos: vec2(center().x, center().y) },
 		"hexColorWin": { idx: 9, content: colorWinContent, lastPos: vec2(208, 160) },
-		"bgColorWin": { idx: 10, content: colorWinContent, lastPos: vec2(1024 - 200, 200) },
+		"bgColorWin": { idx: 10, content: colorWinContent, lastPos: vec2(width() - 200, 200) },
 		"extraWin": { idx: 11, icon: "extra", content: extraWinContent, lastPos: center() },
 	}
 }
@@ -86,17 +85,17 @@ export function openWindow(windowKey = "") {
 		z(0),
 		drag(),
 		area({ scale: vec2(1.04, 1) }),
-		// positionSetter(),
 		"window",
 		`${windowKey}`,
 		{
 			idx: infoForWindows[windowKey].idx,
 			windowKey: windowKey,
+			active: true,
 			close() {
 				this.trigger("close")
 				this.removeAll()
 				this.unuse("window")
-				this.unuse("active")
+				this.active = false
 				playSfx("closeWin")
 
 				tween(this.scale, vec2(0.9), 0.32, (p) => this.scale = p, easings.easeOutQuint)
@@ -119,8 +118,9 @@ export function openWindow(windowKey = "") {
 			},
 
 			activate() {
-				this.use("active")
-
+				this.active = true
+				this.trigger("activate")
+				
 				if (!this.is("shader")) return
 				this.unuse("shader")
 				this.get("*", { recursive: true }).forEach((obj) => {
@@ -129,7 +129,8 @@ export function openWindow(windowKey = "") {
 			},
 
 			deactivate() {
-				this.unuse("active")
+				this.active = false
+				this.trigger("deactivate")
 
 				if (this.is("shader")) return
 				this.use(shader("grayscale"))
@@ -140,27 +141,13 @@ export function openWindow(windowKey = "") {
 
 			isMouseInClickingRange() {
 				let condition = 
-				(mousePos().y >= getPositionOfSide(this).top) &&
-				(mousePos().y <= getPositionOfSide(this).top + 25)
+				(mouse.pos.y >= getPositionOfSide(this).top) &&
+				(mouse.pos.y <= getPositionOfSide(this).top + 25)
 				return condition;
 			},
 
 			isMouseInPreciseRange() {
-				let condition = 
-				(mousePos().y >= getPositionOfSide(this).top) && 
-				(mousePos().y <= getPositionOfSide(this).bottom) &&
-				(mousePos().x <= getPositionOfSide(this).right) &&
-				(mousePos().x >= getPositionOfSide(this).left)
-				return condition;
-			},
-
-			isMouseInGeneralRange() {
-				let condition = 
-				(mousePos().y >= getPositionOfSide(this).top - 10) && 
-				(mousePos().y <= getPositionOfSide(this).bottom + 10) &&
-				(mousePos().x <= getPositionOfSide(this).right + 10) &&
-				(mousePos().x >= getPositionOfSide(this).left - 10)
-				return condition;
+				return this.hasPoint(mouse.pos);
 			},
 
 			update() {
@@ -207,20 +194,25 @@ export function openWindow(windowKey = "") {
 	})
 
 	xButton.onClick(() => {
-		if (!isDraggingAWindow) {
-			windowObj.close()
+		if (!windowObj.active) {
+			// if it's not dragging a window AND a window that is not this one is being hovered
+			if (!isDraggingAWindow && !get("window").some(window => window.isHovering() && window != windowObj)) {
+				windowObj.close()
+			}
 		}
+
+		else windowObj.close()
 	})
 
 	windowObj.onHover(() => {
-		get("hoverOutsideWindow", { recursive: true }).forEach((obj) => {
+		get("hoverObj", { recursive: true }).forEach((obj) => {
 			if (curDraggin) return
 			if (obj.isHovering()) obj.endHover()
 		})
 	})
 	
 	windowObj.onHoverEnd(() => {
-		get("hoverOutsideWindow", { recursive: true }).forEach((obj) => {
+		get("hoverObj", { recursive: true }).forEach((obj) => {
 			if (curDraggin) return
 			if (obj.isHovering()) obj.startHover()
 		})
@@ -235,16 +227,23 @@ export function openWindow(windowKey = "") {
 				return
 			}
 
-			if (windowObj.isMouseInPreciseRange()) {
-				if (windowObj.isMouseInClickingRange()) {
-					mouse.grab()
-					windowObj.pick()
-				}
-
-				if (!windowObj.is("active")) {
-					deactivateAllWindows()
-					windowObj.activate()
-					readd(windowObj)
+			for (const window of get("window").reverse()) {
+				// If mouse is pressed and mouse position is inside, we pick
+				if (window.isMouseInPreciseRange()) {
+					
+					if (window.isMouseInClickingRange()) {
+						mouse.grab();
+						window.pick();
+					}
+					
+					if (window.active == false) {
+						wait(0.01, () => {
+							deactivateAllWindows()
+							window.activate()
+						})
+					}
+					
+					break;
 				}
 			}
 		}
@@ -257,7 +256,7 @@ export function openWindow(windowKey = "") {
 	windowObj.onKeyPress("escape", () => {
 		// if window is active and (window isn't an extra window and curDragging isn't gridMinibutton)
 		// can't close if is extra window and is dragging a button
-		if (windowObj.is("active") && !(windowObj.is("extraWin") && curDraggin?.is("gridMiniButton"))) windowObj.close()
+		if (windowObj.active && curDraggin != windowObj && !(windowObj.is("extraWin") && curDraggin?.is("gridMiniButton"))) windowObj.close()
 	})
 
 	// activate
@@ -279,7 +278,7 @@ export function openWindow(windowKey = "") {
 	bop(correspondingMinibutton)
 
 	// manage some hovers
-	get("hoverOutsideWindow", { recursive: true }).forEach((obj) => {
+	get("hoverObj", { recursive: true }).forEach((obj) => {
 		if (obj.isHovering() && windowObj.isHovering()) obj.endHover()
 	})
 
@@ -287,7 +286,7 @@ export function openWindow(windowKey = "") {
 		correspondingMinibutton.window = null
 		bop(correspondingMinibutton)
 	
-		get("hoverOutsideWindow", { recursive: true }).forEach((obj) => {
+		get("hoverObj", { recursive: true }).forEach((obj) => {
 			if (obj.isHovering() && !obj.dragging) obj.startHover()
 		})
 	})
@@ -313,6 +312,24 @@ export function openWindow(windowKey = "") {
 		}
 	}
 
+	// drawShadow() 
+	let drawShadowEvent = onDraw(() => {
+		drawSprite({
+			sprite: windowObj.sprite,
+			width: windowObj.width,
+			height: windowObj.height,
+			pos: vec2(windowObj.pos.x, windowObj.pos.y + 4),
+			color: BLACK,
+			opacity: 0.5,
+			scale: windowObj.scale,
+			anchor: "center",
+		})
+	})
+
+	windowObj.on("close", () => {
+		drawShadowEvent.cancel()
+	})
+
 	ROOT.trigger("winOpen", windowKey)
 
 	return windowObj;
@@ -323,10 +340,10 @@ export function folderObjManaging() {
 	// reset variables
 	folded = true
 	timeSinceFold = 0
-	isGenerallyHoveringAWindow = false;
-	isPreciselyHoveringAWindow = false;
-	isInClickingRangeOfAWindow = false;
+	
+	isHoveringAWindow = false;
 	isDraggingAWindow = false;
+	
 	movingMinibuttons = false;
 
 	folderObj = add([
@@ -337,7 +354,7 @@ export function folderObjManaging() {
 		z(0),
 		anchor("center"),
 		"folderObj",
-		"hoverOutsideWindow",
+		"hoverObj",
 		{
 			defaultScale: vec2(1.2),
 			editingBar: false,
@@ -389,6 +406,14 @@ export function folderObjManaging() {
 				this.trigger("managefold", folded)
 			},
 
+			openTaskbarEdit() {
+				
+			},
+
+			closeTaskbarEdit() {
+
+			},
+
 			addSlots() {
 				get("minibutton").filter(minibutton => !minibutton.extraMb).forEach((minibutton, index) => {
 					// add slots
@@ -425,7 +450,7 @@ export function folderObjManaging() {
 			update() {
 				this.flipX = folded ? true : false
 				
-				this.area.scale = hasStartedGame == false ? vec2(0) : vec2(1.2) 
+				this.area.scale = (hasStartedGame == false) ? vec2(0) : vec2(1.2) 
 				
 				if (curDraggin?.is("gridMiniButton") || curDraggin?.is("minibutton")) return
 				if (!movingMinibuttons) {
@@ -443,10 +468,12 @@ export function folderObjManaging() {
 	])
 
 	folderObj.onHover(() => {
+		if (curDraggin) return
 		folderObj.startHover()
 	})
 
 	folderObj.onHoverEnd(() => {
+		if (curDraggin) return
 		folderObj.endHover()
 	})
 
@@ -487,26 +514,25 @@ export function folderObjManaging() {
 	folderObj.on("winClose", () => {
 		wait(0.05, () => {
 			// gets the topmost window
-			let allWindows = get("window", { recursive: true })
-			if (allWindows.length > 0) allWindows[clamp(allWindows.length - 1, 0, allWindows.length)].activate()
-
-			isGenerallyHoveringAWindow = get("window", { recursive: true }).some((window) => window.isMouseInGeneralRange())
-			isPreciselyHoveringAWindow = get("window", { recursive: true }).some((window) => window.isMouseInPreciseRange())
+			let allWindows = get("window")
+			if (allWindows.length > 0) allWindows.reverse()[0].activate()
 		})
 	})
 
 	folderObj.onUpdate(() => {
-		if (!(get("window").length > 0)) return
-		// if any window is being hovered on
-		get("window").some((window) => {
-			isGenerallyHoveringAWindow = window.isMouseInGeneralRange()
-			isPreciselyHoveringAWindow = window.isMouseInPreciseRange()
-			isInClickingRangeOfAWindow = window.isMouseInClickingRange()
-			isDraggingAWindow = window.dragging
-		})
+		if ((get("window").length > 0)) {
+			// if any window is being hovered on
+			isHoveringAWindow = get("window").some((window) => window.isMouseInPreciseRange())
+			isDraggingAWindow = get("window").some((window) => window.dragging)
+		}
+
+		else {
+			isHoveringAWindow = false
+			isDraggingAWindow = false
+		}
 	})
 
-	// manages behaviour related tothe closeest minibutton
+	// manages behaviour related to the closeest minibutton
 	onUpdate("closestMinibuttonToDrag", (minibutton) => {
 		if (!curDraggin?.is("gridMiniButton")) return
 		if (curDraggin?.screenPos().dist(minibutton.screenPos()) > 120) return

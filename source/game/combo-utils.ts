@@ -143,7 +143,7 @@ export function addPlusScoreText(opts:plusScoreOpts) {
 		}
 	])
 
-	plusScoreText.text = `+${formatNumber(opts.value, true, false)}`
+	plusScoreText.text = `+${formatNumber(opts.value)}`
 	if (scoreVars.combo > 1 && !opts.cursorRelated) {
 		plusScoreText.text = plusScoreText.text.replace (/^/,'[combo]');
 		// if (scoreVars.combo > 1) plusScoreText.text += `x${Math.floor(scoreVars.combo)}`

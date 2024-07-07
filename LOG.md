@@ -12,16 +12,18 @@ this game MIGHT be getting done
 # ISSUES (hell)
 ## Current TODO (small stuff mostly)
 - So in the end what do i do with the increaseComboAnim, or do i do nothing??
-- make window.active a thing instead of checking for tag, got annoying quick
-- Format actual working numbers (spsText and scoreText and priceText)
+
+- formatting
+	* find a way to remove the extra zeros in the formatNumber function 
+	* find why smallSuffixes aren't working 
+	* find the bug where it says undefined sometimes probabl something related to "theOtherThree"
+- Fix panderito hitbox (just make it bigger damn angle stuff)
 
 - Fix updateTime animation in powerup timers
 - Add multiplier number to powerup timers
 
 - fix music waving speed
-- Fix panderito hitbox (just make it bigger damn angle stuff)
 - Fix weird workings of the combo bar content
-- The sps, spm and sph don't work at all fym i get 80 per second and 1.33 per minute :skull:
 
 ## Next features
 - Prototype ascending (when)
@@ -29,20 +31,18 @@ this game MIGHT be getting done
 ## Complex stuff
 - and click priortiy (holy moly)
 	* For clicking behind object should check if any other window that is not the current one is active, if any other window is active the button should not work
+
 - I REALLYYY need to fix the hover animations
-- and the mouse animations
-	* Maybe do keep the tag system, just uhhhhhhhhhhhhhhhhhhhhhhhhhhhhh
+	* and the mouse animations
+	^ Maybe do keep the tag system, just uhhhhhhhhhhhhhhhhhhhhhhhhhhhhh
 
 # IDEAS (good)
 - Little side to side when doing the param pam pam pam in the combo animation
 - maybe the vignette for powerups could be a small gradient on top of the backgroudn that has color depending on the powerup on the bottom part of the screen
 - Add achievement for making the hexagon black and the bg white (bad apple)
-- When doing achievements i need to add a timeAfter property that waits a time to actually add the toast that indicates you unlocked it
 
 # Missing
 - Ascend mechanic
-	* Everything
-- Medals/Achievmeents
 	* Everything
 - Newgrounds api
 

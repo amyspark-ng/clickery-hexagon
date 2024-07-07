@@ -9,8 +9,8 @@ dependencies:
     specifier: ^0.20.2
     version: 0.20.2
   kaplay:
-    specifier: 3001.0.0-alpha.16
-    version: 3001.0.0-alpha.16
+    specifier: 3001.0.0-alpha.17
+    version: 3001.0.0-alpha.17
 
 packages:
 
@@ -252,6 +252,6 @@ packages:
       '@esbuild/win32-x64': 0.20.2
     dev: false
 
-  /kaplay@3001.0.0-alpha.16:
-    resolution: {integrity: sha512-x9tnlR0GSRwTMlioL1bYpptM2p4xTlBr+97+YK18oxuFxmuf/ZSr5KVlKtZw1G1nqNkvXzVhuVk3MURfky8amg==}
+  /kaplay@3001.0.0-alpha.17:
+    resolution: {integrity: sha512-cuSknXOGQOBgpcekFbsvLa7rQMeOFhyqcIAlr5+3i9kGb/ROHh7b3hIGHLHTGU4qwmYLADP6jAqnWSHYic1RTQ==}
     dev: false

@@ -1,49 +1,96 @@
 import { Color } from "kaplay";
 import { GameState } from "../gamestate";
 import { addToast, mouse } from "./additives";
-import { autoLoopTime, cam, panderitoIndex, triggerGnome } from "./gamescene";
+import { autoLoopTime, cam, triggerGnome } from "./gamescene";
 import { hexagon } from "./hexagon";
-import { spawnPowerup, powerups } from "./powerups";
-import { checkForUnlockable, unlockWindow } from "./unlockables";
+import { checkForUnlockable } from "./unlockables";
+import { isHoveringAWindow } from "./windows/windows-api/windowsAPI";
 
-// definetely not chatgpt
-export function formatNumber(number = 0, short = true, isPrice = false) {
-	let valueToReturn;
-	
-	if (short) {
-		if (number >= 1000000000000) {
-			valueToReturn = number >= 1100000000000 ? (number / 1000000000000).toFixed(1) + 'T' : (number / 1000000000000) + 'T';
-		} else if (number >= 1000000000) {
-			valueToReturn = number >= 1100000000 ? (number / 1000000000).toFixed(1) + 'B' : (number / 1000000000) + 'B';
-		} else if (number >= 1000000) {
-			valueToReturn = number >= 1100000 ? (number / 1000000).toFixed(1) + 'M' : (number / 1000000) + 'M';
-		} else if (number >= 1000) {
-			valueToReturn = (number / 1000).toFixed(number % 1000 === 0 ? 0 : 1) + 'K';
-		} else {
-			valueToReturn = number.toString();
-		}	
-	} 
-	
-	else {
-		// Convert number to locale string
-		valueToReturn = number.toLocaleString().replace(/,/g, '.');
+type formatNumberOpts = {
+	fixAmount?:number,
+	price?:boolean,
+	letterSuffixes?:boolean,
+}
 
-		// Add suffixes for thousands, millions, or billions
-		if (number >= 1000000000000) {
-			valueToReturn += 'T';
-		} else if (number >= 1000000000) {
-			valueToReturn += 'B';
-		} else if (number >= 1000000) {
-			valueToReturn += 'M';
-		} else if (number >= 1000) {
-			valueToReturn += 'K';
+// definetely not stack overflow
+export function simpleNumberFormatting(value) {
+	let integerStr = value.toString()
+	var len = integerStr.length;
+	var formatted = "";
+	
+	var breakpoint = (len-1) % 3; // after which index to place the dot
+	
+	for(let i = 0; i < len; i++){
+		formatted += integerStr.charAt(i);
+		if(i % 3 === breakpoint){
+		if(i < len-1) // don't add dot for last digit
+			formatted += ".";
 		}
 	}
 
-	if (isPrice) valueToReturn = valueToReturn.slice(0, 0)
-	+ "$" + valueToReturn.slice(0);
+	return formatted;
+}
 
-	return valueToReturn;
+export function formatNumber(value:number, opts?:formatNumberOpts):string {
+	let fixAmount = opts?.fixAmount || 3
+	let isPrice = opts?.price || false
+	let letterSuffixes = opts?.letterSuffixes || true
+
+	// if is a small number, bruh
+	if (value < 999) {
+		let string = isPrice ? "$" : ""
+		string += value
+		return string;
+	}
+	
+	let suffixes = {
+		K: { small: "k", large: "thousands" },
+		M: { small: "m", large: "millions" },
+		B: { small: "b", large: "billions" },
+		T: { small: "t", large: "trillions" },
+		Qa: { small: "qa", large: "quadrillions" },
+		Qt: { small: "qt", large: "quintillions" },
+		St: { small: "st", large: "sextillions" },
+		Sp: { small: "sp", large: "septillions" },
+		Oc: { small: "oc", large: "octillions" },
+		Nn: { small: "nn", large: "nonillions" },
+		Dc: { small: "dc", large: "decillions" },
+	}
+
+	// get the suffix
+	let suffix:string = "";
+	let typeOfSuffix = letterSuffixes == true ? "small" : "large"
+	if (value > 999 && value < 999999) suffix = suffixes.K[typeOfSuffix];
+	else if (value > 999999 && value < 999999999) suffix = suffixes.M[typeOfSuffix];
+	else if (value > 999999999 && value < 999999999999) suffix = suffixes.B[typeOfSuffix];
+	else if (value > 999999999999 && value < 999999999999999) suffix = suffixes.T[typeOfSuffix];
+	else if (value > 999999999999999 && value < 999999999999999999) suffix = suffixes.Qa[typeOfSuffix];
+	else if (value > 999999999999999999 && value < 999999999999999999999) suffix = suffixes.Qt[typeOfSuffix];
+	else if (value > 999999999999999999999 && value < 999999999999999999999999) suffix = suffixes.St[typeOfSuffix];
+	else if (value > 999999999999999999999999) suffix = suffixes.Sp[typeOfSuffix];
+	if (letterSuffixes == true) suffix.replace (/^/,' ');
+
+	let valueToReturn:string = "";
+
+	let splittedNumbers = simpleNumberFormatting(value).split(".") 
+
+	let mainNumber = splittedNumbers[0]
+	let otherThreeNumbers = "";
+	
+	for(let i = 0; i < fixAmount; i++) {
+		otherThreeNumbers += splittedNumbers[1][i]	
+	}
+
+	let point = "";
+	if (GameState.settings.commaInsteadOfDot == true) point = "," 
+	else point = "."
+	
+	valueToReturn = `${mainNumber}${point}${otherThreeNumbers}${suffix}`
+
+	// make it price
+	if (isPrice == true) valueToReturn = valueToReturn.replace (/^/,'$');
+	
+	return valueToReturn
 }
 
 export function formatMusicTime(timeInSeconds) {
@@ -228,7 +275,7 @@ export function debugTexts() {
 					"Auto loop time: ": autoLoopTime.toFixed(2),
 					"Time until auto loop ends: ": GameState.timeUntilAutoLoopEnds,
 					"Taskbar: ": GameState.taskbar,
-					"Hexagon.ScaleIncrease": hexagon.scaleIncrease
+					"isHoveringAWindow": isHoveringAWindow
 				}
 
 				this.text = createKeys()
@@ -266,7 +313,7 @@ export function debugFunctions() {
 		}
 
 		else if (isKeyPressed("p")) {
-			unlockWindow("hexColorWin")
+			GameState.clickers += 50
 		}
 		
 		else if (isKeyPressed("h")) {

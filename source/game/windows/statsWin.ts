@@ -1,4 +1,5 @@
 import { GameState } from "../../gamestate";
+import { unlockables } from "../unlockables";
 import { toHHMMSS } from "../utils";
 import { infoForWindows } from "./windows-api/windowsAPI";
 
@@ -13,7 +14,7 @@ export function statsWinContent(winParent) {
 			"Times ascended: ": GameState.stats.timesAscended,
 			[`Clickers (${GameState.clickers}) / Cursors (${GameState.cursors}) owned: `]: `${GameState.clickers + GameState.cursors}`,
 			"Windows unlocked: ": `${GameState.unlockedWindows.length}/${Object.keys(infoForWindows).length}`,
-			"Achievements unlocked: ": `0/50`,
+			"Achievements unlocked: ": `${GameState.unlockedAchievements.length}/${unlockables.achievements.length}`,
 			"Total time played: ": toHHMMSS(Math.round(GameState.stats.totalTimePlayed)),
 		}
 	})

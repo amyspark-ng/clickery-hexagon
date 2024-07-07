@@ -3,7 +3,7 @@ import { dummyShadow } from "../../../plugins/dummyShadow";
 import { playSfx } from "../../../sound";
 import { bop } from "../../utils";
 import { mouse } from "../../additives";
-import { folderObj, infoForWindows, isGenerallyHoveringAWindow, isDraggingAWindow, isPreciselyHoveringAWindow, manageWindow, folded, buttonSpacing } from "./windowsAPI";
+import { folderObj, infoForWindows, isDraggingAWindow, isHoveringAWindow, manageWindow, folded, buttonSpacing } from "./windowsAPI";
 import { GameState } from "../../../gamestate";
 import { destroyExclamation } from "../../unlockables";
 import { Vec2 } from "kaplay";
@@ -48,8 +48,9 @@ export function addMinibutton(opts:minibuttonOpt) {
 		color(),
 		layer("ui"),
 		z(folderObj.z - 1),
+		dummyShadow(),
 		`${Object.keys(infoForWindows)[opts.idxForInfo]}`,
-		"hoverOutsideWindow",
+		"hoverObj",
 		"minibutton",
 		infoForWindows[Object.keys(infoForWindows)[opts.idxForInfo]].icon == "extra" ? "extraMinibutton" : "",
 		{
@@ -269,7 +270,7 @@ export function addMinibutton(opts:minibuttonOpt) {
 					let currentSlot = get(`slot_${this.taskbarIndex}`)[0]
 					currentSlot?.fadeOut(0.32).onEnd(() => currentSlot?.destroy())
 					// isBeingHoveredOn doesn't work
-					if (this.isHovering() && !isGenerallyHoveringAWindow) this.startHover()
+					if (this.isHovering() && !isHoveringAWindow) this.startHover()
 					else this.endHover()
 				})
 
@@ -331,7 +332,7 @@ export function addMinibutton(opts:minibuttonOpt) {
 
 	currentMinibutton.onHover(() => {
 		if (curDraggin) return
-		if (!isPreciselyHoveringAWindow && !isDraggingAWindow) {
+		if (!isHoveringAWindow && !isDraggingAWindow) {
 			currentMinibutton.startHover() // don't add the sound here because then it gets called whenever a window is closed
 			playSfx("hoverMiniButton", {detune: 100 * currentMinibutton.windowInfo.idx / 4})
 		}
@@ -340,7 +341,7 @@ export function addMinibutton(opts:minibuttonOpt) {
 	currentMinibutton.onHoverEnd(() => {
 		if (curDraggin) return
 		if (isDraggingAWindow) return
-		if (!isPreciselyHoveringAWindow) {
+		if (!isHoveringAWindow) {
 			currentMinibutton.endHover()  
 		}
 	})
@@ -369,7 +370,7 @@ export function addMinibutton(opts:minibuttonOpt) {
 		if (!currentMinibutton.dragging) {
 			if (curDraggin) return
 			
-			if (isPreciselyHoveringAWindow || isDraggingAWindow) return
+			if (isHoveringAWindow || isDraggingAWindow) return
 			currentMinibutton.click()
 		}
 
@@ -380,10 +381,6 @@ export function addMinibutton(opts:minibuttonOpt) {
 				currentMinibutton.releaseDrop()
 			}
 		}
-	})
-
-	currentMinibutton.onDrag(() => {
-		currentMinibutton.use(dummyShadow())
 	})
 
 	return currentMinibutton;

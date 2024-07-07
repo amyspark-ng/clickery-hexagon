@@ -1,22 +1,22 @@
 import { GameState } from "../../../gamestate";
 import { playSfx } from "../../../sound";
-import { blendColors, bop, randomPos } from "../../utils";
+import { blendColors, bop, formatNumber, randomPos } from "../../utils";
 
 export let isHoveringUpgrade = false;
 
-let prices = {
-	"k_0": 5,
-	"k_1": 10,
-	"k_2": 20,
-	"k_3": 50,
-	"k_4": 100,
-	"k_5": 500,
-	"c_0": 5,
-	"c_1": 10,
-	"c_2": 20,
-	"c_3": 50,
-	"c_4": 100,
-	"c_5": 500,
+export let upgradeInfo = {
+	"k_0": { value: 2, price: 5 },
+	"k_1": { value: 4, price: 10 },
+	"k_2": { value: 8, price: 20 },
+	"k_3": { value: 16, price: 50,},
+	"k_4": { value: 32, price: 100,},
+	"k_5": { value: 64, price: 500,},
+	"c_0": { freq: 10, price: 5,},
+	"c_1": { freq: 5, price: 10,},
+	"c_2": { freq: 1, price: 50,},
+	"c_3": { value: 8, price: 100,},
+	"c_4": { value: 16, price: 150,},
+	"c_5": { value: 36, price: 500,},
 }
 
 function isUpgradeBought(id:string):boolean {
@@ -46,6 +46,7 @@ export function addUpgrades(elementParent) {
 			z(winParent.z + 1),
 			area(),
 			"upgrade",
+			"hoverObj",
 			{
 				type: elementParent.is("clickersElement") ? "k_" : "c_",
 				idx: i,
@@ -155,7 +156,7 @@ export function addUpgrades(elementParent) {
 					tween(this.scale, vec2(1.1), 0.15, (p) => this.scale = p, easings.easeOutQuad)
 					// let value = this.value != null ? this.value : this.freq;
 					let blink = this.value != null ? `+${this.value}` : `Cursors now click every ${this.freq} seconds`;
-					if (!isUpgradeBought(this.id) && !this.hasTooltip) this.addTooltip(this.price, blink)
+					if (!isUpgradeBought(this.id) && !this.hasTooltip) this.addTooltip(formatNumber(this.price, { price: true, fixAmount: 1 }), blink)
 				},
 
 				endHover() {
@@ -201,46 +202,21 @@ export function addUpgrades(elementParent) {
 				},
 			}
 		])
-		upgradeObj.id = upgradeObj.type + upgradeObj.idx
-		upgradeObj.price = prices[upgradeObj.id]
 		
-		if (upgradeObj.type == "k_") {
-			upgradeObj.value = 2 ** (upgradeObj.idx + 1)
-		}
-
+		// sets info like id price and value/freq
+		upgradeObj.id = upgradeObj.type + upgradeObj.idx
+		upgradeObj.price = upgradeInfo[upgradeObj.id].price
+		
+		if (upgradeObj.type == "k_") upgradeObj.value = upgradeInfo[upgradeObj.id].value
 		else if (upgradeObj.type == "c_") {
-			if (upgradeObj.idx > -1 && upgradeObj.idx < 3) {
-				switch (upgradeObj.idx) {
-					case 0:
-						upgradeObj.freq = 10
-					break;
-					case 1:
-						upgradeObj.freq = 5
-					break;
-					case 2:
-						upgradeObj.freq = 1
-					break;
-				}
-			}
-
-			// is multiplier upgrades
-			else {
-				switch (upgradeObj.idx) {
-					case 3:
-						upgradeObj.value = 8;
-					break;
-					case 4:
-						upgradeObj.value = 16;
-					break;
-					case 5:
-						upgradeObj.value = 36;
-					break;
-				}
-			}
+			if (upgradeObj.idx > -1 && upgradeObj.idx < 3) upgradeObj.freq = upgradeInfo[upgradeObj.id].freq
+			else upgradeObj.value = upgradeInfo[upgradeObj.id].value
 		}
 
 		let downEvent = null;
 		upgradeObj.onMousePress("left", () => {
+			if (!winParent.active) return
+		
 			if (!upgradeObj.isHovering()) return;
 			if (isUpgradeBought(upgradeObj.id) || GameState.score < upgradeObj.price) {bop(upgradeObj); return}
 
@@ -267,6 +243,8 @@ export function addUpgrades(elementParent) {
 		})
 
 		upgradeObj.onMouseRelease(() => {
+			if (!winParent.active) return
+		
 			if (isUpgradeBought(upgradeObj.id)) return
 			upgradeObj.dropBuy()
 			downEvent?.cancel()
@@ -274,10 +252,14 @@ export function addUpgrades(elementParent) {
 		})
 
 		upgradeObj.onHover(() => {
+			if (!winParent.active) return
+		
 			upgradeObj.startHover()
 		})
 
 		upgradeObj.onHoverEnd(() => {
+			if (!winParent.active) return
+		
 			upgradeObj.endHover()
 		})
 

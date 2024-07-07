@@ -5,7 +5,7 @@ import { playSfx } from "../sound"
 import { hexagon, scoreVars } from "./hexagon"
 import { isWindowUnlocked } from "./unlockables"
 import { arrayToColor, blendColors, getPositionOfSide, getZBetween, parseAnimation } from "./utils"
-import { isDraggingAWindow, isPreciselyHoveringAWindow, manageWindow } from "./windows/windows-api/windowsAPI"
+import { isDraggingAWindow, isHoveringAWindow, manageWindow } from "./windows/windows-api/windowsAPI"
 
 export let gameBg;
 export function addBackground() {
@@ -101,13 +101,13 @@ export function addMouse() {
 	})
 
 	onHover("hover_outsideWindow", () => {
-		if (!isPreciselyHoveringAWindow && !isDraggingAWindow && !curDraggin?.is("minibutton")) {
+		if (!isHoveringAWindow && !isDraggingAWindow && !curDraggin?.is("minibutton")) {
 			mouse.play("point")
 		}
 	})
 
 	onHoverEnd("hover_outsideWindow", () => {
-		if (!isPreciselyHoveringAWindow && !isDraggingAWindow && !curDraggin?.is("minibutton")) {
+		if (!isHoveringAWindow && !isDraggingAWindow && !curDraggin?.is("minibutton")) {
 			mouse.play("cursor")
 		}
 	})

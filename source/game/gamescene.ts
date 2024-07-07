@@ -1,7 +1,7 @@
 import { GameState } from "../gamestate.ts"
 import { scoreVars, addHexagon, hexagon } from "./hexagon.ts"
 import { buildingsText, scoreText, spsText, uiCounters } from "./uicounters.ts"
-import { arrayToColor, debugFunctions, randomPos, toHHMMSS } from "./utils.ts"
+import { arrayToColor, debugFunctions, formatNumber, randomPos, toHHMMSS } from "./utils.ts"
 import { addToast, gameBg, mouse } from "./additives.ts"
 import { playMusic, playSfx } from "../sound.ts"
 import { folderObj, folderObjManaging, windowsDefinition } from "./windows/windows-api/windowsAPI.ts"
@@ -71,12 +71,12 @@ export function togglePanderito() {
 
 	if (GameState.settings.panderitoMode) {
 		hexagon.use(sprite("panderito"))
-		hexagon.area.scale = vec2(0.5, 0.8)
+		hexagon.area.scale = hexagon.panderitoAreaScale
 	}
 	
 	else {
 		hexagon.use(sprite("hexagon"))
-		hexagon.area.scale = vec2(1.08)
+		hexagon.area.scale = hexagon.areaScale
 	}
 
 	GameState.save(false)

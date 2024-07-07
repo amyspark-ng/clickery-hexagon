@@ -1,10 +1,10 @@
 
 import { GameState } from "../gamestate.ts";
 import { scoreText, spsText } from "./uicounters.ts";
-import { formatNumber, arrayToColor } from "./utils.ts";
+import { arrayToColor } from "./utils.ts";
 import { mouse } from "./additives.ts";
 import { playSfx } from "../sound.ts";
-import { isDraggingAWindow, isGenerallyHoveringAWindow, isPreciselyHoveringAWindow, manageWindow } from "./windows/windows-api/windowsAPI.ts";
+import { isDraggingAWindow, isHoveringAWindow, manageWindow } from "./windows/windows-api/windowsAPI.ts";
 import { waver } from "../plugins/wave.js";
 import { isDraggingASlider } from "./windows/colorWindow.ts";
 import { addPlusScoreText, getClicksFromCombo, increaseCombo, increaseComboAnim, maxComboAnim, startCombo } from "./combo-utils.ts";
@@ -78,7 +78,7 @@ export function addHexagon() {
 		z(0),
 		layer("hexagon"),
 		"hexagon",
-		"hoverOutsideWindow",
+		"hoverObj",
 		{
 			isBeingHovered: false,
 			smallestScale: 0.985,
@@ -92,8 +92,13 @@ export function addHexagon() {
 			rotationSpeed: 0.01,
 			clickPressTween: null,
 			stretched: true,
+
+			areaScale: vec2(1.01),
+			panderitoAreaScale: vec2(0.5, 1).dot(vec2(1.25)),
 			update() {
-				if (this.isHovering()) maxRotSpeed = 4.75
+				this.area.scale = vec2(1 / this.scale.x, 1 / this.scale.y)
+				
+				if (this.isBeingHovered) maxRotSpeed = 4.75
 				else maxRotSpeed = 4
 				this.rotationSpeed = map(GameState.score, 0, scoreVars.scoreNeededToAscend, 0.01, maxRotSpeed)
 				this.rotationSpeed = clamp(this.rotationSpeed, 0.01, maxRotSpeed)
@@ -326,30 +331,28 @@ export function addHexagon() {
 	})
 
 	hexagon.onHover(() => {
-		if (!isGenerallyHoveringAWindow && !isDraggingAWindow && !hexagon.isBeingHovered && !curDraggin) {
+		if (!isHoveringAWindow && !hexagon.isBeingHovered && !curDraggin) {
 			hexagon.startHover()
 		}
 	})
 
 	hexagon.onHoverEnd(() => {
 		if (isDraggingAWindow || isDraggingASlider) return
-		if (!isPreciselyHoveringAWindow && !curDraggin) {
+		if (!isHoveringAWindow && !curDraggin) {
 			hexagon.endHover()
 		}
 	});
 
 	hexagon.onMousePress("left", () => {
-		if (hexagon.isBeingHovered) {
-			if (!isPreciselyHoveringAWindow && !isDraggingAWindow) {
-				hexagon.clickPress()
-				GameState.stats.timesClicked++
-			}
+		if (hexagon.canClick && hexagon.isBeingHovered && !isHoveringAWindow) {
+			hexagon.clickPress()
+			GameState.stats.timesClicked++
 		}
 	})
 	
 	hexagon.onMouseRelease("left", () => {
 		if (hexagon.isBeingHovered) {
-			if (hexagon.canClick && hexagon.isBeingClicked && !isPreciselyHoveringAWindow&& !isDraggingAWindow) {
+			if (hexagon.canClick && hexagon.isBeingClicked && !isHoveringAWindow) {
 				hexagon.clickRelease()
 			}
 		}
@@ -358,7 +361,7 @@ export function addHexagon() {
 	hexagon.onMousePress("right", () => {
 		if (!GameState.unlockedWindows.includes("hexColorWin")) return;
 
-		if (hexagon.isHovering()) {
+		if (hexagon.isBeingHovered) {
 			manageWindow("hexColorWin")
 		}
 	})
@@ -416,8 +419,8 @@ export function addHexagon() {
 			spsUpdaterTimer = 0;
 
 			// shoutout to Candy&Carmel
-			let divideValue = GameState.settings.spsTextMode ? Math.pow(60, GameState.settings.spsTextMode-1) : 1;
-			scoreVars.scorePerSecond = scoreVars.scorePerSecond / divideValue
+			let multiplyValue = GameState.settings.spsTextMode ? Math.pow(60, GameState.settings.spsTextMode-1) : 1;
+			scoreVars.scorePerSecond = scoreVars.scorePerSecond * multiplyValue
 			clickVars.clicksPerSecond = 0;
 
 			spsText.value = scoreVars.scorePerSecond
