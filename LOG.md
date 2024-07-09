@@ -13,10 +13,11 @@ this game MIGHT be getting done
 ## Current TODO (small stuff mostly)
 - So in the end what do i do with the increaseComboAnim, or do i do nothing??
 
+- maybe convert lambda font to bitmap font to be able to use letter spacing??
+
 - formatting
-	* find a way to remove the extra zeros in the formatNumber function 
 	* find why smallSuffixes aren't working 
-	* find the bug where it says undefined sometimes probabl something related to "theOtherThree"
+	* find the bug where it says undefined, probably something related to "theOtherThree"
 - Fix panderito hitbox (just make it bigger damn angle stuff)
 
 - Fix updateTime animation in powerup timers

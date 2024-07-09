@@ -8,7 +8,7 @@ import { parseAnimation } from "./utils";
 types of powerups
 	clicks: makes clicks more powerful
 	cursors: makes cursors more powerful
-	time: makes cursors click every 0.5 seconds / gives you the score you would have gotten in 10 minutes
+	time: gives you the score you would have gotten in 1 minutes
 	awesome: increases production by a lot
 	store: makes everything cheaper
 	bad: could have the opposite of the effects before, or could increase them by A LOT
@@ -20,7 +20,6 @@ export let powerups = {
 	"time": { sprite: "cursors.wait", multiplier: 1, removalTime: null, color: [247, 242, 193] },
 	"awesome": { sprite: "cursors.check", multiplier: 1, removalTime: null, color: [227, 190, 247]} ,
 	"store": { sprite: "icon_store", multiplier: 1, removalTime: null, color: [195, 250, 162] },
-	"bad": { sprite: "icon_about", multiplier: 1, removalTime: null, color: [250, 178, 162] },
 }
 
 type powerupOpt = {

@@ -417,13 +417,8 @@ export function addHexagon() {
 		spsUpdaterTimer += dt();
 		if (spsUpdaterTimer > 1) {
 			spsUpdaterTimer = 0;
-
-			// shoutout to Candy&Carmel
-			let multiplyValue = GameState.settings.spsTextMode ? Math.pow(60, GameState.settings.spsTextMode-1) : 1;
-			scoreVars.scorePerSecond = scoreVars.scorePerSecond * multiplyValue
 			clickVars.clicksPerSecond = 0;
-
-			spsText.value = scoreVars.scorePerSecond
+			spsText.updateValue();
 		}
 	})
 

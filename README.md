@@ -21,3 +21,4 @@ To build:
 - [Lambda font](https://ggbot.itch.io/lambda-font)
 - Webadazzz <3
 - niceEli - Desktop support
+- Candy&Carmel - Number support

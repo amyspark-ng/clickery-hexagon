@@ -316,13 +316,13 @@ export function openWindow(windowKey = "") {
 	let drawShadowEvent = onDraw(() => {
 		drawSprite({
 			sprite: windowObj.sprite,
-			width: windowObj.width,
-			height: windowObj.height,
+			// width: windowObj.width,
+			// height: windowObj.height,
 			pos: vec2(windowObj.pos.x, windowObj.pos.y + 4),
+			scale: windowObj.scale,
+			anchor: windowObj.anchor,
 			color: BLACK,
 			opacity: 0.5,
-			scale: windowObj.scale,
-			anchor: "center",
 		})
 	})
 

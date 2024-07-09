@@ -355,7 +355,6 @@ export function unlockWindow(windowUnlocked:string) {
 			wait(0.01, () => {
 				let thatOne = gridContainer.get("gridMiniButton").filter(gridminibutton => gridminibutton.windowKey == windowUnlocked)[0]
 				addExclamation(thatOne)
-				console.log(thatOne)
 			})
 
 			winOpenEvent?.cancel()

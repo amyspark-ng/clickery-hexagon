@@ -1,6 +1,7 @@
 import { GameState } from "../gamestate.ts";
 import { waver } from "../plugins/wave.js";
-import { formatNumber, simpleNumberFormatting } from "./utils.ts";
+import { scoreVars } from "./hexagon.ts";
+import { bop, formatNumber, simpleNumberFormatting } from "./utils.ts";
 
 export let scoreText:any;
 export let spsText:any;
@@ -57,7 +58,7 @@ export function uiCounters() {
 			value: 0,
 
 			// value is the raw (number) score per second (with time accounted for)
-			formatSpsText(value:any, spsTextMode:any) {
+			formatSpsText(value:any) {
 				let textThing = "/s"
 				switch (GameState.settings.spsTextMode) {
 					case 1:
@@ -77,11 +78,18 @@ export function uiCounters() {
 				let valueToReturn = formatNumber(value, { letterSuffixes: false })
 				return valueToReturn + textThing
 			},
+			updateValue() {
+				// shoutout to Candy&Carmel
+				let multiplyValue = GameState.settings.spsTextMode ? Math.pow(60, GameState.settings.spsTextMode-1) : 1;
+				this.value = Math.round(scoreVars.scorePerSecond) * multiplyValue
+			},
 			update() {
 				if (isMousePressed("left") && this.isHovering()) {
 					// 1 second, 2 minute, 3 hour
 					GameState.settings.spsTextMode++
 					if (GameState.settings.spsTextMode > 3) GameState.settings.spsTextMode = 1
+					this.updateValue()
+					bop(this, 0.05)
 				}
 
 				this.text = this.formatSpsText(this.value, GameState.settings.spsTextMode)

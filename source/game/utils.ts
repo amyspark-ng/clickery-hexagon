@@ -6,10 +6,36 @@ import { hexagon } from "./hexagon";
 import { checkForUnlockable } from "./unlockables";
 import { isHoveringAWindow } from "./windows/windows-api/windowsAPI";
 
+// candy&Carmel helped here!!!!
 type formatNumberOpts = {
 	fixAmount?:number,
 	price?:boolean,
 	letterSuffixes?:boolean,
+	useCommaForDecimals?:boolean,
+}
+
+let numTypes = {
+	K: { small: "k", large: "thousands" },
+	M: { small: "m", large: "millions" },
+	B: { small: "b", large: "billions" },
+	T: { small: "t", large: "trillions" },
+	Qa: { small: "qa", large: "quadrillions" },
+	Qt: { small: "qt", large: "quintillions" },
+	St: { small: "st", large: "sextillions" },
+	Sp: { small: "sp", large: "septillions" },
+	Oc: { small: "oc", large: "octillions" },
+	Nn: { small: "nn", large: "nonillions" },
+	Dc: { small: "dc", large: "decillions" },
+	Un: { small: "un", large: "undecillions" },
+	Du: { small: "du", large: "duodecillions" },
+	Te: { small: "te", large: "tredecillions" },
+	Qd: { small: "qd", large: "quattuordecillions" },
+	Qu: { small: "qu", large: "quindecillions" },
+	Sd: { small: "sd", large: "sexdecillions" },
+	Su: { small: "su", large: "septendecillions" },
+	Oe: { small: "oe", large: "octodecillions" },
+	No: { small: "no", large: "novemdecillions" },
+	Ve: { small: "ve", large: "vigintillion" },
 }
 
 // definetely not stack overflow
@@ -35,6 +61,7 @@ export function formatNumber(value:number, opts?:formatNumberOpts):string {
 	let fixAmount = opts?.fixAmount || 3
 	let isPrice = opts?.price || false
 	let letterSuffixes = opts?.letterSuffixes || true
+	let commaDecimals = opts?.useCommaForDecimals || GameState?.settings?.commaInsteadOfDot
 
 	// if is a small number, bruh
 	if (value < 999) {
@@ -43,31 +70,17 @@ export function formatNumber(value:number, opts?:formatNumberOpts):string {
 		return string;
 	}
 	
-	let suffixes = {
-		K: { small: "k", large: "thousands" },
-		M: { small: "m", large: "millions" },
-		B: { small: "b", large: "billions" },
-		T: { small: "t", large: "trillions" },
-		Qa: { small: "qa", large: "quadrillions" },
-		Qt: { small: "qt", large: "quintillions" },
-		St: { small: "st", large: "sextillions" },
-		Sp: { small: "sp", large: "septillions" },
-		Oc: { small: "oc", large: "octillions" },
-		Nn: { small: "nn", large: "nonillions" },
-		Dc: { small: "dc", large: "decillions" },
-	}
-
 	// get the suffix
 	let suffix:string = "";
 	let typeOfSuffix = letterSuffixes == true ? "small" : "large"
-	if (value > 999 && value < 999999) suffix = suffixes.K[typeOfSuffix];
-	else if (value > 999999 && value < 999999999) suffix = suffixes.M[typeOfSuffix];
-	else if (value > 999999999 && value < 999999999999) suffix = suffixes.B[typeOfSuffix];
-	else if (value > 999999999999 && value < 999999999999999) suffix = suffixes.T[typeOfSuffix];
-	else if (value > 999999999999999 && value < 999999999999999999) suffix = suffixes.Qa[typeOfSuffix];
-	else if (value > 999999999999999999 && value < 999999999999999999999) suffix = suffixes.Qt[typeOfSuffix];
-	else if (value > 999999999999999999999 && value < 999999999999999999999999) suffix = suffixes.St[typeOfSuffix];
-	else if (value > 999999999999999999999999) suffix = suffixes.Sp[typeOfSuffix];
+	if (value > 999 && value < 999999) suffix = numTypes.K[typeOfSuffix];
+	else if (value > 999999 && value < 999999999) suffix = numTypes.M[typeOfSuffix];
+	else if (value > 999999999 && value < 999999999999) suffix = numTypes.B[typeOfSuffix];
+	else if (value > 999999999999 && value < 999999999999999) suffix = numTypes.T[typeOfSuffix];
+	else if (value > 999999999999999 && value < 999999999999999999) suffix = numTypes.Qa[typeOfSuffix];
+	else if (value > 999999999999999999 && value < 999999999999999999999) suffix = numTypes.Qt[typeOfSuffix];
+	else if (value > 999999999999999999999 && value < 999999999999999999999999) suffix = numTypes.St[typeOfSuffix];
+	else if (value > 999999999999999999999999) suffix = numTypes.Sp[typeOfSuffix];
 	if (letterSuffixes == true) suffix.replace (/^/,' ');
 
 	let valueToReturn:string = "";
@@ -77,12 +90,12 @@ export function formatNumber(value:number, opts?:formatNumberOpts):string {
 	let mainNumber = splittedNumbers[0]
 	let otherThreeNumbers = "";
 	
-	for(let i = 0; i < fixAmount; i++) {
+	for (let i = 0; i < fixAmount; i++) {
 		otherThreeNumbers += splittedNumbers[1][i]	
 	}
 
 	let point = "";
-	if (GameState.settings.commaInsteadOfDot == true) point = "," 
+	if (commaDecimals == true) point = "," 
 	else point = "."
 	
 	valueToReturn = `${mainNumber}${point}${otherThreeNumbers}${suffix}`
@@ -117,7 +130,9 @@ export function getPrice(basePrice, percentageIncrease, objectAmount, amountToBu
     let priceToReturn = 0;
 
     for (let i = 0; i < amountToBuy; i++) {
-        let currentPrice = basePrice * Math.pow(1 + percentageIncrease / 100, objectAmount + i);
+		// let currentPrice = (basePrice * (1 + percentageIncrease / 100)) ** objectAmount + 1
+		// priceToReturn += Math.round(currentPrice)
+		let currentPrice = basePrice * Math.pow(1 + percentageIncrease / 100, objectAmount + i);
         priceToReturn += Math.round(currentPrice);
     }
 
@@ -290,11 +305,11 @@ export function debugFunctions() {
 	debugTexts()
 	
 	window.globalThis.gamestate = function() {
-		console.log(GameState)
+		return GameState
 	}
 
 	window.globalThis.taskbar = function() {
-		console.log(GameState.taskbar)
+		return GameState.taskbar
 	}
 	
 	onUpdate(() => {

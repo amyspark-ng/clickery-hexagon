@@ -143,7 +143,27 @@ function triggerZZZ(idle = true) {
 
 function welcomeBack(idle = false) {
 	function addWelcomeBackToast(score:any, timeInSeconds:number) {
-		let body = `You were out for: ${toHHMMSS(timeInSeconds)} ${timeInSeconds > 60 ? "mins" : "secs"}`; 
+		
+		// an hour is 3600 seconds
+		let times = "";
+		if (timeInSeconds > 3600) {
+			if (timeInSeconds < 3600 * 2) times = "hour"
+			else "hours"
+		}
+		
+		// minutes
+		else if (timeInSeconds > 60) {
+			if (timeInSeconds < 120) times = "min"
+			else "mins"
+		}
+		
+		// seconds
+		else if (timeInSeconds > 0) {
+			if (timeInSeconds < 2) times = "sec"
+			else times = "secs"
+		}
+
+		let body = `You were out for: ${toHHMMSS(timeInSeconds)} ${times}`; 
 		if (score != null) body += `\n+${score}` 
 		
 		let hasCombo = scoreVars.combo > 1
@@ -251,7 +271,9 @@ export function gamescene() {
 			// wait 60 seconds
 			wait(60, () => {
 				loop(120, () => {
-					if (GameState.totalScore > 1) if (DEBUG == false) GameState.save(true)
+					if (GameState.totalScore > 1) if (DEBUG == false) {
+						GameState.save(true)
+					}
 				})
 			})
 

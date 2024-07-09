@@ -150,9 +150,29 @@ function addStoreElement(winParent:any, opts = { key: "null", pos: vec2(0, 20) }
 		z(btn.z + 1),
 		{
 			update() {
-				this.text = `${formatNumber(btn.price, { price: true, fixAmount: 2 })}`
+				this.text = `${formatNumber(Math.round(btn.price), { price: true, fixAmount: 2 })}`
 				if (GameState.score >= btn.price) this.color = GREEN
 				else this.color = RED
+			}
+		}
+	])
+
+	let amountText = btn.add([
+		text("x1", {
+			size: 18,
+			align: "left",
+		}),
+		anchor("center"),
+		pos(-159, -52),
+		positionSetter(),
+		color(BLACK),
+		opacity(0.25),
+		z(btn.z + 1),
+		{
+			update() {
+				this.text = "x" + amountToBuy
+				if (amountToBuy == 10) this.opacity = 0.45
+				else this.opacity = 0.252
 			}
 		}
 	])
@@ -169,7 +189,7 @@ function addStoreElement(winParent:any, opts = { key: "null", pos: vec2(0, 20) }
 		
 		if (isHoveringUpgrade) return
 		if (!btn.isHovering()) return;
-		if (GameState.score < btn.price) return;
+		// if (GameState.score < btn.price) return;
 
 		downEvent = btn.onMouseDown(() => {
 			btn.isBeingClicked = true
