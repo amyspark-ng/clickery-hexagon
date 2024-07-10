@@ -5,6 +5,7 @@ import { autoLoopTime, cam, triggerGnome } from "./gamescene";
 import { hexagon } from "./hexagon";
 import { checkForUnlockable } from "./unlockables";
 import { isHoveringAWindow } from "./windows/windows-api/windowsAPI";
+import { triggerAscension } from "./ascension";
 
 // candy&Carmel helped here!!!!
 type formatNumberOpts = {
@@ -324,7 +325,7 @@ export function debugFunctions() {
 		}
 	
 		else if (isKeyPressed("f")) {
-			checkForUnlockable()
+			triggerAscension()
 		}
 
 		else if (isKeyPressed("p")) {

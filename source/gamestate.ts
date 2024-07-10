@@ -3,7 +3,8 @@ import { saveAnim } from "./game/utils"
 export let GameState = {
 	score: 0,
 	totalScore: 0,
-	
+	mana: 0,
+
 	clickers: 0,
 	clicksUpgradesValue: 0, // multiplier for clicks
 	clickPercentage: 0, // percentage added

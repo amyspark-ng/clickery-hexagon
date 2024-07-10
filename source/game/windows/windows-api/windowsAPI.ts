@@ -3,7 +3,7 @@ import { blendColors, bop, getPositionOfSide } from "../../utils.ts";
 import { mouse } from "../../additives.ts";
 import { drag, curDraggin, setCurDraggin } from "../../../plugins/drag.js";
 import { playSfx } from "../../../sound.ts";
-import { addMinibutton, getXPosFolder } from "./minibuttons.ts";
+import { addMinibutton, getMinibuttonXPos } from "./minibuttons.ts";
 
 // window contents
 import { storeWinContent } from "../store/storeWindows.ts";
@@ -419,7 +419,7 @@ export function folderObjManaging() {
 					// add slots
 					add([
 						rect(20, 20, { radius: 4 }),
-						pos(getXPosFolder(index), folderObj.pos.y),
+						pos(getMinibuttonXPos(index), folderObj.pos.y),
 						color(BLACK),
 						anchor("center"),
 						opacity(0.5),

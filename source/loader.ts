@@ -548,6 +548,7 @@ export function loadEverything() {
 		}
 	})
 	loadSprite("dialogue", "sprites/ascendscene/dialogue.png")
+	loadSprite("hoverDialogue", "sprites/ascendscene/emptyDialogue.png")
 	loadSprite("eye_translate", "sprites/ascendscene/translate.png", {
 		sliceX: 4,
 		sliceY: 1,
@@ -556,6 +557,8 @@ export function loadEverything() {
 			"dumb": 1,
 		}
 	})
+	loadSprite("backcard", "sprites/ascendscene/backcard.png")
+	loadSprite("card", "sprites/ascendscene/card.png")
 
 	loadSprite("gnome", "sprites/gnome.png")
 	//#endregion

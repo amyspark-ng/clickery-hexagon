@@ -8,7 +8,7 @@ import { GameState } from "../../../gamestate";
 import { destroyExclamation } from "../../unlockables";
 import { Vec2 } from "kaplay";
 
-export function getXPosFolder(index, buttonSpacing = 75) {
+export function getMinibuttonXPos(index, buttonSpacing = 75) {
     return folderObj.pos.x - buttonSpacing * (index) - buttonSpacing;
 }
 
@@ -33,7 +33,7 @@ export function addMinibutton(opts:minibuttonOpt) {
 	else {
 		let extraMb = infoForWindows[Object.keys(infoForWindows)[opts.idxForInfo]].icon ? true : false
 		if (extraMb) destinedPosition = vec2(folderObj.pos.x, folderObj.pos.y - buttonSpacing)  
-		else destinedPosition = vec2(getXPosFolder(opts.taskbarIndex), folderObj.pos.y) 
+		else destinedPosition = vec2(getMinibuttonXPos(opts.taskbarIndex), folderObj.pos.y) 
 	}
 
 	let currentMinibutton = add([
@@ -80,7 +80,7 @@ export function addMinibutton(opts:minibuttonOpt) {
 				this.isBeingHovered = true
 
 				if (this.extraMb || this.dragging) return
-				tween(this.pos.x, getXPosFolder(this.taskbarIndex), 0.32, (p) => this.pos.x = p, easings.easeOutQuint)
+				tween(this.pos.x, getMinibuttonXPos(this.taskbarIndex), 0.32, (p) => this.pos.x = p, easings.easeOutQuint)
 			},
 
 			endHover() {
@@ -99,7 +99,7 @@ export function addMinibutton(opts:minibuttonOpt) {
 				this.isBeingHovered = false
 
 				if (this.extraMb || this.dragging) return
-				tween(this.pos.x, getXPosFolder(this.taskbarIndex), 0.32, (p) => this.pos.x = p, easings.easeOutQuint)
+				tween(this.pos.x, getMinibuttonXPos(this.taskbarIndex), 0.32, (p) => this.pos.x = p, easings.easeOutQuint)
 			},
 			
 			update() {
@@ -184,7 +184,7 @@ export function addMinibutton(opts:minibuttonOpt) {
 				}
 
 				else {
-					this.destinedPosition = vec2(getXPosFolder(this.taskbarindex), folderObj.pos.y)
+					this.destinedPosition = vec2(getMinibuttonXPos(this.taskbarindex), folderObj.pos.y)
 				}
 			},
 
@@ -320,7 +320,7 @@ export function addMinibutton(opts:minibuttonOpt) {
 		swap(curDraggin, "taskbarIndex", currentMinibutton, "taskbarIndex")
 
 		// sets position based on the new taskbarindex
-		tween(currentMinibutton.pos.x, getXPosFolder(currentMinibutton.taskbarIndex), 0.32, (p) => currentMinibutton.pos.x = p, easings.easeOutBack)
+		tween(currentMinibutton.pos.x, getMinibuttonXPos(currentMinibutton.taskbarIndex), 0.32, (p) => currentMinibutton.pos.x = p, easings.easeOutBack)
 	})
 
 	currentMinibutton.use(shader("saturate", () => ({

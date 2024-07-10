@@ -32,6 +32,7 @@ layers([
 	"ui",
 	"windows",
 	"powerups",
+	"ascension",
 	"logs",
 	"sound",
 	"mouse",

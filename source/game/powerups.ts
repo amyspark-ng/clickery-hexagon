@@ -29,8 +29,9 @@ type powerupOpt = {
 	time?: number,
 }
 
+// isn't spaceBetweenTimers same as timerSpacing????????????
 let spaceBetweenTimers = 65
-function getPosBasedOnIndex(index:number, timerSpacing = 65) {
+function getTimerPos(index:number, timerSpacing = 65) {
 	return (width() + spaceBetweenTimers / 2) - timerSpacing * (index) - timerSpacing;
 }
 
@@ -66,7 +67,7 @@ function addTimer(opts:{ sprite: string, type: string }) {
 					// decreases the index (moves it to the right)
 					element.index--
 					// moves them accordingly
-					tween(element.pos.x, getPosBasedOnIndex(element.index), 0.32, (p) => element.pos.x = p, easings.easeOutQuint)
+					tween(element.pos.x, getTimerPos(element.index), 0.32, (p) => element.pos.x = p, easings.easeOutQuint)
 				});
 				// # holy shit im a genius
 			},
@@ -76,7 +77,7 @@ function addTimer(opts:{ sprite: string, type: string }) {
 	tween(30, 40, 0.32, (p) => timerObj.pos.y = p, easings.easeOutQuint)
 	tween(90, 0, 0.32, (p) => timerObj.angle = p, easings.easeOutQuint)
 
-	timerObj.pos.x = getPosBasedOnIndex(timerObj.index)
+	timerObj.pos.x = getTimerPos(timerObj.index)
 
 	parseAnimation(timerObj, opts.sprite)
 

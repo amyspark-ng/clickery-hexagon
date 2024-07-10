@@ -12,12 +12,25 @@ this game MIGHT be getting done
 # ISSUES (hell)
 ## Current TODO (small stuff mostly)
 - So in the end what do i do with the increaseComboAnim, or do i do nothing??
+- add the mute dialogue option
+- price texts could be draws instead of objects??? 
+- work on the new number formatting function
+```js
+// this is pretty helpful
+function updateMoney() {
+  moneyText.innerHTML = "Your money: " + money.toFixed(2);
+  if (money < Math.pow(1000, 11)) {
 
-- maybe convert lambda font to bitmap font to be able to use letter spacing??
+    for (let i = 1; money >= Math.pow(1000, i); i++)
+      moneyText.innerHTML = "Your money: " + (money / Math.pow(1000, i)).toFixed(2) + numTypes[i];
+  	}
+  else {
 
-- formatting
-	* find why smallSuffixes aren't working 
-	* find the bug where it says undefined, probably something related to "theOtherThree"
+    moneyText.innerHTML = "Your money: " + (money.toExponential(2)).toFixed(2);
+
+  }
+}
+```
 - Fix panderito hitbox (just make it bigger damn angle stuff)
 
 - Fix updateTime animation in powerup timers
@@ -27,7 +40,7 @@ this game MIGHT be getting done
 - Fix weird workings of the combo bar content
 
 ## Next features
-- Prototype ascending (when)
+- Prototype ascending mechanic (prestige/mana, what time do you get to ascend, actually add the percentages)
 
 ## Complex stuff
 - and click priortiy (holy moly)
@@ -36,15 +49,16 @@ this game MIGHT be getting done
 - I REALLYYY need to fix the hover animations
 	* and the mouse animations
 	^ Maybe do keep the tag system, just uhhhhhhhhhhhhhhhhhhhhhhhhhhhhh
+	* I think i had this crazy idea that 
 
 # IDEAS (good)
 - Little side to side when doing the param pam pam pam in the combo animation
-- maybe the vignette for powerups could be a small gradient on top of the backgroudn that has color depending on the powerup on the bottom part of the screen
+- add a text that comes from the bottom and stops a little below the hexagon that says (Click production increased for 1 min)
 - Add achievement for making the hexagon black and the bg white (bad apple)
 
 # Missing
 - Ascend mechanic
-	* Everything
+	* Mechanics, numbers
 - Newgrounds api
 
 # Bookmarks
