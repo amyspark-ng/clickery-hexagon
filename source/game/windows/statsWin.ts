@@ -11,7 +11,7 @@ export function statsWinContent(winParent) {
 			"Total score: ": Math.round(GameState.totalScore), 
 			"Times clicked: ": GameState.stats.timesClicked,
 			"Powerups clicked: ": GameState.stats.powerupsClicked,
-			"Times ascended: ": GameState.stats.timesAscended,
+			"Times ascended: ": GameState.ascendLevel - 1,
 			[`Clickers (${GameState.clickers}) / Cursors (${GameState.cursors}) owned: `]: `${GameState.clickers + GameState.cursors}`,
 			"Windows unlocked: ": `${GameState.unlockedWindows.length}/${Object.keys(infoForWindows).length}`,
 			"Achievements unlocked: ": `${GameState.unlockedAchievements.length}/${unlockables.achievements.length}`,

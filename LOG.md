@@ -11,29 +11,34 @@ this game MIGHT be getting done
 
 # ISSUES (hell)
 ## Current TODO (small stuff mostly)
+- make all the cards a single animation and change them using the frame
 - So in the end what do i do with the increaseComboAnim, or do i do nothing??
 - add the mute dialogue option
 - price texts could be draws instead of objects??? 
+
 - work on the new number formatting function
 ```js
 // this is pretty helpful
 function updateMoney() {
-  moneyText.innerHTML = "Your money: " + money.toFixed(2);
-  if (money < Math.pow(1000, 11)) {
+	moneyText.innerHTML = "Your money: " + money.toFixed(2);
+	
+	// if money is inside the limits (will always try to be)
+	if (money < Math.pow(1000, 11)) {
+		// run until it finds the numType
+		for (let i = 1; money >= Math.pow(1000, 1); i++) {
+			// turn it into a smaller version
+			moneyText.text = "Your money: " + (money / Math.pow(1000, i)).toFixed(2) + numTypes[i];
+		}
+	}
 
-    for (let i = 1; money >= Math.pow(1000, i); i++)
-      moneyText.innerHTML = "Your money: " + (money / Math.pow(1000, i)).toFixed(2) + numTypes[i];
-  	}
-  else {
-
-    moneyText.innerHTML = "Your money: " + (money.toExponential(2)).toFixed(2);
-
-  }
+	else {
+		moneyText.innerHTML = "Your money: " + (money.toExponential(2)).toFixed(2);
+	}
 }
 ```
 - Fix panderito hitbox (just make it bigger damn angle stuff)
 
-- Fix updateTime animation in powerup timers
+- make it so when you click the powerup timer it adds a little log (cookie clicker style that says how much production increased for how much time)
 - Add multiplier number to powerup timers
 
 - fix music waving speed

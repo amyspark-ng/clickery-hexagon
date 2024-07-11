@@ -25,7 +25,7 @@ export let GameState = {
 	achievementMultiplierPercentage: 0,
 	generalUpgrades: 1, // general multiplier
 
-	ascendLevel: 0,
+	ascendLevel: 1,
 
 	unlockedAchievements: [],
 

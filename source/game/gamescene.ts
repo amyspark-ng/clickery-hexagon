@@ -148,13 +148,13 @@ function welcomeBack(idle = false) {
 		let times = "";
 		if (timeInSeconds > 3600) {
 			if (timeInSeconds < 3600 * 2) times = "hour"
-			else "hours"
+			else times = "hours"
 		}
 		
 		// minutes
 		else if (timeInSeconds > 60) {
 			if (timeInSeconds < 120) times = "min"
-			else "mins"
+			else times = "mins"
 		}
 		
 		// seconds
@@ -252,6 +252,7 @@ export function triggerGnome() {
 	unlockAchievement("gnome")
 }
 
+export let hexagonIntro;
 export let hasStartedGame:boolean;
 export function gamescene() {
 	return scene("gamescene", () => {
@@ -354,6 +355,10 @@ export function gamescene() {
 					else { autoLoopTime = 0; hexagon.autoClick() }
 					excessTime = 0
 				}
+			}
+
+			else {
+				autoLoopTime = 0
 			}
 
 			if (sleeping) timeSlept += dt()
@@ -466,6 +471,8 @@ export function gamescene() {
 			}
 		}
 
+		hexagonIntro = introAnimations.intro_hexagon
+
 		if (hasStartedGame) {
 			Object.values(introAnimations).filter(animation => !animation.name.includes("hopes")).forEach((animation) => {
 				animation()
@@ -516,6 +523,7 @@ export function gamescene() {
 						case 25:
 							introAnimations.intro_folderObj()
 							hasStartedGame = true;
+							folderObj.area.scale = vec2(1.2)
 							ROOT.trigger("gamestart")
 						break;
 					}

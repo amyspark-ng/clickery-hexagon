@@ -20,6 +20,7 @@ import { medalsWinContent } from "../medalsWin.ts";
 import { ROOT } from "../../../main.ts";
 import { positionSetter } from "../../../plugins/positionSetter.js";
 import { dummyShadow } from "../../../plugins/dummyShadow.js";
+import { ascending } from "../../ascension.ts";
 
 export let infoForWindows = {};
 export let isHoveringAWindow = false;
@@ -450,11 +451,10 @@ export function folderObjManaging() {
 			update() {
 				this.flipX = folded ? true : false
 				
-				this.area.scale = (hasStartedGame == false) ? vec2(0) : vec2(1.2) 
-				
 				if (curDraggin?.is("gridMiniButton") || curDraggin?.is("minibutton")) return
 				if (!movingMinibuttons) {
 					if (isKeyPressed("space") || (isMousePressed("left") && this.isHovering())) {
+						if (ascending == true) return
 						this.manageFold()
 						this.deleteSlots()
 						bop(this)
@@ -479,6 +479,7 @@ export function folderObjManaging() {
 
 	// this can't be attached to the buttons because you won't be able to call the event if the buttons don't exist
 	folderObj.onCharInput((key) => {
+		if (ascending) return;
 		if (isKeyDown("control")) return
 		if (curDraggin) return
 

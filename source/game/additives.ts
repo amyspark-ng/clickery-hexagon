@@ -191,10 +191,9 @@ export function addToast(opts:toastOpts) {
 
 		toastBg.height = opts.icon ? 80 : 100;
 
-		toastBg.onMousePress("left", () => {
-			if (!toastBg.isHovering()) return;
+		toastBg.onClick(() => {
 			toastBg.close();
-		});
+		})
 
 		let icon = add([
 			sprite("white_noise"),

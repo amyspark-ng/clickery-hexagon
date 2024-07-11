@@ -118,7 +118,6 @@ export function addHexagon() {
 			
 			clickPress() {
 				this.maxScaleIncrease = 0.98
-				
 				this.clickPressTween = tween(this.scaleIncrease, this.maxScaleIncrease, 0.35, (p) => this.scaleIncrease = p, easings.easeOutQuint)
 				this.isBeingClicked = true
 				mouse.grab()
@@ -343,7 +342,7 @@ export function addHexagon() {
 		}
 	});
 
-	hexagon.onMousePress("left", () => {
+	hexagon.onClick(() => {
 		if (hexagon.canClick && hexagon.isBeingHovered && !isHoveringAWindow) {
 			hexagon.clickPress()
 			GameState.stats.timesClicked++
@@ -360,7 +359,7 @@ export function addHexagon() {
 
 	hexagon.onMousePress("right", () => {
 		if (!GameState.unlockedWindows.includes("hexColorWin")) return;
-
+	
 		if (hexagon.isBeingHovered) {
 			manageWindow("hexColorWin")
 		}

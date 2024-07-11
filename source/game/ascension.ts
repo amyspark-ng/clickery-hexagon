@@ -5,6 +5,9 @@ import { waver } from "../plugins/wave";
 import { hexagon } from "./hexagon"
 import { bop } from "./utils";
 import { playSfx } from "../sound";
+import { folderObj } from "./windows/windows-api/windowsAPI";
+import { hexagonIntro } from "./gamescene";
+import { isWindowUnlocked } from "./unlockables";
 
 export let ascending = false;
 
@@ -40,15 +43,47 @@ function addCard(position:Vec2) {
 		"card",
 		{
 			indexInDeck: 0,
+			infoIdx: 0,
+			price: 0,
+			buy() {
+				if (GameState.mana >= this.price) {
+					tween(0.75, 1, 0.15, (p) => card.scale.y = p, easings.easeOutQuart)
+
+					if (card.infoIdx == 4 || card.infoIdx == 5) {
+						tween(card.scale.x, 0, 0.075, (p) => card.scale.x = p).onEnd(() => {
+							card.use(sprite("backcard"))
+							card.infoIdx -= 2
+							tween(card.scale.x, 1, 0.075, (p) => card.scale.x = p)
+						})
+					}
+	
+					playSfx("kaching", { detune: rand(-50, 50) })
+				}
+				
+				else {
+					tween(0.75, 1, 0.15, (p) => card.scale.x = p, easings.easeOutQuart)
+				}
+			},
+
+			drawInspect() {
+				drawText({
+					text: `deck: ${this.indexInDeck}\ninfo: ${this.infoIdx}`,
+					pos: vec2(0, -this.height),
+					anchor: "center",
+					size: 25,
+					color: WHITE
+				})
+			}
 		}
 	])
 
 	card.on("ready", () => {
 		card.onHover(() => {
 			tween(card.pos.y, cardYPositions.hovered, 0.25, (p) => card.pos.y = p, easings.easeOutQuart)
-			dialogue.box.trigger("talk", "card")
-			talk("card", cardsInfo[Object.keys(cardsInfo)[card.indexInDeck]].info)
 			tween(card.angle, choose([-1.5, 1.5]), 0.25, (p) => card.angle = p, easings.easeOutQuart)
+			
+			dialogue.box.trigger("talk", "card")
+			talk("card", cardsInfo[Object.keys(cardsInfo)[card.infoIdx]].info)
 		})
 
 		card.onHoverEnd(() => {
@@ -56,7 +91,8 @@ function addCard(position:Vec2) {
 		})
 
 		card.onClick(() => {
-			tween(0.75, 1, 0.15, (p) => card.scale.y = p, easings.easeOutQuart)
+			// if gamestate.score.mana >= card.price
+			card.buy()
 		})
 	})
 
@@ -75,12 +111,7 @@ function addMage() {
 		z(1),
 		opacity(1),
 		anchor("center"),
-		{
-			// skipSay() {
-			// 	activeLetterWaits.forEach(waitCall => waitCall.cancel());
-			// 	dialogue.textBox.text = this.currentlySaying
-			// }
-		}
+		"mage",
 	]);
 	mage.startWave()
 
@@ -261,9 +292,11 @@ function addDialogueBox() {
 		pos(623, 144),
 		anchor("center"),
 		scale(),
+		area({ scale: 0.8 }),
 		opacity(),
 		layer("ascension"),
 		z(1),
+		"textbox",
 		{
 			defaultPos: vec2(623, 144),
 		}
@@ -281,6 +314,11 @@ function addDialogueBox() {
 		}
 
 		tween(0.75, 1, 0.25, (p) => box.scale.x = p, easings.easeOutQuint)
+	})
+
+	box.onClick(() => {
+		if (dialogue.textBox.text == currentlySaying) return
+		skipTalk()
 	})
 
 	tween(0.5, 1, 0.25, (p) => box.scale.x = p, easings.easeOutQuint)
@@ -305,7 +343,10 @@ function addDialogueText() {
 		anchor("center"),
 		color(BLACK),
 		layer("ascension"),
+		opacity(),
 		z(dialogue.box.z + 1),
+		"textbox",
+		"boxText",
 	])
 
 	return textBox
@@ -313,7 +354,7 @@ function addDialogueText() {
 
 function talk(speaker = "mage" || "card", thingToSay = "dialogue here", speed?) {
 	dialogue.box.trigger("talk", speaker)
-	
+
 	speed = speed || 0.05
 
 	// if speed is null find the dialogue in dialogues and use that speed, else just use the default one
@@ -344,21 +385,26 @@ function talk(speaker = "mage" || "card", thingToSay = "dialogue here", speed?) 
 	});
 }
 
-export function triggerAscension() {
+function skipTalk() {
+	activeLetterWaits.forEach(waitCall => waitCall.cancel());
+	dialogue.textBox.text = currentlySaying
+	tween(dialogue.box.defaultPos.y + 10, dialogue.box.defaultPos.y, 0.25, (p) => dialogue.box.pos.y = p, easings.easeOutQuint)
+	tween(dialogue.box.defaultPos.x + 10, dialogue.box.defaultPos.x, 0.25, (p) => dialogue.box.pos.x = p, easings.easeOutQuint)
+}
 
+export function triggerAscension() {
 	ascending = true
 
 	ROOT.trigger("ascension")
+	
+	hexagon.area.scale.x = 0
+	hexagon.area.scale.y = 0
 
-	hexagon.area.scale = vec2(0)
+	folderObj.area.scale = vec2(0)
 
 	get("window").forEach((window) => {
 		window.close()
 	})
-
-	// get("*", { recursive: true }).forEach((obj) => {
-	// 	obj.paused = true
-	// })
 
 	tween(hexagon.scaleIncrease, 0, 0.35, (p) => hexagon.scaleIncrease = p, easings.easeOutCubic)
 	tween(hexagon.stretchScaleIncrease, 0, 0.35, (p) => hexagon.stretchScaleIncrease = p, easings.easeOutCubic)
@@ -373,11 +419,13 @@ export function triggerAscension() {
 		pos(center()),
 		z(0),
 		layer("ascension"),
+		"ascensionBg"
 	])
 
+	let mage:any;
 	blackBg.fadeIn(0.35).onEnd(() => {
 		// ADD THE MAGEEEEE!!!!!!!! so excited
-		let mage = addMage()
+		mage = addMage()
 		tween(-489, -17, 0.5, (p) => mage.pos.x = p, easings.easeOutQuart)
 		tween(145, 154, 0.5, (p) => mage.pos.y = p, easings.easeOutQuart)
 		tween(0.5, 1, 0.5, (p) => mage.opacity = p, easings.easeOutQuart).onEnd(() => {
@@ -386,6 +434,10 @@ export function triggerAscension() {
 			dialogue.textBox = addDialogueText()
 			
 			talk("mage", "welcome to fortnite")
+		})
+
+		mage?.onKeyPress("escape", () => {
+			endAscension()
 		})
 	})
 
@@ -405,6 +457,28 @@ export function triggerAscension() {
 		// let randOffset = 0
 		tween(card.pos.y, cardYPositions.dealing + randOffset, 0.75, (p) => card.pos.y = p, easings.easeOutQuint)
 	}
+
+	// assign them the infostuff
+	get("card").forEach((card) => {
+		let actualIndexInDeck = map(card.indexInDeck, 1, 4, 4, 1)
+		
+		if (actualIndexInDeck == 3) {
+			if (!isWindowUnlocked("hexColorWin")) card.infoIdx = 4
+			else card.infoIdx = 2
+		}
+
+		else if (actualIndexInDeck == 4) {
+			if (!isWindowUnlocked("bgColorWin")) card.infoIdx = 5
+			else card.infoIdx = 3
+		}
+
+		else {
+			card.infoIdx = actualIndexInDeck - 1
+		}
+
+		// invert their infoIdx lol
+		// card.infoIdx = 3 - card.infoIdx
+	})
 
 	wait(0.75, () => {
 		let cardSpacing = 150
@@ -441,6 +515,7 @@ export function triggerAscension() {
 			anchor("left"),
 			layer("ascension"),
 			opacity(1),
+			"manaText",
 			{
 				hiddenXPos: -72,
 				update() {
@@ -451,5 +526,57 @@ export function triggerAscension() {
 	
 		manaText.fadeIn(0.35)
 		tween(manaText.hiddenXPos, 4, 0.5, (p) => manaText.pos.x = p, easings.easeOutQuart)
+	})
+}
+
+export function endAscension() {
+	folderObj.area.scale = vec2(1.2)
+	
+	GameState.ascendLevel++
+
+	ROOT.trigger("endAscension")
+
+	get("*", { recursive: true }).filter(obj => obj.layer == "ascension").forEach((obj) => {
+		if (obj.is("area")) obj.area.scale = vec2(0)
+		
+		if (obj.is("mage") || obj.is("manaText")) {
+			tween(obj.pos.x, obj.pos.x - obj.width, 0.5, (p) => obj.pos.x = p, easings.easeOutQuart).onEnd(() => destroy(obj))
+		}
+
+		else if (obj.is("card")) {
+			tween(obj.pos.y, obj.pos.y + obj.height, 0.5, (p) => obj.pos.y = p, easings.easeOutQuart).onEnd(() => destroy(obj))
+		}
+
+		else if (obj.is("textbox")) {
+			tween(obj.pos.y, -obj.height, 0.5, (p) => obj.pos.y = p, easings.easeOutQuart).onEnd(() => destroy(obj))
+		}
+
+		else if (obj.is("ascensionBg")) {
+			obj.fadeOut(0.5).onEnd(() => destroy(obj))
+		}
+	})
+
+	// turn everything back to 0
+	tween(GameState.score, 0, 0.5, (p) => GameState.score = Math.round(p), easings.easeOutQuad)
+	tween(GameState.clickers, 0, 0.5, (p) => GameState.clickers = Math.round(p), easings.easeOutQuad)
+	tween(GameState.cursors, 0, 0.5, (p) => GameState.cursors = Math.round(p), easings.easeOutQuad)
+
+	tween(GameState.clicksUpgradesValue, 0, 0.5, (p) => GameState.clicksUpgradesValue = Math.round(p), easings.easeOutQuad)
+	tween(GameState.cursorsUpgradesValue, 0, 0.5, (p) => GameState.cursorsUpgradesValue = Math.round(p), easings.easeOutQuad)
+	
+	GameState.upgradesBought = ["c_0"]
+	GameState.timeUntilAutoLoopEnds = 10
+
+	wait(0.25, () => {
+		tween(hexagon.scaleIncrease, 1, 0.25, (p) => hexagon.scaleIncrease = p, easings.easeOutQuint)
+		tween(hexagon.maxScaleIncrease, 1, 0.25, (p) => hexagon.maxScaleIncrease = p, easings.easeOutQuint)
+		tween(hexagon.stretchScaleIncrease, 1, 0.25, (p) => hexagon.stretchScaleIncrease = p, easings.easeOutQuint).onEnd(() => {
+			hexagon.area.scale = vec2(1)
+		})
+		hexagonIntro()
+	})
+
+	wait(0.5, () => {
+		ascending = false
 	})
 }
