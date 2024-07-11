@@ -117,6 +117,7 @@ export function loadEverything() {
 	loadSprite("osaka", "sprites/osaka.png")
 	loadSprite("floppy", "sprites/floppy.png")
 	loadSprite("panderito", "sprites/panderito.png")
+	loadSprite("smallpanderito", "sprites/smallpanderito.png")
 	loadSprite("folderObj", "sprites/folderObj.png")
 	loadSprite("speakers", "sprites/speakers.png", {
 		sliceX: 2,

@@ -189,7 +189,7 @@ function addStoreElement(winParent:any, opts = { key: "null", pos: vec2(0, 20) }
 		
 		if (isHoveringUpgrade) return
 		if (!btn.isHovering()) return;
-		// if (GameState.score < btn.price) return;
+		if (GameState.score < btn.price) return;
 
 		downEvent = btn.onMouseDown(() => {
 			btn.isBeingClicked = true

@@ -14,7 +14,7 @@ export function getComboFromClicks(clicks:number) {
 }
 
 export let comboBarContent;
-export let maxBarWidth = 0
+export let maxContentWidth = 0
 
 export function addComboBar() {
 	let targetPos = vec2(0, scoreText.height / 2 + scoreText.height / 4 - 6)
@@ -31,8 +31,8 @@ export function addComboBar() {
 		"comboBar",
 		{
 			update() {
-				this.width = lerp(this.width, scoreText.width, 1.1)
-				maxBarWidth = this.width
+				this.width = lerp(this.width, scoreText.width, 0.25)
+				maxContentWidth = this.width
 			}
 		}
 	])
@@ -52,25 +52,23 @@ export function addComboBar() {
 		{
 			update() {
 				if (!clickVars.constantlyClicking) {
-					if (this.width > 0) this.width--
-					clickVars.consecutiveClicks = map(this.width, 0, maxBarWidth, 0, COMBO_MAXCLICKS)
+					clickVars.consecutiveClicks -= 0.75
 					scoreVars.combo = getComboFromClicks(clickVars.consecutiveClicks)
-					if (this.width < maxBarWidth / 2) clickVars.maxedCombo = false
+					if (this.width < maxContentWidth / 2) clickVars.maxedCombo = false
 				}
 
 				else {
-					if (this.width < maxBarWidth) {
-						let mappedWidth = map(clickVars.consecutiveClicks, COMBO_MINCLICKS, COMBO_MAXCLICKS, 0, maxBarWidth)
-						this.width = lerp(this.width, mappedWidth, 1.1)
-					}
+					clickVars.consecutiveClicks = Math.round(clickVars.consecutiveClicks)
 				}
 
-				this.width = clamp(this.width, 0, maxBarWidth - 2)
-				clickVars.consecutiveClicks = Math.floor(clickVars.consecutiveClicks)
+				let mappedWidth = map(clickVars.consecutiveClicks, COMBO_MINCLICKS, COMBO_MAXCLICKS, 0, maxContentWidth)
+				this.width = lerp(this.width, mappedWidth, 0.25)
+				this.width = clamp(this.width, 0, maxContentWidth - 2)
 				
 				// # player "gave up"
 				if (this.width == 0 && !clickVars.constantlyClicking && clickVars.comboDropped == false) {
 					clickVars.comboDropped = true
+					clickVars.consecutiveClicks = 0
 					get("comboBar", { recursive: true }).forEach(comboBar => {
 						comboBar.fadeOut(0.25).onEnd(() => {
 							comboBar.destroy()
@@ -203,10 +201,10 @@ export function addPlusScoreText(opts:plusScoreOpts) {
 	}
 }
 
-export function increaseComboAnim() {
+export function increaseComboText() {
 	let blendFactor = 0
-	let increaseComboText = add([
-		text(`x${scoreVars.combo}`, {
+	let incComboText = add([
+		text(`[combo]x${scoreVars.combo}[/combo]`, {
 			font: "lambdao",
 			size: 48,
 			align: "center",
@@ -221,25 +219,24 @@ export function increaseComboAnim() {
 				})
 			}
 		}),
-		pos(mousePos().x, mousePos().y - 65),
+		pos(mousePos().x, mousePos().y - 80),
 		scale(),
 		opacity(),
 		layer("ui"),
 		color(),
-		timer(),
 		{
 			update() {
+				this.pos.y -= 0.5
 				blendFactor = map(scoreVars.combo, 0, 10, 0, 1)
 			}
 		}
 	])
 
 	let timeToDie = 2
-	increaseComboText.tween(vec2(0.5), vec2(1), 0.1, (p) => increaseComboText.scale = p, easings.easeOutElastic)
-	increaseComboText.tween(0.5, 1, 0.1, (p) => increaseComboText.opacity = p, easings.easeOutQuint).onEnd(() => {
-		increaseComboText.tween(increaseComboText.opacity, 0, timeToDie, (p) => increaseComboText.opacity = p, easings.easeOutQuint)
-		increaseComboText.wait(timeToDie, () => {
-			destroy(increaseComboText)
+	tween(0.5, 1, 0.1, (p) => incComboText.opacity = p, easings.easeOutQuint).onEnd(() => {
+		tween(incComboText.opacity, 0, timeToDie, (p) => incComboText.opacity = p, easings.easeOutQuint)
+		wait(timeToDie, () => {
+			destroy(incComboText)
 		})
 	})
 }
@@ -282,7 +279,7 @@ export function maxComboAnim() {
 	])
 
 	let timeToDie = 2
-	maxComboText.tween(vec2(0.5), vec2(1), 0.1, (p) => maxComboText.scale = p, easings.easeOutElastic)
+	maxComboText.tween(vec2(0.5), vec2(1), 0.1, (p) => maxComboText.scale = p, easings.easeOutQuad)
 	maxComboText.tween(0.5, 1, 0.1, (p) => maxComboText.opacity = p, easings.easeOutQuint).onEnd(() => {
 		maxComboText.tween(maxComboText.opacity, 0, timeToDie, (p) => maxComboText.opacity = p, easings.easeOutQuint)
 		maxComboText.wait(timeToDie, () => {
@@ -297,6 +294,7 @@ export function increaseCombo() {
 	tween(cam.scale, 0.95, 0.25 / 2, (p) => cam.scale = p, easings.easeOutQuint).onEnd(() => {
 		tween(cam.scale, 1, 0.25, (p) => cam.scale = p, easings.easeOutQuint)
 	})
+	if (scoreVars.combo != 10) increaseComboText()
 }
 
 export function startCombo() {

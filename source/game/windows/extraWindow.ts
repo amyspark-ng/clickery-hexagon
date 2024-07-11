@@ -7,6 +7,7 @@ import { bop } from "../utils";
 import { mouse } from "../additives";
 import { buttonSpacing, folderObj, infoForWindows, manageWindow, openWindow } from "./windows-api/windowsAPI";
 import { addMinibutton } from "./windows-api/minibuttons";
+import { destroyExclamation } from "../unlockables";
 
 export let gridContainer;
 
@@ -206,6 +207,7 @@ export function makeGridMinibutton(idx, gridSlot, winParent) {
 			gridMiniButton.pos = toScreen(mousePos())
 			gridMiniButton.z = mouse.z - 1
 
+			destroyExclamation(gridMiniButton)
 			gridMiniButton.layer = "mouse"
 			mouse.grab()
 			gridMiniButton.pick()

@@ -10,6 +10,7 @@ import { curDraggin } from "../plugins/drag.js"
 import { DEBUG, ROOT } from "../main.ts"
 import { powerupManagement, powerups, spawnPowerup } from "./powerups.ts"
 import { isAchievementUnlocked, unlockables, unlockAchievement } from "./unlockables.ts"
+import { ascending, set_ascending } from "./ascension.ts"
 
 let panderitoLetters = "panderito".split("")
 export let panderitoIndex = 0
@@ -71,12 +72,10 @@ export function togglePanderito() {
 
 	if (GameState.settings.panderitoMode) {
 		hexagon.use(sprite("panderito"))
-		hexagon.area.scale = hexagon.panderitoAreaScale
 	}
 	
 	else {
 		hexagon.use(sprite("hexagon"))
-		hexagon.area.scale = hexagon.areaScale
 	}
 
 	GameState.save(false)
@@ -164,10 +163,10 @@ function welcomeBack(idle = false) {
 		}
 
 		let body = `You were out for: ${toHHMMSS(timeInSeconds)} ${times}`; 
-		if (score != null) body += `\n+${score}` 
+		if (score != null) body += `\n+${formatNumber(score)}` 
 		
 		let hasCombo = scoreVars.combo > 1
-		let hasPowerup = get("poweruptimer")?.length > 0
+		let hasPowerup = get("putimer")?.length > 0
 		let applicationMessage = ""
 		
 		if (hasCombo) applicationMessage += `\n(Combo is not applicable)`
@@ -249,7 +248,7 @@ export function triggerGnome() {
 		destroy(gnome)
 	})
 
-	unlockAchievement("gnome")
+	if (isAchievementUnlocked("gnome")) unlockAchievement("gnome")
 }
 
 export let hexagonIntro;
@@ -258,6 +257,7 @@ export function gamescene() {
 	return scene("gamescene", () => {
 		GameState.load() // loadSave()
 		hasStartedGame = GameState.totalScore > 1
+		set_ascending(false)
 
 		cam.scale = 1
 
@@ -477,11 +477,12 @@ export function gamescene() {
 			Object.values(introAnimations).filter(animation => !animation.name.includes("hopes")).forEach((animation) => {
 				animation()
 			})
-			hexagon.canClick = true
+			hexagon.interactable = true
 			ROOT.trigger("gamestart")
 		}
 
 		else {
+			hexagon.interactable = false
 			let black = add([
 				rect(width(), height()),
 				pos(center()),
@@ -496,7 +497,7 @@ export function gamescene() {
 				black.destroy()
 				let ominus = playSfx("ominus", { loop: true })
 				playSfx("biglight")
-				hexagon.canClick = true
+				hexagon.interactable = true
 				spsText.opacity = 0
 				scoreText.opacity = 0
 				buildingsText.opacity = 0

@@ -7,7 +7,7 @@ import { playSfx } from "../sound.ts";
 import { isDraggingAWindow, isHoveringAWindow, manageWindow } from "./windows/windows-api/windowsAPI.ts";
 import { waver } from "../plugins/wave.js";
 import { isDraggingASlider } from "./windows/colorWindow.ts";
-import { addPlusScoreText, getClicksFromCombo, increaseCombo, increaseComboAnim, maxComboAnim, startCombo } from "./combo-utils.ts";
+import { addPlusScoreText, getClicksFromCombo, increaseCombo, increaseComboText, maxComboAnim, startCombo } from "./combo-utils.ts";
 import { addConfetti } from "../plugins/confetti.js";
 import { curDraggin } from "../plugins/drag.js";
 import { cam } from "./gamescene.ts";
@@ -36,14 +36,15 @@ export let clickVars = {
 export const COMBO_MINCLICKS = 25; // 25
 export const COMBO_MAXCLICKS = 160; // 160
 export const COMBO_MAX = 10
+
 const hoverRotSpeedIncrease = 0.01 * 0.25
+let maxRotSpeed = 10
 
 let consecutiveClicksWaiting = null;
 let spsUpdaterTimer = 0; // to properly calculate sps
 
 export let hexagon:any;
 
-let maxRotSpeed = 10
 export function addHexagon() {
 	// reset variables
 	scoreVars.combo = 1
@@ -73,7 +74,7 @@ export function addHexagon() {
 				vec2(315, 293),
 			]),
 			offset: vec2(-512, -293),
-			scale: GameState.settings.panderitoMode ? vec2(0.5, 1) : vec2(1.08, 1.08) 
+			scale: vec2(1.08), 
 		}),		
 		z(0),
 		layer("hexagon"),
@@ -87,16 +88,17 @@ export function addHexagon() {
 			scaleIncrease: 1,
 			maxScaleIncrease: 1,
 			stretchScaleIncrease: 1,
-			canClick: false,
+			interactable: true,
 			isBeingClicked: false,
 			rotationSpeed: 0.01,
 			clickPressTween: null,
 			stretched: true,
-
-			areaScale: vec2(1.01),
-			panderitoAreaScale: vec2(0.5, 1).dot(vec2(1.25)),
 			update() {
-				this.area.scale = vec2(1 / this.scale.x, 1 / this.scale.y)
+				if (this.interactable) {
+					if (GameState.settings.panderitoMode) this.area.scale = vec2(0.65, 1.1)
+					else this.area.scale = vec2(1.08)
+				}
+				else this.area.scale = vec2(0)
 				
 				if (this.isBeingHovered) maxRotSpeed = 4.75
 				else maxRotSpeed = 4
@@ -112,8 +114,6 @@ export function addHexagon() {
 				if (this.angle >= 360) {
 					this.angle = 0
 				}
-				
-				this.canClick == false ? this.area.scale = vec2(0) : this.area.scale = vec2(1.08)
 			},
 			
 			clickPress() {
@@ -159,7 +159,6 @@ export function addHexagon() {
 						for (let i = 2; i < COMBO_MAX + 1; i++) {
 							if (clickVars.consecutiveClicks == getClicksFromCombo(i)) {
 								increaseCombo()
-								increaseComboAnim()
 							}
 						}
 					}
@@ -188,6 +187,46 @@ export function addHexagon() {
 				tween(scoreText.scaleIncrease, 1.05, 0.2, (p) => scoreText.scaleIncrease = p, easings.easeOutQuint).onEnd(() => {
 					tween(scoreText.scaleIncrease, 1, 0.2, (p) => scoreText.scaleIncrease = p, easings.easeOutQuint)
 				})
+
+				if (GameState.settings.panderitoMode) {
+					let smallpanderito = add([
+						sprite("smallpanderito"),
+						anchor("center"),
+						pos(mouse.pos),
+						rotate(rand(0, 360)),
+						body(),
+						area({ collisionIgnore: ["smallpanderito", "autoCursor"] }),
+						opacity(1),
+						scale(rand(1, 2.5)),
+						layer("ui"),
+						color(),
+						"smallpanderito",
+					])
+					smallpanderito.gravityScale = 0.5
+
+					smallpanderito.vel.x = rand(30, 75)
+					
+					let randomColor = rgb(rand(0, 255), rand(0, 255), rand(0, 255))
+					smallpanderito.color = smallpanderito.color.lerp(randomColor, 0.1)
+					if (chance(0.5)) {
+						tween(smallpanderito.angle, smallpanderito.angle + 90, 1, (p) => smallpanderito.angle = p, )
+					}
+
+					else {
+						tween(smallpanderito.angle, smallpanderito.angle - 90, 1, (p) => smallpanderito.angle = p, )
+						smallpanderito.vel.x *= -1
+					}
+
+					wait(0.5, () => {
+						tween(smallpanderito.opacity, 0, 0.5, (p) => smallpanderito.opacity = p, easings.easeOutQuint)
+					})
+				
+					// ok you're done
+					wait(1, () => {
+						destroy(smallpanderito)
+					})
+				}
+
 				this.trigger("clickrelease")
 			},
 
@@ -198,11 +237,11 @@ export function addHexagon() {
 					scale(0.8),
 					rotate(0),
 					layer("ui"),
-					area({ collisionIgnore: ["cursor"] }),
+					area({ collisionIgnore: ["autoCursor"] }),
 					body(),
 					opacity(1),
 					anchor("center"),
-					"cursor",
+					"autoCursor",
 					{
 						update() {
 							// debug.log(this.angle)
@@ -302,7 +341,7 @@ export function addHexagon() {
 			},
 
 			startHover() {
-				if (this.canClick) {
+				if (this.interactable) {
 					tween(this.scaleIncrease, 1.05, 0.35, (p) => this.scaleIncrease = p, easings.easeOutCubic);
 					this.rotationSpeed += hoverRotSpeedIncrease
 					this.isBeingHovered = true
@@ -312,7 +351,7 @@ export function addHexagon() {
 			},
 
 			endHover() {
-				if (this.canClick) {
+				if (this.interactable) {
 					tween(this.scaleIncrease, 1, 0.35, (p) => this.scaleIncrease = p, easings.easeOutCubic);
 					this.isBeingClicked = false
 					this.rotationSpeed = 0
@@ -343,7 +382,7 @@ export function addHexagon() {
 	});
 
 	hexagon.onClick(() => {
-		if (hexagon.canClick && hexagon.isBeingHovered && !isHoveringAWindow) {
+		if (hexagon.interactable && hexagon.isBeingHovered && !isHoveringAWindow) {
 			hexagon.clickPress()
 			GameState.stats.timesClicked++
 		}
@@ -351,7 +390,7 @@ export function addHexagon() {
 	
 	hexagon.onMouseRelease("left", () => {
 		if (hexagon.isBeingHovered) {
-			if (hexagon.canClick && hexagon.isBeingClicked && !isHoveringAWindow) {
+			if (hexagon.interactable && hexagon.isBeingClicked && !isHoveringAWindow) {
 				hexagon.clickRelease()
 			}
 		}

@@ -6,40 +6,41 @@ import { hexagon } from "./hexagon";
 import { checkForUnlockable } from "./unlockables";
 import { isHoveringAWindow } from "./windows/windows-api/windowsAPI";
 import { triggerAscension } from "./ascension";
+import { powerups, spawnPowerup } from "./powerups";
 
-// candy&Carmel helped here!!!!
+// candy&Carmel helped here, pretty genius stuff!!!!
 type formatNumberOpts = {
 	fixAmount?:number,
 	price?:boolean,
 	letterSuffixes?:boolean,
-	useCommaForDecimals?:boolean,
 }
 
 let numTypes = {
-	K: { small: "k", large: "thousands" },
-	M: { small: "m", large: "millions" },
-	B: { small: "b", large: "billions" },
-	T: { small: "t", large: "trillions" },
-	Qa: { small: "qa", large: "quadrillions" },
-	Qt: { small: "qt", large: "quintillions" },
-	St: { small: "st", large: "sextillions" },
-	Sp: { small: "sp", large: "septillions" },
-	Oc: { small: "oc", large: "octillions" },
-	Nn: { small: "nn", large: "nonillions" },
-	Dc: { small: "dc", large: "decillions" },
-	Un: { small: "un", large: "undecillions" },
-	Du: { small: "du", large: "duodecillions" },
-	Te: { small: "te", large: "tredecillions" },
-	Qd: { small: "qd", large: "quattuordecillions" },
-	Qu: { small: "qu", large: "quindecillions" },
-	Sd: { small: "sd", large: "sexdecillions" },
-	Su: { small: "su", large: "septendecillions" },
-	Oe: { small: "oe", large: "octodecillions" },
-	No: { small: "no", large: "novemdecillions" },
-	Ve: { small: "ve", large: "vigintillion" },
+	K: { small: "K", large: "Thousands" },
+	M: { small: "M", large: "Millions" },
+	B: { small: "B", large: "Billions" },
+	T: { small: "T", large: "Trillions" },
+	Qa: { small: "Qa", large: "Quadrillions" },
+	Qt: { small: "Qi", large: "Quintillions" },
+	St: { small: "Sx", large: "Sextillions" },
+	Sp: { small: "Sp", large: "Septillions" },
+	Oc: { small: "Oc", large: "Octillions" },
+	Nn: { small: "No", large: "Nonillions" },
+	Dc: { small: "Dc", large: "Decillions" },
+	Un: { small: "Und", large: "Undecillions" },
+	Du: { small: "DoD", large: "Duodecillions" },
+	Te: { small: "TrD", large: "Tredecillions" },
+	Qd: { small: "QaD", large: "Quattuordecillion" },
+	Qu: { small: "QiD", large: "Quindecillions" },
+	Sd: { small: "SxD", large: "Sexdecillions" },
+	Su: { small: "SpD", large: "Septemdecillion" },
+	Oe: { small: "OcD", large: "Octodecillion" },
+	No: { small: "NoD", large: "Novemdecillion" },
+	Ve: { small: "VgT", large: "Vigintillion" },
 }
 
 // definetely not stack overflow
+// dots are always for thousands, leave it like this
 export function simpleNumberFormatting(value) {
 	let integerStr = value.toString()
 	var len = integerStr.length;
@@ -58,53 +59,39 @@ export function simpleNumberFormatting(value) {
 	return formatted;
 }
 
+// do check for decimals here
 export function formatNumber(value:number, opts?:formatNumberOpts):string {
 	let fixAmount = opts?.fixAmount || 3
 	let isPrice = opts?.price || false
 	let letterSuffixes = opts?.letterSuffixes || true
-	let commaDecimals = opts?.useCommaForDecimals || GameState?.settings?.commaInsteadOfDot
+
+	let returnValue = ""
 
 	// if is a small number, bruh
-	if (value < 999) {
-		let string = isPrice ? "$" : ""
-		string += value
-		return string;
-	}
-	
-	// get the suffix
-	let suffix:string = "";
-	let typeOfSuffix = letterSuffixes == true ? "small" : "large"
-	if (value > 999 && value < 999999) suffix = numTypes.K[typeOfSuffix];
-	else if (value > 999999 && value < 999999999) suffix = numTypes.M[typeOfSuffix];
-	else if (value > 999999999 && value < 999999999999) suffix = numTypes.B[typeOfSuffix];
-	else if (value > 999999999999 && value < 999999999999999) suffix = numTypes.T[typeOfSuffix];
-	else if (value > 999999999999999 && value < 999999999999999999) suffix = numTypes.Qa[typeOfSuffix];
-	else if (value > 999999999999999999 && value < 999999999999999999999) suffix = numTypes.Qt[typeOfSuffix];
-	else if (value > 999999999999999999999 && value < 999999999999999999999999) suffix = numTypes.St[typeOfSuffix];
-	else if (value > 999999999999999999999999) suffix = numTypes.Sp[typeOfSuffix];
-	if (letterSuffixes == true) suffix.replace (/^/,' ');
-
-	let valueToReturn:string = "";
-
-	let splittedNumbers = simpleNumberFormatting(value).split(".") 
-
-	let mainNumber = splittedNumbers[0]
-	let otherThreeNumbers = "";
-	
-	for (let i = 0; i < fixAmount; i++) {
-		otherThreeNumbers += splittedNumbers[1][i]	
+	if (value < 1000) {
+		returnValue = value.toString()
 	}
 
-	let point = "";
-	if (commaDecimals == true) point = "," 
-	else point = "."
-	
-	valueToReturn = `${mainNumber}${point}${otherThreeNumbers}${suffix}`
+	// if number is inside the limits (will always try to be)
+	else if (value < Math.pow(1000, Object.keys(numTypes).length) && value > 999) {
+		// run until it finds the numType
+		for (let i = 1; value >= Math.pow(1000, i); i++) {
+			// turn it into a smaller version
+			let numberValue = (value / Math.pow(1000, i)).toFixed(fixAmount) 
+			let suffix = (letterSuffixes == true ? "" : " ") + numTypes[Object.keys(numTypes)[i]][letterSuffixes ? "small" : "large"];
+			returnValue = numberValue + suffix
+		}
+	}
 
-	// make it price
-	if (isPrice == true) valueToReturn = valueToReturn.replace (/^/,'$');
-	
-	return valueToReturn
+	// very big number
+	else {
+		returnValue = value.toExponential(2);
+	}
+
+	if (isPrice == true) returnValue = returnValue.replace (/^/,'$');
+	if (GameState.settings.commaInsteadOfDot == true) returnValue = returnValue.replace (/,/,'.');
+
+	return returnValue
 }
 
 export function formatMusicTime(timeInSeconds) {
@@ -325,10 +312,13 @@ export function debugFunctions() {
 		}
 	
 		else if (isKeyPressed("f")) {
-			triggerAscension()
+			spawnPowerup({
+				type: choose(Object.keys(powerups)),
+				pos: randomPos()
+			})
 		}
 
-		else if (isKeyPressed("p")) {
+		else if (isKeyPressed("o")) {
 			GameState.clickers += 50
 		}
 		

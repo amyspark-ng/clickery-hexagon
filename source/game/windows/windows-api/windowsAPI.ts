@@ -273,10 +273,12 @@ export function openWindow(windowKey = "") {
 	tween(vec2(0.8), vec2(1), 0.32, (p) => windowObj.scale = p, easings.easeOutQuint)
 	
 	// manage the minibutton
-	let correspondingMinibutton = get("minibutton").filter(minibutton => minibutton["windowKey"] === windowKey)[0]
-	if (!correspondingMinibutton) return
-	correspondingMinibutton.window = windowObj
-	bop(correspondingMinibutton)
+	let correspondingMinibutton = get("minibutton").filter(minibutton => minibutton.windowKey === windowKey)[0]
+	
+	if (correspondingMinibutton != null) {
+		correspondingMinibutton.window = windowObj
+		bop(correspondingMinibutton)
+	}
 
 	// manage some hovers
 	get("hoverObj", { recursive: true }).forEach((obj) => {
@@ -284,8 +286,10 @@ export function openWindow(windowKey = "") {
 	})
 
 	windowObj.on("close", () => {
-		correspondingMinibutton.window = null
-		bop(correspondingMinibutton)
+		if (correspondingMinibutton != null) {
+			correspondingMinibutton.window = null
+			bop(correspondingMinibutton)
+		}
 	
 		get("hoverObj", { recursive: true }).forEach((obj) => {
 			if (obj.isHovering() && !obj.dragging) obj.startHover()
@@ -548,8 +552,6 @@ export function folderObjManaging() {
 		minibutton.color = blendColors(WHITE, BLACK, blackness)
 	})
 }
-
-// TODO: Re do unlock window function
 
 export function emptyWinContent(winParent) {
 	winParent.add([

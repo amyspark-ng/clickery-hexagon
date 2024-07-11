@@ -62,26 +62,26 @@ export function uiCounters() {
 				let textThing = "/s"
 				switch (GameState.settings.spsTextMode) {
 					case 1:
-						textThing = "/s"
+						textThing = "/sec"
 					break;
 					case 2:
-						textThing = "/m"
+						textThing = "/min"
 					break;
 					case 3:
-						textThing = "/h"
+						textThing = "/hour"
 					break;
 					default: 
-						textThing = "/s"
+						textThing = "/sec"
 					break;
 				}
 
-				let valueToReturn = formatNumber(value, { letterSuffixes: false })
+				let valueToReturn = formatNumber(Number(value.toFixed(2)), { fixAmount: 2,letterSuffixes: false })
 				return valueToReturn + textThing
 			},
 			updateValue() {
 				// shoutout to Candy&Carmel
 				let multiplyValue = GameState.settings.spsTextMode ? Math.pow(60, GameState.settings.spsTextMode-1) : 1;
-				this.value = Math.round(scoreVars.scorePerSecond) * multiplyValue
+				this.value = scoreVars.scorePerSecond * multiplyValue
 			},
 			update() {
 				if (isMousePressed("left") && this.isHovering()) {

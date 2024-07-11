@@ -10,6 +10,9 @@ import { hexagonIntro } from "./gamescene";
 import { isWindowUnlocked } from "./unlockables";
 
 export let ascending = false;
+export function set_ascending(value) {
+	ascending = value
+}
 
 let cardsInfo = {
 	"clickersCard": { info: "Clickers are +1% more efficient" },
@@ -397,9 +400,7 @@ export function triggerAscension() {
 
 	ROOT.trigger("ascension")
 	
-	hexagon.area.scale.x = 0
-	hexagon.area.scale.y = 0
-
+	hexagon.interactable = false
 	folderObj.area.scale = vec2(0)
 
 	get("window").forEach((window) => {
@@ -571,7 +572,7 @@ export function endAscension() {
 		tween(hexagon.scaleIncrease, 1, 0.25, (p) => hexagon.scaleIncrease = p, easings.easeOutQuint)
 		tween(hexagon.maxScaleIncrease, 1, 0.25, (p) => hexagon.maxScaleIncrease = p, easings.easeOutQuint)
 		tween(hexagon.stretchScaleIncrease, 1, 0.25, (p) => hexagon.stretchScaleIncrease = p, easings.easeOutQuint).onEnd(() => {
-			hexagon.area.scale = vec2(1)
+			hexagon.interactable = true
 		})
 		hexagonIntro()
 	})

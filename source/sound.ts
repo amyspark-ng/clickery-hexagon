@@ -224,9 +224,6 @@ export function volumeManager() {
 					})
 					speaker.hidden = false
 					speaker.frame = GameState.settings.music.muted ? 0 : 1
-					get("bpmChange", { recursive: true }).forEach((bpmChange) => {
-						GameState.settings.music.muted ? bpmChange.stopWave() : bpmChange.startWave()
-					})
 					bop(speaker, 0.05)
 
 					// toggle checkbox in setings window

@@ -1,8 +1,10 @@
-import { Vec2 } from "kaplay"
+import { TextCompOpt, Vec2 } from "kaplay"
 import { waver } from "../plugins/wave";
 import { playSfx } from "../sound";
 import { GameState } from "../gamestate";
-import { parseAnimation } from "./utils";
+import { bop, formatNumber, parseAnimation } from "./utils";
+import { scoreVars } from "./hexagon";
+import { positionSetter } from "../plugins/positionSetter";
 
 /*
 types of powerups
@@ -31,18 +33,21 @@ type powerupOpt = {
 
 // isn't spaceBetweenTimers same as timerSpacing????????????
 let spaceBetweenTimers = 65
-function getTimerPos(index:number, timerSpacing = 65) {
-	return (width() + spaceBetweenTimers / 2) - timerSpacing * (index) - timerSpacing;
+function getTimerPos(index:number) {
+	return (width() + spaceBetweenTimers / 2) - spaceBetweenTimers * (index) - spaceBetweenTimers;
 }
 
 function addTimer(opts:{ sprite: string, type: string }) {
 	let timerObj = add([
-		sprite("white_noise"),
+		rect(60, 60),
+		color(WHITE),
+		outline(3, BLACK),
 		pos(0, 40),
 		anchor("center"),
 		opacity(1),
 		rotate(0),
 		layer("ui"),
+		area(),
 		"putimer",
 		`${opts.type}_putimer`,
 		{
@@ -50,9 +55,6 @@ function addTimer(opts:{ sprite: string, type: string }) {
 			updateTime() {
 				tween(vec2(1), vec2(1.1), 0.32, (p) => this.scale = p, easings.easeOutQuint).onEnd(() => {
 					tween(this.scale, vec2(1), 0.32, (p) => this.scale = p, easings.easeOutElastic)
-					tween(-9, 9, 0.15, (p) => this.angle = p, easings.easeOutElastic).onEnd(() => {
-						tween(this.angle, 0, 0.32, (p) => this.angle = p, easings.easeOutQuint)
-					})
 				})
 			},
 			end() {
@@ -79,17 +81,13 @@ function addTimer(opts:{ sprite: string, type: string }) {
 
 	timerObj.pos.x = getTimerPos(timerObj.index)
 
-	parseAnimation(timerObj, opts.sprite)
-
-	timerObj.width = 60
-	timerObj.height = 60
-
 	// add the text object
 	timerObj.add([
 		text("", { font: "lambdao", size: timerObj.height / 2 }),
-		pos(0, timerObj.height / 2),
+		pos(0, timerObj.height / 2 + 15),
 		anchor("center"),
 		opacity(),
+		z(3),
 		{
 			update() {
 				this.opacity = timerObj.opacity
@@ -99,10 +97,120 @@ function addTimer(opts:{ sprite: string, type: string }) {
 			}
 		}
 	])
+
+	timerObj.onClick(() => {
+		if (get(`poweruplog_${opts.type}`).length == 0) {
+			bop(timerObj)
+			addPowerupLog(opts.type)
+		}
+	})
+
+	let icon = timerObj.add([
+		sprite("white_noise"),
+		anchor("center"),
+		z(1),
+		{
+			update() {
+				this.opacity = timerObj.opacity
+			}
+		}
+	])
+
+	parseAnimation(icon, opts.sprite)
+
+	icon.width = 50
+	icon.height = 50
+
+	let maxTime = powerups[opts.type].removalTime
+
+	let round = timerObj.add([
+		z(2),
+		{
+			draw() {
+				drawRect({
+					width: timerObj.width - timerObj.outline.width,
+					height: map(powerups[opts.type].removalTime, 0, maxTime, 0, timerObj.height - timerObj.outline.width),
+					color: YELLOW,
+					anchor: "bot",
+					pos: vec2(0, timerObj.height / 2),
+					opacity: 0.25,
+				})
+			}
+		}
+	])
+}
+
+export function addPowerupLog(powerupType) {
+	let powerupTime = powerups[powerupType].removalTime
+	let textInText = ""
+
+	let bgOpacity = 0.95
+	let bg = add([
+		rect(300, 100, { radius: 5 }),
+		pos(center().x, height() - 100),
+		color(BLACK.lighten(2)),
+		positionSetter(),
+		anchor("center"),
+		layer("powerups"),
+		opacity(bgOpacity),
+		z(1),
+		`poweruplog_${powerupType}`,
+		{
+			draw() {
+				// drawSprite({
+				// 	sprite: "hexagon",
+				// 	scale: vec2(0.5),
+				// 	pos: vec2(-bg.width, -bg.height),
+				// 	color: Color.fromArray(powerups[powerupType].color),
+				// })
+			}
+		}
+	])
+
+	let textInBgOpts = { size: 25, align: "center", width: 300 } 
+	let textInBg = bg.add([
+		text("", textInBgOpts as TextCompOpt),
+		pos(0, 0),
+		anchor("center"),
+		area(),
+		opacity(),
+		{
+			update() {
+				if (powerups[powerupType].removalTime == null) {powerupTime = 0; return}
+				powerupTime = powerups[powerupType].removalTime.toFixed(1)
+				let powerupMultiplier = powerups[powerupType].multiplier
+
+				if (powerupType == "clicks") textInText = `Click production increased x${powerupMultiplier} for ${powerupTime} secs`
+				else if (powerupType == "cursors") textInText = `Cursors production increased x${powerupMultiplier} for ${powerupTime} secs`
+				else if (powerupType == "time") {
+					textInText = `+${formatNumber(scoreVars.autoScorePerSecond * 60)}, the score you would have gained in 1 minute`
+				}
+				else if (powerupType == "awesome") textInText = `Score production increased by x${powerupMultiplier} for ${powerupTime}, AWESOME!!`
+				else if (powerupType == "store") textInText = `Store prices have a discount of ${Math.round(powerupMultiplier * 100)}% for ${powerupTime} secs, get em' now!`
+				else textInText = "errm what the sigma"
+
+				this.text = textInText
+			}
+		}
+	])
+
+	bg.onUpdate(() => {
+		bg.width = 315
+		bg.height = formatText({ text: textInText, ...textInBgOpts as TextCompOpt }).height + 15
+	})
+
+	tween(0, bgOpacity, 0.5, (p) => bg.opacity = p, easings.easeOutQuad)
+	tween(height() + bg.height, height() - bg.height, 0.5, (p) => bg.pos.y = p, easings.easeOutQuad)
+
+	wait(2.5, () => {
+		tween(bg.pos.y, bg.pos.y - bg.height, 0.5, (p) => bg.pos.y = p, easings.easeOutQuad)
+		bg.fadeOut(0.5).onEnd(() => destroy(bg))
+		tween(textInBg.opacity, 0, 0.5, (p) => textInBg.opacity = p, easings.easeOutQuad)
+	})
 }
 
 export function spawnPowerup(opts:powerupOpt) {
-	let powerup = add([
+	let powerupObj = add([
 		sprite("white_noise"),
 		pos(opts.pos),
 		scale(3),
@@ -190,30 +298,31 @@ export function spawnPowerup(opts:powerupOpt) {
 				// if there's already a timer don't add a new one!
 				let checkTimer = get(`${this.type}_putimer`)[0] 
 				if (checkTimer) checkTimer.updateTime()
-				else addTimer({ sprite: powerups[powerup.type].sprite, type: this.type}) 
+				else addTimer({ sprite: powerups[powerupObj.type].sprite, type: this.type}) 
 			}
 		}
 	])
 
 	// other stuff
-	parseAnimation(powerup, powerups[opts.type].sprite)
-	powerup.startWave()
+	parseAnimation(powerupObj, powerups[opts.type].sprite)
+	powerupObj.startWave()
 
 	// spawn anim
-	tween(vec2(powerup.maxScale).sub(0.4), vec2(powerup.maxScale), 0.25, (p) => powerup.scale = p, easings.easeOutBack)
-	tween(0, 1, 0.2, (p) => powerup.opacity = p, easings.easeOutBack)
+	tween(vec2(powerupObj.maxScale).sub(0.4), vec2(powerupObj.maxScale), 0.25, (p) => powerupObj.scale = p, easings.easeOutBack)
+	tween(0, 1, 0.2, (p) => powerupObj.opacity = p, easings.easeOutBack)
 
 	// events
-	powerup.onHover(() => {
-		powerup.startHover()
+	powerupObj.onHover(() => {
+		powerupObj.startHover()
 	})
 
-	powerup.onHoverEnd(() => {
-		powerup.endHover()
+	powerupObj.onHoverEnd(() => {
+		powerupObj.endHover()
 	})
 
-	powerup.onClick(() => {
-		powerup.click()
+	powerupObj.onClick(() => {
+		powerupObj.click()
+		addPowerupLog(powerupObj.type)
 	})
 }
 
