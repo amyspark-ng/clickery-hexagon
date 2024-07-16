@@ -1,10 +1,13 @@
+YELLOW='\033[0;33m'
+LIGHTBLUE='\033[1;36m'
+OFF='\033[0m'
 
-echo "### UPLOADING TO ITCH.IO ###"
+echo -e "${YELLOW}### UPLOADING TO ITCH.IO ###${OFF}"
 pnpm build
 7z a -tzip ./build.zip ./www
 butler push build.zip amyspark-ng/clickery-hexagon:html5 --userversion 1.0
 
-echo "# Uploading source #"
+echo -e "${LIGHTBLUE}# Uploading source #${OFF}"
 
 # upload source
 7z a -tzip ./source.zip ./www ./source

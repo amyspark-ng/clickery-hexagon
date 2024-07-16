@@ -33,8 +33,8 @@ export let clickVars = {
 	constantlyClicking: false,
 }
 
-export const COMBO_MINCLICKS = 25; // 25
-export const COMBO_MAXCLICKS = 160; // 160
+export const COMBO_MINCLICKS = 25;
+export const COMBO_MAXCLICKS = 275;
 export const COMBO_MAX = 10
 
 const hoverRotSpeedIncrease = 0.01 * 0.25

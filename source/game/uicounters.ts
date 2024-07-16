@@ -121,7 +121,7 @@ export function uiCounters() {
 					pos: vec2(this.pos.x + clickersWidth + 5, 28),
 					anchor: "center",
 					scale: 0.75,
-					opacity: 0.9
+					opacity: this.opacity * 0.9
 				})
 
 				// cursors
@@ -131,7 +131,7 @@ export function uiCounters() {
 					pos: vec2(this.pos.x + cursorsWidth + 5, -17),
 					anchor: "center",
 					scale: 0.75,
-					opacity: 0.9
+					opacity: this.opacity * 0.9
 				})
 			}
 		}

@@ -562,6 +562,7 @@ export function loadEverything() {
 	loadSprite("card", "sprites/ascendscene/card.png")
 
 	loadSprite("gnome", "sprites/gnome.png")
+	loadSprite("pinch", "sprites/pinch.png")
 	//#endregion
 	//#endregion SPRITES
 

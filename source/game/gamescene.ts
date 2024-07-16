@@ -491,6 +491,7 @@ export function gamescene() {
 		}
 
 		else {
+			gameBg.color.a = 1
 			hexagon.interactable = false
 			let black = add([
 				rect(width(), height()),

@@ -1,45 +1,46 @@
 import { saveAnim } from "./game/utils"
+import { musicHandler, sfxHandler } from "./sound"
 
-export let GameState = {
-	score: 0,
-	totalScore: 0,
-	mana: 0,
+class _GameState {	
+	score = 0
+	totalScore = 0
+	mana = 0
 
-	clickers: 0,
-	clicksUpgradesValue: 0, // multiplier for clicks
-	clickPercentage: 0, // percentage added
+	clickers = 0
+	clicksUpgradesValue = 0 // multiplier for clicks
+	clickPercentage = 0 // percentage added
 
-	cursors: 0,
-	cursorsUpgradesValue: 0, // multiplier for cursors
-	cursorsPercentage: 0, // percentage added
-	timeUntilAutoLoopEnds: 10, // cursor frequency
+	cursors = 0
+	cursorsUpgradesValue = 0 // multiplier for cursors
+	cursorsPercentage = 0 // percentage added
+	timeUntilAutoLoopEnds = 10 // cursor frequency
 
-	upgradesBought: ["c_0"],
+	upgradesBought = ["c_0"]
 	
-	hasUnlockedPowerups: false,
-	powerupsBought: 0,
-	powerupsFrequency: 120,
-	powerupsChance: 0.1,
-	powerupsPower: 0,
+	hasUnlockedPowerups = false
+	powerupsBought = 0
+	powerupsFrequency = 120
+	powerupsChance = 0.1
+	powerupsPower = 0
 	
-	achievementMultiplierPercentage: 0,
-	generalUpgrades: 1, // general multiplier
+	achievementMultiplierPercentage = 0
+	generalUpgrades = 1 // general multiplier
 
-	ascendLevel: 1,
+	ascendLevel = 1
 
-	unlockedAchievements: [],
+	unlockedAchievements = []
 
-	unlockedWindows: [],
-	taskbar: [],
+	unlockedWindows = []
+	taskbar = []
 
-	stats: {
+	stats = {
 		timesClicked: 0,
 		powerupsClicked: 0,
 		timesAscended: 0,
 		totalTimePlayed: 0,
-	},
+	}
 
-	settings: {
+	settings = {
 		sfx: { volume: 1, muted: false },
 		music: { volume: 1, muted: false, favoriteIdx: 0 },
 		volume: 1,
@@ -51,18 +52,17 @@ export let GameState = {
 		fullscreen: false,
 		panderitoMode: false,
 		spsTextMode: 1,
-	},
+	}
 
 	save(anim = true) {
 		if (anim) {
 			setData("hexagon-save", this)
 			saveAnim()
-			
 		}
 		else {
 			setData("hexagon-save", this)
 		}
-	},
+	}
 
 	load() {
 		let gottenData = getData("hexagon-save") 
@@ -70,30 +70,38 @@ export let GameState = {
 			Object.assign(this, gottenData)
 		}
 		else {
-			// no data????
+			gottenData = new _GameState();
 		}
-	},
+		return gottenData;
+	}
 
 	delete() {
+		// remove data
 		localStorage.removeItem("hexagon-save")
-		Object.assign(this, this)
+		Object.assign(this, new _GameState())
+		
+		musicHandler?.stop()
+		sfxHandler?.stop()
+		
 		go("gamescene")
-	},
+	}
 
 	cheat() {
 		this.score = 1000000
 		this.totalScore = 1000000
-		this.scoreMultiplier = 500
+		this.clickers = 500
 		this.cursors = 500
-	},
+	}
 
-	addScore(amount) {
+	addScore(amount:number) {
 		this.score += amount
 		this.totalScore += amount
-	},
+	}
 
-	setScore(amount) {
+	setScore(amount:number) {
 		this.score = amount
 		this.totalScore = amount
-	},
+	}
 }
+
+export let GameState = new _GameState()

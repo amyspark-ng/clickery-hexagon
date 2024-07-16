@@ -3,7 +3,7 @@ import { ROOT } from "../../../main";
 import { positionSetter } from "../../../plugins/positionSetter";
 import { playSfx } from "../../../sound";
 import { powerups, spawnPowerup } from "../../powerups";
-import { formatNumber, getPrice, randomPos } from "../../utils";
+import { decreaseScoreBuy, formatNumber, getPrice, randomPos } from "../../utils";
 import { addUpgrades } from "./upgrades";
 
 let storeElementsInfo = {
@@ -64,7 +64,7 @@ function addStoreElement(winParent:any, opts = { key: "null", pos: vec2(0, 20) }
 				if (this.is("clickersElement")) GameState.clickers += amount
 				else if (this.is("cursorsElement")) GameState.cursors += amount
 
-				tween(GameState.score, GameState.score - this.price, 0.32, (p) => GameState.score = p)
+				decreaseScoreBuy(this.price)
 
 				hasBoughtRecently = true;
 				storePitchSeconds = 0;

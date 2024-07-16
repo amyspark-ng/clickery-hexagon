@@ -220,6 +220,10 @@ export function bop(obj:any, howMuch = 0.1, bopEasing = easings.easeOutQuint) {
 	})
 }
 
+export function decreaseScoreBuy(price:number) {
+	tween(GameState.score, GameState.score - price, 0.32, (p) => GameState.score = p, easings.easeOutExpo)
+}
+
 export function shrink(obj, howMuch) {
 	if (!obj.is("scale")) obj.use(scale(1))
 	if (!obj.shrinkDefScale) obj.shrinkDefScale = obj.scale

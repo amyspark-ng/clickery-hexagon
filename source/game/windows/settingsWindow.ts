@@ -232,20 +232,21 @@ export function settingsWinContent(winParent) {
 		anchor("top"),
 	])
 
-	// otherButtonsBg.add([
-	// 	sprite("icon_hexColor"),
-	// 	pos(-140, 24),
-	// 	scale(0.8),
-	// 	anchor("center"),
-	// 	area(),
-	// 	// fill(BLACK, 0.5),
-	// 	"settingsWindowButton",
-	// 	{
-	// 		action() {
-	// 			manageWindow("hexColorWin")
-	// 		},
-	// 	}
-	// ])
+	otherButtonsBg.add([
+		sprite("pinch"),
+		pos(-140, 24),
+		scale(0.8),
+		color(RED),
+		anchor("center"),
+		area(),
+		"settingsWindowButton",
+		"panderitoButton", // only so it doesn't play hover bruh
+		{
+			action() {
+				GameState.delete()
+			},
+		}
+	])
 
 	// otherButtonsBg.add([
 	// 	sprite("icon_bgColor"),
