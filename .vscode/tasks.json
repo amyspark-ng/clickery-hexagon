@@ -15,7 +15,7 @@
 			// Needs 7zip
 			"label": "— Deliver kaplay to Itch.io",
 			"type": "shell",
-			"command": "pnpm build ; 7z a -tzip ./build.zip ./www ; butler push build.zip amyspark-ng/clickery-hexagon:html5 --userversion 1.0",
+			"command": "./itchtask.sh",
 		},
 	]
 }

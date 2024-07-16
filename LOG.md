@@ -6,13 +6,11 @@ this game MIGHT be getting done
 
 * Do "-" for issues, "*" for notes, "^" for comments on either
 
-<!-- KAPLAY -->
-- there might be a bug in the loop function
-
 # ISSUES (hell)
 ## Current TODO (small stuff mostly)
 - make the time for the time powerup be the time you "skip" getting the score for
 - yes the memory crash of powerups still happens
+- replace the draws for the buildings text to objects because drawings don't work with llayers and never will
 
 - make all the cards a single animation and change them using the frame (only include icons, number and price is ingame)
 - add the mute dialogue option

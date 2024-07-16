@@ -8,6 +8,26 @@ import { isHoveringAWindow } from "./windows/windows-api/windowsAPI";
 import { triggerAscension } from "./ascension";
 import { powerups, spawnPowerup } from "./powerups";
 
+// definetely not stack overflow
+// dots are always for thousands, leave it like this
+export function simpleNumberFormatting(value) {
+	let integerStr = value.toString()
+	var len = integerStr.length;
+	var formatted = "";
+	
+	var breakpoint = (len-1) % 3; // after which index to place the dot
+	
+	for(let i = 0; i < len; i++){
+		formatted += integerStr.charAt(i);
+		if(i % 3 === breakpoint){
+		if(i < len-1) // don't add dot for last digit
+			formatted += ".";
+		}
+	}
+
+	return formatted;
+}
+
 // candy&Carmel helped here, pretty genius stuff!!!!
 type formatNumberOpts = {
 	fixAmount?:number,
@@ -16,6 +36,7 @@ type formatNumberOpts = {
 }
 
 let numTypes = {
+	n: { small: "", large: "" }, // just for offset apparently
 	K: { small: "K", large: "Thousands" },
 	M: { small: "M", large: "Millions" },
 	B: { small: "B", large: "Billions" },
@@ -39,26 +60,6 @@ let numTypes = {
 	Ve: { small: "VgT", large: "Vigintillion" },
 }
 
-// definetely not stack overflow
-// dots are always for thousands, leave it like this
-export function simpleNumberFormatting(value) {
-	let integerStr = value.toString()
-	var len = integerStr.length;
-	var formatted = "";
-	
-	var breakpoint = (len-1) % 3; // after which index to place the dot
-	
-	for(let i = 0; i < len; i++){
-		formatted += integerStr.charAt(i);
-		if(i % 3 === breakpoint){
-		if(i < len-1) // don't add dot for last digit
-			formatted += ".";
-		}
-	}
-
-	return formatted;
-}
-
 // do check for decimals here
 export function formatNumber(value:number, opts?:formatNumberOpts):string {
 	let fixAmount = opts?.fixAmount || 3
@@ -67,9 +68,8 @@ export function formatNumber(value:number, opts?:formatNumberOpts):string {
 
 	let returnValue = ""
 
-	// if is a small number, bruh
 	if (value < 1000) {
-		returnValue = value.toString()
+		returnValue = value.toString();
 	}
 
 	// if number is inside the limits (will always try to be)
@@ -89,7 +89,7 @@ export function formatNumber(value:number, opts?:formatNumberOpts):string {
 	}
 
 	if (isPrice == true) returnValue = returnValue.replace (/^/,'$');
-	if (GameState.settings.commaInsteadOfDot == true) returnValue = returnValue.replace (/,/,'.');
+	if (GameState.settings.commaInsteadOfDot == true) returnValue = returnValue.replaceAll(".", ",");
 
 	return returnValue
 }
@@ -153,23 +153,8 @@ export function getZBetween(a, b) {
 	return Math.floor(a + b / 2)
 }
 
-// im aware kaboom has Color.mult, i like blend more
 export function blendColors(color1:Color, color2:Color, blendFactor:number) {
-    // Extract RGB components from color structures
-    const rgb1 = [color1.r, color1.g, color1.b];
-    const rgb2 = [color2.r, color2.g, color2.b];
-
-    // Calculate blended RGB values
-    const blendedRgb = rgb1.map((val, index) => (1 - blendFactor) * val + blendFactor * rgb2[index]);
-
-    // Round and clamp blended RGB values
-    const blendedColor = rgb(
-		Math.round(blendedRgb[0]),
-		Math.round(blendedRgb[1]),
-		Math.round(blendedRgb[2]),
-	)
-
-    return blendedColor;
+    return color1.lerp(color2, blendFactor);
 }
 
 export function arrayToColor(arr) {
@@ -197,6 +182,7 @@ export function getPositionOfSide(obj) {
 	}
 }
 
+// TODO: add support for frames cursors.anim/10
 export function parseAnimation(obj, anim) {
 	let spriteName = !anim.includes(".") ? anim : [anim.split(".")[0], anim.split(".")[1]];
 	obj.unuse("sprite")

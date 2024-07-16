@@ -167,6 +167,7 @@ export function addToast(opts:toastOpts) {
 					else if (opts.title.toLowerCase().includes("welcome")) this.type = "welcome"
 				},
 				close() {
+					wait(0.7).onEnd(() => this.trigger("closed"))
 					tween(toastBg.pos.x, -toastBg.width, 0.8, (p) => (toastBg.pos.x = p), easings.easeOutQuint).onEnd(() => {
 						// updateLogPositions();
 						destroy(toastBg);
@@ -286,17 +287,11 @@ export function addToast(opts:toastOpts) {
 
 		if (toastBg.type == "save") playSfx("gamesaved")
 		else if (toastBg.type == "achievement" || toastBg.type == "window") playSfx("unlockachievement", { detune: toastBg.index * 100 })
+	
+		return toastBg;
 	}
 
-	// function updateLogPositions() {
-	// 	let logs = get("toast", { recursive: true });
-	// 	let yOffset = initialYPosition;
-
-	// 	logs.forEach((log, idx) => {
-	// 		tween(log.pos.y, yOffset, 0.5, (p) => log.pos.y = p, easings.easeOutQuint);
-	// 		yOffset += log.height + 10;
-	// 	});
-	// }
+	let toastObj:any;
 
 	function processQueue() {
 		let logs = get("toast", { recursive: true });
@@ -308,7 +303,7 @@ export function addToast(opts:toastOpts) {
 			let nextToast = toastQueue.shift();
 			let availableIndex = getAvailableIndex(logs);
 			if (availableIndex !== -1) {
-				actuallyAddToast(availableIndex, nextToast);
+				toastObj = actuallyAddToast(availableIndex, nextToast);
 				logs = get("toast", { recursive: true }); // update logs after adding a toast
 			}
 		}
@@ -333,9 +328,11 @@ export function addToast(opts:toastOpts) {
 	else {
 		let availableIndex = getAvailableIndex(logs);
 		if (availableIndex !== -1) {
-			actuallyAddToast(availableIndex, opts);
+			toastObj = actuallyAddToast(availableIndex, opts);
 		}
 	}
 
 	processQueue(); // Ensure the queue is processed if there are available slots
+
+	return toastObj;
 }

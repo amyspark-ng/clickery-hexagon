@@ -41,6 +41,36 @@ export let unlockables = {
 			"icon":"upgrades.k_0",
 			condition: () => GameState.score >= 100
 		},
+		{"name":"500score",
+			"text": "Get 500 of score, cool", 
+			"icon":"upgrades.k_1",
+			condition: () => GameState.score >= 500
+		},
+		{"name":"1000score",
+			"text": "Get 1.000 of score, cool", 
+			"icon":"upgrades.k_2",
+			condition: () => GameState.score >= 1000
+		},
+		{"name":"5000score",
+			"text": "Get 5.000 of score, cool", 
+			"icon":"upgrades.k_3",
+			condition: () => GameState.score >= 5000
+		},
+		{"name":"10000score",
+			"text": "Get 10.0000 of score, cool", 
+			"icon":"upgrades.k_4",
+			condition: () => GameState.score >= 10000
+		},
+		{"name":"25000score",
+			"text": "Get 25.0000 of score, cool", 
+			"icon":"upgrades.k_5",
+			condition: () => GameState.score >= 25000
+		},
+		{"name":"50000score",
+			"text": "Get 50.0000 of score, cool", 
+			"icon":"upgrades.c_6",
+			condition: () => GameState.score >= 50000
+		},
 		{"name":"200score",
 			"text":"Empty text", "icon":"icon_about"
 		},

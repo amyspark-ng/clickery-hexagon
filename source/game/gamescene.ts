@@ -9,7 +9,7 @@ import { songs } from "./windows/musicWindow.ts"
 import { curDraggin } from "../plugins/drag.js"
 import { DEBUG, ROOT } from "../main.ts"
 import { powerupManagement, powerups, spawnPowerup } from "./powerups.ts"
-import { isAchievementUnlocked, unlockables, unlockAchievement } from "./unlockables.ts"
+import { checkForUnlockable, isAchievementUnlocked, unlockables, unlockAchievement } from "./unlockables.ts"
 import { ascending, set_ascending } from "./ascension.ts"
 
 let panderitoLetters = "panderito".split("")
@@ -174,7 +174,8 @@ function welcomeBack(idle = false) {
 		else if (hasCombo && hasPowerup) applicationMessage += "\n(Combo nor Power-ups are applicable)"
 		body += applicationMessage
 
-		addToast({ icon: "cursors.cursor", title: "Welcome back!", body: body })
+		let toast = addToast({ icon: "cursors.cursor", title: "Welcome back!", body: body })
+		toast.on("closed", () => checkForUnlockable())
 	}
 	
 	let welcomeBackToasts = get("toast").filter(toast => toast.type == "welcome")
@@ -324,14 +325,15 @@ export function gamescene() {
 			})
 
 			// gnome
-			wait(60, () => {
-				loop(1, () => {
-					if (chance(0.0025))
-					if (!isAchievementUnlocked("gnome")) {
-						triggerGnome()
-					}
+			if (!isAchievementUnlocked("gnome")) {
+				wait(60, () => {
+					loop(1, () => {
+						if (chance(0.0025)) {
+							triggerGnome()
+						}
+					})
 				})
-			})
+			}
 		})
 
 		onUpdate(() => {
@@ -363,7 +365,8 @@ export function gamescene() {
 
 			if (sleeping) timeSlept += dt()
 
-			powerupManagement()		
+			powerupManagement()
+			GameState.settings.fullscreen = isFullscreen()
 		})
 
 		// #region OUTSIDE OF TAB STUFF
@@ -413,6 +416,12 @@ export function gamescene() {
 			// all of the objects that are draggable have this function
 			if (curDraggin && curDraggin.releaseDrop) curDraggin.releaseDrop()
 		}, false);
+
+		document.getElementById("kanva").addEventListener("fullscreenchange", () => {
+			wait(0.01, () => {
+				ROOT.trigger("fullscreenchange")
+			})
+		})
 	
 		let introAnimations = {
 			intro_hopes() {

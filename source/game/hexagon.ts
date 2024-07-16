@@ -153,7 +153,7 @@ export function addHexagon() {
 					if (clickVars.consecutiveClicks == getClicksFromCombo(2) && clickVars.comboDropped == true) {
 						startCombo()
 					}
-	
+
 					// check for all the other combos
 					else if (scoreVars.combo < COMBO_MAX) {
 						for (let i = 2; i < COMBO_MAX + 1; i++) {
@@ -183,7 +183,7 @@ export function addHexagon() {
 					value: scoreVars.scorePerClick * scoreVars.combo,
 					cursorRelated: false,
 				})
-				GameState.addScore((scoreVars.scorePerClick * powerups["clicks"].multiplier) * scoreVars.combo)
+				GameState.addScore((scoreVars.scorePerClick * powerups.clicks.multiplier) * scoreVars.combo)
 				tween(scoreText.scaleIncrease, 1.05, 0.2, (p) => scoreText.scaleIncrease = p, easings.easeOutQuint).onEnd(() => {
 					tween(scoreText.scaleIncrease, 1, 0.2, (p) => scoreText.scaleIncrease = p, easings.easeOutQuint)
 				})
@@ -308,7 +308,7 @@ export function addHexagon() {
 								value: scoreVars.scorePerAutoClick,
 								cursorRelated: true,
 							})
-							GameState.addScore(scoreVars.scorePerAutoClick * powerups["cursors"].multiplier)
+							GameState.addScore(scoreVars.scorePerAutoClick * powerups.cursors.multiplier)
 			
 							// has done its bidding, time to roll and dissapear
 							autoCursor.gravityScale = 1
@@ -420,8 +420,8 @@ export function addHexagon() {
 	}
 
 	function getFullSPC() {
-		if (GameState.clicksUpgradesValue < 2) return ((1 + GameState.clickers) * powerups["clicks"].multiplier) * scoreVars.combo
-		else return (((1 + GameState.clickers) * GameState.clicksUpgradesValue) * powerups["clicks"].multiplier) * scoreVars.combo
+		if (GameState.clicksUpgradesValue < 2) return ((1 + GameState.clickers) * powerups.clicks.multiplier) * scoreVars.combo
+		else return (((1 + GameState.clickers) * GameState.clicksUpgradesValue) * powerups.clicks.multiplier) * scoreVars.combo
 	}
 
 	function getVanillaSPAC() {
@@ -438,8 +438,8 @@ export function addHexagon() {
 	}
 
 	function getFullSPAC() {
-		if (GameState.cursorsUpgradesValue < 2) return GameState.cursors * powerups["cursors"].multiplier 
-		else return (GameState.cursors * GameState.cursorsUpgradesValue) * powerups["cursors"].multiplier
+		if (GameState.cursorsUpgradesValue < 2) return GameState.cursors * powerups.cursors.multiplier 
+		else return (GameState.cursors * GameState.cursorsUpgradesValue) * powerups.cursors.multiplier
 	}
 
 	// score setting stuff
@@ -451,7 +451,7 @@ export function addHexagon() {
 		// this is for when you leave the game
 		scoreVars.autoScorePerSecond = scoreVars.scorePerAutoClick / GameState.timeUntilAutoLoopEnds
 
-		scoreVars.scorePerSecond = ((clickVars.clicksPerSecond * getFullSPC()) + (scoreVars.autoScorePerSecond * getFullSPAC()))
+		scoreVars.scorePerSecond = ((clickVars.clicksPerSecond * getFullSPC()) + (scoreVars.autoScorePerSecond))
 		spsUpdaterTimer += dt();
 		if (spsUpdaterTimer > 1) {
 			spsUpdaterTimer = 0;

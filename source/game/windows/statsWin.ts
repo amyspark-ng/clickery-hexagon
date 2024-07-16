@@ -1,6 +1,6 @@
 import { GameState } from "../../gamestate";
 import { unlockables } from "../unlockables";
-import { toHHMMSS } from "../utils";
+import { formatNumber, toHHMMSS } from "../utils";
 import { infoForWindows } from "./windows-api/windowsAPI";
 
 export function statsWinContent(winParent) {
@@ -8,11 +8,11 @@ export function statsWinContent(winParent) {
 
 	winParent.onUpdate(() => {
 		stats = {
-			"Total score: ": Math.round(GameState.totalScore), 
+			"Total score: ": formatNumber(GameState.totalScore), 
 			"Times clicked: ": GameState.stats.timesClicked,
 			"Powerups clicked: ": GameState.stats.powerupsClicked,
 			"Times ascended: ": GameState.ascendLevel - 1,
-			[`Clickers (${GameState.clickers}) / Cursors (${GameState.cursors}) owned: `]: `${GameState.clickers + GameState.cursors}`,
+			// [`Clickers (${GameState.clickers}) / Cursors (${GameState.cursors}) owned: `]: `${GameState.clickers + GameState.cursors}`,
 			"Windows unlocked: ": `${GameState.unlockedWindows.length}/${Object.keys(infoForWindows).length}`,
 			"Achievements unlocked: ": `${GameState.unlockedAchievements.length}/${unlockables.achievements.length}`,
 			"Total time played: ": toHHMMSS(Math.round(GameState.stats.totalTimePlayed)),

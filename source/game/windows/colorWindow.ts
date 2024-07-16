@@ -129,7 +129,7 @@ function addRgbSlider(winParent, posToAdd = vec2(0), coloredObj, type = "r") {
 						}
 					}
 
-					if (!winParent.isMouseInGeneralRange()) deactivateAllSliders()
+					if (!winParent.isMouseInRange()) deactivateAllSliders()
 				}
 
 				else if (isMouseReleased("left")) this.releaseDrop()

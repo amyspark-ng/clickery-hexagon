@@ -5,18 +5,18 @@ import { blendColors, bop, formatNumber, randomPos } from "../../utils";
 export let isHoveringUpgrade = false;
 
 export let upgradeInfo = {
-	"k_0": { value: 2, price: 5 },
-	"k_1": { value: 4, price: 10 },
-	"k_2": { value: 8, price: 20 },
-	"k_3": { value: 16, price: 50,},
-	"k_4": { value: 32, price: 100,},
-	"k_5": { value: 64, price: 500,},
-	"c_0": { freq: 10, price: 5,},
-	"c_1": { freq: 5, price: 10,},
-	"c_2": { freq: 1, price: 50,},
-	"c_3": { value: 8, price: 100,},
-	"c_4": { value: 16, price: 150,},
-	"c_5": { value: 36, price: 500,},
+	"k_0": { value: 2, price: 500 },
+	"k_1": { value: 4, price: 5000 },
+	"k_2": { value: 8, price: 7500 },
+	"k_3": { value: 16, price: 7500,},
+	"k_4": { value: 32, price: 10000,},
+	"k_5": { value: 64, price: 25000,},
+	"c_0": { freq: 10 }, // 10 seconds
+	"c_1": { freq: 5, price: 15000 }, // 5 seconds
+	"c_2": { freq: 1, price: 40000 }, // 1 second
+	"c_3": { value: 8, price: 10000 }, // 10K 
+	"c_4": { value: 16, price: 350000 }, // 35K
+	"c_5": { value: 36, price: 500000 }, // 50K
 }
 
 function isUpgradeBought(id:string):boolean {
@@ -63,7 +63,7 @@ export function addUpgrades(elementParent) {
 					this.area.scale = vec2(1 / this.scale.x, 1 / this.scale.y)
 				},
 
-				addTooltip(price:any, blink:any, alignmentForTooltip:any = "center") {
+				addTooltip(textInBg:any, blink:any, alignmentForTooltip:any = "center") {
 					this.hasTooltip = true
 					let thisUpgrade = this;
 					let bg = add([
@@ -84,7 +84,7 @@ export function addUpgrades(elementParent) {
 					])
 					tween(vec2(0.85), vec2(1), 0.15, (p) => bg.scale = p, easings.easeOutBack)
 
-					let displayText = price;
+					let displayText = textInBg;
 					if (GameState.upgradesBought.length == 0) displayText = displayText + " (Hold to buy)" 
 
 					let priceText = bg.add([
@@ -96,8 +96,8 @@ export function addUpgrades(elementParent) {
 						"tooltip",
 						{
 							update() {
-								if (typeof price == "number") {
-									if (GameState.score >= price) this.color = GREEN
+								if (textInBg.includes("$")) {
+									if (GameState.score >= upgradeInfo[thisUpgrade.id].price) this.color = GREEN
 									else this.color = RED
 								}
 							}

@@ -182,7 +182,10 @@ export function addCheckbox(opts:checkBoxOpt, parent:any) {
 		setVariable(GameState, opts.variable, !getVariable(GameState, opts.variable))
 
 		playSfx("clickButton", {detune: getVariable(GameState, opts.variable) == true ? 150 : -150})
-		if (opts.variable == "settings.fullscreen") setFullscreen(getVariable(GameState, "settings.fullscreen"))
+	
+		if (opts.variable == "settings.fullscreen") {
+			setFullscreen(GameState.settings.fullscreen)
+		}
 	}))
 
 	if (opts.title) {
@@ -200,7 +203,7 @@ export function addCheckbox(opts:checkBoxOpt, parent:any) {
 			}
 		])
 	}
-	
+
 	return checkBox
 }
 
@@ -229,51 +232,51 @@ export function settingsWinContent(winParent) {
 		anchor("top"),
 	])
 
-	otherButtonsBg.add([
-		sprite("icon_hexColor"),
-		pos(-140, 24),
-		scale(0.8),
-		anchor("center"),
-		area(),
-		// fill(BLACK, 0.5),
-		"settingsWindowButton",
-		{
-			action() {
-				manageWindow("hexColorWin")
-			},
-		}
-	])
+	// otherButtonsBg.add([
+	// 	sprite("icon_hexColor"),
+	// 	pos(-140, 24),
+	// 	scale(0.8),
+	// 	anchor("center"),
+	// 	area(),
+	// 	// fill(BLACK, 0.5),
+	// 	"settingsWindowButton",
+	// 	{
+	// 		action() {
+	// 			manageWindow("hexColorWin")
+	// 		},
+	// 	}
+	// ])
 
-	otherButtonsBg.add([
-		sprite("icon_bgColor"),
-		pos(-60, 25),
-		scale(0.8),
-		anchor("center"),
-		area(),
-		// fill(BLACK, 0.5),
-		"settingsWindowButton",
-		{
-			action() {
-				manageWindow("bgColorWin")
-			},
-		}
-	])
+	// otherButtonsBg.add([
+	// 	sprite("icon_bgColor"),
+	// 	pos(-60, 25),
+	// 	scale(0.8),
+	// 	anchor("center"),
+	// 	area(),
+	// 	// fill(BLACK, 0.5),
+	// 	"settingsWindowButton",
+	// 	{
+	// 		action() {
+	// 			manageWindow("bgColorWin")
+	// 		},
+	// 	}
+	// ])
 
-	otherButtonsBg.add([
-		sprite("panderito"),
-		pos(22, 26),
-		scale(0.13),
-		anchor("center"),
-		area(),
-		// fill(BLACK, 0.5),
-		"settingsWindowButton",
-		"panderitoButton",
-		{
-			action() {
-				togglePanderito()
-			},
-		}
-	])
+	// otherButtonsBg.add([
+	// 	sprite("panderito"),
+	// 	pos(22, 26),
+	// 	scale(0.13),
+	// 	anchor("center"),
+	// 	area(),
+	// 	// fill(BLACK, 0.5),
+	// 	"settingsWindowButton",
+	// 	"panderitoButton",
+	// 	{
+	// 		action() {
+	// 			togglePanderito()
+	// 		},
+	// 	}
+	// ])
 
 	get("settingsWindowButton", { recursive: true }).forEach((setWinBut) => {
 		setWinBut.onMousePress("left", () => {
@@ -296,5 +299,15 @@ export function settingsWinContent(winParent) {
 				setWinBut.play("default")
 			}
 		})
+	})
+
+	let fullscreenEvent = ROOT.on("fullscreenchange", () => {
+		// the variable already changed at the moment 
+		// of this so we'll just check it backwards
+		if (GameState.settings.fullscreen == false) fullscreenCheckbox.turnOff()
+	})
+
+	winParent.onDestroy(() => {
+		fullscreenEvent.cancel()
 	})
 }

@@ -147,7 +147,7 @@ export function openWindow(windowKey = "") {
 				return condition;
 			},
 
-			isMouseInPreciseRange() {
+			isMouseInRange() {
 				return this.hasPoint(mouse.pos);
 			},
 
@@ -230,7 +230,7 @@ export function openWindow(windowKey = "") {
 
 			for (const window of get("window").reverse()) {
 				// If mouse is pressed and mouse position is inside, we pick
-				if (window.isMouseInPreciseRange()) {
+				if (window.isMouseInRange()) {
 					
 					if (window.isMouseInClickingRange()) {
 						mouse.grab();
@@ -395,8 +395,8 @@ export function folderObjManaging() {
 				// return them to folderObj pos
 				movingMinibuttons = true
 				get("minibutton").forEach(minibutton => {
-					tween(minibutton.opacity, 0, 0.32, (p) => minibutton.opacity = p, easings.easeOutQuad)
-					tween(minibutton.pos, folderObj.pos, 0.32, (p) => minibutton.pos = p, easings.easeOutBack).then(() => {
+					tween(minibutton.opacity, 0, 0.32, (p) => minibutton.opacity = p, easings.easeOutQuint)
+					tween(minibutton.pos, folderObj.pos, 0.32, (p) => minibutton.pos = p, easings.easeOutQuint).then(() => {
 						destroy(minibutton)
 						movingMinibuttons = false
 					})
@@ -527,7 +527,7 @@ export function folderObjManaging() {
 	folderObj.onUpdate(() => {
 		if ((get("window").length > 0)) {
 			// if any window is being hovered on
-			isHoveringAWindow = get("window").some((window) => window.isMouseInPreciseRange())
+			isHoveringAWindow = get("window").some((window) => window.isMouseInRange())
 			isDraggingAWindow = get("window").some((window) => window.dragging)
 		}
 

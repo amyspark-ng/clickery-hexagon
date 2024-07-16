@@ -3,7 +3,7 @@ import { playSfx } from "../sound"
 import { cam } from "./gamescene"
 import { COMBO_MINCLICKS, COMBO_MAX, COMBO_MAXCLICKS, clickVars, scoreVars } from "./hexagon"
 import { scoreText, spsText } from "./uicounters";
-import { blendColors, formatNumber, getPositionOfSide } from "./utils";
+import { blendColors, formatNumber } from "./utils";
 
 export function getClicksFromCombo(level:number) {
 	return Math.round(map(level, 2, COMBO_MAX, COMBO_MINCLICKS, COMBO_MAXCLICKS))
@@ -52,7 +52,7 @@ export function addComboBar() {
 		{
 			update() {
 				if (!clickVars.constantlyClicking) {
-					clickVars.consecutiveClicks -= 0.75
+					if (clickVars.consecutiveClicks > 0) clickVars.consecutiveClicks -= 0.75
 					scoreVars.combo = getComboFromClicks(clickVars.consecutiveClicks)
 					if (this.width < maxContentWidth / 2) clickVars.maxedCombo = false
 				}
