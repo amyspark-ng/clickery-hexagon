@@ -308,10 +308,6 @@ export function debugFunctions() {
 			})
 		}
 
-		else if (isKeyPressed("o")) {
-			GameState.clickers += 50
-		}
-		
 		else if (isKeyPressed("h")) {
 			triggerGnome()
 		}
@@ -319,10 +315,10 @@ export function debugFunctions() {
 
 	// #region debug stuff
 	onScroll((delta)=>{
-		cam.scale = cam.scale * (1 - 0.1 * Math.sign(delta.y))
+		if (isKeyPressed("shift")) cam.scale = cam.scale * (1 - 0.1 * Math.sign(delta.y)) 
 	})
 
 	onMousePress("middle", () => {
-		cam.scale = 1
+		if (isKeyPressed("shift")) cam.scale = 1
 	})
 }

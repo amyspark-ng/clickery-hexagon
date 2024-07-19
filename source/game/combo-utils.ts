@@ -91,7 +91,7 @@ export function addComboBar() {
 	])
 	comboBarContent.fadeIn(0.25)
 
-	// fix spsText pos
+	// when combo starts the spsText y pos should change to accomodate it
 	tween(spsText.pos.y, spsText.barYPos, 0.5, (p) => spsText.pos.y = p, easings.easeOutQuint)
 
 	return barFrame;

@@ -6,7 +6,7 @@ import { GameState } from "./gamestate.ts";
 import { addBackground, addMouse, gameBg } from "./game/additives.ts";
 import { volumeManager } from "./sound.ts";
 
-export const DEBUG:boolean = false
+export const DEBUG:boolean = true
 export const k = kaplay({
 	width: 1024,
 	height: 576,
@@ -61,8 +61,9 @@ onLoad(() => {
 	}
 	
 	else {
-		addMouse()
-		go("gamescene")
+		wait(0.05, () => {
+			ROOT.trigger("rungame")
+		})
 	}
 	
 	ROOT.on("rungame", () => {

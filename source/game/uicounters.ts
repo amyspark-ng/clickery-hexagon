@@ -1,7 +1,8 @@
 import { GameState } from "../gamestate.ts";
+import { positionSetter } from "../plugins/positionSetter.js";
 import { waver } from "../plugins/wave.js";
 import { scoreVars } from "./hexagon.ts";
-import { bop, formatNumber, simpleNumberFormatting } from "./utils.ts";
+import { bop, formatNumber, getPositionOfSide, simpleNumberFormatting } from "./utils.ts";
 
 export let scoreText:any;
 export let spsText:any;
@@ -53,8 +54,8 @@ export function uiCounters() {
 		"scoreCounter",
 		// can't put text change here bc it would update to 0 each second
 		{
-			defaultYPos: scoreText.pos.y - 14,
-			barYPos: (scoreText.pos.y - 14) + (scoreText.height / 4) + 5,
+			defaultYPos: 49,
+			barYPos: 75,
 			value: 0,
 
 			// value is the raw (number) score per second (with time accounted for)

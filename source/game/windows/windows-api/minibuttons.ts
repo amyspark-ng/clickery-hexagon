@@ -105,16 +105,9 @@ export function addMinibutton(opts:minibuttonOpt) {
 			update() {
 				// dragging is minibutton
 				if (this.dragging) {
-					// do tilt towards direction stuff
-					if (isMouseMoved()) {
-						let mappedAngle = map(mouseDeltaPos().x, -25, 25, -40, 40)
-						this.angle = lerp(this.angle, mappedAngle, 0.25)
-						this.angle = clamp(this.angle, -40, 40)
-					}
-	
-					else {
-						this.angle = lerp(this.angle, 0, 0.25)
-					}
+					// tilting towards direction
+					if (isMouseMoved()) this.angle = lerp(this.angle, mouseDeltaPos().x, 0.25)
+					else this.angle = lerp(this.angle, 0, 0.25)
 				}
 
 				else {

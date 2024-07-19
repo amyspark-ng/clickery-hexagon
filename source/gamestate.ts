@@ -55,13 +55,8 @@ class _GameState {
 	}
 
 	save(anim = true) {
-		if (anim) {
-			setData("hexagon-save", this)
-			saveAnim()
-		}
-		else {
-			setData("hexagon-save", this)
-		}
+		setData("hexagon-save", this)
+		if (anim) saveAnim()
 	}
 
 	load() {

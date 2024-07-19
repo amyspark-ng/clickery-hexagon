@@ -83,11 +83,9 @@ export function makeGridMinibutton(idx, gridSlot, winParent) {
 			beingHeld: false,
 			update() {
 				if (this.dragging) {
-					// do tilt towards direction stuff
-					if (isMouseMoved()) {
-						let mappedAngle = map(mouseDeltaPos().x, -50, 50, -40, 40)
-						this.angle = mappedAngle
-					}
+					// tilting towards direction
+					if (isMouseMoved()) this.angle = lerp(this.angle, mouseDeltaPos().x, 0.25)
+					else this.angle = lerp(this.angle, 0, 0.25)
 				}
 			},
 

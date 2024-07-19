@@ -1,5 +1,5 @@
 export function ascendWinContent(winParent) {
-	debug.log("alexa play ascend ominus")
+	// debug.log("alexa play ascend ominus")
 
 	let button = winParent.add([
 		text("go to ascendscene", {
@@ -16,7 +16,7 @@ export function ascendWinContent(winParent) {
 		go("ascendscene")
 	})
 	
-	winParent.on("close", () => {
-		debug.log("goodbye")
-	})
+	// winParent.on("close", () => {
+	// 	debug.log("goodbye")
+	// })
 }

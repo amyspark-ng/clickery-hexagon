@@ -8,9 +8,17 @@ this game MIGHT be getting done
 
 # ISSUES (hell)
 ## Current TODO (small stuff mostly)
-- make the time for the time powerup be the time you "skip" getting the score for
+- takes around 5 mins to reach 1 million and 6 to reach 10, do of that what you will
+- there's a point where stuff is too expensive and you have to click too much to buy at least
+- give cursors more power 
+
+- add universal tooltips, based on the ones the upgrades have, maybe a parameter that moves them around if the mouse does like cookie clicker
+	* give direction but don't add the little tail that shows where it's coming from, maybe add icon that has the same sprite so to show???? idk
+	* give them a little niceeee outline
+	* have a text parameter? which is all the text it can have, no titles no bs
+	* can use them for medals window
+- make unactive windows darker (greyer) instead of grayscale
 - yes the memory crash of powerups still happens
-- replace the draws for the buildings text to objects because drawings don't work with llayers and never will
 
 - make all the cards a single animation and change them using the frame (only include icons, number and price is ingame)
 - add the mute dialogue option
