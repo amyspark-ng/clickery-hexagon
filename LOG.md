@@ -12,12 +12,6 @@ this game MIGHT be getting done
 - there's a point where stuff is too expensive and you have to click too much to buy at least
 - give cursors more power 
 
-- add universal tooltips, based on the ones the upgrades have, maybe a parameter that moves them around if the mouse does like cookie clicker
-	* give direction but don't add the little tail that shows where it's coming from, maybe add icon that has the same sprite so to show???? idk
-	* give them a little niceeee outline
-	* have a text parameter? which is all the text it can have, no titles no bs
-	* can use them for medals window
-- make unactive windows darker (greyer) instead of grayscale
 - yes the memory crash of powerups still happens
 
 - make all the cards a single animation and change them using the frame (only include icons, number and price is ingame)

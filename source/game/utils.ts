@@ -3,8 +3,8 @@ import { GameState } from "../gamestate";
 import { addToast, mouse } from "./additives";
 import { autoLoopTime, cam, triggerGnome } from "./gamescene";
 import { hexagon } from "./hexagon";
-import { checkForUnlockable } from "./unlockables";
-import { isHoveringAWindow } from "./windows/windows-api/windowsAPI";
+import { checkForUnlockable, unlockAchievement } from "./unlockables";
+import { isHoveringAWindow, openWindow } from "./windows/windows-api/windowsAPI";
 import { triggerAscension } from "./ascension";
 import { powerups, spawnPowerup } from "./powerups";
 
@@ -282,14 +282,12 @@ export function debugTexts() {
 export function debugFunctions() {
 	debugTexts()
 	
-	window.globalThis.gamestate = function() {
-		return GameState
-	}
+	// can modify gamestate from console
+	window.globalThis.GameState = GameState
+	window.globalThis.unlockAchievement = unlockAchievement
+	window.globalThis.hexagon = hexagon
+	window.globalThis.openWindow = openWindow
 
-	window.globalThis.taskbar = function() {
-		return GameState.taskbar
-	}
-	
 	onUpdate(() => {
 		// if (isKeyDown("control")) {
 		if (isKeyPressed("c")) GameState.save(true)
@@ -315,10 +313,10 @@ export function debugFunctions() {
 
 	// #region debug stuff
 	onScroll((delta)=>{
-		if (isKeyPressed("shift")) cam.scale = cam.scale * (1 - 0.1 * Math.sign(delta.y)) 
+		if (isKeyDown("shift")) cam.scale = cam.scale * (1 - 0.1 * Math.sign(delta.y)) 
 	})
 
 	onMousePress("middle", () => {
-		if (isKeyPressed("shift")) cam.scale = 1
+		if (isKeyDown("shift")) cam.scale = 1
 	})
 }

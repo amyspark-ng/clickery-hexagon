@@ -542,6 +542,10 @@ export function gamescene() {
 			})
 		}
 
+		ROOT.on("buy", (info) => {
+			checkForUnlockable()
+		})
+
 		if (DEBUG) debugFunctions()
 	})
 }

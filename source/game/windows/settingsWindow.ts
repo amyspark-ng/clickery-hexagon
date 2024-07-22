@@ -5,6 +5,7 @@ import { playSfx, volChangeTune } from "../../sound"
 import { togglePanderito } from "../gamescene"
 import { bop, getVariable, setVariable } from "../utils"
 import { manageWindow } from "./windows-api/windowsAPI"
+import { addTooltip } from "../additives"
 
 let volumeControlBg:any;
 let barscontainer:any;
@@ -232,7 +233,7 @@ export function settingsWinContent(winParent) {
 		anchor("top"),
 	])
 
-	otherButtonsBg.add([
+	let deleteSave = otherButtonsBg.add([
 		sprite("pinch"),
 		pos(-140, 24),
 		scale(0.8),
@@ -247,6 +248,16 @@ export function settingsWinContent(winParent) {
 			},
 		}
 	])
+
+	let endTooltip;
+	deleteSave.onHover(() => {
+		let tooltip = addTooltip(deleteSave, { text: "Delete game save, CAREFUL!!!", direction: "up" })
+		endTooltip = tooltip.end
+	})
+
+	deleteSave.onHoverEnd(() => {
+		endTooltip()
+	})
 
 	// otherButtonsBg.add([
 	// 	sprite("icon_bgColor"),

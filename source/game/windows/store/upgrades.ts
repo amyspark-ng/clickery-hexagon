@@ -1,5 +1,7 @@
 import { GameState } from "../../../gamestate";
+import { ROOT } from "../../../main";
 import { playSfx } from "../../../sound";
+import { addTooltip } from "../../additives";
 import { blendColors, bop, decreaseScoreBuy, formatNumber, randomPos } from "../../utils";
 
 export let isHoveringUpgrade = false;
@@ -57,91 +59,50 @@ export function addUpgrades(elementParent) {
 				price: 0,
 				
 				boughtProgress: 0,
-				hasTooltip: false,
 				
 				update() {
 					this.area.scale = vec2(1 / this.scale.x, 1 / this.scale.y)
 				},
 
-				addTooltip(textInBg:any, blink:any, alignmentForTooltip:any = "center") {
-					this.hasTooltip = true
-					let thisUpgrade = this;
-					let bg = add([
-						rect(0, 0, { radius: 5 }),
-						z(this.z + 1),
-						color(BLACK),
-						layer("windows"),
-						scale(),
-						pos(upgradeObj.screenPos().x, upgradeObj.screenPos().y + upgradeObj.height / 2 + 5),
-						anchor(alignmentForTooltip),
-						"tooltip",
-						{
-							update() {
-								this.scale.x = thisUpgrade.scale.x
-								this.scale.y = thisUpgrade.scale.y
-							}
-						}
-					])
-					tween(vec2(0.85), vec2(1), 0.15, (p) => bg.scale = p, easings.easeOutBack)
-
-					let displayText = textInBg;
-					if (GameState.upgradesBought.length == 0) displayText = displayText + " (Hold to buy)" 
-
-					let priceText = bg.add([
-						text(displayText, { align: alignmentForTooltip, size: upgradeObj.height / 2}),
-						color(WHITE),
-						z(this.z + 1),
-						pos(),
-						anchor(alignmentForTooltip),
-						"tooltip",
-						{
-							update() {
-								if (textInBg.includes("$")) {
-									if (GameState.score >= upgradeInfo[thisUpgrade.id].price) this.color = GREEN
-									else this.color = RED
+				manageBlinkText(texty:string = "missing a text there buddy") {
+					let thisUpgrade = this
+					
+					function addT() {
+						let stacksText = thisUpgrade.parent.get("stacksText")[0]
+					
+						// blinking
+						let alignment = thisUpgrade.value != null ? "left" : "right" as any;
+						let blinkingText = add([
+							text("+0", { align: alignment, size: stacksText.textSize + 4 }),
+							pos(),
+							color(BLACK),
+							anchor(alignment),
+							layer("windows"),
+							opacity(),
+							"blinkText",
+							{
+								upgradeId: thisUpgrade.id,
+								update() {
+									this.text = texty
+									this.opacity = wave(0.25, 1, time() * 8)
 								}
 							}
+						])
+	
+						if (thisUpgrade.value != null) {
+							blinkingText.pos = vec2(stacksText.screenPos().x + stacksText.width / 2 + 2, stacksText.screenPos().y - 2)
 						}
-					])
-
-					bg.width = formatText({ text: displayText, align: displayText.align, size: priceText.textSize, }).width + 5
-					bg.height = priceText.height + 2
-				
-					let stacksText = this.parent.get("stacksText")[0]
-					
-					// blinking
-					let alignment = thisUpgrade.value != null ? "left" : "right" as any;
-					let blinkingText = add([
-						text("+0", { align: alignment, size: stacksText.textSize + 4 }),
-						pos(),
-						color(BLACK),
-						anchor(alignment),
-						layer("windows"),
-						z(priceText.z + 1),
-						opacity(),
-						"tooltip",
-						{
-							update() {
-								this.text = blink
-								this.opacity = wave(0.25, 1, time() * 8)
-							}
+						
+						else if (thisUpgrade.freq != null) {
+							blinkingText.pos = vec2(thisUpgrade.screenPos().x, thisUpgrade.screenPos().y)
 						}
-					])
-
-					if (thisUpgrade.value != null) {
-						blinkingText.pos = vec2(stacksText.screenPos().x + stacksText.width / 2 + 2, stacksText.screenPos().y - 2)
 					}
-					
-					else if (thisUpgrade.freq != null) {
-						blinkingText.pos = vec2(thisUpgrade.screenPos().x, thisUpgrade.screenPos().y)
-					}
-				},
 
-				endTooltip() {
-					this.hasTooltip = false
-					get("tooltip").forEach(element => {
-						element?.destroy()
-					});
+					function end() {
+						get("blinkText").filter((t) => t.upgradeId == thisUpgrade.id).forEach((t) => t.destroy())
+					}
+
+					return { addT, end }
 				},
 
 				dropBuy() {
@@ -155,8 +116,6 @@ export function addUpgrades(elementParent) {
 					
 					tween(this.scale, vec2(1.1), 0.15, (p) => this.scale = p, easings.easeOutQuad)
 					// let value = this.value != null ? this.value : this.freq;
-					let blink = this.value != null ? `+${this.value}` : `Cursors now click every ${this.freq} seconds`;
-					if (!isUpgradeBought(this.id) && !this.hasTooltip) this.addTooltip(formatNumber(this.price, { price: true, fixAmount: 1 }), blink)
 				},
 
 				endHover() {
@@ -165,11 +124,11 @@ export function addUpgrades(elementParent) {
 
 					if (!isUpgradeBought(upgradeObj.id)) this.dropBuy()
 					tween(this.scale, vec2(1), 0.15, (p) => this.scale = p, easings.easeOutQuad)
-					if (!isUpgradeBought(this.id) && this.hasTooltip) this.endTooltip()
+					if (!isUpgradeBought(this.id)) this.tooltip?.end()
 				},
 
 				buy() {
-					this.endTooltip()	
+					this.tooltip?.end()
 					GameState.upgradesBought.push(this.id)
 					playSfx("kaching", { detune: 25 * this.idx })
 					tween(this.scale, vec2(1.1), 0.15, (p) => this.scale = p, easings.easeOutQuad)
@@ -180,6 +139,8 @@ export function addUpgrades(elementParent) {
 						else if (this.freq != null) GameState.timeUntilAutoLoopEnds = this.freq
 					}
 					decreaseScoreBuy(this.price)
+					
+					ROOT.trigger("buy", { element: "upgrade", id: this.id, price: this.price })
 				},
 
 				draw() {
@@ -200,6 +161,10 @@ export function addUpgrades(elementParent) {
 						pos: vec2(0, this.height / 2),
 						opacity: 0.5,
 					})
+				},
+
+				inspect() {
+					return `upgradeId: ${this.id}`
 				},
 			}
 		])
@@ -222,9 +187,15 @@ export function addUpgrades(elementParent) {
 			if (isUpgradeBought(upgradeObj.id) || GameState.score < upgradeObj.price) {bop(upgradeObj); return}
 
 			if (upgradeObj.id == "c_2" && !isUpgradeBought("c_1")) {
-				upgradeObj.endTooltip()
-				upgradeObj.addTooltip("You have to buy the previous one", `Cursors now click every ${upgradeObj.freq} seconds`, "right")
-				return
+				upgradeObj.tooltip.end()
+
+				let tooltip = addTooltip(upgradeObj, {
+					text: "You have to buy the previous one",
+					textSize: upgradeObj.height / 2,
+					direction: "down",
+				})
+
+				return // end the event
 			}
 
 			downEvent = upgradeObj.onMouseDown(() => {
@@ -254,14 +225,33 @@ export function addUpgrades(elementParent) {
 
 		upgradeObj.onHover(() => {
 			if (!winParent.active) return
-		
 			upgradeObj.startHover()
+		
+			let textInBlink = upgradeObj.value != null ? `+${upgradeObj.value}` : `Cursors now click every ${upgradeObj.freq} seconds`;
+			if (!isUpgradeBought(upgradeObj.id) && !upgradeObj.hasTooltip) {
+				upgradeObj.tooltip?.end()
+				let tooltip = addTooltip(upgradeObj, {
+					text: formatNumber(upgradeObj.price, { price: true, fixAmount: 1 }),
+					textSize: upgradeObj.height / 2,
+					direction: "down",
+					lerpValue: 0.75,
+				})
+
+				tooltip.tooltipText.onUpdate(() => {
+					if (GameState.score >= upgradeObj.price) tooltip.tooltipText.color = GREEN
+					else tooltip.tooltipText.color = RED
+				})
+
+				upgradeObj.manageBlinkText(textInBlink).addT()
+			}
 		})
 
 		upgradeObj.onHoverEnd(() => {
 			if (!winParent.active) return
-		
 			upgradeObj.endHover()
+		
+			upgradeObj.tooltip?.end()
+			upgradeObj.manageBlinkText().end()
 		})
 
 		let drawShadow = elementParent.onDraw(() => {

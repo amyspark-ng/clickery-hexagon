@@ -102,6 +102,7 @@ function addStoreElement(winParent:any, opts = { key: "null", pos: vec2(0, 20) }
 				if (this.timesBoughtConsecutively == 5) {
 					addSmoke(winParent, this)
 				}
+				ROOT.trigger("buy", { element: "storeElement", type: this.is("clickersElement") ? "clickers" : "cursors", price: this.price })
 			},
 
 			startHover() {
@@ -300,6 +301,7 @@ function addPowerupStoreElement(winParent:any, posToAdd:any, hasUnlockedPowerups
 					pos: randomPos()
 				})
 				playSfx("kaching")
+				ROOT.trigger("buy", { element: "storeElement", type: "powerup", price: this.price })
 			},
 			update() {
 				this.area.scale = vec2(1 / this.scale.x, 1 / this.scale.y)

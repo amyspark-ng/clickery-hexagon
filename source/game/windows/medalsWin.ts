@@ -1,3 +1,4 @@
+import { addTooltip } from "../additives";
 import { allAchivementsNames, getAchievementFor, getIndexForAchievement, isAchievementUnlocked, unlockables, unlockAchievement } from "../unlockables";
 import { parseAnimation } from "../utils";
 
@@ -52,6 +53,7 @@ export function medalsWinContent(winParent) {
 				achievementId: getAchievementFor(medalInfo.name).name,
 				row: gridPosition.row,
 				column: gridPosition.column,
+				
 				update() {
 					if (!isAchievementUnlocked(this.achievementId)) {
 						this.opacity = 0.25
@@ -81,10 +83,15 @@ export function medalsWinContent(winParent) {
 		})
 
 		medalObj.onHover(() => {
-			// debug.log(medalObj.achievementIdx)
-			// debug.log(`row: ${medalObj.row}, column: ${medalObj.column}`)	
-			// debug.log(medalObj.achievementId)
+			let tooltip = addTooltip(medalObj, { 
+				text: getAchievementFor(medalObj.achievementId).text,
+				direction: "down",
+			})
 		})
+
+		medalObj.onHoverEnd(() => {
+			medalObj.tooltip.end()
+		}) 
 	}
 
 	// add all the medals

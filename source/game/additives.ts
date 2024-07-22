@@ -1,3 +1,4 @@
+import { GameObj, LayerComp, TextAlign, ZComp } from "kaplay"
 import { GameState } from "../gamestate"
 import { curDraggin } from "../plugins/drag"
 import { trail } from "../plugins/trail"
@@ -335,4 +336,121 @@ export function addToast(opts:toastOpts) {
 	processQueue(); // Ensure the queue is processed if there are available slots
 
 	return toastObj;
+}
+
+type tooltipOpts = {
+	text:string;
+	direction?: "up" | "down" | "left" | "right",
+	lerpValue?:number,
+	textSize?:number,
+}
+
+export function addTooltip(obj:GameObj, opts?:tooltipOpts) {
+	// if there's a tooltip already attached to the obj don't add a new one
+	// if (get("tooltip")?.some((tooltip) => tooltip.obj == obj)) return;
+	
+	// maybe don't lerp positions and just tween them
+	// no because i have to lerp them to the obj position in case the obj position changes
+	opts.direction = opts.direction ?? "up";
+	opts.lerpValue = opts.lerpValue ?? 0.35;
+	opts.textSize = opts.textSize ?? 20;
+
+	let sizeOfText = { x: 0, y: 0 };
+
+	let offset = 10
+	let bgPos = vec2(obj.screenPos().x, obj.screenPos().y)
+	let padding = 10;
+
+	let tooltipBg = add([
+		rect(sizeOfText.x, sizeOfText.y, { radius: 5 }),
+		z(0),
+		pos(obj.screenPos()),
+		color(BLACK),
+		opacity(0.95),
+		opacity(),
+		anchor("center"),
+		layer("windows"),
+		z(obj.z ? obj.z + 1 : 0),
+		"tooltip",
+		{
+			obj: obj,
+			update() {
+				switch (opts.direction) {
+					case "up":
+						bgPos.y = obj.screenPos().y - obj.height / 2 - offset
+					break;
+			
+					case "down":
+						bgPos.y = obj.screenPos().y + obj.height / 2 + offset
+					break;
+			
+					case "left":
+						this.anchor = "right"	
+						bgPos.x = getPositionOfSide(obj).left - offset
+					break;
+			
+					case "right":
+						this.anchor = "left"	
+						bgPos.x = getPositionOfSide(obj).right + offset
+					break;
+				}
+				
+				this.width = lerp(this.width, sizeOfText.x + padding, opts.lerpValue)
+				this.height = lerp(this.height, sizeOfText.y + padding, opts.lerpValue)
+
+				this.pos.x = lerp(this.pos.x, bgPos.x, opts.lerpValue)
+				this.pos.y = lerp(this.pos.y, bgPos.y, opts.lerpValue)
+			},
+		}
+	])
+
+	let tooltipText = add([
+		text(opts.text, {
+			font: "lambda",
+			size: opts.textSize,
+			styles: {
+				"red": {
+					color: RED,
+				},
+				"green": {
+					color: GREEN,
+				}
+			}
+		}),
+		color(WHITE),
+		anchor(tooltipBg.anchor),
+		opacity(),
+		pos(tooltipBg.pos),
+		layer("windows"),
+		z(obj.z ? obj.z + 1 : 0),
+		"tooltip",
+		{
+			update() {
+				sizeOfText.x = formatText({ text: tooltipText.text, size: tooltipText.textSize }).width
+				sizeOfText.y = formatText({ text: tooltipText.text, size: tooltipText.textSize }).height
+			
+				this.anchor = tooltipBg.anchor
+				let xPos:number;
+
+				if (opts.direction == "right") xPos = tooltipBg.pos.x + padding / 2
+				else if (opts.direction == "left") xPos = tooltipBg.pos.x - padding / 2
+				else xPos = tooltipBg.pos.x
+
+				this.pos.x = lerp(this.pos.x, xPos, opts.lerpValue)
+				this.pos.y = lerp(this.pos.y, tooltipBg.pos.y, opts.lerpValue)
+			}
+		}
+	])
+
+	function end() {
+		// moving it to obj center doesn't work because the switch is getting called onUpdate
+		// changing the bgPos to the actual position all the time
+		destroy(tooltipBg)
+		destroy(tooltipText)
+	}
+
+	let tooltipinfo = { tooltipBg, tooltipText, end }
+	obj.tooltip = tooltipinfo
+
+	return tooltipinfo
 }
