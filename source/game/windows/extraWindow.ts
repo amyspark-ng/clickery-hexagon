@@ -5,9 +5,10 @@ import { dummyShadow } from "../../plugins/dummyShadow";
 import { playSfx } from "../../sound";
 import { bop } from "../utils";
 import { mouse } from "../additives";
-import { buttonSpacing, folderObj, infoForWindows, manageWindow, openWindow } from "./windows-api/windowsAPI";
+import { buttonSpacing, infoForWindows, openWindow } from "./windows-api/windowsAPI";
 import { addMinibutton } from "./windows-api/minibuttons";
 import { destroyExclamation } from "../unlockables";
+import { openWindowButton } from "../classes/windowButtonClass";
 
 export let gridContainer;
 
@@ -77,17 +78,12 @@ export function makeGridMinibutton(idx, gridSlot, winParent) {
 		z(winParent.z + 1),
 		area(),
 		rotate(0),
+		dummyShadow(),
+		openWindowButton(),
 		"gridMiniButton",
 		{
 			windowKey: Object.keys(infoForWindows)[idx],
 			beingHeld: false,
-			update() {
-				if (this.dragging) {
-					// tilting towards direction
-					if (isMouseMoved()) this.angle = lerp(this.angle, mouseDeltaPos().x, 0.25)
-					else this.angle = lerp(this.angle, 0, 0.25)
-				}
-			},
 
 			startHover() {
 				playSfx("hoverMiniButton", {detune: 100 * idx / 4})
@@ -182,38 +178,6 @@ export function makeGridMinibutton(idx, gridSlot, winParent) {
 
 	tween(gridMiniButton.scale, vec2(1), 0.32, (p) => gridMiniButton.scale = p, easings.easeOutElastic)
 	
-	let lastPosClicked;
-	let waitingHold = wait(0, () => {});
-	gridMiniButton.onMousePress("left", () => {
-		lastPosClicked = mousePos()
-		if (!gridMiniButton.isHovering()) return
-		
-		waitingHold.cancel()
-		waitingHold = wait(0.08, () => {
-			if (!gridMiniButton.isHovering()) return
-			// hold function
-			if (curDraggin) {
-				return
-			}
-
-			// get out of the parent and sends him to the real world (root)
-			gridMiniButton.parent.children.splice(gridMiniButton.parent.children.indexOf(gridMiniButton), 1)
-			gridMiniButton.parent = ROOT
-			ROOT.children.push(gridMiniButton)
-
-			// important
-			gridMiniButton.pos = toScreen(mousePos())
-			gridMiniButton.z = mouse.z - 1
-
-			destroyExclamation(gridMiniButton)
-			gridMiniButton.layer = "mouse"
-			mouse.grab()
-			gridMiniButton.pick()
-			playSfx("plap")
-		})
-	})
-
-	// click/release hold functions
 	gridMiniButton.onUpdate(() => {
 		if (gridMiniButton.dragging) {
 			closestMinibutton = null;
@@ -233,28 +197,6 @@ export function makeGridMinibutton(idx, gridSlot, winParent) {
 	
 			distanceToSlot = gridMiniButton.screenPos().dist(gridSlot.screenPos())
 			distanceToClosestMinibutton = gridMiniButton.screenPos().dist(closestMinibutton.screenPos())
-		
-			// was being draggrd and got released
-			if (isMouseReleased("left")) {
-				// release hold function
-				gridMiniButton.releaseDrop(false)
-			}
-		}
-
-		// was not being dragged
-		else {
-			if (isMouseReleased("left")) {
-				waitingHold.cancel()
-				// if last posclicked is inside gridminibutton
-				if (!gridMiniButton.isHovering()) return
-				if (!gridMiniButton.hasPoint(lastPosClicked)) return
-				if (curDraggin) return
-
-				// click function
-				if (get(gridMiniButton.windowKey)[0]) winParent.close()
-				else {openWindow(gridMiniButton.windowKey); winParent.close()}
-				bop(gridMiniButton)
-			}
 		}
 	})
 
@@ -272,8 +214,39 @@ export function makeGridMinibutton(idx, gridSlot, winParent) {
 		get("gridMinibuttonSelection", { recursive: true }).forEach(selection => {
 			selection?.destroy()
 		})
+	})
 
-		gridMiniButton.use(dummyShadow())
+	// press, hold and release hold functions
+	gridMiniButton.onPress(() => {
+		if (get(gridMiniButton.windowKey)[0]) winParent.close()
+		
+		else {
+			openWindow(gridMiniButton.windowKey); 
+			winParent.close()
+		}
+		
+		bop(gridMiniButton)
+	})
+
+	gridMiniButton.onHold(() => {
+		// get out of the parent and sends him to the real world (root)
+		gridMiniButton.parent.children.splice(gridMiniButton.parent.children.indexOf(gridMiniButton), 1)
+		gridMiniButton.parent = ROOT
+		ROOT.children.push(gridMiniButton)
+
+		// important
+		gridMiniButton.pos = toScreen(mousePos())
+		gridMiniButton.z = mouse.z - 1
+
+		destroyExclamation(gridMiniButton)
+		gridMiniButton.layer = "mouse"
+		mouse.grab()
+		gridMiniButton.pick()
+		playSfx("plap")
+	})
+
+	gridMiniButton.onHoldRelease(() => {
+		gridMiniButton.releaseDrop(false)
 	})
 
 	return gridMiniButton

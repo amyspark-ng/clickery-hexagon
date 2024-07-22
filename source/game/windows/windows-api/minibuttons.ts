@@ -7,6 +7,7 @@ import { folderObj, infoForWindows, isDraggingAWindow, isHoveringAWindow, manage
 import { GameState } from "../../../gamestate";
 import { destroyExclamation } from "../../unlockables";
 import { Vec2 } from "kaplay";
+import { openWindowButton } from "../../classes/windowButtonClass";
 
 export function getMinibuttonXPos(index, buttonSpacing = 75) {
     return folderObj.pos.x - buttonSpacing * (index) - buttonSpacing;
@@ -49,6 +50,7 @@ export function addMinibutton(opts:minibuttonOpt) {
 		layer("ui"),
 		z(folderObj.z - 1),
 		dummyShadow(),
+		openWindowButton(),
 		`${Object.keys(infoForWindows)[opts.idxForInfo]}`,
 		"hoverObj",
 		"minibutton",
@@ -103,14 +105,7 @@ export function addMinibutton(opts:minibuttonOpt) {
 			},
 			
 			update() {
-				// dragging is minibutton
-				if (this.dragging) {
-					// tilting towards direction
-					if (isMouseMoved()) this.angle = lerp(this.angle, mouseDeltaPos().x, 0.25)
-					else this.angle = lerp(this.angle, 0, 0.25)
-				}
-
-				else {
+				if (this.dragging == false) {
 					if (curDraggin?.is("minibutton") && !this.extraMb) {
 						// spinning
 						// if it's waiting to be swapped
@@ -340,40 +335,21 @@ export function addMinibutton(opts:minibuttonOpt) {
 		}
 	})
 
-	let holdWaiting = wait(0, () => {});
-	currentMinibutton.onMousePress("left", () => {
-		if (!currentMinibutton.isBeingHovered) return
-		if (currentMinibutton.extraMb) return
-
-		holdWaiting.cancel()
-		holdWaiting = wait(0.185, () => {
-			if (!currentMinibutton.isBeingHovered) return;
-			currentMinibutton.pickFromTaskbar()
-		
-			// unlocking stuff
-			destroyExclamation(currentMinibutton)
-		})
+	currentMinibutton.onPress(() => {
+		if (isHoveringAWindow || isDraggingAWindow) return
+		currentMinibutton.click()
 	})
 
-	currentMinibutton.onMouseRelease((button) => {
-		if (!currentMinibutton.isBeingHovered) return
-		if (button != "left") return
-		holdWaiting.cancel()
+	currentMinibutton.onHold(() => {
+		currentMinibutton.pickFromTaskbar()
+		
+		// unlocking stuff
+		destroyExclamation(currentMinibutton)
+	})
 
-		// wasn't dragggin
-		if (!currentMinibutton.dragging) {
-			if (curDraggin) return
-			
-			if (isHoveringAWindow || isDraggingAWindow) return
-			currentMinibutton.click()
-		}
-
-		// was dragging
-		else if (currentMinibutton.dragging) {
-			// release hold function
-			if (curDraggin == currentMinibutton) {
-				currentMinibutton.releaseDrop()
-			}
+	currentMinibutton.onHoldRelease(() => {
+		if (curDraggin == currentMinibutton) {
+			currentMinibutton.releaseDrop()
 		}
 	})
 
