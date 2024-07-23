@@ -11,10 +11,9 @@ export function statsWinContent(winParent) {
 			"Total score: ": formatNumber(GameState.totalScore), 
 			"Times clicked: ": GameState.stats.timesClicked,
 			"Powerups clicked: ": GameState.stats.powerupsClicked,
-			// [`Clickers (${GameState.clickers}) / Cursors (${GameState.cursors}) owned: `]: `${GameState.clickers + GameState.cursors}`,
-			"Windows unlocked: ": `${GameState.unlockedWindows.length}/${Object.keys(infoForWindows).length}`,
 			"Achievements unlocked: ": `${GameState.unlockedAchievements.length}/${unlockables.achievements.length}`,
 			"Total time played: ": toHHMMSS(Math.round(GameState.stats.totalTimePlayed)),
+			// [`Clickers (${GameState.clickers}) / Cursors (${GameState.cursors}) owned: `]: `${GameState.clickers + GameState.cursors}`,
 		}
 
 		if (GameState.ascendLevel - 1 > 1) stats["Times ascended: "] = GameState.ascendLevel - 1

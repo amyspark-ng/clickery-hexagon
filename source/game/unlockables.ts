@@ -8,6 +8,23 @@ import { ROOT } from '../main';
 import { addToast } from './additives';
 import { addConfetti } from '../plugins/confetti';
 import { gridContainer } from './windows/extraWindow';
+import { upgradeInfo } from './windows/store/upgrades';
+
+
+let fullCursorsUpgrades = 0
+
+function getFullCursorsUpgrades() {
+	let sum = 0
+	Object.keys(upgradeInfo).forEach(key => {
+		if (key.includes("c_") && upgradeInfo[key].freq == null) {
+			sum += upgradeInfo[key].value
+		}
+	});
+	
+	return sum;
+}
+
+fullCursorsUpgrades = getFullCursorsUpgrades()
 
 export let unlockables = {
 	"windows": {
@@ -81,7 +98,7 @@ export let unlockables = {
 			"text":"Buy all available upgrades",
 			"icon":"icon_store",
 			"timeAfter": 1,
-			condition: () => isAchievementUnlocked("allclickupgrades") && GameState.cursorsUpgradesValue == (8 + 16 + 36) && GameState.timeUntilAutoLoopEnds == 1
+			condition: () => isAchievementUnlocked("allclickupgrades") && GameState.cursorsUpgradesValue == fullCursorsUpgrades && GameState.timeUntilAutoLoopEnds == 1
 		},
 		{"name":"maxedcombo",
 			"text": "Max combo for the first time, FULL COMBO!!!!", 

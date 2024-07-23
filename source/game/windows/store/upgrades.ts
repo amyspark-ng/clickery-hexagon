@@ -8,17 +8,20 @@ export let isHoveringUpgrade = false;
 
 export let upgradeInfo = {
 	"k_0": { value: 2, price: 500 },
-	"k_1": { value: 4, price: 5000 },
-	"k_2": { value: 8, price: 7500 },
-	"k_3": { value: 16, price: 7500,},
-	"k_4": { value: 32, price: 10000,},
-	"k_5": { value: 64, price: 25000,},
+	"k_1": { value: 4, price: 2500 },
+	"k_2": { value: 8, price: 6750 },
+	// ending
+	"k_3": { value: 16, price: 20200,},
+	"k_4": { value: 32, price: 22500,},
+	"k_5": { value: 64, price: 30500,},
+	// freq
 	"c_0": { freq: 10 }, // 10 seconds
-	"c_1": { freq: 5, price: 15000 }, // 5 seconds
-	"c_2": { freq: 1, price: 40000 }, // 1 second
-	"c_3": { value: 8, price: 10000 }, // 10K 
-	"c_4": { value: 16, price: 350000 }, // 35K
-	"c_5": { value: 36, price: 500000 }, // 50K
+	"c_1": { freq: 5, price: 15500 }, // 5 seconds
+	"c_2": { freq: 1, price: 45500 }, // 1 second
+	// cursor values
+	"c_3": { value: 16, price: 8500 }, 
+	"c_4": { value: 32, price: 10500 },
+	"c_5": { value: 48, price: 12400 },
 }
 
 function isUpgradeBought(id:string):boolean {
@@ -124,11 +127,17 @@ export function addUpgrades(elementParent) {
 
 					if (!isUpgradeBought(upgradeObj.id)) this.dropBuy()
 					tween(this.scale, vec2(1), 0.15, (p) => this.scale = p, easings.easeOutQuad)
-					if (!isUpgradeBought(this.id)) this.tooltip?.end()
+					if (!isUpgradeBought(this.id)) {
+						upgradeObj.tooltips?.filter(tooltip => tooltip.tag == "price").forEach(tooltip => {
+							tooltip.end()
+						});
+					}
 				},
 
 				buy() {
-					this.tooltip?.end()
+					upgradeObj.tooltips?.filter(tooltip => tooltip.tag == "price").forEach(tooltip => {
+						tooltip.end()
+					});
 					GameState.upgradesBought.push(this.id)
 					playSfx("kaching", { detune: 25 * this.idx })
 					tween(this.scale, vec2(1.1), 0.15, (p) => this.scale = p, easings.easeOutQuad)
@@ -187,12 +196,15 @@ export function addUpgrades(elementParent) {
 			if (isUpgradeBought(upgradeObj.id) || GameState.score < upgradeObj.price) {bop(upgradeObj); return}
 
 			if (upgradeObj.id == "c_2" && !isUpgradeBought("c_1")) {
-				upgradeObj.tooltip.end()
+				upgradeObj.tooltips?.filter(tooltip => tooltip.tag == "price").forEach(tooltip => {
+					tooltip.end()
+				});
 
 				let tooltip = addTooltip(upgradeObj, {
 					text: "You have to buy the previous one",
 					textSize: upgradeObj.height / 2,
 					direction: "down",
+					tag: "price",
 				})
 
 				return // end the event
@@ -229,12 +241,15 @@ export function addUpgrades(elementParent) {
 		
 			let textInBlink = upgradeObj.value != null ? `+${upgradeObj.value}` : `Cursors now click every ${upgradeObj.freq} seconds`;
 			if (!isUpgradeBought(upgradeObj.id) && !upgradeObj.hasTooltip) {
-				upgradeObj.tooltip?.end()
+				upgradeObj.tooltips?.filter(tooltip => tooltip.tag == "price").forEach(tooltip => {
+					tooltip.end()
+				});
 				let tooltip = addTooltip(upgradeObj, {
 					text: formatNumber(upgradeObj.price, { price: true, fixAmount: 1 }),
 					textSize: upgradeObj.height / 2,
 					direction: "down",
 					lerpValue: 0.75,
+					tag: "price",
 				})
 
 				tooltip.tooltipText.onUpdate(() => {
@@ -250,7 +265,9 @@ export function addUpgrades(elementParent) {
 			if (!winParent.active) return
 			upgradeObj.endHover()
 		
-			upgradeObj.tooltip?.end()
+			upgradeObj.tooltips?.filter(tooltip => tooltip.tag == "price").forEach(tooltip => {
+				tooltip.end()
+			});
 			upgradeObj.manageBlinkText().end()
 		})
 

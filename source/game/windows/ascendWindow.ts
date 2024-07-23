@@ -1,3 +1,5 @@
+import { triggerAscension } from "../ascension"
+
 export function ascendWinContent(winParent) {
 	// debug.log("alexa play ascend ominus")
 
@@ -13,7 +15,7 @@ export function ascendWinContent(winParent) {
 	])
 
 	button.onClick(() => {
-		go("ascendscene")
+		triggerAscension()
 	})
 	
 	// winParent.on("close", () => {

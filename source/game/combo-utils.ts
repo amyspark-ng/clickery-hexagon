@@ -77,7 +77,7 @@ export function addComboBar() {
 					})
 				}
 
-				let blendFactor = map(scoreVars.combo, 1, 10, 0, 1)
+				let blendFactor = map(scoreVars.combo, 1, COMBO_MAX, 0, 1)
 				this.color = blendColors(
 					WHITE,
 					hsl2rgb((time() * 0.2 * 0.1) % 1, 1.5, 0.8),
@@ -136,7 +136,7 @@ export function addPlusScoreText(opts:plusScoreOpts) {
 		{
 			update() {
 				if (opts.cursorRelated) return
-				textBlendFactor = map(scoreVars.combo, 1, 10, 0, 1)
+				textBlendFactor = map(scoreVars.combo, 1, COMBO_MAX, 0, 1)
 			}
 		}
 	])
@@ -227,7 +227,7 @@ export function increaseComboText() {
 		{
 			update() {
 				this.pos.y -= 0.5
-				blendFactor = map(scoreVars.combo, 0, 10, 0, 1)
+				blendFactor = map(scoreVars.combo, 0, COMBO_MAX, 0, 1)
 			}
 		}
 	])
@@ -294,7 +294,7 @@ export function increaseCombo() {
 	tween(cam.scale, 0.95, 0.25 / 2, (p) => cam.scale = p, easings.easeOutQuint).onEnd(() => {
 		tween(cam.scale, 1, 0.25, (p) => cam.scale = p, easings.easeOutQuint)
 	})
-	if (scoreVars.combo != 10) increaseComboText()
+	if (scoreVars.combo != COMBO_MAX) increaseComboText()
 }
 
 export function startCombo() {

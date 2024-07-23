@@ -2,9 +2,11 @@ import { GameState } from "../../../gamestate";
 import { ROOT } from "../../../main";
 import { positionSetter } from "../../../plugins/positionSetter";
 import { playSfx } from "../../../sound";
+import { addTooltip } from "../../additives";
+import { hexagon } from "../../hexagon";
 import { powerups, spawnPowerup } from "../../powerups";
 import { decreaseScoreBuy, formatNumber, getPrice, randomPos } from "../../utils";
-import { addUpgrades } from "./upgrades";
+import { addUpgrades, upgradeInfo } from "./upgrades";
 
 let storeElementsInfo = {
 	"clickersElement": { gamestateKey: "clickers", basePrice: 25, percentageIncrease: 15 },
@@ -54,7 +56,7 @@ function addStoreElement(winParent:any, opts = { key: "null", pos: vec2(0, 20) }
 		"storeElement",
 		`${opts.key}`,
 		{
-			price: 0,
+			price: storeElementsInfo[opts.key].basePrice,
 			isBeingHovered: false,
 			isBeingClicked: false,
 			down: false,
@@ -117,7 +119,15 @@ function addStoreElement(winParent:any, opts = { key: "null", pos: vec2(0, 20) }
 
 			update() {
 				isKeyDown("shift") ? amountToBuy = 10 : amountToBuy = 1
-				if (this.is("clickersElement") || this.is("cursorsElement")) this.price = getPrice(storeElementsInfo[opts.key].basePrice * powerups.store.multiplier, storeElementsInfo[opts.key].percentageIncrease, GameState[storeElementsInfo[opts.key].gamestateKey], amountToBuy)
+				if (this.is("clickersElement") || this.is("cursorsElement")) {
+					const elementInfo = storeElementsInfo[opts.key]
+					this.price = getPrice({
+						basePrice: elementInfo.basePrice,
+						percentageIncrease: elementInfo.percentageIncrease,
+						objectAmount: GameState[elementInfo.gamestateKey],
+						amountToBuy: amountToBuy
+					})
+				}
 				this.area.scale = vec2(1 / this.scale.x, 1 / this.scale.y)
 			},
 		}
@@ -358,6 +368,7 @@ function addPowerupStoreElement(winParent:any, posToAdd:any, hasUnlockedPowerups
 	
 				if (btn.boughtProgress >= 100 && !GameState.hasUnlockedPowerups) {
 					btn.unlock()
+					decreaseScoreBuy(storeElementsInfo.powerupsElement.unlockPrice)
 				}
 			})
 		})
@@ -427,9 +438,86 @@ export function storeWinContent(winParent) {
 		isHoveringUpgrade = get("upgrade", { recursive: true }).some((upgrade) => upgrade.isHovering())
 	})
 
+	function addCursorsElTutTool() {
+		let tooltip = addTooltip(cursorsElement, {
+			text: "← You can buy these to get automatically get score!",
+			direction: "right",
+			tag: "tutorial",
+		})
+
+		let buyCursorsEvent = ROOT.on("buy", (data) => {
+			if (data.type == "cursors") {
+				tooltip.end()
+				buyCursorsEvent.cancel()
+			}
+		})
+	}
+
+	function addFirstUpgradeTutTool() {
+		// adds the tooltip to the first upgrade
+		let tooltip = addTooltip(clickersElement.get("upgrade").filter(upgrade => upgrade.id == "k_0")[0], {
+			text: "With these you can make clicks or cursors more efficient! →",
+			direction: "left",
+			tag: "tutorial",
+		})
+
+		let buyUpgradeEvent = ROOT.on("buy", (data) => {
+			if (data.element == "upgrade" && data.id == "k_0") {
+				tooltip.end()
+				buyUpgradeEvent.cancel()
+			}
+		})
+	}
+
+	if (GameState.ascendLevel < 2) {
+		if (GameState.clickers == 0) {
+			let tooltip = addTooltip(clickersElement, {
+				text: "← You can buy these to get more\nscore per click",
+				direction: "right",
+				tag: "tutorial",
+			})
+
+			let buyClickersEvent = ROOT.on("buy", (data) => {
+				if (data.type == "clickers") {
+					tooltip.end()
+					buyClickersEvent.cancel()
+				}
+			})
+		}
+	
+		if (GameState.cursors == 0 && GameState.score >= cursorsElement.price) {
+			addCursorsElTutTool()
+		}
+
+		if (GameState.score >= upgradeInfo.k_0.price) {
+			addFirstUpgradeTutTool()
+		}
+	}
+
+	let cursorsChecked = false
+	let upgradeChecked = false
+	let checkForStuff = hexagon.on("clickrelease", () => {
+		if (cursorsChecked == false && GameState.cursors == 0 && GameState.score >= cursorsElement.price) {
+			cursorsChecked = true
+			addCursorsElTutTool()
+		}
+
+		if (upgradeChecked == false && GameState.score >= upgradeInfo.k_0.price) {
+			upgradeChecked = true
+			addFirstUpgradeTutTool()
+		}
+	})
+
 	winParent.on("close", () => {
 		winParent.get("*", { recursive: true }).forEach(element => {
 			if (element.endHover) element.endHover()
 		});
+
+		get("tooltip").filter(obj => obj.is("text")).forEach((tooltipObj) => {
+			// is part of the tutorial
+			if (tooltipObj.text.includes("←") || tooltipObj.text.includes("→")) tooltipObj.end()
+		})
+
+		checkForStuff?.cancel()
 	})
 }

@@ -71,12 +71,15 @@ class _GameState {
 	}
 
 	delete() {
+		let oldvolume = this.settings.volume
+		
 		// remove data
 		localStorage.removeItem("hexagon-save")
 		Object.assign(this, new _GameState())
-		
+
 		musicHandler?.stop()
 		sfxHandler?.stop()
+		this.settings.volume = oldvolume
 		
 		go("gamescene")
 	}
@@ -88,14 +91,10 @@ class _GameState {
 		this.cursors = 500
 	}
 
+	// this one STAYS because i have to modify the totalScore as well as the regular score
 	addScore(amount:number) {
 		this.score += amount
 		this.totalScore += amount
-	}
-
-	setScore(amount:number) {
-		this.score = amount
-		this.totalScore = amount
 	}
 }
 

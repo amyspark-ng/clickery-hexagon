@@ -34,8 +34,8 @@ export let clickVars = {
 }
 
 export const COMBO_MINCLICKS = 25;
-export const COMBO_MAXCLICKS = 275;
-export const COMBO_MAX = 10
+export const COMBO_MAXCLICKS = 160;
+export const COMBO_MAX = 5
 
 const hoverRotSpeedIncrease = 0.01 * 0.25
 let maxRotSpeed = 10
@@ -163,7 +163,7 @@ export function addHexagon() {
 						}
 					}
 	
-					if (scoreVars.combo == 10 && clickVars.maxedCombo == false) {
+					if (scoreVars.combo == COMBO_MAX && clickVars.maxedCombo == false) {
 						clickVars.maxedCombo = true
 						maxComboAnim()
 

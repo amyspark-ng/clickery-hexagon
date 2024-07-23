@@ -8,9 +8,31 @@ this game MIGHT be getting done
 
 # ISSUES (hell)
 ## Current TODO (small stuff mostly)
-- takes around 5 mins to reach 1 million and 6 to reach 10, do of that what you will
+- takes 10-15-20 mins to reach 75 million of total score, that's good
 - there's a point where stuff is too expensive and you have to click too much to buy at least
-- give cursors more power 
+^ that's where you got to ascend
+- increase the prices of click upgrades
+^ just a little
+- combo is so fucking op!!!! (maybe max of 5-7 instead of 10)
+<!-- niceEli -->
+0-300 no combo
+300-600 2x
+600-700 3x
+700-800 4x
+800-1000 5x
+>1000 HYPERDRIVE (8x)
+dont say its 8x
+just say HYPERDRIVE
+its more cool
+
+- BU-GS I HATE THEM -
+- complete all achievements achivment is bugged
+- holding down to buy is bugged because it keeps clicking even if you don't have score for it
+- i don't see the gifted powerup after 1 minute after you unllck them
+- do powerups spawning even fucking work
+- price doesn't increase when buying powerups
+- gnome achievement is not granted
+- why is achievementUnlocked getting called several times, sometimes
 
 - yes the memory crash of powerups still happens
 

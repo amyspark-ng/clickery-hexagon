@@ -343,6 +343,7 @@ type tooltipOpts = {
 	direction?: "up" | "down" | "left" | "right",
 	lerpValue?:number,
 	textSize?:number,
+	tag?:string,
 }
 
 export function addTooltip(obj:GameObj, opts?:tooltipOpts) {
@@ -374,24 +375,30 @@ export function addTooltip(obj:GameObj, opts?:tooltipOpts) {
 		"tooltip",
 		{
 			obj: obj,
+			tag: opts.tag ?? "nothing",
+			end: null,
 			update() {
+				if (opts.direction != "up" || "down") {
+					bgPos.y = obj.screenPos().y
+				}
+
 				switch (opts.direction) {
 					case "up":
-						bgPos.y = obj.screenPos().y - obj.height / 2 - offset
+						bgPos.y = (obj.screenPos().y - obj.height / 2) - offset
 					break;
 			
 					case "down":
-						bgPos.y = obj.screenPos().y + obj.height / 2 + offset
+						bgPos.y = (obj.screenPos().y + obj.height / 2) + offset
 					break;
 			
 					case "left":
 						this.anchor = "right"	
-						bgPos.x = getPositionOfSide(obj).left - offset
+						bgPos.x = (obj.screenPos().x - obj.width / 2) - offset
 					break;
 			
 					case "right":
 						this.anchor = "left"	
-						bgPos.x = getPositionOfSide(obj).right + offset
+						bgPos.x = (obj.screenPos().x + obj.width / 2) + offset
 					break;
 				}
 				
@@ -425,6 +432,7 @@ export function addTooltip(obj:GameObj, opts?:tooltipOpts) {
 		z(obj.z ? obj.z + 1 : 0),
 		"tooltip",
 		{
+			end: null,
 			update() {
 				sizeOfText.x = formatText({ text: tooltipText.text, size: tooltipText.textSize }).width
 				sizeOfText.y = formatText({ text: tooltipText.text, size: tooltipText.textSize }).height
@@ -436,8 +444,8 @@ export function addTooltip(obj:GameObj, opts?:tooltipOpts) {
 				else if (opts.direction == "left") xPos = tooltipBg.pos.x - padding / 2
 				else xPos = tooltipBg.pos.x
 
-				this.pos.x = lerp(this.pos.x, xPos, opts.lerpValue)
-				this.pos.y = lerp(this.pos.y, tooltipBg.pos.y, opts.lerpValue)
+				this.pos.x = lerp(this.pos.x, xPos, opts.lerpValue * 1.5)
+				this.pos.y = lerp(this.pos.y, tooltipBg.pos.y, opts.lerpValue * 1.5)
 			}
 		}
 	])
@@ -449,8 +457,12 @@ export function addTooltip(obj:GameObj, opts?:tooltipOpts) {
 		destroy(tooltipText)
 	}
 
-	let tooltipinfo = { tooltipBg, tooltipText, end }
-	obj.tooltip = tooltipinfo
+	let tooltipinfo = { tooltipBg, tooltipText, end, tag: opts.tag }
+	if (obj.tooltips == null) obj.tooltips = []
+	obj.tooltips.push(tooltipinfo)
+
+	tooltipBg.end = end
+	tooltipText.end = end
 
 	return tooltipinfo
 }

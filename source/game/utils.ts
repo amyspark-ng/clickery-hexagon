@@ -114,15 +114,26 @@ export function percentage(number, percentageTo) {
 	return Math.round((number * percentageTo) / 100)
 }
 
-export function getPrice(basePrice, percentageIncrease, objectAmount, amountToBuy) {
-    let priceToReturn = 0;
+type getPriceOpts = {
+	basePrice:number,
+	percentageIncrease:number,
+	objectAmount:number,
+	amountToBuy?:number,
+}
 
-    for (let i = 0; i < amountToBuy; i++) {
-		// let currentPrice = (basePrice * (1 + percentageIncrease / 100)) ** objectAmount + 1
-		// priceToReturn += Math.round(currentPrice)
-		let currentPrice = basePrice * Math.pow(1 + percentageIncrease / 100, objectAmount + i);
-        priceToReturn += Math.round(currentPrice);
-    }
+export function getPrice(opts:getPriceOpts) {
+    opts.amountToBuy = opts.amountToBuy ?? 1 
+	let percentageMultiplier = (1 + opts.percentageIncrease / 100)
+	let priceToReturn = 0;
+
+    for (let i = 0; i < opts.amountToBuy; i++) {
+		// OLD FORMULA
+		// let currentPrice = opts.basePrice * Math.pow(percentageMultiplier, opts.objectAmount + i);
+        // priceToReturn += Math.round(currentPrice);
+		
+		let currentPrice = opts.basePrice * 1.15 ** (opts.objectAmount + i)
+		priceToReturn += Math.round(currentPrice);
+	}
 
     return priceToReturn;
 }
