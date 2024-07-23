@@ -90,7 +90,7 @@ export function medalsWinContent(winParent) {
 		})
 
 		medalObj.onHoverEnd(() => {
-			medalObj.tooltip.end()
+			medalObj.tooltips[0].end()
 		}) 
 	}
 

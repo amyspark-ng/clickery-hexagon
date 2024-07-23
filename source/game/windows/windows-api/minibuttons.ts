@@ -7,7 +7,7 @@ import { folderObj, infoForWindows, isDraggingAWindow, isHoveringAWindow, manage
 import { GameState } from "../../../gamestate";
 import { destroyExclamation } from "../../unlockables";
 import { Vec2 } from "kaplay";
-import { openWindowButton } from "../../classes/windowButtonClass";
+import { openWindowButton } from "./windowButtonClass";
 
 export function getMinibuttonXPos(index, buttonSpacing = 75) {
     return folderObj.pos.x - buttonSpacing * (index) - buttonSpacing;
@@ -24,7 +24,6 @@ type minibuttonOpt = {
 export function addMinibutton(opts:minibuttonOpt) {
 	let quad;
 
-	// @ts-ignore
 	getSprite("bean")?.then(quady => {
 		quad = quady
 	})

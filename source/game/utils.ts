@@ -6,7 +6,7 @@ import { hexagon } from "./hexagon";
 import { checkForUnlockable, unlockAchievement } from "./unlockables";
 import { isHoveringAWindow, openWindow } from "./windows/windows-api/windowsAPI";
 import { triggerAscension } from "./ascension";
-import { powerups, spawnPowerup } from "./powerups";
+import { powerupTypes, spawnPowerup } from "./powerups";
 
 // definetely not stack overflow
 // dots are always for thousands, leave it like this
@@ -62,9 +62,12 @@ let numTypes = {
 
 // do check for decimals here
 export function formatNumber(value:number, opts?:formatNumberOpts):string {
-	let fixAmount = opts?.fixAmount || 3
-	let isPrice = opts?.price || false
-	let letterSuffixes = opts?.letterSuffixes || true
+	if (opts == undefined) opts = {} as formatNumberOpts 
+	opts.price = opts.price ?? false
+	opts.letterSuffixes = opts.letterSuffixes ?? false
+	
+	if (opts.price && !opts.fixAmount) opts.fixAmount = 1
+	else opts.fixAmount = opts.fixAmount ?? 3
 
 	let returnValue = ""
 
@@ -77,8 +80,8 @@ export function formatNumber(value:number, opts?:formatNumberOpts):string {
 		// run until it finds the numType
 		for (let i = 1; value >= Math.pow(1000, i); i++) {
 			// turn it into a smaller version
-			let numberValue = (value / Math.pow(1000, i)).toFixed(fixAmount) 
-			let suffix = (letterSuffixes == true ? "" : " ") + numTypes[Object.keys(numTypes)[i]][letterSuffixes ? "small" : "large"];
+			let numberValue = (value / Math.pow(1000, i)).toFixed(opts.fixAmount) 
+			let suffix = (opts.letterSuffixes == true ? "" : " ") + numTypes[Object.keys(numTypes)[i]][opts.letterSuffixes ? "small" : "large"];
 			returnValue = numberValue + suffix
 		}
 	}
@@ -88,7 +91,7 @@ export function formatNumber(value:number, opts?:formatNumberOpts):string {
 		returnValue = value.toExponential(2);
 	}
 
-	if (isPrice == true) returnValue = returnValue.replace (/^/,'$');
+	if (opts.price == true) returnValue = returnValue.replace (/^/,'$');
 	if (GameState.settings.commaInsteadOfDot == true) returnValue = returnValue.replaceAll(".", ",");
 
 	return returnValue
@@ -307,10 +310,10 @@ export function debugFunctions() {
 		}
 	
 		else if (isKeyPressed("f")) {
-			spawnPowerup({
-				type: choose(Object.keys(powerups)),
-				pos: randomPos()
-			})
+			// spawnPowerup({
+			// 	type: choose(Object.keys(powerupTypes)),
+			// 	pos: randomPos()
+			// })
 		}
 
 		else if (isKeyPressed("h")) {

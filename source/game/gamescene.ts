@@ -8,7 +8,7 @@ import { folderObj, folderObjManaging, windowsDefinition } from "./windows/windo
 import { songs } from "./windows/musicWindow.ts"
 import { curDraggin } from "../plugins/drag.js"
 import { DEBUG, ROOT } from "../main.ts"
-import { powerupManagement, powerups, spawnPowerup } from "./powerups.ts"
+import { powerupManagement, powerupTypes, spawnPowerup } from "./powerups.ts"
 import { checkForUnlockable, isAchievementUnlocked, unlockables, unlockAchievement } from "./unlockables.ts"
 import { ascending, set_ascending } from "./ascension.ts"
 
@@ -284,7 +284,7 @@ export function gamescene() {
 						if (chance(0.25)) {
 							if (GameState.hasUnlockedPowerups) {
 								spawnPowerup({
-									type: choose(Object.keys(powerups)),
+									type: choose(Object.keys(powerupTypes)),
 									pos: randomPos()
 								})
 							}

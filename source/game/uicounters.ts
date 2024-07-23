@@ -1,5 +1,5 @@
 import { GameState } from "../gamestate.ts";
-import { positionSetter } from "../plugins/positionSetter.js";
+import { positionSetter } from "../plugins/positionSetter.ts";
 import { waver } from "../plugins/wave.js";
 import { scoreVars } from "./hexagon.ts";
 import { bop, formatNumber, getPositionOfSide, simpleNumberFormatting } from "./utils.ts";

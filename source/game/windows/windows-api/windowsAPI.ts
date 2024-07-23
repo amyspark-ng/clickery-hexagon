@@ -18,7 +18,7 @@ import { hasStartedGame } from "../../gamescene.ts";
 import { isAchievementUnlocked, unlockAchievement } from "../../unlockables.ts";
 import { medalsWinContent } from "../medalsWin.ts";
 import { ROOT } from "../../../main.ts";
-import { positionSetter } from "../../../plugins/positionSetter.js";
+import { positionSetter } from "../../../plugins/positionSetter.ts";
 import { dummyShadow } from "../../../plugins/dummyShadow.js";
 import { ascending } from "../../ascension.ts";
 

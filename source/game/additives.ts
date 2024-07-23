@@ -352,6 +352,8 @@ export function addTooltip(obj:GameObj, opts?:tooltipOpts) {
 	
 	// maybe don't lerp positions and just tween them
 	// no because i have to lerp them to the obj position in case the obj position changes
+
+	if (opts == undefined) opts = {} as tooltipOpts 
 	opts.direction = opts.direction ?? "up";
 	opts.lerpValue = opts.lerpValue ?? 0.35;
 	opts.textSize = opts.textSize ?? 20;
@@ -378,27 +380,27 @@ export function addTooltip(obj:GameObj, opts?:tooltipOpts) {
 			tag: opts.tag ?? "nothing",
 			end: null,
 			update() {
-				if (opts.direction != "up" || "down") {
-					bgPos.y = obj.screenPos().y
-				}
-
 				switch (opts.direction) {
 					case "up":
 						bgPos.y = (obj.screenPos().y - obj.height / 2) - offset
+						bgPos.x = obj.screenPos().x
 					break;
 			
 					case "down":
 						bgPos.y = (obj.screenPos().y + obj.height / 2) + offset
+						bgPos.x = obj.screenPos().x
 					break;
 			
 					case "left":
 						this.anchor = "right"	
 						bgPos.x = (obj.screenPos().x - obj.width / 2) - offset
+						bgPos.y = obj.screenPos().y
 					break;
 			
 					case "right":
 						this.anchor = "left"	
 						bgPos.x = (obj.screenPos().x + obj.width / 2) + offset
+						bgPos.y = obj.screenPos().y
 					break;
 				}
 				
@@ -450,16 +452,18 @@ export function addTooltip(obj:GameObj, opts?:tooltipOpts) {
 		}
 	])
 
+	let tooltipinfo = { tooltipBg, tooltipText, end, tag: opts.tag }
+	if (obj.tooltips == null) obj.tooltips = []
+	obj.tooltips.push(tooltipinfo)
+
 	function end() {
 		// moving it to obj center doesn't work because the switch is getting called onUpdate
 		// changing the bgPos to the actual position all the time
 		destroy(tooltipBg)
 		destroy(tooltipText)
+		let index = obj.tooltips.indexOf(tooltipinfo)
+		if (index > -1) obj.tooltips.splice(index, 1)
 	}
-
-	let tooltipinfo = { tooltipBg, tooltipText, end, tag: opts.tag }
-	if (obj.tooltips == null) obj.tooltips = []
-	obj.tooltips.push(tooltipinfo)
 
 	tooltipBg.end = end
 	tooltipText.end = end

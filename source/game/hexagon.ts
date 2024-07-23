@@ -2,7 +2,7 @@
 import { GameState, scoreManager } from "../gamestate.ts";
 import { scoreText, spsText } from "./uicounters.ts";
 import { arrayToColor } from "./utils.ts";
-import { mouse } from "./additives.ts";
+import { addTooltip, mouse } from "./additives.ts";
 import { playSfx } from "../sound.ts";
 import { isDraggingAWindow, isHoveringAWindow, manageWindow } from "./windows/windows-api/windowsAPI.ts";
 import { waver } from "../plugins/wave.js";
@@ -11,7 +11,7 @@ import { addPlusScoreText, getClicksFromCombo, increaseCombo, increaseComboText,
 import { addConfetti } from "../plugins/confetti.js";
 import { curDraggin } from "../plugins/drag.js";
 import { cam } from "./gamescene.ts";
-import { powerups } from "./powerups.ts";
+import { powerupTypes } from "./powerups.ts";
 import { checkForUnlockable, isAchievementUnlocked, unlockAchievement } from "./unlockables.ts";
 
 export let scoreVars = {
@@ -184,7 +184,7 @@ export function addHexagon() {
 					cursorRelated: false,
 				})
 
-				scoreManager.addScore((scoreVars.scorePerClick * powerups.clicks.multiplier) * scoreVars.combo)
+				scoreManager.addScore((scoreVars.scorePerClick * powerupTypes.clicks.multiplier) * scoreVars.combo)
 
 				tween(scoreText.scaleIncrease, 1.05, 0.2, (p) => scoreText.scaleIncrease = p, easings.easeOutQuint).onEnd(() => {
 					tween(scoreText.scaleIncrease, 1, 0.2, (p) => scoreText.scaleIncrease = p, easings.easeOutQuint)
@@ -311,7 +311,7 @@ export function addHexagon() {
 								cursorRelated: true,
 							})
 
-							scoreManager.addScore(scoreVars.scorePerAutoClick * powerups.cursors.multiplier)
+							scoreManager.addScore(scoreVars.scorePerAutoClick * powerupTypes.cursors.multiplier)
 			
 							// has done its bidding, time to roll and dissapear
 							autoCursor.gravityScale = 1
@@ -423,8 +423,8 @@ export function addHexagon() {
 	}
 
 	function getFullSPC() {
-		if (GameState.clicksUpgradesValue < 2) return ((1 + GameState.clickers) * powerups.clicks.multiplier) * scoreVars.combo
-		else return (((1 + GameState.clickers) * GameState.clicksUpgradesValue) * powerups.clicks.multiplier) * scoreVars.combo
+		if (GameState.clicksUpgradesValue < 2) return ((1 + GameState.clickers) * powerupTypes.clicks.multiplier) * scoreVars.combo
+		else return (((1 + GameState.clickers) * GameState.clicksUpgradesValue) * powerupTypes.clicks.multiplier) * scoreVars.combo
 	}
 
 	function getVanillaSPAC() {
@@ -441,8 +441,8 @@ export function addHexagon() {
 	}
 
 	function getFullSPAC() {
-		if (GameState.cursorsUpgradesValue < 2) return GameState.cursors * powerups.cursors.multiplier 
-		else return (GameState.cursors * GameState.cursorsUpgradesValue) * powerups.cursors.multiplier
+		if (GameState.cursorsUpgradesValue < 2) return GameState.cursors * powerupTypes.cursors.multiplier 
+		else return (GameState.cursors * GameState.cursorsUpgradesValue) * powerupTypes.cursors.multiplier
 	}
 
 	// score setting stuff

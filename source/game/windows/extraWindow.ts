@@ -8,7 +8,7 @@ import { mouse } from "../additives";
 import { buttonSpacing, infoForWindows, openWindow } from "./windows-api/windowsAPI";
 import { addMinibutton } from "./windows-api/minibuttons";
 import { destroyExclamation } from "../unlockables";
-import { openWindowButton } from "../classes/windowButtonClass";
+import { openWindowButton } from "./windows-api/windowButtonClass";
 
 export let gridContainer;
 

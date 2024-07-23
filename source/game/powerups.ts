@@ -16,7 +16,7 @@ types of powerups
 	bad: could have the opposite of the effects before, or could increase them by A LOT
 */
 
-export let powerups = {
+export let powerupTypes = {
 	"clicks": { sprite: "cursors.cursor", multiplier: 1, removalTime: null, color: [199, 228, 255] },
 	"cursors": { sprite: "cursors.point", multiplier: 1, removalTime: null, color: [199, 252, 197] },
 	"time": { sprite: "cursors.wait", multiplier: 1, removalTime: null, color: [247, 242, 193] },
@@ -92,8 +92,8 @@ function addTimer(opts:{ sprite: string, type: string }) {
 			update() {
 				this.opacity = timerObj.opacity
 				
-				if (powerups[opts.type].removalTime == null) return
-				this.text = `${powerups[opts.type].removalTime.toFixed(0)}s\n`
+				if (powerupTypes[opts.type].removalTime == null) return
+				this.text = `${powerupTypes[opts.type].removalTime.toFixed(0)}s\n`
 			}
 		}
 	])
@@ -121,7 +121,7 @@ function addTimer(opts:{ sprite: string, type: string }) {
 	icon.width = 50
 	icon.height = 50
 
-	let maxTime = powerups[opts.type].removalTime
+	let maxTime = powerupTypes[opts.type].removalTime
 
 	let round = timerObj.add([
 		z(2),
@@ -129,7 +129,7 @@ function addTimer(opts:{ sprite: string, type: string }) {
 			draw() {
 				drawRect({
 					width: timerObj.width - timerObj.outline.width,
-					height: map(powerups[opts.type].removalTime, 0, maxTime, 0, timerObj.height - timerObj.outline.width),
+					height: map(powerupTypes[opts.type].removalTime, 0, maxTime, 0, timerObj.height - timerObj.outline.width),
 					color: YELLOW,
 					anchor: "bot",
 					pos: vec2(0, timerObj.height / 2),
@@ -141,7 +141,7 @@ function addTimer(opts:{ sprite: string, type: string }) {
 }
 
 export function addPowerupLog(powerupType) {
-	let powerupTime = powerups[powerupType].removalTime
+	let powerupTime = powerupTypes[powerupType].removalTime
 	let textInText = ""
 
 	let bgOpacity = 0.95
@@ -176,9 +176,9 @@ export function addPowerupLog(powerupType) {
 		opacity(),
 		{
 			update() {
-				if (powerups[powerupType].removalTime == null) {powerupTime = 0; return}
-				powerupTime = powerups[powerupType].removalTime.toFixed(1)
-				let powerupMultiplier = powerups[powerupType].multiplier
+				if (powerupTypes[powerupType].removalTime == null) {powerupTime = 0; return}
+				powerupTime = Math.round(powerupTypes[powerupType].removalTime)
+				let powerupMultiplier = powerupTypes[powerupType].multiplier
 
 				if (powerupType == "clicks") textInText = `Click production increased x${powerupMultiplier} for ${powerupTime} secs`
 				else if (powerupType == "cursors") textInText = `Cursors production increased x${powerupMultiplier} for ${powerupTime} secs`
@@ -260,7 +260,7 @@ export function spawnPowerup(opts:powerupOpt) {
 					}
 				])
 
-				parseAnimation(blink, powerups[opts.type].sprite)
+				parseAnimation(blink, powerupTypes[opts.type].sprite)
 
 				let timeToLeave = 0.75
 				blink.loop(timeToLeave / 12, () => {
@@ -290,21 +290,21 @@ export function spawnPowerup(opts:powerupOpt) {
 					multiplier = 10
 				}
 
-				powerups[this.type].multiplier = multiplier
+				powerupTypes[this.type].multiplier = multiplier
 
 				// # time
-				powerups[this.type].removalTime = opts.time || 10
+				powerupTypes[this.type].removalTime = opts.time || 10
 				
 				// if there's already a timer don't add a new one!
 				let checkTimer = get(`${this.type}_putimer`)[0] 
 				if (checkTimer) checkTimer.updateTime()
-				else addTimer({ sprite: powerups[powerupObj.type].sprite, type: this.type}) 
+				else addTimer({ sprite: powerupTypes[powerupObj.type].sprite, type: this.type}) 
 			}
 		}
 	])
 
 	// other stuff
-	parseAnimation(powerupObj, powerups[opts.type].sprite)
+	parseAnimation(powerupObj, powerupTypes[opts.type].sprite)
 	powerupObj.startWave()
 
 	// spawn anim
@@ -327,14 +327,14 @@ export function spawnPowerup(opts:powerupOpt) {
 }
 
 export function powerupManagement() {
-	for (let powerup in powerups) {
-		if (powerups[powerup].removalTime != null) {
-			powerups[powerup].removalTime -= dt()
+	for (let powerup in powerupTypes) {
+		if (powerupTypes[powerup].removalTime != null) {
+			powerupTypes[powerup].removalTime -= dt()
 		
-			if (powerups[powerup].removalTime < 0) {
-				powerups[powerup].removalTime = null
+			if (powerupTypes[powerup].removalTime < 0) {
+				powerupTypes[powerup].removalTime = null
 				get(`${powerup}_putimer`)?.forEach(timer => timer.end())
-				powerups[powerup].multiplier = 1
+				powerupTypes[powerup].multiplier = 1
 			}
 		}
 	}
