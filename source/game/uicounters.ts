@@ -26,8 +26,9 @@ export function uiCounters() {
 		{
 			defaultScale: 1,
 			scaleIncrease: 1,
+			scoreShown: 0,
 			update() {
-				this.text = `${formatNumber(Math.round(GameState.score))}` 
+				this.text = `${formatNumber(Math.round(this.scoreShown))}` 
 				this.angle = wave(-2.8, 2.8, time() * 1.25)
 				this.scale.x = wave(0.95 * this.scaleIncrease, 1.08 * this.scaleIncrease, time() * 1.15)
 				this.scale.y = wave(0.95 * this.scaleIncrease, 1.08 * this.scaleIncrease, time() * 1.15)
@@ -39,6 +40,7 @@ export function uiCounters() {
 	scoreText.on("startAnimEnd", () => {
 		scoreText.use(waver({ maxAmplitude: 5, wave_speed: 0.5 }))		
 		scoreText.startWave()
+		scoreText.onUpdate(() => scoreText.scoreShown = GameState.score)
 	})
 
 	spsText = scoreText.add([

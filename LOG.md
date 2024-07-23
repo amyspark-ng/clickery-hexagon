@@ -26,6 +26,7 @@ just say HYPERDRIVE
 its more cool
 
 - BU-GS I HATE THEM -
+- update the tooltips for the medals
 - complete all achievements achivment is bugged
 - holding down to buy is bugged because it keeps clicking even if you don't have score for it
 - i don't see the gifted powerup after 1 minute after you unllck them

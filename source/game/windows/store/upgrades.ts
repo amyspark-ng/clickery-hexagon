@@ -1,8 +1,8 @@
-import { GameState } from "../../../gamestate";
+import { GameState, scoreManager } from "../../../gamestate";
 import { ROOT } from "../../../main";
 import { playSfx } from "../../../sound";
 import { addTooltip } from "../../additives";
-import { blendColors, bop, decreaseScoreBuy, formatNumber, randomPos } from "../../utils";
+import { blendColors, bop, formatNumber } from "../../utils";
 
 export let isHoveringUpgrade = false;
 
@@ -24,7 +24,7 @@ export let upgradeInfo = {
 	"c_5": { value: 48, price: 12400 },
 }
 
-function isUpgradeBought(id:string):boolean {
+export function isUpgradeBought(id:string):boolean {
 	return (GameState.upgradesBought.includes(id))
 }
 
@@ -147,8 +147,8 @@ export function addUpgrades(elementParent) {
 						if (this.value != null) GameState.cursorsUpgradesValue += this.value
 						else if (this.freq != null) GameState.timeUntilAutoLoopEnds = this.freq
 					}
-					decreaseScoreBuy(this.price)
 					
+					scoreManager.subScore(this.price)
 					ROOT.trigger("buy", { element: "upgrade", id: this.id, price: this.price })
 				},
 

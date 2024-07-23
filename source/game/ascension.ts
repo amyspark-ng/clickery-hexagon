@@ -1,5 +1,5 @@
 import { Vec2 } from "kaplay";
-import { GameState } from "../gamestate";
+import { GameState, scoreManager } from "../gamestate";
 import { ROOT } from "../main"
 import { waver } from "../plugins/wave";
 import { hexagon } from "./hexagon"
@@ -558,7 +558,8 @@ export function endAscension() {
 	})
 
 	// turn everything back to 0
-	tween(GameState.score, 0, 0.5, (p) => GameState.score = Math.round(p), easings.easeOutQuad)
+	scoreManager.resetScoreBcAscend()
+
 	tween(GameState.clickers, 0, 0.5, (p) => GameState.clickers = Math.round(p), easings.easeOutQuad)
 	tween(GameState.cursors, 0, 0.5, (p) => GameState.cursors = Math.round(p), easings.easeOutQuad)
 

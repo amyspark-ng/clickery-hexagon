@@ -1,9 +1,11 @@
+import { scoreText } from "./game/uicounters"
 import { saveAnim } from "./game/utils"
 import { musicHandler, sfxHandler } from "./sound"
 
 class _GameState {	
 	score = 0
-	totalScore = 0
+	scoreThisRun = 0
+	scoreAllTime = 0
 	mana = 0
 
 	clickers = 0
@@ -85,17 +87,30 @@ class _GameState {
 	}
 
 	cheat() {
-		this.score = 1000000
-		this.totalScore = 1000000
 		this.clickers = 500
 		this.cursors = 500
-	}
-
-	// this one STAYS because i have to modify the totalScore as well as the regular score
-	addScore(amount:number) {
-		this.score += amount
-		this.totalScore += amount
 	}
 }
 
 export let GameState = new _GameState()
+
+export let scoreManager = {
+	addScore(amount:number) {
+		GameState.score += amount
+		GameState.scoreThisRun += amount
+		GameState.scoreAllTime += amount
+	},
+
+	// used usually when buying
+	subScore(amount:number) {
+		// GameState.score -= amount
+		tween(GameState.score, GameState.score - amount, 0.32, (p) => GameState.score = p, easings.easeOutExpo)
+	},
+
+	resetScoreBcAscend() {
+		// GameState.score = 0
+		// GameState.scoreThisRun = 0
+		tween(GameState.score, 0, 0.32, (p) => GameState.score = p, easings.easeOutCirc)
+		tween(GameState.scoreThisRun, 0, 0.32, (p) => GameState.scoreThisRun = p, easings.easeOutCirc)
+	}
+}

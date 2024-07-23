@@ -1,12 +1,12 @@
-import { GameState } from "../../../gamestate";
+import { GameState, scoreManager } from "../../../gamestate";
 import { ROOT } from "../../../main";
 import { positionSetter } from "../../../plugins/positionSetter";
 import { playSfx } from "../../../sound";
 import { addTooltip } from "../../additives";
 import { hexagon } from "../../hexagon";
 import { powerups, spawnPowerup } from "../../powerups";
-import { decreaseScoreBuy, formatNumber, getPrice, randomPos } from "../../utils";
-import { addUpgrades, upgradeInfo } from "./upgrades";
+import { formatNumber, getPrice, randomPos } from "../../utils";
+import { addUpgrades, isUpgradeBought, upgradeInfo } from "./upgrades";
 
 let storeElementsInfo = {
 	"clickersElement": { gamestateKey: "clickers", basePrice: 25, percentageIncrease: 15 },
@@ -66,7 +66,7 @@ function addStoreElement(winParent:any, opts = { key: "null", pos: vec2(0, 20) }
 				if (this.is("clickersElement")) GameState.clickers += amount
 				else if (this.is("cursorsElement")) GameState.cursors += amount
 
-				decreaseScoreBuy(this.price)
+				scoreManager.subScore(this.price)
 
 				hasBoughtRecently = true;
 				storePitchSeconds = 0;
@@ -303,6 +303,7 @@ function addPowerupStoreElement(winParent:any, posToAdd:any, hasUnlockedPowerups
 				this.destroy()
 				addPowerupStoreElement(winParent, posToAdd, true)
 				ROOT.trigger("powerupunlock")
+				scoreManager.subScore(storeElementsInfo.powerupsElement.unlockPrice)
 			},
 			buy() {
 				let randomPowerup = choose(Object.keys(powerups).filter(p => p != "awesome"))
@@ -312,6 +313,7 @@ function addPowerupStoreElement(winParent:any, posToAdd:any, hasUnlockedPowerups
 				})
 				playSfx("kaching")
 				ROOT.trigger("buy", { element: "storeElement", type: "powerup", price: this.price })
+				scoreManager.subScore(this.price) // TODO: this doesn't have a price
 			},
 			update() {
 				this.area.scale = vec2(1 / this.scale.x, 1 / this.scale.y)
@@ -368,7 +370,6 @@ function addPowerupStoreElement(winParent:any, posToAdd:any, hasUnlockedPowerups
 	
 				if (btn.boughtProgress >= 100 && !GameState.hasUnlockedPowerups) {
 					btn.unlock()
-					decreaseScoreBuy(storeElementsInfo.powerupsElement.unlockPrice)
 				}
 			})
 		})
@@ -469,6 +470,7 @@ export function storeWinContent(winParent) {
 		})
 	}
 
+	let checkForStuff = null;
 	if (GameState.ascendLevel < 2) {
 		if (GameState.clickers == 0) {
 			let tooltip = addTooltip(clickersElement, {
@@ -489,24 +491,24 @@ export function storeWinContent(winParent) {
 			addCursorsElTutTool()
 		}
 
-		if (GameState.score >= upgradeInfo.k_0.price) {
+		if (GameState.score >= upgradeInfo.k_0.price && !isUpgradeBought("k_0")) {
 			addFirstUpgradeTutTool()
 		}
+
+		let cursorsChecked = false
+		let upgradeChecked = false
+		checkForStuff = hexagon.on("clickrelease", () => {
+			if (cursorsChecked == false && GameState.cursors == 0 && GameState.score >= cursorsElement.price) {
+				cursorsChecked = true
+				addCursorsElTutTool()
+			}
+	
+			if (upgradeChecked == false && GameState.score >= upgradeInfo.k_0.price && !isUpgradeBought("k_0")) {
+				upgradeChecked = true
+				addFirstUpgradeTutTool()
+			}
+		})
 	}
-
-	let cursorsChecked = false
-	let upgradeChecked = false
-	let checkForStuff = hexagon.on("clickrelease", () => {
-		if (cursorsChecked == false && GameState.cursors == 0 && GameState.score >= cursorsElement.price) {
-			cursorsChecked = true
-			addCursorsElTutTool()
-		}
-
-		if (upgradeChecked == false && GameState.score >= upgradeInfo.k_0.price) {
-			upgradeChecked = true
-			addFirstUpgradeTutTool()
-		}
-	})
 
 	winParent.on("close", () => {
 		winParent.get("*", { recursive: true }).forEach(element => {

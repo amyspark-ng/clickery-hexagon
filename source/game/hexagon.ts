@@ -1,5 +1,5 @@
 
-import { GameState } from "../gamestate.ts";
+import { GameState, scoreManager } from "../gamestate.ts";
 import { scoreText, spsText } from "./uicounters.ts";
 import { arrayToColor } from "./utils.ts";
 import { mouse } from "./additives.ts";
@@ -143,7 +143,7 @@ export function addHexagon() {
 					if (scoreVars.combo < 2) clickVars.consecutiveClicks = 0
 				})
 
-				if (GameState.totalScore > 100) {
+				if (GameState.scoreThisRun > 100) {
 					// if consecutiveclicks is not combo_maxclicks increase clicks
 					if (clickVars.consecutiveClicks != COMBO_MAXCLICKS) {
 						clickVars.consecutiveClicks++
@@ -183,7 +183,9 @@ export function addHexagon() {
 					value: scoreVars.scorePerClick * scoreVars.combo,
 					cursorRelated: false,
 				})
-				GameState.addScore((scoreVars.scorePerClick * powerups.clicks.multiplier) * scoreVars.combo)
+
+				scoreManager.addScore((scoreVars.scorePerClick * powerups.clicks.multiplier) * scoreVars.combo)
+
 				tween(scoreText.scaleIncrease, 1.05, 0.2, (p) => scoreText.scaleIncrease = p, easings.easeOutQuint).onEnd(() => {
 					tween(scoreText.scaleIncrease, 1, 0.2, (p) => scoreText.scaleIncrease = p, easings.easeOutQuint)
 				})
@@ -308,7 +310,8 @@ export function addHexagon() {
 								value: scoreVars.scorePerAutoClick,
 								cursorRelated: true,
 							})
-							GameState.addScore(scoreVars.scorePerAutoClick * powerups.cursors.multiplier)
+
+							scoreManager.addScore(scoreVars.scorePerAutoClick * powerups.cursors.multiplier)
 			
 							// has done its bidding, time to roll and dissapear
 							autoCursor.gravityScale = 1

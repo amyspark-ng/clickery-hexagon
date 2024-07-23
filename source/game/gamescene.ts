@@ -1,4 +1,4 @@
-import { GameState } from "../gamestate.ts"
+import { GameState, scoreManager } from "../gamestate.ts"
 import { scoreVars, addHexagon, hexagon } from "./hexagon.ts"
 import { buildingsText, scoreText, spsText, uiCounters } from "./uicounters.ts"
 import { arrayToColor, debugFunctions, formatNumber, randomPos, toHHMMSS } from "./utils.ts"
@@ -202,8 +202,7 @@ function welcomeBack(idle = false) {
 				addWelcomeBackToast(gainedScore, totalTimeOutsideTab / 1000)
 			}
 	
-			tween(GameState.score, GameState.score + gainedScore, 0.25, (p) => GameState.score = p, easings.easeOutQuint)
-			tween(GameState.totalScore, GameState.totalScore + gainedScore, 0.25, (p) => GameState.totalScore = p, easings.easeOutQuint)
+			scoreManager.addScore(GameState.score + gainedScore)
 		}
 	}
 
@@ -257,7 +256,7 @@ export let hasStartedGame:boolean;
 export function gamescene() {
 	return scene("gamescene", () => {
 		GameState.load() // loadSave()
-		hasStartedGame = GameState.totalScore > 1
+		hasStartedGame = GameState.scoreAllTime > 1
 		set_ascending(false)
 
 		cam.scale = 1
@@ -273,7 +272,7 @@ export function gamescene() {
 			// wait 60 seconds
 			wait(60, () => {
 				loop(120, () => {
-					if (GameState.totalScore > 1) if (DEBUG == false) {
+					if (GameState.scoreAllTime > 1) if (DEBUG == false) {
 						GameState.save(true)
 					}
 				})
@@ -389,7 +388,7 @@ export function gamescene() {
 					totalTimeOutsideTab += timeOutsideTab;
 					GameState.stats.totalTimePlayed += totalTimeOutsideTab / 1000
 
-					if (!(GameState.totalScore > 0)) return;
+					if (!(GameState.scoreAllTime > 0)) return;
 					// 30 being the seconds outside of screen to get the zzz screen
 					if (totalTimeOutsideTab / 1000 > 30) {
 						// false means it was out not idle
@@ -460,6 +459,7 @@ export function gamescene() {
 			},
 			intro_scoreCounter() {
 				// scoreCounter
+				tween(scoreText.scoreShown, GameState.score, 0.25, (p) => scoreText.scoreShown = p, easings.easeOutQuint)
 				tween(vec2(center().x, 80), vec2(center().x, 60), 0.5, (p) => scoreText.pos = p, easings.easeOutQuad).onEnd(() => {
 					scoreText.trigger("startAnimEnd")
 				})
@@ -484,10 +484,13 @@ export function gamescene() {
 
 		if (hasStartedGame) {
 			Object.values(introAnimations).filter(animation => !animation.name.includes("hopes")).forEach((animation) => {
-				animation()
+				animation() // animations take 0.5 seconds
 			})
-			hexagon.interactable = true
-			ROOT.trigger("gamestart")
+
+			wait(0.5, () => {
+				hexagon.interactable = true
+				ROOT.trigger("gamestart")
+			})
 		}
 
 		else {
@@ -514,7 +517,7 @@ export function gamescene() {
 				folderObj.opacity = 0
 				
 				hexagon.on("clickrelease", () => {
-					switch (GameState.totalScore) {
+					switch (GameState.scoreAllTime) {
 						case 1:
 							ominus.stop()
 							gameBg.color.a = 0.84
