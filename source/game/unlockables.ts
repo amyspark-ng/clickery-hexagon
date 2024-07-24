@@ -1,4 +1,4 @@
-import { GameState } from '../gamestate';
+import { GameState, scoreManager } from '../gamestate';
 import { folded, folderObj, infoForWindows } from './windows/windows-api/windowsAPI';
 import { playSfx } from '../sound';
 import { waver } from '../plugins/wave';
@@ -9,6 +9,7 @@ import { addToast } from './additives';
 import { addConfetti } from '../plugins/confetti';
 import { gridContainer } from './windows/extraWindow';
 import { upgradeInfo } from './windows/store/upgrades';
+import { songs, songsListened } from './windows/musicWindow';
 
 let fullUpgradeValues = {
 	clicks: () => {
@@ -57,7 +58,17 @@ export let unlockables = {
 	},
 
 	// i have to use this fuckass format because javascript object sorting FUCKS. ME. UP
+	
+	// TODO: missing achievements
+	/* TODO: Missing types of achievements
+	- Score per second
+	- Score forfeited on ascending
+	- Score gained by tapping
+	- Score gained by cursors
+	- achievement for listening to all the songs
+	*/
 	"achievements": [
+		// #region SCORE ACHIEVEMENTS =====================
 		{"name":"100score",
 			"text": "Get 100 of score, cool", 
 			"icon":"upgrades.k_0",
@@ -93,6 +104,68 @@ export let unlockables = {
 			"icon":"upgrades.c_6",
 			condition: () => GameState.score >= 50000
 		},
+		// #endregion SCORE ACHIEVEMENTS ====================
+		// #region CLICKER/CURSOR ACHIEVEMENTS ==================
+		// #### CLICKERS
+		{"name":"10clickers",
+			"text": "Have 10 clickers", 
+			"icon": "cursors.cursor",
+			condition: () => GameState.clickers >= 10
+		},
+		{"name":"20clickers",
+			"text": "Have 20 clickers", 
+			"icon": "cursors.cursor",
+			condition: () => GameState.clickers >= 20
+		},
+		{"name":"30clickers",
+			"text": "Have 30 clickers", 
+			"icon": "cursors.cursor",
+			condition: () => GameState.clickers >= 30
+		},
+		{"name":"40clickers",
+			"text": "Have 40 clickers", 
+			"icon": "cursors.cursor",
+			condition: () => GameState.clickers >= 40
+		},
+		{"name":"50clickers",
+			"text": "Have 50 clickers", 
+			"icon": "cursors.cursor",
+			condition: () => GameState.clickers >= 50
+		},
+		// ##### CURSORS
+		{"name":"10cursor",
+			"text": "Have 10 cursor", 
+			"icon": "cursors.point",
+			condition: () => GameState.cursors >= 10
+		},
+		{"name":"20cursor",
+			"text": "Have 20 cursor", 
+			"icon": "cursors.point",
+			condition: () => GameState.cursors >= 20
+		},
+		{"name":"30cursor",
+			"text": "Have 30 cursor", 
+			"icon": "cursors.point",
+			condition: () => GameState.cursors >= 30
+		},
+		{"name":"40cursor",
+			"text": "Have 40 cursor", 
+			"icon": "cursors.point",
+			condition: () => GameState.cursors >= 40
+		},
+		{"name":"50cursor",
+			"text": "Have 50 cursor", 
+			"icon": "cursors.point",
+			condition: () => GameState.cursors >= 50
+		},
+		//#endregion CLICKERS/CURSORS ACHIEVEMENTS =================
+		// #region SCORE PER SECOND ACHIEVEMENTS ==================
+		{"name":"10scorepersecond",
+			"text":"Get to 10 score per second",
+			"icon":"cursors.cursor",
+			condition: () => scoreManager.scorePerSecond() >= 10
+		},
+		//#endregion SCORE PER SECOND ACHIEVEMENTS =================
 		{"name":"allclickupgrades",
 			"text":"Buy all click upgrades",
 			"icon":"icon_store",
@@ -105,25 +178,7 @@ export let unlockables = {
 			"timeAfter": 1,
 			condition: () => isAchievementUnlocked("allclickupgrades") && GameState.cursorsUpgradesValue == fullUpgradeValues.cursors() && GameState.timeUntilAutoLoopEnds == 1
 		},
-		// #region powerup achievements 
-		{"name":"buy1powerup",
-			"text":"Buy 1 powerup, pay to win",
-			"icon":"icon_store",
-			"timeAfter": 0.5,
-			condition: () => GameState.powerupsBought >= 1
-		},
-		{"name":"buy5powerup",
-			"text":"Buy 5 powerup, Scrooge McDuck over here",
-			"icon":"icon_store",
-			"timeAfter": 0.5,
-			condition: () => GameState.powerupsBought >= 5
-		},
-		{"name":"buy10powerup",
-			"text":"Buy 10 powerup, ok that's enough we're running out",
-			"icon":"icon_store",
-			"timeAfter": 0.5,
-			condition: () => GameState.powerupsBought >= 10
-		},
+		// #region POWERUP ACHIEVEMENTS =====================
 		{"name":"click1powerup",
 			"text":"Click 1 powerup, little helping hand :)",
 			"icon":"cursors.cursor",
@@ -160,7 +215,41 @@ export let unlockables = {
 			"timeAfter": 0.5,
 			condition: () => GameState.stats.powerupsClicked >= 25
 		},
+		// # BUYING ACHIEVEMENTS
+		{"name":"buy1powerup",
+			"text":"Buy 1 powerup, pay to win",
+			"icon":"icon_store",
+			"timeAfter": 0.5,
+			condition: () => GameState.powerupsBought >= 1
+		},
+		{"name":"buy5powerup",
+			"text":"Buy 5 powerup, Scrooge McDuck over here",
+			"icon":"icon_store",
+			"timeAfter": 0.5,
+			condition: () => GameState.powerupsBought >= 5
+		},
+		{"name":"buy10powerup",
+			"text":"Buy 10 powerup, ok that's enough we're running out",
+			"icon":"icon_store",
+			"timeAfter": 0.5,
+			condition: () => GameState.powerupsBought >= 10
+		},
+		// #endregion POWERUP ACHIEVEMENTS ====================
+		// #region ASCENSION ACHIEVEMENTS ====================
+		{"name":"ascend1time",
+			"text":"Ascend for the first time",
+			"icon":"icon_ascend",
+			"timeAfter": 5,
+			condition: () => GameState.timesAscended >= 1
+		},
+		{"name":"ascend5time",
+			"text":"Ascend 5 times",
+			"icon":"icon_ascend",
+			"timeAfter": 5,
+			condition: () => GameState.timesAscended >= 5
+		},
 		//#endregion
+		// #region EXTRA ACHIEVEMENTS ========================
 		{"name":"maxedcombo",
 			"text": "Max combo for the first time, FULL COMBO!!!!", 
 			"icon": "hexagon",
@@ -183,6 +272,12 @@ export let unlockables = {
 			"icon": "gnome",
 			"timeAfter": 2.5,
 		},
+		{"name":"allsongs",
+			"text": "Big fan, listen to all the songs", 
+			"icon": "icon_music",
+			condition: () => songsListened.length == Object.keys(songs).length,
+		},
+		// #endregion EXTRA ACHIEVEMENTS ========================
 		{"name":"allachievements",
 			"text": "Complete all achievements, congrats!!!", 
 			"icon": "osaka",

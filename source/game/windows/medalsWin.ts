@@ -78,7 +78,7 @@ export function medalsWinContent(winParent) {
 	
 		medalObj.onClick(() => {
 			if (medalObj.achievementId == "tapachievementslot") {
-				if (!isAchievementUnlocked("tapachievementslot")) unlockAchievement("tapachievementslot")
+				if (!isAchievementUnlocked(medalObj.achievementId)) unlockAchievement(medalObj.achievementId)
 			}
 		})
 

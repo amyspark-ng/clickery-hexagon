@@ -1,14 +1,14 @@
 import { clickVars } from "./game/hexagon"
 import { powerupTypes } from "./game/powerups"
 import { percentage, saveAnim } from "./game/utils"
+import { ROOT } from "./main"
 import { musicHandler, sfxHandler } from "./sound"
 
 class _GameState {	
 	score = 0
 	scoreThisRun = 0
 	scoreAllTime = 0
-	mana = 0
-
+	
 	clickers = 1
 	clicksUpgradesValue = 1 // multiplier for clicks
 	clickPercentage = 0 // percentage added
@@ -26,6 +26,16 @@ class _GameState {
 	powerupsChance = 0.1
 	powerupsPower = 0
 	
+	ascension = {
+		mana: 0,
+		manaAllTime: 0,
+		magicLevel: 1, // times ascended + 1
+		clickPercentagesBought: 0,
+		cursorsPercentagesBought: 0,
+		powerupPower: 1,
+		// other element missing
+	}
+
 	achievementMultiplierPercentage = 0
 	generalUpgrades = 1 // general multiplier
 
@@ -96,6 +106,8 @@ class _GameState {
 export let GameState = new _GameState()
 
 class _scoreManager {
+	combo = 1
+	
 	// score per click (no combo or powerups or percentage)
 	scorePerClick_Vanilla = () => {
 		return Math.round(GameState.clickers * GameState.clicksUpgradesValue)
@@ -134,30 +146,60 @@ class _scoreManager {
 		return (clickVars.clicksPerSecond * this.scorePerClick()) + this.autoScorePerSecond()
 	}
 
-	scoreNeededToAscend = 1000000
-	combo = 1
-
 	addScore(amount:number) {
 		GameState.score += amount
 		GameState.scoreThisRun += amount
 		GameState.scoreAllTime += amount
+		ROOT.trigger("scoreGained", amount)
 	}
 
 	// used usually when buying
-	subScore(amount:number) {
+	subTweenScore(amount:number) {
 		// GameState.score -= amount
 		tween(GameState.score, GameState.score - amount, 0.32, (p) => GameState.score = p, easings.easeOutExpo)
+		ROOT.trigger("scoreDecreased", amount)
 	}
 
 	addTweenScore(amount:number) {
 		tween(GameState.score, GameState.score + amount, 0.32, (p) => GameState.score = p, easings.easeOutExpo)
+		GameState.scoreThisRun += amount
+		GameState.scoreAllTime += amount
+		ROOT.trigger("scoreGained", amount)
 	}
 
-	resetScoreBcAscend() {
-		// GameState.score = 0
-		// GameState.scoreThisRun = 0
+	// =====================
+	//   ASCENSION STUFF
+	// =====================
+	// This is just a constant
+	seventyMillions = 70000000 // 70.000.000
+	
+	// Mana is a spendable currency
+	// When score is greater than scoreTilNextMana, mana is added by one
+	// Magic level is as multiplier
+
+	// Is the actual formula that determines the amounts you get mana at
+	getScoreForManaAT = (manaAllTime:number) => {
+		return (manaAllTime ** 0.5) * this.seventyMillions
+	}
+
+	// how much score is left until the next mana
+	scoreTilNextMana = () => {
+		let nextManaAt = this.getScoreForManaAT(GameState.ascension.manaAllTime + 1);
+		return nextManaAt;
+	}
+	
+	resetRun() {
 		tween(GameState.score, 0, 0.32, (p) => GameState.score = p, easings.easeOutCirc)
 		tween(GameState.scoreThisRun, 0, 0.32, (p) => GameState.scoreThisRun = p, easings.easeOutCirc)
+	
+		tween(GameState.clickers, 1, 0.5, (p) => GameState.clickers = Math.round(p), easings.easeOutQuad)
+		tween(GameState.cursors, 0, 0.5, (p) => GameState.cursors = Math.round(p), easings.easeOutQuad)
+
+		tween(GameState.clicksUpgradesValue, 0, 0.5, (p) => GameState.clicksUpgradesValue = Math.round(p), easings.easeOutQuad)
+		tween(GameState.cursorsUpgradesValue, 0, 0.5, (p) => GameState.cursorsUpgradesValue = Math.round(p), easings.easeOutQuad)
+		
+		GameState.upgradesBought = ["c_0"]
+		GameState.timeUntilAutoLoopEnds = 10
 	}
 }
 

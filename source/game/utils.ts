@@ -7,6 +7,7 @@ import { checkForUnlockable, unlockAchievement } from "./unlockables";
 import { isHoveringAWindow, openWindow } from "./windows/windows-api/windowsAPI";
 import { triggerAscension } from "./ascension";
 import { powerupTypes, spawnPowerup } from "./powerups";
+import { songsListened } from "./windows/musicWindow";
 
 // definetely not stack overflow
 // dots are always for thousands, leave it like this
@@ -225,7 +226,9 @@ export function saveAnim() {
 }
 
 export function randomPowerup() {
-	return choose(Object.keys(powerupTypes))
+	let list = Object.keys(powerupTypes)
+	if (scoreManager.autoScorePerSecond() < 1) list.splice(list.indexOf("time"), 1)
+	return choose(list)
 }
 
 export function randomPos() {
@@ -234,7 +237,7 @@ export function randomPos() {
 
 export function bop(obj:any, howMuch = 0.1, bopEasing = easings.easeOutQuint) {
 	if (!obj.is("scale")) throw new Error("Obj must have scale component")
-	obj.bopDefScale = obj.scale
+	if (obj.bopDefScale == null) obj.bopDefScale = obj.scale
 
 	tween(obj.scale, obj.bopDefScale.sub(howMuch), 0.15, (p) => obj.scale = p, bopEasing).then(() => {
 		tween(obj.scale, obj.bopDefScale, 0.15, (p) => obj.scale = p, bopEasing)
@@ -307,6 +310,7 @@ export function debugFunctions() {
 	window.globalThis.hexagon = hexagon
 	window.globalThis.openWindow = openWindow
 	window.globalThis.powerupTypes = powerupTypes
+	window.globalThis.songsListened = songsListened
 
 	onUpdate(() => {
 		// if (isKeyDown("control")) {

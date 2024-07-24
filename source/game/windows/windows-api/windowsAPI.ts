@@ -274,7 +274,7 @@ export function openWindow(windowKey = "") {
 	
 	if (correspondingMinibutton != null) {
 		correspondingMinibutton.window = windowObj
-		bop(correspondingMinibutton)
+		if (!correspondingMinibutton.isHovering()) bop(correspondingMinibutton)
 	}
 
 	// manage some hovers
@@ -285,7 +285,7 @@ export function openWindow(windowKey = "") {
 	windowObj.on("close", () => {
 		if (correspondingMinibutton != null) {
 			correspondingMinibutton.window = null
-			bop(correspondingMinibutton)
+			if (!correspondingMinibutton.isHovering()) bop(correspondingMinibutton)
 		}
 	
 		get("hoverObj", { recursive: true }).forEach((obj) => {
@@ -407,14 +407,6 @@ export function folderObjManaging() {
 				if (folded) folderObj.unfold()
 				else folderObj.fold()
 				this.trigger("managefold", folded)
-			},
-
-			openTaskbarEdit() {
-				
-			},
-
-			closeTaskbarEdit() {
-
 			},
 
 			addSlots() {

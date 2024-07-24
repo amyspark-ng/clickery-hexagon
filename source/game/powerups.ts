@@ -294,16 +294,16 @@ export function spawnPowerup(opts?:powerupOpt) {
 				let time = 0
 				if (opts.multiplier == null) {
 					if (opts.type == "clicks" || opts.type == "cursors") {
-						multiplier = randi(2, 7)
+						multiplier = randi(2, 7) * GameState.ascension.powerupPower
 					}
 					
 					else if (opts.type == "awesome") {
-						multiplier = randi(15, 20)
+						multiplier = randi(15, 20) * GameState.ascension.powerupPower
 					}
 
 					else if (opts.type == "time") {
 						multiplier = 1
-						time = opts.time ?? 60
+						time = opts.time ?? 60 * GameState.ascension.powerupPower
 						scoreManager.addTweenScore(scoreManager.scorePerSecond() * opts.time)
 					}
 

@@ -16,10 +16,9 @@ this game MIGHT be getting done
 - increase the prices of click upgrades
 ^ just a little
 - make powerups a little bit cheaper
-- add achievements for reaching certain amounts of clickers or cursors
-- add achievements for score per second, so if your score per second is greater than etc
 - add chains sound
-- make new graphic
+- add cards sound
+- make new graphic for upgrades
 
 <!-- some powerup stuff -->
 - make powerupRandomPos() so it's not too close to buttons or other stuff
@@ -27,15 +26,11 @@ this game MIGHT be getting done
 
 <!-- bugs -->
 - BU-GS I HATE THEM -
-- tutorial tooltip for clickers doesn't appear
-- and getting the one for cursors at the wrong time
-- complete all achievements achivment is bugged
-- CRASH OF POWERUPS STILL EXISTS
-^ might be related to the loop that blinks the dieAnim
+- fixed some weird behaviour in the folder obj foldings
 - make all the cards a single animation and change them using the frame (only include icons, number and price is ingame)
 - add the mute dialogue option
 
-- IDEA: make a component to manage hovers, add onHoverStart function and onHoverEnd
+- IDEA: make a component that manages the mouse animation for objects outside of windows
 
 ## Next features
 - Prototype ascending mechanic (prestige/mana, what time do you get to ascend, actually add the percentages)

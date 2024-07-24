@@ -1,6 +1,7 @@
 import { GameState } from "../../gamestate";
 import { waver } from "../../plugins/wave";
 import { musicHandler, playMusic, playSfx, scratchSong } from "../../sound";
+import { isAchievementUnlocked } from "../unlockables";
 import { bop, formatMusicTime } from "../utils";
 
 export let songs = {
@@ -17,6 +18,7 @@ export let songs = {
 	"project_23": { name: "Project_23", idx: 10, speed: 2.1, cover: "defaultCover", duration: 45},
 }
 
+export let songsListened = [];
 export let currentSongIdx = 0
 
 export let progressBar;
@@ -36,6 +38,14 @@ let angleOfDisc = 0
 export function musicWinContent(winParent) {
 	currentSongIdx = GameState.settings.music.favoriteIdx == null ? 0 : GameState.settings.music.favoriteIdx
 	
+	function checkForSongListen(songIdx) {
+		if (songsListened.includes(songIdx) == false) songsListened.push(songIdx)
+	}
+
+	if (!isAchievementUnlocked("allsongs")) {
+		checkForSongListen(currentSongIdx)
+	}
+
 	let disc = winParent.add([
 		sprite("discs", {
 			anim: `${songs[Object.keys(songs)[currentSongIdx]].cover}`
@@ -279,6 +289,10 @@ export function musicWinContent(winParent) {
 		disc.play(songs[Object.keys(songs)[currentSongIdx]].cover)
 		GameState.settings.music.favoriteIdx = currentSongIdx
 		timeSinceSkip = 0
+
+		if (!isAchievementUnlocked("allsongs")) {
+			checkForSongListen(currentSongIdx)
+		}
 
 		wait(1, () => {
 			if (timeSinceSkip > 1) {

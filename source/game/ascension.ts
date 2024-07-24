@@ -49,7 +49,7 @@ function addCard(position:Vec2) {
 			infoIdx: 0,
 			price: 0,
 			buy() {
-				if (GameState.mana >= this.price) {
+				if (GameState.ascension.mana >= this.price) {
 					tween(0.75, 1, 0.15, (p) => card.scale.y = p, easings.easeOutQuart)
 
 					if (card.infoIdx == 4 || card.infoIdx == 5) {
@@ -355,12 +355,14 @@ function addDialogueText() {
 	return textBox
 }
 
-function talk(speaker = "mage" || "card", thingToSay = "dialogue here", speed?) {
+function talk(speaker:"mage" | "card", thingToSay:string, speed?:number) {
 	dialogue.box.trigger("talk", speaker)
 
+	speaker = speaker || "card"
+	thingToSay = thingToSay || "No dialogue, missing a dialogue here"
 	speed = speed || 0.05
 
-	// if speed is null find the dialogue in dialogues and use that speed, else just use the default one
+	// TODO: if speed is null find the dialogue in dialogues and use that speed, else just use the default one
 	// exists to override and because i felt bad
 	
 	currentlySaying = thingToSay
@@ -396,9 +398,13 @@ function skipTalk() {
 }
 
 export function triggerAscension() {
+	// stuff
 	ascending = true
 
-	ROOT.trigger("ascension")
+	// the multiplier cool!!!
+	GameState.ascension.magicLevel++
+
+	ROOT.trigger("ascension", { score: GameState.score, scoreThisRun: GameState.scoreThisRun })
 	
 	hexagon.interactable = false
 	folderObj.area.scale = vec2(0)
@@ -520,7 +526,7 @@ export function triggerAscension() {
 			{
 				hiddenXPos: -72,
 				update() {
-					this.text = `✦${GameState.mana}`
+					this.text = `✦${GameState.ascension.mana}`
 				}
 			}
 		])
@@ -533,8 +539,6 @@ export function triggerAscension() {
 export function endAscension() {
 	folderObj.area.scale = vec2(1.2)
 	
-	GameState.timesAscended++
-
 	ROOT.trigger("endAscension")
 
 	get("*", { recursive: true }).filter(obj => obj.layer == "ascension").forEach((obj) => {
@@ -558,16 +562,7 @@ export function endAscension() {
 	})
 
 	// turn everything back to 0
-	scoreManager.resetScoreBcAscend()
-
-	tween(GameState.clickers, 0, 0.5, (p) => GameState.clickers = Math.round(p), easings.easeOutQuad)
-	tween(GameState.cursors, 0, 0.5, (p) => GameState.cursors = Math.round(p), easings.easeOutQuad)
-
-	tween(GameState.clicksUpgradesValue, 0, 0.5, (p) => GameState.clicksUpgradesValue = Math.round(p), easings.easeOutQuad)
-	tween(GameState.cursorsUpgradesValue, 0, 0.5, (p) => GameState.cursorsUpgradesValue = Math.round(p), easings.easeOutQuad)
-	
-	GameState.upgradesBought = ["c_0"]
-	GameState.timeUntilAutoLoopEnds = 10
+	scoreManager.resetRun()
 
 	wait(0.25, () => {
 		tween(hexagon.scaleIncrease, 1, 0.25, (p) => hexagon.scaleIncrease = p, easings.easeOutQuint)

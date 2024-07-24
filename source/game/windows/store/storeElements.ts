@@ -194,7 +194,7 @@ function lockedPowerupStoreElement(winParent:GameObj) {
 			if (index > -1) storeElements[index] = newElement 
 			
 			ROOT.trigger("powerupunlock")
-			scoreManager.subScore(storeElementsInfo.powerupsElement.unlockPrice)
+			scoreManager.subTweenScore(storeElementsInfo.powerupsElement.unlockPrice)
 		},
 	}
 }
@@ -229,7 +229,7 @@ export function addStoreElement(winParent:any, opts:storeElementOpt) {
 				if (winParent.dragging) return
 				
 				GameState[storeElementsInfo[opts.type].gamestateKey] += amount
-				scoreManager.subScore(this.price)
+				scoreManager.subTweenScore(this.price)
 
 				storePitchJuice.hasBoughtRecently = true;
 				storePitchJuice.timeSinceBought = 0;

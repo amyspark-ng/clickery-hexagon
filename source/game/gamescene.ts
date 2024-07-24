@@ -272,7 +272,7 @@ export function gamescene() {
 			// wait 60 seconds
 			wait(60, () => {
 				loop(120, () => {
-					if (GameState.scoreAllTime > 1) if (DEBUG == false) {
+					if (GameState.scoreAllTime > 25) if (DEBUG == false) {
 						GameState.save(true)
 					}
 				})
@@ -345,12 +345,20 @@ export function gamescene() {
 			camRot(cam.rotation)
 			camScale(vec2(cam.scale))
 			if (isKeyDown("shift") && isKeyPressed("r") && panderitoIndex != 6) go("gamescene")
-			if (isKeyDown("shift") && isKeyPressed("s")) GameState.save()
+			if (isKeyDown("shift") && isKeyPressed("s") && GameState.scoreAllTime > 25) GameState.save()
 			
 			GameState.stats.totalTimePlayed += dt()
 			
 			GameState.score = clamp(GameState.score, 0, Infinity)
 			GameState.score = Math.round(GameState.score)
+
+			// INCREASES MANA
+			if (GameState.score >= scoreManager.scoreTilNextMana()) {
+				GameState.ascension.mana++
+				GameState.ascension.manaAllTime++
+			}
+
+			GameState.timesAscended = GameState.ascension.magicLevel - 1
 
 			// auto loop stuff
 			if (GameState.cursors >= 1) {
@@ -553,6 +561,10 @@ export function gamescene() {
 
 		ROOT.on("buy", (info) => {
 			checkForUnlockable()
+		})
+
+		ROOT.on("scoreGained", (amount) => {
+			// kill myself
 		})
 
 		if (DEBUG) debugFunctions()

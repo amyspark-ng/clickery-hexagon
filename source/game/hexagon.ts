@@ -13,6 +13,7 @@ import { curDraggin } from "../plugins/drag.js";
 import { cam } from "./gamescene.ts";
 import { powerupTypes } from "./powerups.ts";
 import { checkForUnlockable, isAchievementUnlocked, unlockAchievement } from "./unlockables.ts";
+import { ROOT } from "../main.ts";
 
 export let clickVars = {
 	clicksPerSecond: 0, // to properly calculate sps
@@ -91,7 +92,7 @@ export function addHexagon() {
 				
 				if (this.isBeingHovered) maxRotSpeed = 4.75
 				else maxRotSpeed = 4
-				this.rotationSpeed = map(GameState.score, 0, scoreManager.scoreNeededToAscend, 0.01, maxRotSpeed)
+				this.rotationSpeed = map(GameState.score, 0, scoreManager.scoreTilNextMana(), 0.01, maxRotSpeed)
 				this.rotationSpeed = clamp(this.rotationSpeed, 0.01, maxRotSpeed)
 				this.angle += this.rotationSpeed
 				
@@ -404,7 +405,7 @@ export function addHexagon() {
 		}
 	})
 
-	hexagon.on("clickrelease", () => {
+	ROOT.on("scoreGained", (amount) => {
 		checkForUnlockable()
 	})
 

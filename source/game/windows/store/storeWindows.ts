@@ -117,7 +117,7 @@ export function storeWinContent(winParent) {
 		winParent.onUpdate(() => {
 			if (!winParent.is("window")) return
 			
-			if (GameState.clickers == 0 && GameState.scoreThisRun >= storeElementsInfo.clickersElement.basePrice) {
+			if (GameState.clickers == 1 && GameState.scoreThisRun >= storeElementsInfo.clickersElement.basePrice) {
 				if (getTooltip("tutorialClickers").length == 0) {
 					clickersTutToolTip()
 				}

@@ -154,7 +154,7 @@ export function addUpgrades(elementParent) {
 						else if (this.freq != null) GameState.timeUntilAutoLoopEnds = this.freq
 					}
 					
-					scoreManager.subScore(this.price)
+					scoreManager.subTweenScore(this.price)
 					ROOT.trigger("buy", { element: "upgrade", id: this.id, price: this.price })
 				},
 
