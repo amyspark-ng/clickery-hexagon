@@ -533,7 +533,7 @@ export function triggerAscension() {
 export function endAscension() {
 	folderObj.area.scale = vec2(1.2)
 	
-	GameState.ascendLevel++
+	GameState.timesAscended++
 
 	ROOT.trigger("endAscension")
 

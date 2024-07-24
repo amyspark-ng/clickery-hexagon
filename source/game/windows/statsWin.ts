@@ -1,27 +1,31 @@
 import { GameState } from "../../gamestate";
 import { unlockables } from "../unlockables";
-import { formatNumber, toHHMMSS } from "../utils";
+import { formatNumber, simpleNumberFormatting, toHHMMSS } from "../utils";
 
 export function statsWinContent(winParent) {
-	let stats = {};
+	let stats = [];
 
 	winParent.onUpdate(() => {
-		// TODO: move this to an array of objects so it stays ordered
-		stats = {
-			"Total score: ": formatNumber(GameState.scoreThisRun), 
-			"Times clicked: ": GameState.stats.timesClicked,
-			"Powerups clicked: ": GameState.stats.powerupsClicked,
-			"Achievements unlocked: ": `${GameState.unlockedAchievements.length}/${unlockables.achievements.length}`,
-			"Total time played: ": toHHMMSS(Math.round(GameState.stats.totalTimePlayed)),
-			// [`Clickers (${GameState.clickers}) / Cursors (${GameState.cursors}) owned: `]: `${GameState.clickers + GameState.cursors}`,
-		}
+		stats = [
+			{ "Total score": formatNumber(GameState.scoreAllTime) },
+			{ "Times clicked": simpleNumberFormatting(GameState.stats.timesClicked) },
+			{ "Powerups clicked": simpleNumberFormatting(GameState.stats.powerupsClicked) },
+			{ "Achievements unlocked": `${GameState.unlockedAchievements.length}/${unlockables.achievements.length}` },
+			{ "Total time played": toHHMMSS(Math.round(GameState.stats.totalTimePlayed)) },
+		]
 
-		if (GameState.ascendLevel - 1 > 1) stats["Times ascended: "] = GameState.ascendLevel - 1
-		// TODO: Add here score all time and replace total score with score in this run
+		if (GameState.timesAscended > 0) {
+			stats[0] = { "Score all time": formatNumber(GameState.scoreAllTime) }
+			stats[1] = { "Score this run": formatNumber(GameState.scoreThisRun) }
+			stats.splice(2, 0, { "Times clicked": `${simpleNumberFormatting(GameState.stats.timesClicked)}` });
+
+			let ascendStatObject = { "Times ascended": `${GameState.timesAscended}` }
+			if (stats.indexOf(ascendStatObject) == -1) stats.push(ascendStatObject)
+		}
 	})
 
 	function createStats() {
-		let text = Object.keys(stats).map((key) => `${key} ${stats[key]}`).join("\n")
+		let text = stats.map((stat) => `${Object.keys(stat)[0]}: ${Object.values(stat)[0]}`).join("\n")
 		return text
 	}
 

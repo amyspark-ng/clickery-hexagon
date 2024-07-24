@@ -413,8 +413,6 @@ export function loadEverything() {
 			},
 		}
 	})
-	
-	loadSprite("tooltip", "sprites/tooltip.png")
 	//#endregion Store
 
 	//#region Music

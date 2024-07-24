@@ -5,6 +5,7 @@ import { GameState } from "../gamestate";
 import { bop, formatNumber, parseAnimation } from "./utils";
 import { scoreVars } from "./hexagon";
 import { positionSetter } from "../plugins/positionSetter";
+import { checkForUnlockable } from "./unlockables";
 
 /*
 types of powerups
@@ -275,6 +276,7 @@ export function spawnPowerup(opts:powerupOpt) {
 			click() {
 				this.dieAnim()
 				playSfx("powerup")
+				checkForUnlockable()
 				GameState.stats.powerupsClicked++
 
 				// # multipliers

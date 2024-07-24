@@ -28,7 +28,7 @@ class _GameState {
 	achievementMultiplierPercentage = 0
 	generalUpgrades = 1 // general multiplier
 
-	ascendLevel = 1
+	timesAscended = 0
 
 	unlockedAchievements = []
 

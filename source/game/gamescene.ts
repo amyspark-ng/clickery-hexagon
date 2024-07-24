@@ -1,7 +1,7 @@
 import { GameState, scoreManager } from "../gamestate.ts"
 import { scoreVars, addHexagon, hexagon } from "./hexagon.ts"
 import { buildingsText, scoreText, spsText, uiCounters } from "./uicounters.ts"
-import { arrayToColor, debugFunctions, formatNumber, randomPos, toHHMMSS } from "./utils.ts"
+import { arrayToColor, debugFunctions, formatNumber, randomPos, randomPowerup, toHHMMSS } from "./utils.ts"
 import { addToast, gameBg, mouse } from "./additives.ts"
 import { playMusic, playSfx } from "../sound.ts"
 import { folderObj, folderObjManaging, windowsDefinition } from "./windows/windows-api/windowsAPI.ts"
@@ -248,7 +248,7 @@ export function triggerGnome() {
 		destroy(gnome)
 	})
 
-	if (isAchievementUnlocked("gnome")) unlockAchievement("gnome")
+	if (!isAchievementUnlocked("gnome")) unlockAchievement("gnome")
 }
 
 export let hexagonIntro;
@@ -295,7 +295,13 @@ export function gamescene() {
 
 			if (!GameState.hasUnlockedPowerups) {
 				ROOT.on("powerupunlock", () => {
-					naturalPowerupSpawningManagement()
+					wait(60, () => {
+						naturalPowerupSpawningManagement()
+						spawnPowerup({
+							type: randomPowerup(),
+							pos: randomPos(),
+						})
+					})
 				})
 			}
 

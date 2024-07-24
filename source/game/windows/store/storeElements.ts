@@ -2,11 +2,10 @@ import { GameObj, Vec2 } from "kaplay"
 import { GameState, scoreManager } from "../../../gamestate"
 import { playSfx } from "../../../sound"
 import { ROOT } from "../../../main"
-import { bop, formatNumber, getPrice, randomPos } from "../../utils"
+import { bop, formatNumber, getPrice, randomPos, randomPowerup } from "../../utils"
 import { addTooltip } from "../../additives"
 import { powerupTypes, spawnPowerup } from "../../powerups"
-import { storeElements, storePitchJuice } from "./storeWindows"
-import { isHoveringUpgrade } from "./upgrades"
+import { isHoveringUpgrade, storeElements, storePitchJuice } from "./storeWindows"
 
 export let storeElementsInfo = {
 	"clickersElement": { 
@@ -21,8 +20,8 @@ export let storeElementsInfo = {
 	},
 	"powerupsElement": { 
 		gamestateKey: "powerupsBought",
-		basePrice: 1000,
-		percentageIncrease: 50,
+		basePrice: 10500,
+		percentageIncrease: 250,
 		unlockPrice: 10100
 	},
 }
@@ -271,14 +270,11 @@ export function addStoreElement(winParent:any, opts:storeElementOpt) {
 				ROOT.trigger("buy", { element: "storeElement", type: opts.type == "clickersElement" ? "clickers" : "cursors", price: this.price })
 			
 				if (opts.type == "powerupsElement") {
-					const randomPowerup = function() {
-						return choose(Object.keys(powerupTypes))
-					}
-					
 					spawnPowerup({
 						pos: randomPos(),
 						type: randomPowerup(),
 					})
+					GameState.powerupsBought++
 				}
 			},
 

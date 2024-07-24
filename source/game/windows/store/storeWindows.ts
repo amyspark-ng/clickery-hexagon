@@ -1,7 +1,6 @@
 import { GameState } from "../../../gamestate";
 import { ROOT } from "../../../main";
 import { addTooltip } from "../../additives";
-import { hexagon } from "../../hexagon";
 import { addStoreElement, storeElementsInfo } from "./storeElements";
 import { addUpgrades, isUpgradeBought, upgradeInfo } from "./upgrades";
 
@@ -14,7 +13,7 @@ export let storePitchJuice = {
 	storeTune: 0,
 }
 
-let isHoveringUpgrade:boolean;
+export let isHoveringUpgrade:boolean;
 let clickersElement:any;
 let cursorsElement:any;
 let powerupsElement:any;
@@ -49,59 +48,12 @@ export function storeWinContent(winParent) {
 	})
 
 	// tutorial stuff
-	// TODO: This could be rewritten it kinda sucks very hard
-	function addCursorsElTutTool() {
-		let tooltip = addTooltip(cursorsElement, {
-			text: "← You can buy these to get automatically get score!",
-			direction: "right",
-			tag: "tutorial",
-		})
-
-		let buyCursorsEvent = ROOT.on("buy", (data) => {
-			if (data.type == "cursors") {
-				tooltip.end()
-				buyCursorsEvent.cancel()
-			}
-		})
-	}
-
-	function addFirstUpgradeTutTool() {
-		// adds the tooltip to the first upgrade
-		let tooltip = addTooltip(clickersElement.get("upgrade").filter(upgrade => upgrade.id == "k_0")[0], {
-			text: "With these you can make clicks or cursors more efficient! →",
-			direction: "left",
-			tag: "tutorial",
-		})
-
-		let buyUpgradeEvent = ROOT.on("buy", (data) => {
-			if (data.element == "upgrade" && data.id == "k_0") {
-				tooltip.end()
-				buyUpgradeEvent.cancel()
-			}
-		})
-	}
-
-	function addPowerupsTutTool() {
-		// adds the tooltip to the first upgrade
-		let tooltip = addTooltip(powerupsElement, {
-			text: "← Power-ups give you a small help!\nFor a time limit.",
-			direction: "right",
-			tag: "tutorial",
-		})
-
-		let powerupUnlockCheck = ROOT.on("powerupunlock", () => {
-			powerupUnlockCheck.cancel()
-			tooltip.end()
-		})
-	}
-
-	let checkForStuff = null;
-	if (GameState.ascendLevel < 2) {
-		if (GameState.clickers == 0) {
+	if (GameState.timesAscended < 1) {
+		const clickersTutToolTip = () => {
 			let tooltip = addTooltip(clickersElement, {
 				text: "← You can buy these to get more\nscore per click",
 				direction: "right",
-				tag: "tutorial",
+				type: "tutorialClickers",
 			})
 
 			let buyClickersEvent = ROOT.on("buy", (data) => {
@@ -111,36 +63,82 @@ export function storeWinContent(winParent) {
 				}
 			})
 		}
+
+		const cursorsTutToolTip = () => {
+			let tooltip = addTooltip(cursorsElement, {
+				text: "← You can buy these to get automatically get score!",
+				direction: "right",
+				type: "tutorialCursors",
+			})
+
+			let buyCursorsEvent = ROOT.on("buy", (data) => {
+				if (data.type == "cursors") {
+					tooltip.end()
+					buyCursorsEvent.cancel()
+				}
+			})
+		}
+
+		const powerupsTutToolTip = () => {
+			let tooltip = addTooltip(powerupsElement, {
+				text: "← Power-ups give you a small help!\nFor a time limit.",
+				direction: "right",
+				type: "tutorialPowerups",
+			})
 	
-		if (GameState.cursors == 0 && GameState.score >= cursorsElement.price) {
-			addCursorsElTutTool()
+			let unlockPowerupsEvent = ROOT.on("powerupunlock", () => {
+				tooltip.end()
+				unlockPowerupsEvent.cancel()
+			})
 		}
 
-		if (GameState.score >= upgradeInfo.k_0.price && !isUpgradeBought("k_0")) {
-			addFirstUpgradeTutTool()
+		const upgradesTutToolTip = () => {
+			// adds the tooltip to the first upgrade
+			let k_0Upgrade = clickersElement.get("upgrade").filter(upgrade => upgrade.id == "k_0")[0]
+			let tooltip = addTooltip(k_0Upgrade, {
+				text: "With these you can make clicks or cursors more efficient! →",
+				direction: "left",
+				type: "tutorialUpgrades",
+			})
+
+			let buyUpgradeEvent = ROOT.on("buy", (data) => {
+				if (data.element == "upgrade" && data.id == "k_0") {
+					tooltip.end()
+					buyUpgradeEvent.cancel()
+				}
+			})
 		}
 
-		if (GameState.score >= storeElementsInfo.powerupsElement.unlockPrice && GameState.stats.powerupsClicked < 1) {
-			addPowerupsTutTool()
+		const getTooltip = (type:string) => {
+			return get("tooltip").filter(tooltip => tooltip.is("text") == false && tooltip.type == type)
 		}
 
-		let cursorsChecked = false
-		let upgradeChecked = false
-		let powerupChecked = false
-		checkForStuff = hexagon.on("clickrelease", () => {
-			if (cursorsChecked == false && GameState.cursors == 0 && GameState.score >= cursorsElement.price) {
-				cursorsChecked = true
-				addCursorsElTutTool()
+		// EVENT THAT CHECKS FOR THE STUFF
+		winParent.onUpdate(() => {
+			if (!winParent.is("window")) return
+			
+			if (GameState.clickers == 0 && GameState.scoreThisRun >= storeElementsInfo.clickersElement.basePrice) {
+				if (getTooltip("tutorialClickers").length == 0) {
+					clickersTutToolTip()
+				}
 			}
-	
-			if (upgradeChecked == false && GameState.score >= upgradeInfo.k_0.price && !isUpgradeBought("k_0")) {
-				upgradeChecked = true
-				addFirstUpgradeTutTool()
+			
+			if (GameState.cursors == 0 && GameState.scoreThisRun >= storeElementsInfo.cursorsElement.basePrice) {
+				if (getTooltip("tutorialCursors").length == 0) {
+					cursorsTutToolTip()
+				}
 			}
 
-			if (powerupChecked == false && GameState.score >= storeElementsInfo.powerupsElement.unlockPrice && GameState.stats.powerupsClicked < 1) {
-				powerupChecked = true
-				addPowerupsTutTool()
+			if (GameState.hasUnlockedPowerups == false && GameState.score >= storeElementsInfo.powerupsElement.unlockPrice) {
+				if (getTooltip("tutorialPowerups").length == 0) {
+					powerupsTutToolTip()
+				}
+			}
+
+			if (!isUpgradeBought("k_0") && GameState.score >= upgradeInfo.k_0.price) {
+				if (getTooltip("tutorialUpgrades").length == 0) {
+					upgradesTutToolTip()
+				}
 			}
 		})
 	}
@@ -148,15 +146,10 @@ export function storeWinContent(winParent) {
 	winParent.on("close", () => {
 		winParent.get("*", { recursive: true }).forEach(element => {
 			if (element.endHover) element.endHover()
-			});
-		
-		get("tooltip").filter(obj => obj.is("text")).forEach((tooltipObj) => {
-			// is part of the tutorial
-			// TODO: i added the tag to use them here but turns out it i can't even get it here, maybe add the opts
-			// to the bg and text
-			if (tooltipObj.text.includes("←") || tooltipObj.text.includes("→")) tooltipObj.end()
+		});
+	
+		get("tooltip").filter(tooltip => tooltip.is("text") == false).forEach(tooltip => {
+			tooltip.end()
 		})
-		
-		checkForStuff?.cancel()
 	})
 }

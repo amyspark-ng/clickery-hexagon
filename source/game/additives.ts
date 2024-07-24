@@ -343,16 +343,10 @@ type tooltipOpts = {
 	direction?: "up" | "down" | "left" | "right",
 	lerpValue?:number,
 	textSize?:number,
-	tag?:string,
+	type?:string,
 }
 
 export function addTooltip(obj:GameObj, opts?:tooltipOpts) {
-	// if there's a tooltip already attached to the obj don't add a new one
-	// if (get("tooltip")?.some((tooltip) => tooltip.obj == obj)) return;
-	
-	// maybe don't lerp positions and just tween them
-	// no because i have to lerp them to the obj position in case the obj position changes
-
 	if (opts == undefined) opts = {} as tooltipOpts 
 	opts.direction = opts.direction ?? "up";
 	opts.lerpValue = opts.lerpValue ?? 0.35;
@@ -361,13 +355,13 @@ export function addTooltip(obj:GameObj, opts?:tooltipOpts) {
 	let sizeOfText = { x: 0, y: 0 };
 
 	let offset = 10
-	let bgPos = vec2(obj.screenPos().x, obj.screenPos().y)
+	let bgPos = vec2(obj.worldPos().x, obj.worldPos().y)
 	let padding = 10;
 
 	let tooltipBg = add([
 		rect(sizeOfText.x, sizeOfText.y, { radius: 5 }),
 		z(0),
-		pos(obj.screenPos()),
+		pos(obj.worldPos()),
 		color(BLACK),
 		opacity(0.95),
 		opacity(),
@@ -376,31 +370,30 @@ export function addTooltip(obj:GameObj, opts?:tooltipOpts) {
 		z(obj.z ? obj.z + 1 : 0),
 		"tooltip",
 		{
-			obj: obj,
-			tag: opts.tag ?? "nothing",
 			end: null,
+			type: opts.type,
 			update() {
 				switch (opts.direction) {
 					case "up":
-						bgPos.y = (obj.screenPos().y - obj.height / 2) - offset
-						bgPos.x = obj.screenPos().x
+						bgPos.y = (obj.worldPos().y - obj.height / 2) - offset
+						bgPos.x = obj.worldPos().x
 					break;
 			
 					case "down":
-						bgPos.y = (obj.screenPos().y + obj.height / 2) + offset
-						bgPos.x = obj.screenPos().x
+						bgPos.y = (obj.worldPos().y + obj.height / 2) + offset
+						bgPos.x = obj.worldPos().x
 					break;
 			
 					case "left":
 						this.anchor = "right"	
-						bgPos.x = (obj.screenPos().x - obj.width / 2) - offset
-						bgPos.y = obj.screenPos().y
+						bgPos.x = (obj.worldPos().x - obj.width / 2) - offset
+						bgPos.y = obj.worldPos().y
 					break;
 			
 					case "right":
 						this.anchor = "left"	
-						bgPos.x = (obj.screenPos().x + obj.width / 2) + offset
-						bgPos.y = obj.screenPos().y
+						bgPos.x = (obj.worldPos().x + obj.width / 2) + offset
+						bgPos.y = obj.worldPos().y
 					break;
 				}
 				
@@ -434,7 +427,7 @@ export function addTooltip(obj:GameObj, opts?:tooltipOpts) {
 		z(obj.z ? obj.z + 1 : 0),
 		"tooltip",
 		{
-			end: null,
+			bg: tooltipBg,
 			update() {
 				sizeOfText.x = formatText({ text: tooltipText.text, size: tooltipText.textSize }).width
 				sizeOfText.y = formatText({ text: tooltipText.text, size: tooltipText.textSize }).height
@@ -452,21 +445,23 @@ export function addTooltip(obj:GameObj, opts?:tooltipOpts) {
 		}
 	])
 
-	let tooltipinfo = { tooltipBg, tooltipText, end, tag: opts.tag }
+	let tooltipinfo = { tooltipBg, tooltipText, end, type: opts.type }
 	if (obj.tooltips == null) obj.tooltips = []
 	obj.tooltips.push(tooltipinfo)
-
+	
 	function end() {
-		// moving it to obj center doesn't work because the switch is getting called onUpdate
-		// changing the bgPos to the actual position all the time
 		destroy(tooltipBg)
 		destroy(tooltipText)
+
 		let index = obj.tooltips.indexOf(tooltipinfo)
 		if (index > -1) obj.tooltips.splice(index, 1)
 	}
 
+	obj.onDestroy(() => {
+		end()
+	})
+
 	tooltipBg.end = end
-	tooltipText.end = end
 
 	return tooltipinfo
 }

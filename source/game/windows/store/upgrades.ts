@@ -4,8 +4,6 @@ import { playSfx } from "../../../sound";
 import { addTooltip } from "../../additives";
 import { blendColors, bop, formatNumber } from "../../utils";
 
-export let isHoveringUpgrade = false;
-
 export let upgradeInfo = {
 	"k_0": { value: 2, price: 500 },
 	"k_1": { value: 4, price: 2500 },
@@ -128,14 +126,14 @@ export function addUpgrades(elementParent) {
 					if (!isUpgradeBought(upgradeObj.id)) this.dropBuy()
 					tween(this.scale, vec2(1), 0.15, (p) => this.scale = p, easings.easeOutQuad)
 					if (!isUpgradeBought(this.id)) {
-						upgradeObj.tooltips?.filter(tooltip => tooltip.tag == "price").forEach(tooltip => {
+						upgradeObj.tooltips?.filter(tooltip => tooltip.type == "price").forEach(tooltip => {
 							tooltip.end()
 						});
 					}
 				},
 
 				buy() {
-					upgradeObj.tooltips?.filter(tooltip => tooltip.tag == "price").forEach(tooltip => {
+					upgradeObj.tooltips?.filter(tooltip => tooltip.type == "price").forEach(tooltip => {
 						tooltip.end()
 					});
 					GameState.upgradesBought.push(this.id)
@@ -196,7 +194,7 @@ export function addUpgrades(elementParent) {
 			if (isUpgradeBought(upgradeObj.id) || GameState.score < upgradeObj.price) {bop(upgradeObj); return}
 
 			if (upgradeObj.id == "c_2" && !isUpgradeBought("c_1")) {
-				upgradeObj.tooltips?.filter(tooltip => tooltip.tag == "price").forEach(tooltip => {
+				upgradeObj.tooltips?.filter(tooltip => tooltip.type == "price").forEach(tooltip => {
 					tooltip.end()
 				});
 
@@ -204,7 +202,7 @@ export function addUpgrades(elementParent) {
 					text: "You have to buy the previous one",
 					textSize: upgradeObj.height / 2,
 					direction: "down",
-					tag: "price",
+					type: "price",
 				})
 
 				return // end the event
@@ -241,15 +239,16 @@ export function addUpgrades(elementParent) {
 		
 			let textInBlink = upgradeObj.value != null ? `+${upgradeObj.value}` : `Cursors now click every ${upgradeObj.freq} seconds`;
 			if (!isUpgradeBought(upgradeObj.id) && !upgradeObj.hasTooltip) {
-				upgradeObj.tooltips?.filter(tooltip => tooltip.tag == "price").forEach(tooltip => {
+				upgradeObj.tooltips?.filter(tooltip => tooltip.type == "price").forEach(tooltip => {
 					tooltip.end()
 				});
+
 				let tooltip = addTooltip(upgradeObj, {
 					text: formatNumber(upgradeObj.price, { price: true, fixAmount: 1 }),
 					textSize: upgradeObj.height / 2,
 					direction: "down",
 					lerpValue: 0.75,
-					tag: "price",
+					type: "price",
 				})
 
 				tooltip.tooltipText.onUpdate(() => {
@@ -265,7 +264,7 @@ export function addUpgrades(elementParent) {
 			if (!winParent.active) return
 			upgradeObj.endHover()
 		
-			upgradeObj.tooltips?.filter(tooltip => tooltip.tag == "price").forEach(tooltip => {
+			upgradeObj.tooltips?.filter(tooltip => tooltip.type == "price").forEach(tooltip => {
 				tooltip.end()
 			});
 			upgradeObj.manageBlinkText().end()

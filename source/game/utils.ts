@@ -32,7 +32,7 @@ export function simpleNumberFormatting(value) {
 type formatNumberOpts = {
 	fixAmount?:number,
 	price?:boolean,
-	letterSuffixes?:boolean,
+	fullWord?:boolean,
 }
 
 let numTypes = {
@@ -64,7 +64,7 @@ let numTypes = {
 export function formatNumber(value:number, opts?:formatNumberOpts):string {
 	if (opts == undefined) opts = {} as formatNumberOpts 
 	opts.price = opts.price ?? false
-	opts.letterSuffixes = opts.letterSuffixes ?? false
+	opts.fullWord = opts.fullWord ?? false
 	
 	if (opts.price && !opts.fixAmount) opts.fixAmount = 1
 	else opts.fixAmount = opts.fixAmount ?? 3
@@ -81,7 +81,7 @@ export function formatNumber(value:number, opts?:formatNumberOpts):string {
 		for (let i = 1; value >= Math.pow(1000, i); i++) {
 			// turn it into a smaller version
 			let numberValue = (value / Math.pow(1000, i)).toFixed(opts.fixAmount) 
-			let suffix = (opts.letterSuffixes == true ? "" : " ") + numTypes[Object.keys(numTypes)[i]][opts.letterSuffixes ? "small" : "large"];
+			let suffix = (opts.fullWord == true ? " " : "") + numTypes[Object.keys(numTypes)[i]][opts.fullWord == true ? "large" : "small"];
 			returnValue = numberValue + suffix
 		}
 	}
@@ -134,7 +134,7 @@ export function getPrice(opts:getPriceOpts) {
 		// let currentPrice = opts.basePrice * Math.pow(percentageMultiplier, opts.objectAmount + i);
         // priceToReturn += Math.round(currentPrice);
 		
-		let currentPrice = opts.basePrice * 1.15 ** (opts.objectAmount + i)
+		let currentPrice = opts.basePrice * percentageMultiplier ** (opts.objectAmount + i)
 		priceToReturn += Math.round(currentPrice);
 	}
 
@@ -219,6 +219,10 @@ export function setVariable(obj, path, value) {
 
 export function saveAnim() {
 	addToast({ icon: "floppy", title: "Game saved!", body: `Time played: ${toHHMMSS(GameState.stats.totalTimePlayed)}` })
+}
+
+export function randomPowerup() {
+	return choose(Object.keys(powerupTypes))
 }
 
 export function randomPos() {
@@ -310,10 +314,10 @@ export function debugFunctions() {
 		}
 	
 		else if (isKeyPressed("f")) {
-			// spawnPowerup({
-			// 	type: choose(Object.keys(powerupTypes)),
-			// 	pos: randomPos()
-			// })
+			spawnPowerup({
+				type: randomPowerup(),
+				pos: randomPos()
+			})
 		}
 
 		else if (isKeyPressed("h")) {
@@ -323,10 +327,10 @@ export function debugFunctions() {
 
 	// #region debug stuff
 	onScroll((delta)=>{
-		if (isKeyDown("shift")) cam.scale = cam.scale * (1 - 0.1 * Math.sign(delta.y)) 
+		if (isMouseDown("right")) cam.scale = cam.scale * (1 - 0.1 * Math.sign(delta.y)) 
 	})
 
 	onMousePress("middle", () => {
-		if (isKeyDown("shift")) cam.scale = 1
+		if (isMouseDown("right")) cam.scale = 1
 	})
 }

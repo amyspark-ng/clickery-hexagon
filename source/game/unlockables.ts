@@ -100,6 +100,62 @@ export let unlockables = {
 			"timeAfter": 1,
 			condition: () => isAchievementUnlocked("allclickupgrades") && GameState.cursorsUpgradesValue == fullCursorsUpgrades && GameState.timeUntilAutoLoopEnds == 1
 		},
+		// #region powerup achievements 
+		{"name":"buy1powerup",
+			"text":"Buy 1 powerup, pay to win",
+			"icon":"icon_store",
+			"timeAfter": 0.5,
+			condition: () => GameState.powerupsBought >= 1
+		},
+		{"name":"buy5powerup",
+			"text":"Buy 5 powerup, Scrooge McDuck over here",
+			"icon":"icon_store",
+			"timeAfter": 0.5,
+			condition: () => GameState.powerupsBought >= 5
+		},
+		{"name":"buy10powerup",
+			"text":"Buy 10 powerup, ok that's enough we're running out",
+			"icon":"icon_store",
+			"timeAfter": 0.5,
+			condition: () => GameState.powerupsBought >= 10
+		},
+		{"name":"click1powerup",
+			"text":"Click 1 powerup, little helping hand :)",
+			"icon":"icon_store",
+			"timeAfter": 0.5,
+			condition: () => GameState.stats.powerupsClicked >= 1
+		},
+		{"name":"click5powerup",
+			"text":"Click 5 powerup, you've played a while...",
+			"icon":"icon_store",
+			"timeAfter": 0.5,
+			condition: () => GameState.stats.powerupsClicked >= 5
+		},
+		{"name":"click10powerup",
+			"text":"Click 10 powerup, ran out of texts...",
+			"icon":"icon_store",
+			"timeAfter": 0.5,
+			condition: () => GameState.stats.powerupsClicked >= 10
+		},
+		{"name":"click15powerup",
+			"text":"Click 15 powerup, ran out of texts...",
+			"icon":"icon_store",
+			"timeAfter": 0.5,
+			condition: () => GameState.stats.powerupsClicked >= 15
+		},
+		{"name":"click20powerup",
+			"text":"Click 20 powerup, ran out of texts...",
+			"icon":"icon_store",
+			"timeAfter": 0.5,
+			condition: () => GameState.stats.powerupsClicked >= 20
+		},
+		{"name":"click25powerup",
+			"text":"Click 25 powerup, ran out of texts...",
+			"icon":"icon_store",
+			"timeAfter": 0.5,
+			condition: () => GameState.stats.powerupsClicked >= 25
+		},
+		//#endregion
 		{"name":"maxedcombo",
 			"text": "Max combo for the first time, FULL COMBO!!!!", 
 			"icon": "hexagon",
@@ -182,6 +238,8 @@ export function unlockAchievement(achievementName:string) {
 	let achievementInfo = getAchievementFor(achievementName)
 	let waitTime = achievementInfo.timeAfter ?? 0
 
+	GameState.unlockedAchievements.push(achievementName)
+
 	wait(waitTime, () => {
 		addToast({
 			icon: achievementInfo.icon,
@@ -189,7 +247,6 @@ export function unlockAchievement(achievementName:string) {
 			body: `${achievementInfo.text}`,
 		})
 	
-		GameState.unlockedAchievements.push(achievementName)
 
 		if (achievementName == "allachievements") {
 			addConfetti({ pos: mousePos() })

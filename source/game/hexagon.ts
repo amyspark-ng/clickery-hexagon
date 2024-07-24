@@ -7,7 +7,7 @@ import { playSfx } from "../sound.ts";
 import { isDraggingAWindow, isHoveringAWindow, manageWindow } from "./windows/windows-api/windowsAPI.ts";
 import { waver } from "../plugins/wave.js";
 import { isDraggingASlider } from "./windows/colorWindow.ts";
-import { addPlusScoreText, getClicksFromCombo, increaseCombo, increaseComboText, maxComboAnim, startCombo } from "./combo-utils.ts";
+import { addPlusScoreText, getClicksFromCombo, increaseCombo, maxComboAnim, startCombo } from "./combo-utils.ts";
 import { addConfetti } from "../plugins/confetti.js";
 import { curDraggin } from "../plugins/drag.js";
 import { cam } from "./gamescene.ts";

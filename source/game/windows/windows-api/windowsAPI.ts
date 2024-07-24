@@ -14,12 +14,9 @@ import { ascendWinContent } from "../ascendWindow.ts";
 import { extraWinContent } from "../extraWindow.ts";
 import { creditsWinContent } from "../creditsWin.ts";
 import { statsWinContent } from "../statsWin.ts";
-import { hasStartedGame } from "../../gamescene.ts";
 import { isAchievementUnlocked, unlockAchievement } from "../../unlockables.ts";
 import { medalsWinContent } from "../medalsWin.ts";
 import { ROOT } from "../../../main.ts";
-import { positionSetter } from "../../../plugins/positionSetter.ts";
-import { dummyShadow } from "../../../plugins/dummyShadow.js";
 import { ascending } from "../../ascension.ts";
 
 export let infoForWindows = {};
