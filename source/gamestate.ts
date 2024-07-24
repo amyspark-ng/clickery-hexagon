@@ -1,5 +1,6 @@
-import { scoreText } from "./game/uicounters"
-import { saveAnim } from "./game/utils"
+import { clickVars } from "./game/hexagon"
+import { powerupTypes } from "./game/powerups"
+import { percentage, saveAnim } from "./game/utils"
 import { musicHandler, sfxHandler } from "./sound"
 
 class _GameState {	
@@ -8,12 +9,12 @@ class _GameState {
 	scoreAllTime = 0
 	mana = 0
 
-	clickers = 0
-	clicksUpgradesValue = 0 // multiplier for clicks
+	clickers = 1
+	clicksUpgradesValue = 1 // multiplier for clicks
 	clickPercentage = 0 // percentage added
 
 	cursors = 0
-	cursorsUpgradesValue = 0 // multiplier for cursors
+	cursorsUpgradesValue = 1 // multiplier for cursors
 	cursorsPercentage = 0 // percentage added
 	timeUntilAutoLoopEnds = 10 // cursor frequency
 
@@ -94,18 +95,63 @@ class _GameState {
 
 export let GameState = new _GameState()
 
-export let scoreManager = {
+class _scoreManager {
+	// score per click (no combo or powerups or percentage)
+	scorePerClick_Vanilla = () => {
+		return Math.round(GameState.clickers * GameState.clicksUpgradesValue)
+	}
+
+	// score per click
+	scorePerClick = () => {
+		let vanillaValue = this.scorePerClick_Vanilla()
+		let noPercentage = (vanillaValue * powerupTypes.clicks.multiplier * this.combo)
+		let returnValue = noPercentage + percentage(GameState.clickPercentage, noPercentage)
+		return Math.round(returnValue)
+	}
+
+	// score per cursor click (not including powerups or percentages)
+	scorePerAutoClick_Vanilla = () => {
+		return Math.round(GameState.cursors * GameState.cursorsUpgradesValue)
+	}
+
+	// score per cursor click
+	scorePerAutoClick = () => {
+		let noPercentage = GameState.cursors * GameState.clicksUpgradesValue * powerupTypes.cursors.multiplier
+		let returnValue = noPercentage + percentage(GameState.cursorsPercentage, noPercentage)
+		return Math.round(returnValue)
+	}
+
+	// the score per second you're getting by cursors
+	// no rounding because can be decimal (0.1)
+	autoScorePerSecond = () => {
+		let returnValue = this.scorePerAutoClick() / GameState.timeUntilAutoLoopEnds
+		return returnValue
+	}
+
+	// the general score per second clicks and all
+	// no rounding because can be decimal (0.1)
+	scorePerSecond = () => {
+		return (clickVars.clicksPerSecond * this.scorePerClick()) + this.autoScorePerSecond()
+	}
+
+	scoreNeededToAscend = 1000000
+	combo = 1
+
 	addScore(amount:number) {
 		GameState.score += amount
 		GameState.scoreThisRun += amount
 		GameState.scoreAllTime += amount
-	},
+	}
 
 	// used usually when buying
 	subScore(amount:number) {
 		// GameState.score -= amount
 		tween(GameState.score, GameState.score - amount, 0.32, (p) => GameState.score = p, easings.easeOutExpo)
-	},
+	}
+
+	addTweenScore(amount:number) {
+		tween(GameState.score, GameState.score + amount, 0.32, (p) => GameState.score = p, easings.easeOutExpo)
+	}
 
 	resetScoreBcAscend() {
 		// GameState.score = 0
@@ -114,3 +160,5 @@ export let scoreManager = {
 		tween(GameState.scoreThisRun, 0, 0.32, (p) => GameState.scoreThisRun = p, easings.easeOutCirc)
 	}
 }
+
+export let scoreManager = new _scoreManager()

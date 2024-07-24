@@ -1,5 +1,5 @@
 import { Color } from "kaplay";
-import { GameState } from "../gamestate";
+import { GameState, scoreManager } from "../gamestate";
 import { addToast, mouse } from "./additives";
 import { autoLoopTime, cam, triggerGnome } from "./gamescene";
 import { hexagon } from "./hexagon";
@@ -113,8 +113,8 @@ export function toHHMMSS(timeInSeconds) {
     return `${formattedHours}${formattedMinutes}:${formattedSeconds}`;
 }
 
-export function percentage(number, percentageTo) {
-	return Math.round((number * percentageTo) / 100)
+export function percentage(percentageOf, number) {
+	return Math.round((percentageOf * number) / 100)
 }
 
 type getPriceOpts = {
@@ -122,10 +122,13 @@ type getPriceOpts = {
 	percentageIncrease:number,
 	objectAmount:number,
 	amountToBuy?:number,
+	gifted?:number,
 }
 
 export function getPrice(opts:getPriceOpts) {
-    opts.amountToBuy = opts.amountToBuy ?? 1 
+    opts.amountToBuy = opts.amountToBuy ?? 1
+	opts.gifted = opts.gifted ?? 0
+	
 	let percentageMultiplier = (1 + opts.percentageIncrease / 100)
 	let priceToReturn = 0;
 
@@ -134,7 +137,7 @@ export function getPrice(opts:getPriceOpts) {
 		// let currentPrice = opts.basePrice * Math.pow(percentageMultiplier, opts.objectAmount + i);
         // priceToReturn += Math.round(currentPrice);
 		
-		let currentPrice = opts.basePrice * percentageMultiplier ** (opts.objectAmount + i)
+		let currentPrice = opts.basePrice * percentageMultiplier ** ((opts.objectAmount + i) - opts.gifted)
 		priceToReturn += Math.round(currentPrice);
 	}
 
@@ -298,6 +301,7 @@ export function debugFunctions() {
 	
 	// can modify gamestate from console
 	window.globalThis.GameState = GameState
+	window.globalThis.scoreManager = scoreManager
 	window.globalThis.unlockAchievement = unlockAchievement
 	window.globalThis.hexagon = hexagon
 	window.globalThis.openWindow = openWindow

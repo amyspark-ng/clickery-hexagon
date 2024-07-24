@@ -18,9 +18,10 @@ this game MIGHT be getting done
 <!-- some powerup stuff -->
 - make powerupRandomPos() so it's not too close to powerups or other stuff
 
+<!-- bugs -->
 - BU-GS I HATE THEM -
 - complete all achievements achivment is bugged
-
+- CRASH OF POWERUPS STILL EXISTS
 - make all the cards a single animation and change them using the frame (only include icons, number and price is ingame)
 - add the mute dialogue option
 
@@ -30,6 +31,7 @@ this game MIGHT be getting done
 - Prototype ascending mechanic (prestige/mana, what time do you get to ascend, actually add the percentages)
 
 ## Complex stuff
+- simpleNumberFormatting change to formatNumber but has a simple opt that returns what the simpleNumberFormatting funcion would have
 - and click priortiy (holy moly)
 	* For clicking behind object should check if any other window that is not the current one is active, if any other window is active the button should not work
 

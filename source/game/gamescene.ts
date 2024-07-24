@@ -165,7 +165,7 @@ function welcomeBack(idle = false) {
 		let body = `You were out for: ${toHHMMSS(timeInSeconds)} ${times}`; 
 		if (score != null) body += `\n+${formatNumber(score)}` 
 		
-		let hasCombo = scoreVars.combo > 1
+		let hasCombo = scoreManager.combo > 1
 		let hasPowerup = get("putimer")?.length > 0
 		let applicationMessage = ""
 		
@@ -195,7 +195,7 @@ function welcomeBack(idle = false) {
 			gainedScore = Math.floor(excessTime / GameState.timeUntilAutoLoopEnds); // can't add scorePerAutoClick here bc
 			excessTime -= GameState.timeUntilAutoLoopEnds * gainedScore // I use it before to shave off the extra time
 			// actual gainedScore
-			gainedScore = gainedScore * scoreVars.scorePerAutoClick
+			gainedScore = gainedScore * scoreManager.scorePerAutoClick()
 	
 			// SECONDS FOR LOG
 			if ((totalTimeOutsideTab / 1000) > 60) {
@@ -211,7 +211,7 @@ function welcomeBack(idle = false) {
 		
 		// SECONDS FOR LOG
 		if (timeSlept > 60) {
-			addWelcomeBackToast(Math.round(scoreVars.scorePerAutoClick * timeSlept), timeSlept)
+			addWelcomeBackToast(Math.round(scoreManager.scorePerSecond() * timeSlept), timeSlept)
 			timeSlept = 0
 		}
 		// don't add no score because it is aded in the loop

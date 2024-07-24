@@ -1,9 +1,8 @@
 import { TextCompOpt, Vec2 } from "kaplay"
 import { waver } from "../plugins/wave";
 import { playSfx } from "../sound";
-import { GameState } from "../gamestate";
-import { bop, formatNumber, parseAnimation } from "./utils";
-import { scoreVars } from "./hexagon";
+import { GameState, scoreManager } from "../gamestate";
+import { bop, formatNumber, parseAnimation, randomPos } from "./utils";
 import { positionSetter } from "../plugins/positionSetter";
 import { checkForUnlockable } from "./unlockables";
 
@@ -184,7 +183,7 @@ export function addPowerupLog(powerupType) {
 				if (powerupType == "clicks") textInText = `Click production increased x${powerupMultiplier} for ${powerupTime} secs`
 				else if (powerupType == "cursors") textInText = `Cursors production increased x${powerupMultiplier} for ${powerupTime} secs`
 				else if (powerupType == "time") {
-					textInText = `+${formatNumber(scoreVars.autoScorePerSecond * 60)}, the score you would have gained in 1 minute`
+					textInText = `+${formatNumber(scoreManager.autoScorePerSecond() * powerupMultiplier)}, the score you would have gained in 1 minute`
 				}
 				else if (powerupType == "awesome") textInText = `Score production increased by x${powerupMultiplier} for ${powerupTime}, AWESOME!!`
 				else if (powerupType == "store") textInText = `Store prices have a discount of ${Math.round(powerupMultiplier * 100)}% for ${powerupTime} secs, get em' now!`
@@ -211,6 +210,15 @@ export function addPowerupLog(powerupType) {
 }
 
 export function spawnPowerup(opts:powerupOpt) {
+	opts.type = opts.type || "clicks"
+	opts.pos = opts.pos || randomPos()
+
+	if (opts.type == "time") {
+		opts.time = opts.time || 60
+	}
+
+	else opts.time = opts.time || 10
+
 	let powerupObj = add([
 		sprite("white_noise"),
 		pos(opts.pos),
@@ -281,15 +289,22 @@ export function spawnPowerup(opts:powerupOpt) {
 
 				// # multipliers
 				let multiplier = 0
-				if (!opts.multiplier) {
-					if (this.type == "clicks" || this.type == "cursors") multiplier = randi(2, 7)
-					else if (this.type == "awesome") multiplier = randi(15, 20)
-					else if (this.type == "bad") multiplier = rand(0.15, 0.5)
-					else if (this.type == "store") multiplier = rand(0.15, 0.5)
-					else if (this.type == "time") multiplier = randi(1, 1)
-				}
-				else {
-					multiplier = 10
+				if (opts.multiplier == null) {
+					if (this.type == "clicks" || this.type == "cursors") {
+						multiplier = randi(2, 7)
+					}
+					
+					else if (this.type == "awesome") {
+						multiplier = randi(15, 20)
+					}
+
+					else if (this.type == "time") {
+						scoreManager.addTweenScore(scoreManager.scorePerSecond() * opts.time)
+					}
+
+					else if (this.type == "store") {
+						multiplier = rand(0.15, 0.5)
+					}
 				}
 
 				powerupTypes[this.type].multiplier = multiplier
@@ -337,6 +352,7 @@ export function powerupManagement() {
 				powerupTypes[powerup].removalTime = null
 				get(`${powerup}_putimer`)?.forEach(timer => timer.end())
 				powerupTypes[powerup].multiplier = 1
+				debug.log("reset multiplier")
 			}
 		}
 	}

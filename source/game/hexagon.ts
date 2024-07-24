@@ -14,17 +14,6 @@ import { cam } from "./gamescene.ts";
 import { powerupTypes } from "./powerups.ts";
 import { checkForUnlockable, isAchievementUnlocked, unlockAchievement } from "./unlockables.ts";
 
-export let scoreVars = {
-	scorePerClick: 1,
-	scorePerAutoClick: 0,
-	
-	autoScorePerSecond: 0, // the score per second you're getting automatically
-	scorePerSecond: null, // the total score per second
-	
-	scoreNeededToAscend: 1000000,
-	combo: 1,
-}
-
 export let clickVars = {
 	clicksPerSecond: 0, // to properly calculate sps
 	consecutiveClicks: 0,
@@ -47,7 +36,7 @@ export let hexagon:any;
 
 export function addHexagon() {
 	// reset variables
-	scoreVars.combo = 1
+	scoreManager.combo = 1
 
 	clickVars.consecutiveClicks = 0
 	clickVars.constantlyClicking = false
@@ -102,10 +91,8 @@ export function addHexagon() {
 				
 				if (this.isBeingHovered) maxRotSpeed = 4.75
 				else maxRotSpeed = 4
-				this.rotationSpeed = map(GameState.score, 0, scoreVars.scoreNeededToAscend, 0.01, maxRotSpeed)
+				this.rotationSpeed = map(GameState.score, 0, scoreManager.scoreNeededToAscend, 0.01, maxRotSpeed)
 				this.rotationSpeed = clamp(this.rotationSpeed, 0.01, maxRotSpeed)
-				// this.wave_speed = map(GameState.score, 0, scoreVars.scoreNeededToAscend, 1, 2)
-				// this.wave_speed = clamp(this.wave_speed, 1, 2)
 				this.angle += this.rotationSpeed
 				
 				this.scale.x = wave((this.smallestScale * this.scaleIncrease), (this.biggestScale * this.scaleIncrease), time() * 1.15)
@@ -140,7 +127,7 @@ export function addHexagon() {
 				consecutiveClicksWaiting.cancel()
 				consecutiveClicksWaiting = wait(1, () => {
 					clickVars.constantlyClicking = false
-					if (scoreVars.combo < 2) clickVars.consecutiveClicks = 0
+					if (scoreManager.combo < 2) clickVars.consecutiveClicks = 0
 				})
 
 				if (GameState.scoreThisRun > 100) {
@@ -155,7 +142,7 @@ export function addHexagon() {
 					}
 
 					// check for all the other combos
-					else if (scoreVars.combo < COMBO_MAX) {
+					else if (scoreManager.combo < COMBO_MAX) {
 						for (let i = 2; i < COMBO_MAX + 1; i++) {
 							if (clickVars.consecutiveClicks == getClicksFromCombo(i)) {
 								increaseCombo()
@@ -163,7 +150,7 @@ export function addHexagon() {
 						}
 					}
 	
-					if (scoreVars.combo == COMBO_MAX && clickVars.maxedCombo == false) {
+					if (scoreManager.combo == COMBO_MAX && clickVars.maxedCombo == false) {
 						clickVars.maxedCombo = true
 						maxComboAnim()
 
@@ -180,11 +167,11 @@ export function addHexagon() {
 				// # actual score additions
 				addPlusScoreText({
 					pos: mousePos(),
-					value: scoreVars.scorePerClick * scoreVars.combo,
+					value: scoreManager.scorePerClick(),
 					cursorRelated: false,
 				})
 
-				scoreManager.addScore((scoreVars.scorePerClick * powerupTypes.clicks.multiplier) * scoreVars.combo)
+				scoreManager.addScore(scoreManager.scorePerClick())
 
 				tween(scoreText.scaleIncrease, 1.05, 0.2, (p) => scoreText.scaleIncrease = p, easings.easeOutQuint).onEnd(() => {
 					tween(scoreText.scaleIncrease, 1, 0.2, (p) => scoreText.scaleIncrease = p, easings.easeOutQuint)
@@ -307,11 +294,11 @@ export function addHexagon() {
 							
 							addPlusScoreText({
 								pos: autoCursor.pos,
-								value: scoreVars.scorePerAutoClick,
+								value: scoreManager.scorePerAutoClick(),
 								cursorRelated: true,
 							})
 
-							scoreManager.addScore(scoreVars.scorePerAutoClick * powerupTypes.cursors.multiplier)
+							scoreManager.addScore(scoreManager.scorePerAutoClick())
 			
 							// has done its bidding, time to roll and dissapear
 							autoCursor.gravityScale = 1
@@ -407,59 +394,13 @@ export function addHexagon() {
 		}
 	})
 
-	// # vanilla means clicks and upgrades included but not powerups/combo
-	// SPC = Score per Click / SPAC = Score per Auto Click
-	function getVanillaSPC() {
-		let value:number;
-		// clickers start at 0 that's why i have to add 1
-		if (GameState.clicksUpgradesValue < 2) {
-			value = 1 + GameState.clickers
-		}
-
-		else {
-			value = (1 + GameState.clickers) * GameState.clicksUpgradesValue
-		}
-		return value;
-	}
-
-	function getFullSPC() {
-		if (GameState.clicksUpgradesValue < 2) return ((1 + GameState.clickers) * powerupTypes.clicks.multiplier) * scoreVars.combo
-		else return (((1 + GameState.clickers) * GameState.clicksUpgradesValue) * powerupTypes.clicks.multiplier) * scoreVars.combo
-	}
-
-	function getVanillaSPAC() {
-		// DONT ADD POWERUPS they're not applicable for outside time
-		let value:number;
-		if (GameState.cursorsUpgradesValue < 2) {
-			value = GameState.cursors
-		}
-
-		else {
-			value = GameState.cursors * GameState.cursorsUpgradesValue
-		}
-		return value;
-	}
-
-	function getFullSPAC() {
-		if (GameState.cursorsUpgradesValue < 2) return GameState.cursors * powerupTypes.cursors.multiplier 
-		else return (GameState.cursors * GameState.cursorsUpgradesValue) * powerupTypes.cursors.multiplier
-	}
-
 	// score setting stuff
 	hexagon.onUpdate(() => {
-		scoreVars.scorePerClick = getVanillaSPC()
-		scoreVars.scorePerAutoClick = getVanillaSPAC()
-
-		// # sps
-		// this is for when you leave the game
-		scoreVars.autoScorePerSecond = scoreVars.scorePerAutoClick / GameState.timeUntilAutoLoopEnds
-
-		scoreVars.scorePerSecond = ((clickVars.clicksPerSecond * getFullSPC()) + (scoreVars.autoScorePerSecond))
 		spsUpdaterTimer += dt();
 		if (spsUpdaterTimer > 1) {
 			spsUpdaterTimer = 0;
+			spsText.updateValue(); // update it before it gets to 0
 			clickVars.clicksPerSecond = 0;
-			spsText.updateValue();
 		}
 	})
 

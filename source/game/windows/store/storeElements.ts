@@ -329,8 +329,9 @@ export function addStoreElement(winParent:any, opts:storeElementOpt) {
 				basePrice: elementInfo.basePrice,
 				percentageIncrease: elementInfo.percentageIncrease,
 				objectAmount: GameState[elementInfo.gamestateKey],
-				amountToBuy: amountToBuy
-			})
+				amountToBuy: amountToBuy,
+				gifted: opts.type == "clickersElement" ? 1 : 0
+			}) * powerupTypes.store.multiplier
 		}
 
 		else if (opts.type == "powerupsElement") {
@@ -342,7 +343,7 @@ export function addStoreElement(winParent:any, opts:storeElementOpt) {
 					percentageIncrease: elementInfo.percentageIncrease,
 					objectAmount: GameState[elementInfo.gamestateKey],
 					amountToBuy: 1
-				})
+				}) * powerupTypes.store.multiplier
 			}
 		}
 
@@ -375,8 +376,14 @@ export function addStoreElement(winParent:any, opts:storeElementOpt) {
 		"stacksText",
 		{
 			update() {
-				if (opts.type == "clickersElement") this.text = `Stacked upgrades: ${GameState.clicksUpgradesValue}`
-				else if (opts.type == "cursorsElement") this.text = `Stacked upgrades: ${GameState.cursorsUpgradesValue}`
+				if (opts.type == "clickersElement") {
+					this.text = `Stacked upgrades: ${GameState.clicksUpgradesValue == 1 ? GameState.clicksUpgradesValue - 1: GameState.clicksUpgradesValue}`
+				}
+
+				else if (opts.type == "cursorsElement") {
+					this.text = `Stacked upgrades: ${GameState.cursorsUpgradesValue == 1 ? GameState.cursorsUpgradesValue - 1: GameState.cursorsUpgradesValue}`
+				}
+
 				else if (opts.type == "powerupsElement") this.destroy()
 			}
 		}

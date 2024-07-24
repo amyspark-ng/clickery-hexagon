@@ -1,11 +1,11 @@
 import { Vec2 } from "kaplay";
 import { playSfx } from "../sound"
 import { cam } from "./gamescene"
-import { COMBO_MINCLICKS, COMBO_MAX, COMBO_MAXCLICKS, clickVars, scoreVars } from "./hexagon"
+import { COMBO_MINCLICKS, COMBO_MAX, COMBO_MAXCLICKS, clickVars } from "./hexagon"
 import { scoreText, spsText } from "./uicounters";
 import { blendColors, formatNumber, randomPos } from "./utils";
 import { spawnPowerup } from "./powerups";
-import { GameState } from "../gamestate";
+import { GameState, scoreManager } from "../gamestate";
 
 export function getClicksFromCombo(level:number) {
 	return Math.round(map(level, 2, COMBO_MAX, COMBO_MINCLICKS, COMBO_MAXCLICKS))
@@ -55,7 +55,7 @@ export function addComboBar() {
 			update() {
 				if (!clickVars.constantlyClicking) {
 					if (clickVars.consecutiveClicks > 0) clickVars.consecutiveClicks -= 0.75
-					scoreVars.combo = getComboFromClicks(clickVars.consecutiveClicks)
+					scoreManager.combo = getComboFromClicks(clickVars.consecutiveClicks)
 					if (this.width < maxContentWidth / 2) clickVars.maxedCombo = false
 				}
 
@@ -79,7 +79,7 @@ export function addComboBar() {
 					})
 				}
 
-				let blendFactor = map(scoreVars.combo, 1, COMBO_MAX, 0, 1)
+				let blendFactor = map(scoreManager.combo, 1, COMBO_MAX, 0, 1)
 				this.color = blendColors(
 					WHITE,
 					hsl2rgb((time() * 0.2 * 0.1) % 1, 1.5, 0.8),
@@ -138,15 +138,15 @@ export function addPlusScoreText(opts:plusScoreOpts) {
 		{
 			update() {
 				if (opts.cursorRelated) return
-				textBlendFactor = map(scoreVars.combo, 1, COMBO_MAX, 0, 1)
+				textBlendFactor = map(scoreManager.combo, 1, COMBO_MAX, 0, 1)
 			}
 		}
 	])
 
 	plusScoreText.text = `+${formatNumber(opts.value)}`
-	if (scoreVars.combo > 1 && !opts.cursorRelated) {
+	if (scoreManager.combo > 1 && !opts.cursorRelated) {
 		plusScoreText.text = plusScoreText.text.replace (/^/,'[combo]');
-		// if (scoreVars.combo > 1) plusScoreText.text += `x${Math.floor(scoreVars.combo)}`
+		// if (scoreManager.combo > 1) plusScoreText.text += `x${Math.floor(scoreManager.combo)}`
 		plusScoreText.text += `[/combo]`;
 	}
 	
@@ -183,7 +183,7 @@ export function addPlusScoreText(opts:plusScoreOpts) {
 	if (plusScoreText.pos.x > opts.pos.x) plusScoreText.anchor = "left"
 	else plusScoreText.anchor = "right"
 
-	if (scoreVars.combo > 1 && !opts.cursorRelated) {
+	if (scoreManager.combo > 1 && !opts.cursorRelated) {
 		// let totalScore = plusScoreText.add([
 		// 	text("", {
 		// 		font: "lambdao",
@@ -199,14 +199,14 @@ export function addPlusScoreText(opts:plusScoreOpts) {
 		// 	}
 		// ])
 
-		// totalScore.text = `(${formatNumber(opts.value * scoreVars.combo, true, false)})`
+		// totalScore.text = `(${formatNumber(opts.value * scoreManager.combo, true, false)})`
 	}
 }
 
 export function increaseComboText() {
 	let blendFactor = 0
 	let incComboText = add([
-		text(`[combo]x${scoreVars.combo}[/combo]`, {
+		text(`[combo]x${scoreManager.combo}[/combo]`, {
 			font: "lambdao",
 			size: 48,
 			align: "center",
@@ -229,7 +229,7 @@ export function increaseComboText() {
 		{
 			update() {
 				this.pos.y -= 0.5
-				blendFactor = map(scoreVars.combo, 0, COMBO_MAX, 0, 1)
+				blendFactor = map(scoreManager.combo, 0, COMBO_MAX, 0, 1)
 			}
 		}
 	])
@@ -298,12 +298,12 @@ export function maxComboAnim() {
 }
 
 export function increaseCombo() {
-	scoreVars.combo = getComboFromClicks(clickVars.consecutiveClicks)
-	playSfx("combo", {detune: scoreVars.combo > 1 ? 100 * scoreVars.combo : 0 })
+	scoreManager.combo = getComboFromClicks(clickVars.consecutiveClicks)
+	playSfx("combo", {detune: scoreManager.combo > 1 ? 100 * scoreManager.combo : 0 })
 	tween(cam.scale, 0.95, 0.25 / 2, (p) => cam.scale = p, easings.easeOutQuint).onEnd(() => {
 		tween(cam.scale, 1, 0.25, (p) => cam.scale = p, easings.easeOutQuint)
 	})
-	if (scoreVars.combo != COMBO_MAX) increaseComboText()
+	if (scoreManager.combo != COMBO_MAX) increaseComboText()
 }
 
 export function startCombo() {

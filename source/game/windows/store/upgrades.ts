@@ -140,9 +140,9 @@ export function addUpgrades(elementParent) {
 					playSfx("kaching", { detune: 25 * this.idx })
 					tween(this.scale, vec2(1.1), 0.15, (p) => this.scale = p, easings.easeOutQuad)
 				
-					if (this.type == "k_") GameState.clicksUpgradesValue += this.value
+					if (this.type == "k_") GameState.clicksUpgradesValue += this.value - 1
 					else if (this.type == "c_") {
-						if (this.value != null) GameState.cursorsUpgradesValue += this.value
+						if (this.value != null) GameState.cursorsUpgradesValue += this.value - 1
 						else if (this.freq != null) GameState.timeUntilAutoLoopEnds = this.freq
 					}
 					
@@ -220,6 +220,7 @@ export function addUpgrades(elementParent) {
 	
 				if (upgradeObj.boughtProgress >= 100) {
 					upgradeObj.buy()
+					upgradeObj.manageBlinkText().end()
 				}
 			})
 		})
