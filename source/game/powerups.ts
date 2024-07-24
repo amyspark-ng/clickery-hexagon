@@ -2,7 +2,7 @@ import { TextCompOpt, Vec2 } from "kaplay"
 import { waver } from "../plugins/wave";
 import { playSfx } from "../sound";
 import { GameState, scoreManager } from "../gamestate";
-import { bop, formatNumber, parseAnimation, randomPos } from "./utils";
+import { bop, formatMusicTime, formatNumber, parseAnimation, randomPos, randomPowerup } from "./utils";
 import { positionSetter } from "../plugins/positionSetter";
 import { checkForUnlockable } from "./unlockables";
 
@@ -183,11 +183,11 @@ export function addPowerupLog(powerupType) {
 				if (powerupType == "clicks") textInText = `Click production increased x${powerupMultiplier} for ${powerupTime} secs`
 				else if (powerupType == "cursors") textInText = `Cursors production increased x${powerupMultiplier} for ${powerupTime} secs`
 				else if (powerupType == "time") {
-					textInText = `+${formatNumber(scoreManager.autoScorePerSecond() * powerupMultiplier)}, the score you would have gained in 1 minute`
+					textInText = `+${formatNumber(scoreManager.autoScorePerSecond() * powerupTime)}, the score you would have gained in ${powerupTime} secs`
 				}
 				else if (powerupType == "awesome") textInText = `Score production increased by x${powerupMultiplier} for ${powerupTime}, AWESOME!!`
 				else if (powerupType == "store") textInText = `Store prices have a discount of ${Math.round(powerupMultiplier * 100)}% for ${powerupTime} secs, get em' now!`
-				else textInText = "errm what the sigma"
+				else throw new Error("powerup type doesn't exist");
 
 				this.text = textInText
 			}
@@ -209,8 +209,10 @@ export function addPowerupLog(powerupType) {
 	})
 }
 
-export function spawnPowerup(opts:powerupOpt) {
-	opts.type = opts.type || "clicks"
+export function spawnPowerup(opts?:powerupOpt) {
+	if (opts == undefined) opts = {} as powerupOpt 
+
+	opts.type = opts.type || randomPowerup()
 	opts.pos = opts.pos || randomPos()
 
 	if (opts.type == "time") {
@@ -272,10 +274,10 @@ export function spawnPowerup(opts:powerupOpt) {
 				parseAnimation(blink, powerupTypes[opts.type].sprite)
 
 				let timeToLeave = 0.75
-				blink.loop(timeToLeave / 12, () => {
-					if (blink.opacity == blink.maxOpacity) blink.opacity = 0
-					else blink.opacity = blink.maxOpacity 
-				})
+				// blink.loop(timeToLeave / 12, () => {
+				// 	if (blink.opacity == blink.maxOpacity) blink.opacity = 0
+				// 	else blink.opacity = blink.maxOpacity 
+				// })
 				// tween(0.5, 0, timeToLeave, (p) => blink.maxOpacity = p, easings.easeOutBack)
 				blink.wait(timeToLeave, () => {
 					destroy(blink)
@@ -289,33 +291,38 @@ export function spawnPowerup(opts:powerupOpt) {
 
 				// # multipliers
 				let multiplier = 0
+				let time = 0
 				if (opts.multiplier == null) {
-					if (this.type == "clicks" || this.type == "cursors") {
+					if (opts.type == "clicks" || opts.type == "cursors") {
 						multiplier = randi(2, 7)
 					}
 					
-					else if (this.type == "awesome") {
+					else if (opts.type == "awesome") {
 						multiplier = randi(15, 20)
 					}
 
-					else if (this.type == "time") {
+					else if (opts.type == "time") {
+						multiplier = 1
+						time = opts.time ?? 60
 						scoreManager.addTweenScore(scoreManager.scorePerSecond() * opts.time)
 					}
 
-					else if (this.type == "store") {
+					else if (opts.type == "store") {
 						multiplier = rand(0.15, 0.5)
 					}
 				}
 
-				powerupTypes[this.type].multiplier = multiplier
+				if (opts.type != "time") {
+					// if there's already a timer don't add a new one!
+					let checkTimer = get(`${opts.type}_putimer`)[0] 
+					if (checkTimer) checkTimer.updateTime()
+					else addTimer({ sprite: powerupTypes[powerupObj.type].sprite, type: opts.type}) 
+				}
 
-				// # time
-				powerupTypes[this.type].removalTime = opts.time || 10
+				powerupTypes[opts.type].multiplier = multiplier
+				powerupTypes[opts.type].removalTime = opts.time
 				
-				// if there's already a timer don't add a new one!
-				let checkTimer = get(`${this.type}_putimer`)[0] 
-				if (checkTimer) checkTimer.updateTime()
-				else addTimer({ sprite: powerupTypes[powerupObj.type].sprite, type: this.type}) 
+				addPowerupLog(opts.type)
 			}
 		}
 	])
@@ -339,20 +346,18 @@ export function spawnPowerup(opts:powerupOpt) {
 
 	powerupObj.onClick(() => {
 		powerupObj.click()
-		addPowerupLog(powerupObj.type)
 	})
 }
 
 export function powerupManagement() {
 	for (let powerup in powerupTypes) {
 		if (powerupTypes[powerup].removalTime != null) {
-			powerupTypes[powerup].removalTime -= dt()
-		
+			if (powerup != "time") powerupTypes[powerup].removalTime -= dt()
+			
 			if (powerupTypes[powerup].removalTime < 0) {
 				powerupTypes[powerup].removalTime = null
 				get(`${powerup}_putimer`)?.forEach(timer => timer.end())
 				powerupTypes[powerup].multiplier = 1
-				debug.log("reset multiplier")
 			}
 		}
 	}

@@ -6,7 +6,7 @@ import { blendColors, bop, formatNumber } from "../../utils";
 
 export let upgradeInfo = {
 	"k_0": { value: 2, price: 500 },
-	"k_1": { value: 4, price: 2500 },
+	"k_1": { value: 4, price: 2500 }, // TODO: look into this, between first and second there's a 5x gap, i think that's good
 	"k_2": { value: 8, price: 6750 },
 	// ending
 	"k_3": { value: 16, price: 20200,},
@@ -140,9 +140,17 @@ export function addUpgrades(elementParent) {
 					playSfx("kaching", { detune: 25 * this.idx })
 					tween(this.scale, vec2(1.1), 0.15, (p) => this.scale = p, easings.easeOutQuad)
 				
-					if (this.type == "k_") GameState.clicksUpgradesValue += this.value - 1
+					if (this.type == "k_") {
+						if (GameState.clicksUpgradesValue == 1) GameState.clicksUpgradesValue += this.value - 1
+						else GameState.clicksUpgradesValue += this.value 
+					}
+
 					else if (this.type == "c_") {
-						if (this.value != null) GameState.cursorsUpgradesValue += this.value - 1
+						if (this.value != null) {
+							if (GameState.cursorsUpgradesValue == 1) GameState.cursorsUpgradesValue += this.value - 1
+							else GameState.cursorsUpgradesValue += this.value 
+						}
+
 						else if (this.freq != null) GameState.timeUntilAutoLoopEnds = this.freq
 					}
 					

@@ -125,6 +125,7 @@ export function addCheckbox(opts:checkBoxOpt, parent:any) {
 		pos(opts.pos),
 		anchor("center"),
 		area(),
+		scale(),
 		opts.variable == "settings.sfx.muted" ? "sfxCheckbox" : null,
 		opts.variable == "settings.music.muted" ? "musicCheckbox" : null,
 		{

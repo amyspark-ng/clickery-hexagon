@@ -81,6 +81,7 @@ export function addSoundElements() {
 		opacity(1),
 		pos(0, -64),
 		positionSetter(),
+		scale(),
 		anchor("center"),
 		layer("sound"),
 		z(1),
@@ -100,6 +101,7 @@ export function addSoundElements() {
 			anchor("center"),
 			layer("sound"),
 			z(1),
+			scale(),
 			"trayVolElement",
 			"trayVolBar",
 			{

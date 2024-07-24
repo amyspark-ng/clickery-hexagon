@@ -10,6 +10,7 @@ export function statsWinContent(winParent) {
 			{ "Total score": formatNumber(GameState.scoreAllTime) },
 			{ "Times clicked": simpleNumberFormatting(GameState.stats.timesClicked) },
 			{ "Powerups clicked": simpleNumberFormatting(GameState.stats.powerupsClicked) },
+			{ "Powerups bought": simpleNumberFormatting(GameState.powerupsBought) },
 			{ "Achievements unlocked": `${GameState.unlockedAchievements.length}/${unlockables.achievements.length}` },
 			{ "Total time played": toHHMMSS(Math.round(GameState.stats.totalTimePlayed)) },
 		]

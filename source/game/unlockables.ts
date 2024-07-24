@@ -10,21 +10,26 @@ import { addConfetti } from '../plugins/confetti';
 import { gridContainer } from './windows/extraWindow';
 import { upgradeInfo } from './windows/store/upgrades';
 
-
-let fullCursorsUpgrades = 0
-
-function getFullCursorsUpgrades() {
-	let sum = 0
-	Object.keys(upgradeInfo).forEach(key => {
-		if (key.includes("c_") && upgradeInfo[key].freq == null) {
-			sum += upgradeInfo[key].value
-		}
-	});
-	
-	return sum;
+let fullUpgradeValues = {
+	clicks: () => {
+		let sum = 0
+		Object.keys(upgradeInfo).forEach(key => {
+			if (key.includes("k_")) {
+				sum += upgradeInfo[key].value
+			}
+		});
+		return sum;
+	},
+	cursors: () => {
+		let sum = 0
+		Object.keys(upgradeInfo).forEach(key => {
+			if (key.includes("c_") && upgradeInfo[key].freq != null) {
+				sum += upgradeInfo[key].value
+			}
+		});
+		return sum;
+	}
 }
-
-fullCursorsUpgrades = getFullCursorsUpgrades()
 
 export let unlockables = {
 	"windows": {
@@ -92,13 +97,13 @@ export let unlockables = {
 			"text":"Buy all click upgrades",
 			"icon":"icon_store",
 			"timeAfter": 1,
-			condition: () => GameState.clicksUpgradesValue == 126
+			condition: () => GameState.clicksUpgradesValue == fullUpgradeValues.clicks()
 		},
 		{"name":"buyallupgrades",
 			"text":"Buy all available upgrades",
 			"icon":"icon_store",
 			"timeAfter": 1,
-			condition: () => isAchievementUnlocked("allclickupgrades") && GameState.cursorsUpgradesValue == fullCursorsUpgrades && GameState.timeUntilAutoLoopEnds == 1
+			condition: () => isAchievementUnlocked("allclickupgrades") && GameState.cursorsUpgradesValue == fullUpgradeValues.cursors() && GameState.timeUntilAutoLoopEnds == 1
 		},
 		// #region powerup achievements 
 		{"name":"buy1powerup",
@@ -121,37 +126,37 @@ export let unlockables = {
 		},
 		{"name":"click1powerup",
 			"text":"Click 1 powerup, little helping hand :)",
-			"icon":"icon_store",
+			"icon":"cursors.cursor",
 			"timeAfter": 0.5,
 			condition: () => GameState.stats.powerupsClicked >= 1
 		},
 		{"name":"click5powerup",
 			"text":"Click 5 powerup, you've played a while...",
-			"icon":"icon_store",
+			"icon":"cursors.cursor",
 			"timeAfter": 0.5,
 			condition: () => GameState.stats.powerupsClicked >= 5
 		},
 		{"name":"click10powerup",
 			"text":"Click 10 powerup, ran out of texts...",
-			"icon":"icon_store",
+			"icon":"cursors.cursor",
 			"timeAfter": 0.5,
 			condition: () => GameState.stats.powerupsClicked >= 10
 		},
 		{"name":"click15powerup",
 			"text":"Click 15 powerup, ran out of texts...",
-			"icon":"icon_store",
+			"icon":"cursors.cursor",
 			"timeAfter": 0.5,
 			condition: () => GameState.stats.powerupsClicked >= 15
 		},
 		{"name":"click20powerup",
 			"text":"Click 20 powerup, ran out of texts...",
-			"icon":"icon_store",
+			"icon":"cursors.cursor",
 			"timeAfter": 0.5,
 			condition: () => GameState.stats.powerupsClicked >= 20
 		},
 		{"name":"click25powerup",
 			"text":"Click 25 powerup, ran out of texts...",
-			"icon":"icon_store",
+			"icon":"cursors.cursor",
 			"timeAfter": 0.5,
 			condition: () => GameState.stats.powerupsClicked >= 25
 		},

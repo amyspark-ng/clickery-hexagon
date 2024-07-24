@@ -21,7 +21,7 @@ export let storeElementsInfo = {
 	"powerupsElement": { 
 		gamestateKey: "powerupsBought",
 		basePrice: 10500,
-		percentageIncrease: 250,
+		percentageIncrease: 180,
 		unlockPrice: 10100
 	},
 }

@@ -104,7 +104,7 @@ class _scoreManager {
 	// score per click
 	scorePerClick = () => {
 		let vanillaValue = this.scorePerClick_Vanilla()
-		let noPercentage = (vanillaValue * powerupTypes.clicks.multiplier * this.combo)
+		let noPercentage = (vanillaValue * (powerupTypes.clicks.multiplier * powerupTypes.awesome.multiplier) * this.combo)
 		let returnValue = noPercentage + percentage(GameState.clickPercentage, noPercentage)
 		return Math.round(returnValue)
 	}
@@ -116,7 +116,7 @@ class _scoreManager {
 
 	// score per cursor click
 	scorePerAutoClick = () => {
-		let noPercentage = GameState.cursors * GameState.clicksUpgradesValue * powerupTypes.cursors.multiplier
+		let noPercentage = GameState.cursors * GameState.cursorsUpgradesValue * (powerupTypes.cursors.multiplier * powerupTypes.awesome.multiplier)
 		let returnValue = noPercentage + percentage(GameState.cursorsPercentage, noPercentage)
 		return Math.round(returnValue)
 	}

@@ -1,5 +1,5 @@
 import { GameState, scoreManager } from "../gamestate.ts"
-import { scoreVars, addHexagon, hexagon } from "./hexagon.ts"
+import { addHexagon, hexagon } from "./hexagon.ts"
 import { buildingsText, scoreText, spsText, uiCounters } from "./uicounters.ts"
 import { arrayToColor, debugFunctions, formatNumber, randomPos, randomPowerup, toHHMMSS } from "./utils.ts"
 import { addToast, gameBg, mouse } from "./additives.ts"
@@ -202,7 +202,7 @@ function welcomeBack(idle = false) {
 				addWelcomeBackToast(gainedScore, totalTimeOutsideTab / 1000)
 			}
 	
-			scoreManager.addScore(GameState.score + gainedScore)
+			scoreManager.addTweenScore(gainedScore)
 		}
 	}
 
@@ -211,7 +211,7 @@ function welcomeBack(idle = false) {
 		
 		// SECONDS FOR LOG
 		if (timeSlept > 60) {
-			addWelcomeBackToast(Math.round(scoreManager.scorePerSecond() * timeSlept), timeSlept)
+			addWelcomeBackToast(Math.round(scoreManager.autoScorePerSecond() * timeSlept), timeSlept)
 			timeSlept = 0
 		}
 		// don't add no score because it is aded in the loop
@@ -334,7 +334,7 @@ export function gamescene() {
 				wait(60, () => {
 					loop(1, () => {
 						if (chance(0.0025)) {
-							triggerGnome()
+							if (!isAchievementUnlocked("gnome")) triggerGnome()
 						}
 					})
 				})

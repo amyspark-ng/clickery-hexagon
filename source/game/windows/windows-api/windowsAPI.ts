@@ -354,6 +354,7 @@ export function folderObjManaging() {
 		area({ scale: vec2(1.2) }),
 		layer("ui"),
 		z(0),
+		scale(),
 		anchor("center"),
 		"folderObj",
 		"hoverObj",

@@ -47,6 +47,7 @@ export function uiCounters() {
 			size: 30,
 			font: "lambdao"
 		}),
+		scale(),
 		anchor("center"),
 		area(),
 		layer("ui"),

@@ -233,8 +233,8 @@ export function randomPos() {
 }
 
 export function bop(obj:any, howMuch = 0.1, bopEasing = easings.easeOutQuint) {
-	if (!obj.is("scale")) obj.use(scale(1))
-	if (!obj.bopDefScale) obj.bopDefScale = obj.scale
+	if (!obj.is("scale")) throw new Error("Obj must have scale component")
+	obj.bopDefScale = obj.scale
 
 	tween(obj.scale, obj.bopDefScale.sub(howMuch), 0.15, (p) => obj.scale = p, bopEasing).then(() => {
 		tween(obj.scale, obj.bopDefScale, 0.15, (p) => obj.scale = p, bopEasing)
@@ -303,8 +303,10 @@ export function debugFunctions() {
 	window.globalThis.GameState = GameState
 	window.globalThis.scoreManager = scoreManager
 	window.globalThis.unlockAchievement = unlockAchievement
+	window.globalThis.spawnPowerup = spawnPowerup
 	window.globalThis.hexagon = hexagon
 	window.globalThis.openWindow = openWindow
+	window.globalThis.powerupTypes = powerupTypes
 
 	onUpdate(() => {
 		// if (isKeyDown("control")) {
