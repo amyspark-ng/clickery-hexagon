@@ -15,13 +15,44 @@ export function set_ascending(value) {
 }
 
 let cardsInfo = {
-	"clickersCard": { info: "Clickers are +1% more efficient" },
-	"cursorsCard": { info: "Cursors are +1% more efficient", basePrice: 50, percentageIncrease: 25 },
-	"powerupsCard": { info: "Powerups are +1% more efficient", basePrice: 1000, percentageIncrease: 50, unlockPrice: 10000 },
-	"achievementsCard": { info: "You get +1% more for every achivement you unlock", basePrice: 1000, percentageIncrease: 50, unlockPrice: 10000 },
-	"hexColorCard": { info: "You can customize the hexagon's color", basePrice: 1000, percentageIncrease: 50, unlockPrice: 10000 },
-	"bgColorCard": { info: "You can customize the background's color", basePrice: 1000, percentageIncrease: 50, unlockPrice: 10000 },
+	"clickersCard": { 
+		info: "Clickers are +[number]% more efficient",
+		basePrice: 1,
+		percentageIncrease: 200,
+		idx: 0,
+	},
+	"cursorsCard": { 
+		info: "Cursors are +[number]% more efficient",
+		basePrice: 50,
+		percentageIncrease: 200,
+		idx: 1,
+	},
+	"powerupsCard": { 
+		info: "Powerups are +[number]% more efficient",
+		basePrice: 1000,
+		percentageIncrease: 50,
+		idx: 2,
+	},
+	"extraCard": {
+		info: "No info",
+		basePrice: 1,
+		percentageIncrease: 50,
+		idx: 3,
+	},
+	"hexColorCard": { 
+		info: "You can customize the hexagon's color",
+		unlockPrice: 10000,
+		idx: 4,
+	},
+	"bgColorCard": { 
+		info: "You can customize the background's color",
+		unlockPrice: 10000,
+		idx: 5,
+	},
 }
+
+// TODO: do this with powerups
+type cardType = keyof typeof cardsInfo
 
 let cardYPositions = {
 	hidden: 691,
@@ -33,7 +64,10 @@ let cardYPositions = {
 let activeLetterWaits = []
 let currentlySaying = ""
 
-function addCard(position:Vec2) {
+// clickersCard -> card_clickers
+const typeToSprite = (type:cardType | string) => `card_${type.replace("Card", "")}`    
+
+function addCard(cardType:cardType, position:Vec2) {
 	let card = add([
 		layer("ascension"),
 		z(6),
@@ -46,17 +80,28 @@ function addCard(position:Vec2) {
 		"card",
 		{
 			indexInDeck: 0,
-			infoIdx: 0,
+			infoIdx: cardsInfo[cardType].idx,
 			price: 0,
+			type: cardType,
+			chosenPercentage: 0,
+			update() {
+				// this.price = getPrice({
+				// 	basePrice: cardsInfo[cardType].basePrice,
+				// 	percentageIncrease: cardsInfo[cardType].percentageIncrease,
+				// })
+			},
+			
 			buy() {
 				if (GameState.ascension.mana >= this.price) {
-					tween(0.75, 1, 0.15, (p) => card.scale.y = p, easings.easeOutQuart)
+					tween(0.75, 1, 0.15, (p) => this.scale.y = p, easings.easeOutQuart)
 
-					if (card.infoIdx == 4 || card.infoIdx == 5) {
-						tween(card.scale.x, 0, 0.075, (p) => card.scale.x = p).onEnd(() => {
-							card.use(sprite("backcard"))
-							card.infoIdx -= 2
-							tween(card.scale.x, 1, 0.075, (p) => card.scale.x = p)
+					if (this.infoIdx == 4 || this.infoIdx == 5) {
+						this.infoIdx -= 2
+						this.type = Object.keys(cardsInfo)[this.infoIdx]
+
+						tween(this.scale.x, 0, 0.075, (p) => this.scale.x = p).onEnd(() => {
+							this.use(sprite(typeToSprite(this.type)))
+							tween(this.scale.x, 1, 0.075, (p) => this.scale.x = p)
 						})
 					}
 	
@@ -64,7 +109,7 @@ function addCard(position:Vec2) {
 				}
 				
 				else {
-					tween(0.75, 1, 0.15, (p) => card.scale.x = p, easings.easeOutQuart)
+					tween(0.75, 1, 0.15, (p) => this.scale.x = p, easings.easeOutQuart)
 				}
 			},
 
@@ -79,6 +124,14 @@ function addCard(position:Vec2) {
 			}
 		}
 	])
+
+	if (cardType == "clickersCard" || cardType == "cursorsCard") {
+		card.chosenPercentage = randi(8, 12)
+	}
+
+	else if (cardType == "powerupsCard") {
+		card.chosenPercentage = randi(2, 4)
+	}
 
 	card.on("ready", () => {
 		card.onHover(() => {
@@ -454,7 +507,20 @@ export function triggerAscension() {
 
 	// add the initials card
 	for (let i = 0; i < 4; i++) {
-		let card = addCard(vec2(dealingXPosition, cardYPositions.hidden))
+		let type:cardType;
+		if (i == 0) type = "clickersCard"
+		if (i == 1) type = "cursorsCard"
+		if (i == 2) {
+			if (!isWindowUnlocked("hexColorWin")) type = "hexColorCard"
+			else type = "powerupsCard"
+		}
+		if (i == 3) {
+			if (isWindowUnlocked("bgColorWin")) type = "bgColorCard"
+			else type = "extraCard"
+		}
+
+
+		let card = addCard(type, vec2(dealingXPosition, cardYPositions.hidden))
 		card.angle = rand(-4, 4)
 		card.pos.x = dealingXPosition + rand(-5, 5)
 		card.indexInDeck = i + 1
@@ -482,9 +548,6 @@ export function triggerAscension() {
 		else {
 			card.infoIdx = actualIndexInDeck - 1
 		}
-
-		// invert their infoIdx lol
-		// card.infoIdx = 3 - card.infoIdx
 	})
 
 	wait(0.75, () => {
@@ -503,7 +566,8 @@ export function triggerAscension() {
 				
 				// turn it over
 				tween(card.scale.x, 0, 0.25, (p) => card.scale.x = p, easings.easeOutQuart).onEnd(() => {
-					card.use(sprite("card"))
+					card.use(sprite(typeToSprite(card.type)))
+					
 					tween(card.scale.x, 1, 0.25, (p) => card.scale.x = p, easings.easeOutQuart).onEnd(() => {
 						card.area.scale = vec2(1)
 						card.trigger("ready")

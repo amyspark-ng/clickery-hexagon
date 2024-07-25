@@ -11,6 +11,23 @@ import { gridContainer } from './windows/extraWindow';
 import { upgradeInfo } from './windows/store/upgrades';
 import { songs, songsListened } from './windows/musicWindow';
 
+// type achievementType = {
+// 	title: string, // what you have to do in order to get it
+// 	flavorText: string, // some cheeky little joke
+// 	condition: () => boolean// the condition
+// }
+
+// class Achievement {
+// 	constructor(public opts = {} as achievementType) { 
+
+// 	}
+// 	// constructor(
+// 	// 	public name: string,
+// 	// 	public description: string,
+// 	// 	public condition: () => boolean
+// 	// ) { }
+// }
+
 let fullUpgradeValues = {
 	clicks: () => {
 		let sum = 0
@@ -31,6 +48,16 @@ let fullUpgradeValues = {
 		return sum;
 	}
 }
+
+// export let achievements: Achievement[] = []
+
+// achievements["100id"] = new Achievement({
+// 	title: "Get 100 of score, cool",
+// 	flavorText: "Get 100 of score, cool",
+// 	condition: () => GameState.score >= 100
+// })
+
+// type achievementList = keyof typeof achievements
 
 export let unlockables = {
 	"windows": {
@@ -286,6 +313,11 @@ export let unlockables = {
 		},
 	], 
 }
+
+// TODO: find a way for these to take an actual achievement id (being the name) instead of a string
+// export function testAchivement(achievement:achievementList) {
+
+// }
 
 export function getAchievementFor(achievementName:string) {
 	return unlockables.achievements.filter(achievementObject => achievementObject.name == achievementName)[0]

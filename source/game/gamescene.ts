@@ -567,6 +567,18 @@ export function gamescene() {
 			// kill myself
 		})
 
+		// add([
+		// 	sprite("card_clickers"),
+		// 	pos(center()),
+		// 	anchor("center"),
+		// 	layer("ascension"),
+		// 	{
+		// 		update() {
+		// 			this.pos = mousePos()
+		// 		}
+		// 	}
+		// ])
+
 		if (DEBUG) debugFunctions()
 	})
 }

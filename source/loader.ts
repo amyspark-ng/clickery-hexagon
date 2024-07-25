@@ -556,8 +556,47 @@ export function loadEverything() {
 			"dumb": 1,
 		}
 	})
+	
+	loadSpriteAtlas("sprites/ascendscene/cards.png", {
+		// 22 between each card
+		"card_clickers": {
+			"x": 0,
+			"y": 0,
+			"width": 123,
+			"height": 169,
+		},
+		"card_cursors": {
+			"x": 133 * 1,
+			"y": 0,
+			"width": 123,
+			"height": 169,
+		},
+		"card_powerups": {
+			"x": 133 * 2,
+			"y": 0,
+			"width": 123,
+			"height": 169,
+		},
+		"card_extra": {
+			"x": 133 * 3,
+			"y": 0,
+			"width": 123,
+			"height": 169,
+		},
+		"card_bgColor": {
+			"x": 133 * 4,
+			"y": 0,
+			"width": 123,
+			"height": 169,
+		},
+		"card_hexColor": {
+			"x": 133 * 5,
+			"y": 0,
+			"width": 123,
+			"height": 169,
+		},
+	})
 	loadSprite("backcard", "sprites/ascendscene/backcard.png")
-	loadSprite("card", "sprites/ascendscene/card.png")
 
 	loadSprite("gnome", "sprites/gnome.png")
 	loadSprite("pinch", "sprites/pinch.png")
