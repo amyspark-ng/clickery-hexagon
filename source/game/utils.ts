@@ -5,7 +5,7 @@ import { autoLoopTime, cam, triggerGnome } from "./gamescene";
 import { hexagon } from "./hexagon";
 import { checkForUnlockable, unlockAchievement } from "./unlockables";
 import { isHoveringAWindow, openWindow } from "./windows/windows-api/windowsAPI";
-import { triggerAscension } from "./ascension";
+import { triggerAscension } from "./ascension/ascension";
 import { powerupTypes, spawnPowerup } from "./powerups";
 import { songsListened } from "./windows/musicWindow";
 

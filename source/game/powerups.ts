@@ -45,6 +45,7 @@ function addTimer(opts:{ sprite: string, type: string }) {
 		pos(0, 40),
 		anchor("center"),
 		opacity(1),
+		scale(),
 		rotate(0),
 		layer("ui"),
 		area(),
@@ -294,16 +295,16 @@ export function spawnPowerup(opts?:powerupOpt) {
 				let time = 0
 				if (opts.multiplier == null) {
 					if (opts.type == "clicks" || opts.type == "cursors") {
-						multiplier = randi(2, 7) * GameState.ascension.powerupPower
+						multiplier = randi(2, 7) * GameState.powerupPower
 					}
 					
 					else if (opts.type == "awesome") {
-						multiplier = randi(15, 20) * GameState.ascension.powerupPower
+						multiplier = randi(15, 20) * GameState.powerupPower
 					}
 
 					else if (opts.type == "time") {
 						multiplier = 1
-						time = opts.time ?? 60 * GameState.ascension.powerupPower
+						time = opts.time ?? 60 * GameState.powerupPower
 						scoreManager.addTweenScore(scoreManager.scorePerSecond() * opts.time)
 					}
 

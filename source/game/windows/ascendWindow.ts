@@ -1,6 +1,6 @@
 import { GameState, scoreManager } from "../../gamestate"
 import { positionSetter } from "../../plugins/positionSetter"
-import { triggerAscension } from "../ascension"
+import { triggerAscension } from "../ascension/ascension"
 import { formatNumber } from "../utils"
 
 export function ascendWinContent(winParent) {

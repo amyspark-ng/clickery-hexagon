@@ -10,7 +10,7 @@ import { curDraggin } from "../plugins/drag.js"
 import { DEBUG, ROOT } from "../main.ts"
 import { powerupManagement, powerupTypes, spawnPowerup } from "./powerups.ts"
 import { checkForUnlockable, isAchievementUnlocked, unlockables, unlockAchievement } from "./unlockables.ts"
-import { ascending, set_ascending } from "./ascension.ts"
+import { ascending, set_ascending } from "./ascension/ascension.ts"
 
 let panderitoLetters = "panderito".split("")
 export let panderitoIndex = 0
@@ -334,6 +334,7 @@ export function gamescene() {
 				wait(60, () => {
 					loop(1, () => {
 						if (chance(0.0025)) {
+							if (ascending == true) return
 							if (!isAchievementUnlocked("gnome")) triggerGnome()
 						}
 					})
@@ -357,11 +358,11 @@ export function gamescene() {
 				GameState.ascension.mana++
 				GameState.ascension.manaAllTime++
 			}
-
-			GameState.timesAscended = GameState.ascension.magicLevel - 1
+			
+			GameState.stats.timesAscended = GameState.ascension.magicLevel - 1
 
 			// auto loop stuff
-			if (GameState.cursors >= 1) {
+			if (GameState.cursors >= 1 && ascending == false) {
 				autoLoopTime += dt()
 				
 				// this runs when time's up
@@ -525,11 +526,12 @@ export function gamescene() {
 				let ominus = playSfx("ominus", { loop: true })
 				playSfx("biglight")
 				hexagon.interactable = true
+				folderObj.interactable = false
 				spsText.opacity = 0
 				scoreText.opacity = 0
 				buildingsText.opacity = 0
 				folderObj.opacity = 0
-				
+
 				hexagon.on("clickrelease", () => {
 					switch (GameState.scoreAllTime) {
 						case 1:
@@ -551,7 +553,7 @@ export function gamescene() {
 						case 25:
 							introAnimations.intro_folderObj()
 							hasStartedGame = true;
-							folderObj.area.scale = vec2(1.2)
+							folderObj.interactable = true
 							ROOT.trigger("gamestart")
 						break;
 					}

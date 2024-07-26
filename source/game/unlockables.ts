@@ -80,7 +80,7 @@ export let unlockables = {
 			condition: () => GameState.score >= 200
 		},
 		"ascendWin": {
-			condition: () => GameState.score >= 1000000
+			condition: () => GameState.scoreAllTime >= scoreManager.seventyMillions
 		},
 	},
 
@@ -190,7 +190,7 @@ export let unlockables = {
 		{"name":"10scorepersecond",
 			"text":"Get to 10 score per second",
 			"icon":"cursors.cursor",
-			condition: () => scoreManager.scorePerSecond() >= 10
+			condition: () => scoreManager.autoScorePerSecond() >= 10
 		},
 		//#endregion SCORE PER SECOND ACHIEVEMENTS =================
 		{"name":"allclickupgrades",
@@ -247,33 +247,30 @@ export let unlockables = {
 			"text":"Buy 1 powerup, pay to win",
 			"icon":"icon_store",
 			"timeAfter": 0.5,
-			condition: () => GameState.powerupsBought >= 1
+			condition: () => GameState.stats.powerupsBought >= 1
 		},
 		{"name":"buy5powerup",
 			"text":"Buy 5 powerup, Scrooge McDuck over here",
 			"icon":"icon_store",
 			"timeAfter": 0.5,
-			condition: () => GameState.powerupsBought >= 5
+			condition: () => GameState.stats.powerupsBought >= 5
 		},
 		{"name":"buy10powerup",
 			"text":"Buy 10 powerup, ok that's enough we're running out",
 			"icon":"icon_store",
 			"timeAfter": 0.5,
-			condition: () => GameState.powerupsBought >= 10
+			condition: () => GameState.stats.powerupsBought >= 10
 		},
 		// #endregion POWERUP ACHIEVEMENTS ====================
 		// #region ASCENSION ACHIEVEMENTS ====================
 		{"name":"ascend1time",
 			"text":"Ascend for the first time",
 			"icon":"icon_ascend",
-			"timeAfter": 5,
-			condition: () => GameState.timesAscended >= 1
 		},
 		{"name":"ascend5time",
 			"text":"Ascend 5 times",
 			"icon":"icon_ascend",
-			"timeAfter": 5,
-			condition: () => GameState.timesAscended >= 5
+			condition: () => GameState.stats.timesAscended >= 5
 		},
 		//#endregion
 		// #region EXTRA ACHIEVEMENTS ========================

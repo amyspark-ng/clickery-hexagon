@@ -34,7 +34,6 @@ export function positionSetter() {
 		},
 
 		add() {
-			if (!this.is("pos")) this.use(pos())
 			// this.use(area())
 			// this.use(drag())
 		}

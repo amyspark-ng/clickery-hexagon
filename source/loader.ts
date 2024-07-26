@@ -597,6 +597,7 @@ export function loadEverything() {
 		},
 	})
 	loadSprite("backcard", "sprites/ascendscene/backcard.png")
+	loadSprite("confirmAscension", "sprites/ascendscene/confirmAscension.png")
 
 	loadSprite("gnome", "sprites/gnome.png")
 	loadSprite("pinch", "sprites/pinch.png")

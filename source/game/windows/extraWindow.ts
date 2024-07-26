@@ -310,6 +310,7 @@ export function extraWinContent(winParent) {
 
 	let winUnlockEvent = ROOT.on("winUnlock", (window) => {
 		let newMinibutton = gridContainer.add(makeGridMinibutton(infoForWindows[window].idx, get(`gridShadow_${infoForWindows[window].idx}`, { recursive: true })[0], winParent))
+		
 	})
 	
 	winParent.on("close", () => {

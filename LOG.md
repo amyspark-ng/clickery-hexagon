@@ -19,6 +19,7 @@ this game MIGHT be getting done
 - add chains sound
 - add cards sound
 - make new graphic for upgrades
+- why can't i fold after unfolding if the score is not greater than 25
 
 <!-- some powerup stuff -->
 - make powerupRandomPos() so it's not too close to buttons or other stuff

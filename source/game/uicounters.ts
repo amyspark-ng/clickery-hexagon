@@ -2,6 +2,7 @@ import { GameState, scoreManager } from "../gamestate.ts";
 import { positionSetter } from "../plugins/positionSetter.ts";
 import { waver } from "../plugins/wave.js";
 import { bop, formatNumber, getPositionOfSide, simpleNumberFormatting } from "./utils.ts";
+import { isHoveringAWindow } from "./windows/windows-api/windowsAPI.ts";
 
 export let scoreText:any;
 export let spsText:any;
@@ -87,7 +88,7 @@ export function uiCounters() {
 				this.value = scoreManager.scorePerSecond() * multiplyValue
 			},
 			update() {
-				if (isMousePressed("left") && this.isHovering()) {
+				if (isMousePressed("left") && this.isHovering() && isHoveringAWindow == false) {
 					// 1 second, 2 minute, 3 hour
 					GameState.settings.spsTextMode++
 					if (GameState.settings.spsTextMode > 3) GameState.settings.spsTextMode = 1

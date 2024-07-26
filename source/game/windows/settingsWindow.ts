@@ -32,6 +32,7 @@ export function addVolumeControl(opts:volumeControlOpt, parent:any) {
 			sprite("volbarbutton"),
 			pos(opts.pos),
 			anchor("center"),
+			scale(),
 			area(),
 			opacity(1),
 			"volbar",
@@ -65,6 +66,7 @@ export function addVolumeControl(opts:volumeControlOpt, parent:any) {
 		sprite("minusbutton"),
 		pos(-180, -194),
 		area(),
+		scale(),
 		anchor("center"),
 	]);
 
@@ -87,6 +89,7 @@ export function addVolumeControl(opts:volumeControlOpt, parent:any) {
 		sprite("plusbutton"),
 		pos(142, -194),
 		area(),
+		scale(),
 		anchor("center"),
 	]);
 

@@ -17,7 +17,7 @@ import { statsWinContent } from "../statsWin.ts";
 import { isAchievementUnlocked, unlockAchievement } from "../../unlockables.ts";
 import { medalsWinContent } from "../medalsWin.ts";
 import { ROOT } from "../../../main.ts";
-import { ascending } from "../../ascension.ts";
+import { ascending } from "../../ascension/ascension.ts";
 
 export let infoForWindows = {};
 export let isHoveringAWindow = false;
@@ -360,7 +360,7 @@ export function folderObjManaging() {
 		"hoverObj",
 		{
 			defaultScale: vec2(1.2),
-			editingBar: false,
+			interactable: true, 
 			unfold() {
 				folded = false
 				timeSinceFold = 0
@@ -443,12 +443,14 @@ export function folderObjManaging() {
 			},
 
 			update() {
+				if (this.interactable == false) this.area.scale = vec2(0)
+				else this.area.scale = vec2(1.2) 
+
 				this.flipX = folded ? true : false
 				
 				if (curDraggin?.is("gridMiniButton") || curDraggin?.is("minibutton")) return
 				if (!movingMinibuttons) {
-					if (isKeyPressed("space") || (isMousePressed("left") && this.isHovering())) {
-						if (ascending == true) return
+					if (this.interactable == true && isKeyPressed("space") || (isMousePressed("left") && this.isHovering())) {
 						this.manageFold()
 						this.deleteSlots()
 						bop(this)

@@ -11,17 +11,17 @@ export function statsWinContent(winParent) {
 			{ "Total score": formatNumber(GameState.scoreAllTime) },
 			{ "Times clicked": simpleNumberFormatting(GameState.stats.timesClicked) },
 			{ "Powerups clicked": simpleNumberFormatting(GameState.stats.powerupsClicked) },
-			{ "Powerups bought": simpleNumberFormatting(GameState.powerupsBought) },
+			{ "Powerups bought": simpleNumberFormatting(GameState.stats.powerupsBought) },
 			{ "Achievements unlocked": `${GameState.unlockedAchievements.length}/${unlockables.achievements.length}` },
 			{ "Total time played": toHHMMSS(Math.round(GameState.stats.totalTimePlayed)) },
 		]
 
-		if (GameState.timesAscended > 0) {
+		if (GameState.stats.timesAscended > 0) {
 			stats[0] = { "Score all time": formatNumber(GameState.scoreAllTime) }
 			stats[1] = { "Score this run": formatNumber(GameState.scoreThisRun) }
 			stats.splice(2, 0, { "Times clicked": `${simpleNumberFormatting(GameState.stats.timesClicked)}` });
 
-			let ascendStatObject = { "Times ascended": `${GameState.timesAscended}` }
+			let ascendStatObject = { "Times ascended": `${GameState.stats.timesAscended}` }
 			if (stats.indexOf(ascendStatObject) == -1) stats.push(ascendStatObject)
 		}
 	})

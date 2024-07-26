@@ -2,7 +2,6 @@ import kaplay from "kaplay";
 import "kaplay/global";
 
 import { drawSeriousLoadScreen, loadEverything } from "./loader.ts"
-import { GameState } from "./gamestate.ts";
 import { addBackground, addMouse, gameBg } from "./game/additives.ts";
 import { volumeManager } from "./sound.ts";
 
@@ -13,11 +12,11 @@ export const k = kaplay({
 	font: 'lambda',
 	canvas: document.querySelector("#kanva"),
 	logMax: 10,
-	backgroundAudio: GameState.settings.keepAudioOnTabChange,
 	debugKey: "f1",
 	debug: DEBUG,
 	loadingScreen: true,
 	crisp: false,
+	backgroundAudio: true,
 	// stretch: true,
 	// letterbox: true,
 });
@@ -72,3 +71,7 @@ onLoad(() => {
 		else go("gamescene")
 	})
 })
+
+// @ts-ignore
+// if (DEBUG == true) document.body.style.backgroundColor = "rgb(1, 3, 13)";
+// else document.body.style.backgroundColor = "rgb(0, 0, 0)";

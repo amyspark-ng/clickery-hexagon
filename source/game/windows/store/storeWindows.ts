@@ -48,7 +48,7 @@ export function storeWinContent(winParent) {
 	})
 
 	// tutorial stuff
-	if (GameState.timesAscended < 1) {
+	if (GameState.stats.timesAscended < 1) {
 		const clickersTutToolTip = () => {
 			let tooltip = addTooltip(clickersElement, {
 				text: "← You can buy these to get more\nscore per click",

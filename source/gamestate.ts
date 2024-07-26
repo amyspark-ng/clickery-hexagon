@@ -19,27 +19,25 @@ class _GameState {
 	timeUntilAutoLoopEnds = 10 // cursor frequency
 
 	upgradesBought = ["c_0"]
-	
+
+	// powerups 
 	hasUnlockedPowerups = false
-	powerupsBought = 0
-	powerupsFrequency = 120
-	powerupsChance = 0.1
-	powerupsPower = 0
-	
+	powerupPower = 0
+
+	critPower = 0
+
 	ascension = {
 		mana: 0,
 		manaAllTime: 0,
 		magicLevel: 1, // times ascended + 1
+		
+		// stuff bought for price calculation
 		clickPercentagesBought: 0,
 		cursorsPercentagesBought: 0,
-		powerupPower: 1,
+		powerupPowersBought: 0,
+		critPercentagesBought: 0,
 		// other element missing
 	}
-
-	achievementMultiplierPercentage = 0
-	generalUpgrades = 1 // general multiplier
-
-	timesAscended = 0
 
 	unlockedAchievements = []
 
@@ -50,6 +48,7 @@ class _GameState {
 		timesClicked: 0,
 		powerupsClicked: 0,
 		timesAscended: 0,
+		powerupsBought: 0,
 		totalTimePlayed: 0,
 	}
 
@@ -59,12 +58,12 @@ class _GameState {
 		volume: 1,
 		hexColor: [255, 255, 255],
 		bgColor: [0, 0, 0, 0.84],
-		keepAudioOnTabChange: true,
-		dropDragsOnMouseOut: true,
 		commaInsteadOfDot: false,
 		fullscreen: false,
-		panderitoMode: false,
 		spsTextMode: 1,
+
+		panderitoMode: false,
+		cursorTail: false,
 	}
 
 	save(anim = true) {
@@ -100,6 +99,9 @@ class _GameState {
 	cheat() {
 		this.clickers = 500
 		this.cursors = 500
+		this.score = scoreManager.seventyMillions - 1
+		this.scoreThisRun = scoreManager.seventyMillions - 1
+		this.scoreAllTime = scoreManager.seventyMillions - 1 
 	}
 }
 
@@ -195,8 +197,8 @@ class _scoreManager {
 		tween(GameState.clickers, 1, 0.5, (p) => GameState.clickers = Math.round(p), easings.easeOutQuad)
 		tween(GameState.cursors, 0, 0.5, (p) => GameState.cursors = Math.round(p), easings.easeOutQuad)
 
-		tween(GameState.clicksUpgradesValue, 0, 0.5, (p) => GameState.clicksUpgradesValue = Math.round(p), easings.easeOutQuad)
-		tween(GameState.cursorsUpgradesValue, 0, 0.5, (p) => GameState.cursorsUpgradesValue = Math.round(p), easings.easeOutQuad)
+		tween(GameState.clicksUpgradesValue, 1, 0.5, (p) => GameState.clicksUpgradesValue = Math.round(p), easings.easeOutQuad)
+		tween(GameState.cursorsUpgradesValue, 1, 0.5, (p) => GameState.cursorsUpgradesValue = Math.round(p), easings.easeOutQuad)
 		
 		GameState.upgradesBought = ["c_0"]
 		GameState.timeUntilAutoLoopEnds = 10

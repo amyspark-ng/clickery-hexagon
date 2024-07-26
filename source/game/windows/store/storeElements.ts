@@ -274,7 +274,7 @@ export function addStoreElement(winParent:any, opts:storeElementOpt) {
 						pos: randomPos(),
 						type: randomPowerup(),
 					})
-					GameState.powerupsBought++
+					GameState.stats.powerupsBought++
 				}
 			},
 
