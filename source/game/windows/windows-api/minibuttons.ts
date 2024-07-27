@@ -3,7 +3,7 @@ import { dummyShadow } from "../../../plugins/dummyShadow";
 import { playSfx } from "../../../sound";
 import { bop } from "../../utils";
 import { mouse } from "../../additives";
-import { folderObj, infoForWindows, isDraggingAWindow, isHoveringAWindow, manageWindow, folded, buttonSpacing, openWindow } from "./windowsAPI";
+import { folderObj, infoForWindows, isDraggingAWindow, isHoveringAWindow, manageWindow, folded, buttonSpacing, openWindow, windowKey } from "./windowsAPI";
 import { GameState } from "../../../gamestate";
 import { destroyExclamation } from "../../unlockables";
 import { Vec2 } from "kaplay";
@@ -14,25 +14,26 @@ export function getMinibuttonXPos(index, buttonSpacing = 75) {
 }
 
 type minibuttonOpt = {
-	idxForInfo:number;
+	windowKey:windowKey
 	taskbarIndex:number;
 	initialPosition:Vec2,
 	destPosition?:Vec2;
 	moveToPosition?:boolean;
 }
 
-// TODO: make this work with key instead of idxForInfo
 export function addMinibutton(opts:minibuttonOpt) {
 	let quad;
 
 	getSprite("bean")?.then(quady => {
 		quad = quady
 	})
-	
+
+	let idxForInfo = infoForWindows[opts.windowKey].idx
+
 	let destinedPosition:Vec2;
 	if (opts.destPosition) destinedPosition = opts.destPosition
 	else {
-		let extraMb = infoForWindows[Object.keys(infoForWindows)[opts.idxForInfo]].icon ? true : false
+		let extraMb = infoForWindows[Object.keys(infoForWindows)[idxForInfo]].icon ? true : false
 		if (extraMb) destinedPosition = vec2(folderObj.pos.x, folderObj.pos.y - buttonSpacing)  
 		else destinedPosition = vec2(getMinibuttonXPos(opts.taskbarIndex), folderObj.pos.y) 
 	}
@@ -51,16 +52,16 @@ export function addMinibutton(opts:minibuttonOpt) {
 		z(folderObj.z - 1),
 		dummyShadow(),
 		openWindowButton(),
-		`${Object.keys(infoForWindows)[opts.idxForInfo]}`,
+		`${opts.windowKey}`,
 		"hoverObj",
 		"minibutton",
-		infoForWindows[Object.keys(infoForWindows)[opts.idxForInfo]].icon == "extra" ? "extraMinibutton" : "",
+		infoForWindows[opts.windowKey].icon == "extra" ? "extraMinibutton" : "",
 		{
-			idxForInfo: opts.idxForInfo,
+			idxForInfo: idxForInfo,
 			taskbarIndex: opts.taskbarIndex,
-			window: get(`${Object.keys(infoForWindows)[opts.idxForInfo]}`, { recursive: true })[0] ?? null,
-			windowInfo: infoForWindows[Object.keys(infoForWindows)[opts.idxForInfo]],
-			windowKey: Object.keys(infoForWindows)[opts.idxForInfo],
+			window: get(`${opts.windowKey}`, { recursive: true })[0] ?? null,
+			windowInfo: infoForWindows[opts.windowKey],
+			windowKey: opts.windowKey,
 			nervousSpinSpeed: 10,
 			saturation: 0,
 			saturationColor: WHITE,
@@ -68,7 +69,7 @@ export function addMinibutton(opts:minibuttonOpt) {
 			dragHasSurpassed: false,
 			destinedPosition: destinedPosition,
 			isBeingHovered: false,
-			extraMb: infoForWindows[Object.keys(infoForWindows)[opts.idxForInfo]].icon == "extra" ? true : null,
+			extraMb: infoForWindows[opts.windowKey].icon == "extra" ? true : null,
 			shut: get("extraWin")[0] ? false : true,
 			startHover() {
 				if (folded) return
@@ -272,7 +273,7 @@ export function addMinibutton(opts:minibuttonOpt) {
 	])
 
 	// SPRITE
-	currentMinibutton.use(sprite(`icon_${infoForWindows[Object.keys(infoForWindows)[opts.idxForInfo]].icon || Object.keys(infoForWindows)[opts.idxForInfo].replace("Win", "")}`))
+	currentMinibutton.use(sprite(`icon_${infoForWindows[opts.windowKey].icon || opts.windowKey.replace("Win", "")}`))
 	if (currentMinibutton.extraMb) {
 		if (currentMinibutton.shut) currentMinibutton.play("shut_default")
 		else currentMinibutton.play("open_default")

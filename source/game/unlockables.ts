@@ -1,5 +1,5 @@
 import { GameState, scoreManager } from '../gamestate';
-import { folded, folderObj, infoForWindows } from './windows/windows-api/windowsAPI';
+import { folded, folderObj, infoForWindows, windowKey } from './windows/windows-api/windowsAPI';
 import { playSfx } from '../sound';
 import { waver } from '../plugins/wave';
 import { addMinibutton} from './windows/windows-api/minibuttons';
@@ -419,8 +419,10 @@ export function addExclamation(obj:GameObj) {
 export function unlockWindow(windowUnlocked:string) {
 	// does the actual stuff
 	GameState.unlockedWindows.push(windowUnlocked)
-	playSfx("hoverhex")
+	playSfx("windowUnlocked")
 	
+	debug.log(windowUnlocked)
+
 	if (GameState.taskbar.length < 4) {
 		GameState.taskbar.push(windowUnlocked)
 	}
@@ -441,11 +443,11 @@ export function unlockWindow(windowUnlocked:string) {
 		let checkForWinOpen = ROOT.on("winOpen", (windowOpened) => {
 			if (windowOpened == "extraWin") {
 				let extraWindowObj = get("window").filter(window => window.is("extraWin"))[0]
-				// let newBtn = add(makeGridMinibutton(
-				// 	infoForWindows[windowUnlocked].idx,
-				// 	get("gridShadow").filter(shadow => shadow.idx == infoForWindows[windowUnlocked].idx)[0],
-				// 	extraWindowObj)
-				// )
+				let newBtn = gridContainer.add(makeGridMinibutton(
+					infoForWindows[windowUnlocked].idx,
+					get("gridShadow").filter(shadow => shadow.idx == infoForWindows[windowUnlocked].idx)[0],
+					extraWindowObj)
+				)
 				
 				let newlyUnlockedBtn = gridContainer.get("*").filter(btn => btn.windowKey == windowUnlocked)[0]
 				checkForWinOpen.cancel()
@@ -489,7 +491,7 @@ export function unlockWindow(windowUnlocked:string) {
 			let newIndex = GameState.taskbar.indexOf(windowUnlocked)
 
 			let newMinibutton = addMinibutton({
-				idxForInfo: infoForWindows[windowUnlocked].idx,
+				windowKey: windowUnlocked as windowKey,
 				taskbarIndex: newIndex,
 				initialPosition: folderObj.pos,
 				moveToPosition: true,

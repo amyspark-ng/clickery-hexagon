@@ -68,7 +68,9 @@ export function windowsDefinition() {
 	}
 }
 
-export function openWindow(windowKey = "") {
+export type windowKey = "storeWin" | "musicWin" | "ascendWin" | "statsWin" | "medalsWin" | "aboutWin" | "creditsWin" | "settingsWin" | "leaderboardsWin" | "hexColorWin" | "bgColorWin" | "extraWin"
+
+export function openWindow(windowKey:windowKey) {
 	if (!infoForWindows.hasOwnProperty(windowKey)) throw new Error(`No such window for: ${windowKey}`)
 	
 	playSfx("openWin")
@@ -368,10 +370,8 @@ export function folderObjManaging() {
 				// if there's no minibutton
 				if (get("minibutton").length == 0) {
 					GameState.taskbar.forEach((key, taskbarIndex) => {
-						let idxForInfo = infoForWindows[key].idx;
-						
 						let newminibutton = addMinibutton({
-							idxForInfo: idxForInfo,
+							windowKey: key,
 							taskbarIndex: taskbarIndex,
 							initialPosition: folderObj.pos,
 						})

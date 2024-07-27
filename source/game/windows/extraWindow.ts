@@ -5,10 +5,11 @@ import { dummyShadow } from "../../plugins/dummyShadow";
 import { playSfx } from "../../sound";
 import { bop } from "../utils";
 import { mouse } from "../additives";
-import { buttonSpacing, infoForWindows, openWindow } from "./windows-api/windowsAPI";
+import { buttonSpacing, infoForWindows, openWindow, windowKey } from "./windows-api/windowsAPI";
 import { addMinibutton } from "./windows-api/minibuttons";
 import { destroyExclamation } from "../unlockables";
 import { openWindowButton } from "./windows-api/windowButtonClass";
+import { Vec2 } from "kaplay";
 
 export let gridContainer;
 
@@ -56,13 +57,22 @@ function updateClosestMinibuttonToDrag() {
     }
 }
 
-export function makeGridMinibutton(idx:number, gridSlot, winParent) {
-	let selection;
-	let distanceToSlot
-	let distanceToClosestMinibutton;
-	let minibuttons;
+/**
+ * Makes a gridMiniButton to add
+ * @param idx 
+ * @param gridSlot 
+ * @param winParent 
+ * @returns the grid minibutton
+ */
+export function makeGridMinibutton(windowKey:windowKey, gridSlot:any, winParent:any) {
+	let selection:any;
+	let distanceToSlot:number
+	let distanceToClosestMinibutton:number;
+	let minibuttons:any[];
 	let closestMinibutton = null;
 	let closestDistance = Infinity;
+
+	let idx = infoForWindows[windowKey].idx
 
 	let gridMiniButton = make([
 		sprite(`icon_${infoForWindows[Object.keys(infoForWindows)[idx]].icon || Object.keys(infoForWindows)[idx].replace("Win", "")}`, {
@@ -138,7 +148,7 @@ export function makeGridMinibutton(idx:number, gridSlot, winParent) {
 						// add the new minibutton to the minibutton list
 						
 						let newMinibutton = addMinibutton({
-							idxForInfo: idx,
+							windowKey: thisThing.windowKey,
 							taskbarIndex: closestMinibutton.taskbarIndex,
 							initialPosition: thisThing.pos,
 							destPosition: closestMinibutton.pos
@@ -221,7 +231,7 @@ export function makeGridMinibutton(idx:number, gridSlot, winParent) {
 		if (get(gridMiniButton.windowKey)[0]) winParent.close()
 		
 		else {
-			openWindow(gridMiniButton.windowKey); 
+			openWindow(gridMiniButton.windowKey as windowKey); 
 			winParent.close()
 		}
 		
@@ -259,6 +269,7 @@ export function extraWinContent(winParent) {
 	gridContainer = winParent.add([pos(-154, -192)])
 
 	for(let i = 0; i < Object.keys(infoForWindows).length - 1; i++) {
+		let windowKey = Object.keys(infoForWindows)[i]
 		let buttonPositionX = 0
 		let buttonPositionY = 0
 		
@@ -271,7 +282,7 @@ export function extraWinContent(winParent) {
 
 		// add the shadow/empty-spot one
 		let shadowOne = gridContainer.add([
-			sprite(`icon_${infoForWindows[Object.keys(infoForWindows)[i]].icon || Object.keys(infoForWindows)[i].replace("Win", "")}`, {
+			sprite(`icon_${infoForWindows[windowKey].icon || windowKey.replace("Win", "")}`, {
 				anim: "default"
 			}),
 			anchor("center"),
@@ -287,10 +298,10 @@ export function extraWinContent(winParent) {
 		])
 
 		// if the button is not on the taskbar
-		if (!GameState.taskbar.includes(Object.keys(infoForWindows)[i])) {
+		if (!GameState.taskbar.includes(windowKey)) {
 			// if the button is unlocked
-			if (GameState.unlockedWindows.includes(Object.keys(infoForWindows)[i])) {
-				gridContainer.add(makeGridMinibutton(i, shadowOne, winParent))
+			if (GameState.unlockedWindows.includes(windowKey)) {
+				gridContainer.add(makeGridMinibutton(windowKey as windowKey, shadowOne, winParent))
 			}
 		}
 	}

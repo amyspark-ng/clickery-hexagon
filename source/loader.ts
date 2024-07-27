@@ -607,32 +607,41 @@ export function loadEverything() {
 	// #region SOUNDS
 	if (!DEBUG) {load(new Promise<void>((res) => { setTimeout(() => { res() }, 5000) })) }
 
-	loadSound("gnome", "sounds/gnome.ogg")
-	loadSound("volumeChange", "sounds/volumeChange.mp3")
-	loadSound("whistle", "sounds/sfx/whistle.ogg")
-	loadSound("mage_e", "sounds/mage_e.mp3")
-	loadSound("clickPress", "sounds/click_press.mp3")
-	loadSound("clickRelease", "sounds/click_release.mp3")
-	loadSound("clickButton", "sounds/sfx/generalClick.ogg")
-	loadSound("kaching", "sounds/kaching.mp3")
-	loadSound("hoverElement", "sounds/hoverElement.mp3")
-	loadSound("hoverMiniButton", "sounds/hoverMiniButton.wav")
-	loadSound("openWin", "sounds/win_open.wav")
-	loadSound("closeWin", "sounds/win_close.wav")
-	loadSound("hoverhex", "sounds/sfx/hoverhex.wav")
-	loadSound("unhoverhex", "sounds/sfx/unhoverhex.wav")
-	loadSound("fold", "sounds/sfx/fold.wav")
-	loadSound("combo", "sounds/sfx/combo.wav")
-	loadSound("fullcombo", "sounds/sfx/fc.wav")
-	loadSound("gamesaved", "sounds/sfx/gamesaved.wav")
-	loadSound("unlockachievement", "sounds/sfx/achievementunlock.wav")
+	//#region hexagonintro
+	loadSound("biglight", "sounds/sfx/hexagonintro/biglight.mp3")
+	loadSound("ominus", "sounds/sfx/hexagonintro/ominus.mp3")
 
-	loadSound("plap", "sounds/sfx/plap.mp3")
-	loadSound("plop", "sounds/sfx/plop.mp3")
-	loadSound("powerup", "sounds/sfx/powerup.wav")
+	loadSound("clickPress", "sounds/sfx/hexagonintro/clickPress.mp3")
+	loadSound("clickRelease", "sounds/sfx/hexagonintro/clickRelease.mp3")
+	loadSound("powerup", "sounds/sfx/hexagonintro/powerup.wav")
+	loadSound("fullcombo", "sounds/sfx/hexagonintro/fullcombo.wav")
+	loadSound("combo", "sounds/sfx/hexagonintro/combo.wav")
+	//#endregion hexagonintro
+	
+	//#region ascension
+	loadSound("mage_e", "sounds/sfx/ascension/mage_e.mp3")
+	//#endregion ascension
 
-	loadSound("ominus", "sounds/sfx/ominus.mp3")
-	loadSound("biglight", "sounds/sfx/biglight.mp3")
+	//#region ui
+	loadSound("unlockachievement", "sounds/sfx/ui/unlockachievement.wav")
+	loadSound("gamesaved", "sounds/sfx/ui/gamesaved.wav")
+	loadSound("clickButton", "sounds/sfx/ui/clickButton.ogg")
+	loadSound("kaching", "sounds/sfx/ui/kaching.mp3")
+	loadSound("unhoverhex", "sounds/sfx/ui/unhoverhex.wav")
+	loadSound("volumeChange", "sounds/sfx/ui/volumeChange.mp3")
+	//#endregion ui
+
+	//#region window
+	loadSound("fold", "sounds/sfx/window/fold.wav")
+	loadSound("hoverMiniButton", "sounds/sfx/window/hoverMiniButton.wav")
+	loadSound("plap", "sounds/sfx/window/plap.mp3")
+	loadSound("plop", "sounds/sfx/window/plop.mp3")
+	loadSound("windowUnlocked", "sounds/sfx/window/windowUnlocked.wav")
+	loadSound("openWin", "sounds/sfx/window/openWin.wav")
+	loadSound("closeWin", "sounds/sfx/window/closeWin.wav")
+	//#endregion window
+	
+	loadSound("gnome", "sounds/sfx/gnome.ogg")
 
 	// music
 	// don't load as music because then it won't play when the game loads
