@@ -5,6 +5,7 @@ import { ascension, talk } from "./ascension"
 import { ROOT } from "../../main"
 import { isWindowUnlocked, unlockWindow } from "../unlockables"
 import { playSfx } from "../../sound"
+import { windowKey } from "../windows/windows-api/windowsAPI"
 
 let cardsInfo = {
 	"clickersCard": { 
@@ -189,11 +190,12 @@ function addCard(cardType:string | card, position: Vec2) {
 				tween(0.75, 1, 0.15, (p) => this.scale.y = p, easings.easeOutQuart)
 			
 				if (this.type == "hexColorCard" || this.type == "bgColorCard") {
+					let oldType = this.type // get it before it changes
 					flipCard(card, cardTypes()[this.typeIdx - 2])
 
 					let endascensioncheck = ROOT.on("endAscension", () => {
 						wait(1, () => {
-							unlockWindow(this.type.replace("Card", "Win"))
+							unlockWindow(oldType.replace("Card", "Win") as windowKey)
 						})
 						endascensioncheck.cancel()
 					})

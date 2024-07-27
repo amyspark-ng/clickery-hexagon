@@ -128,7 +128,7 @@ export function makeGridMinibutton(windowKey:windowKey, gridSlot:any, winParent:
 						// GO BACK TO SLOT
 						let gridMinibuttonIdx = infoForWindows[thisThing.windowKey].idx
 						destroy(thisThing)
-						gridContainer.add(makeGridMinibutton(gridMinibuttonIdx, get(`gridShadow_${gridMinibuttonIdx}`, { recursive: true })[0], winParent))
+						gridContainer.add(makeGridMinibutton(windowKey, get(`gridShadow_${gridMinibuttonIdx}`, { recursive: true })[0], winParent))
 						playSfx("plop")
 						
 						// reset their properties
@@ -171,7 +171,7 @@ export function makeGridMinibutton(windowKey:windowKey, gridSlot:any, winParent:
 						let cmbShadow = get(`gridShadow_${closestMinibutton.idxForInfo}`, { recursive: true })[0]
 		
 						// make the new gridminibutton to the one that was just unpinned
-						gridContainer.add(makeGridMinibutton(closestMinibutton.idxForInfo, cmbShadow, winParent))
+						gridContainer.add(makeGridMinibutton(windowKey, cmbShadow, winParent))
 						playSfx("plop")
 	
 						get("minibutton").forEach(minibutton => {
@@ -294,6 +294,7 @@ export function extraWinContent(winParent) {
 			"gridShadow",
 			{
 				idx: i,
+				windowKey: windowKey
 			}
 		])
 
@@ -321,7 +322,7 @@ export function extraWinContent(winParent) {
 
 	// if a window is unlocked and this is opened
 	let winUnlockEvent = ROOT.on("winUnlock", (window) => {
-		let newMinibutton = gridContainer.add(makeGridMinibutton(infoForWindows[window].idx, get(`gridShadow_${infoForWindows[window].idx}`, { recursive: true })[0], winParent))
+		// let newMinibutton = gridContainer.add(makeGridMinibutton(infoForWindows[window].idx, get(`gridShadow_${infoForWindows[window].idx}`, { recursive: true })[0], winParent))
 	})
 	
 	winParent.on("close", () => {
@@ -330,6 +331,6 @@ export function extraWinContent(winParent) {
 			extraMinibutton.shut = true
 			extraMinibutton.play(`shut_${extraMinibutton.isHovering() ? "hover" : "default"}`)
 		}
-		winUnlockEvent?.cancel()
+		winUnlockEvent.cancel()
 	})
 }

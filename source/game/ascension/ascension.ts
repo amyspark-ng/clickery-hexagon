@@ -8,7 +8,6 @@ import { bop, getPrice, getVariable, randomPos } from "../utils";
 import { playSfx } from "../../sound";
 import { folderObj } from "../windows/windows-api/windowsAPI";
 import { hexagonIntro } from "../gamescene";
-import { isWindowUnlocked, unlockWindow } from "../unlockables";
 import { positionSetter } from "../../plugins/positionSetter";
 import { mouse } from "../additives";
 import { spawnCards } from "./cards";
@@ -329,10 +328,6 @@ export function triggerAscension() {
 			talk("mage", "welcome to fortnite")
 			mage.trigger("endAnimating")
 		})
-
-		mage?.onKeyPress("escape", () => {
-			endAscension()
-		})
 	})
 
 	//#region CARD STUFF
@@ -360,7 +355,7 @@ export function triggerAscension() {
 	})
 
 	// leave button
-	ROOT.on("canLeaveAscension", () => {
+	let canLeaveAscensionCheck = ROOT.on("canLeaveAscension", () => {
 		let leaveButton = add([
 			sprite("confirmAscension"),
 			layer("ascension"),
@@ -373,6 +368,7 @@ export function triggerAscension() {
 			positionSetter(),
 			opacity(),
 			"ascensionHover",
+			"leaveButton",
 			{
 				dscale: vec2(0.8),
 				update() {
@@ -404,13 +400,14 @@ export function triggerAscension() {
 		})
 	
 		leaveButton.onClick(() => {
-			bop(leaveButton)
 			leaveButton.area.scale = vec2(0)
-			leaveButton.fadeOut(0.25).onEnd(() => destroy(leaveButton))
+			bop(leaveButton)
 			playSfx("clickButton")
 			mouse.play("point")
 			endAscension()
 		})
+
+		canLeaveAscensionCheck.cancel()
 	})
 
 	let startHover = onHover("ascensionHover", () => {
@@ -447,7 +444,7 @@ export function endAscension() {
 			tween(obj.pos.y, -obj.height, 0.5, (p) => obj.pos.y = p, easings.easeOutQuart).onEnd(() => destroy(obj))
 		}
 
-		else if (obj.is("ascensionBg")) {
+		else if (obj.is("ascensionBg") || obj.is("leaveButton")) {
 			obj.fadeOut(0.5).onEnd(() => destroy(obj))
 		}
 	})

@@ -70,6 +70,10 @@ export function windowsDefinition() {
 
 export type windowKey = "storeWin" | "musicWin" | "ascendWin" | "statsWin" | "medalsWin" | "aboutWin" | "creditsWin" | "settingsWin" | "leaderboardsWin" | "hexColorWin" | "bgColorWin" | "extraWin"
 
+export function isWindowOpen(windowKey:windowKey) {
+	return get(windowKey).length > 0
+}
+
 export function openWindow(windowKey:windowKey) {
 	if (!infoForWindows.hasOwnProperty(windowKey)) throw new Error(`No such window for: ${windowKey}`)
 	

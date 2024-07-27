@@ -9,9 +9,9 @@ export function setCurDraggin(value = null) {
 
 /**
  * Drag objects
- * @param onlyX - only drag it on the Y axis
+ * @param onlyX - only drag it on the X axis
  */
-export function drag(/**/onlyX:boolean = false/**/) {
+export function drag(onlyX:boolean = false) {
 
 	// The displacement between object pos and mouse pos
 	let offset = vec2(0)
