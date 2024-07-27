@@ -319,7 +319,6 @@ export function loadEverything() {
 			anims: {
 				"up": 0,
 				"down": 1,
-				"locked": 2,
 			}
 		},
 	})

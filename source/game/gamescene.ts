@@ -4,7 +4,7 @@ import { buildingsText, scoreText, spsText, uiCounters } from "./uicounters.ts"
 import { arrayToColor, debugFunctions, formatNumber, randomPos, randomPowerup, toHHMMSS } from "./utils.ts"
 import { addToast, gameBg, mouse } from "./additives.ts"
 import { playMusic, playSfx } from "../sound.ts"
-import { folderObj, folderObjManaging, windowsDefinition } from "./windows/windows-api/windowsAPI.ts"
+import { folderObj, folderObjManaging, isWindowOpen, windowsDefinition } from "./windows/windows-api/windowsAPI.ts"
 import { songs } from "./windows/musicWindow.ts"
 import { curDraggin } from "../plugins/drag.ts"
 import { DEBUG, ROOT } from "../main.ts"
@@ -176,6 +176,29 @@ function welcomeBack(idle = false) {
 
 		let toast = addToast({ icon: "cursors.cursor", title: "Welcome back!", body: body })
 		toast.on("closed", () => checkForUnlockable())
+	
+		if (GameState.hasUnlockedPowerups == true) {
+			// if you left for 60 seconds there's a 10% chance you get a powerup
+			if (timeInSeconds > 60) {
+				if (chance(0.1)) spawnPowerup()
+			}
+
+			// if the time you left is greater than 120 seconds
+			if (timeInSeconds > 120) {
+				// there's a chance of 25% to get a powerup
+				if (chance(0.25)) {
+					// if an additional 5% chance also happens to be you get 2
+					if (chance(0.05)) {
+						for (let i = 0; i < 2; i++) spawnPowerup()
+					}
+
+					// else you get a single one
+					else {
+						spawnPowerup()
+					}
+				}
+			}
+		}
 	}
 	
 	let welcomeBackToasts = get("toast").filter(toast => toast.type == "welcome")

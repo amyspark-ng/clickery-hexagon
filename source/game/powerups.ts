@@ -24,8 +24,10 @@ export let powerupTypes = {
 	"store": { sprite: "icon_store", multiplier: 1, removalTime: null, color: [195, 250, 162] },
 }
 
+export type powerup = keyof typeof powerupTypes
+
 type powerupOpt = {
-	type: string;
+	type: powerup;
 	pos: Vec2,
 	multiplier?: number,
 	time?: number,
@@ -36,8 +38,6 @@ let spaceBetweenTimers = 65
 function getTimerPos(index:number) {
 	return (width() + spaceBetweenTimers / 2) - spaceBetweenTimers * (index) - spaceBetweenTimers;
 }
-
-const powerupPowerToActualPower = (power:number) => power / 100
 
 function addTimer(opts:{ sprite: string, type: string }) {
 	let timerObj = add([
@@ -277,11 +277,11 @@ export function spawnPowerup(opts?:powerupOpt) {
 				parseAnimation(blink, powerupTypes[opts.type].sprite)
 
 				let timeToLeave = 0.75
-				// blink.loop(timeToLeave / 12, () => {
-				// 	if (blink.opacity == blink.maxOpacity) blink.opacity = 0
-				// 	else blink.opacity = blink.maxOpacity 
-				// })
-				// tween(0.5, 0, timeToLeave, (p) => blink.maxOpacity = p, easings.easeOutBack)
+				loop(0.1, () => {
+					if (blink.opacity == blink.maxOpacity) blink.opacity = 0
+					else blink.opacity = blink.maxOpacity 
+				})
+				tween(0.5, 0, timeToLeave, (p) => blink.maxOpacity = p, easings.easeOutBack)
 				blink.wait(timeToLeave, () => {
 					destroy(blink)
 				})
@@ -295,25 +295,26 @@ export function spawnPowerup(opts?:powerupOpt) {
 				// # multipliers
 				let multiplier = 0
 				let time = 0
-				let powerupPower = powerupPowerToActualPower(GameState.powerupPower)
+
+				const power = GameState.powerupPower / 100
 
 				if (opts.multiplier == null) {
 					if (opts.type == "clicks" || opts.type == "cursors") {
-						multiplier = randi(2, 7) * 1 + powerupPower
+						multiplier = randi(2, 7) * power
 					}
 					
 					else if (opts.type == "awesome") {
-						multiplier = randi(15, 20) * 1 + powerupPower
+						multiplier = randi(15, 20) * power
 					}
 
 					else if (opts.type == "time") {
 						multiplier = 1
-						time = opts.time ?? 60 * 1 + powerupPower
+						time = opts.time ?? 60 * power
 						scoreManager.addTweenScore(scoreManager.scorePerSecond() * opts.time)
 					}
 
 					else if (opts.type == "store") {
-						multiplier = rand(0.15, 0.5) / 1 + powerupPower * 0.75
+						multiplier = rand(0.15, 0.5) / power * 0.75
 						// multiplied by 0.75 so it's not too op
 					}
 				}
@@ -353,6 +354,37 @@ export function spawnPowerup(opts?:powerupOpt) {
 	powerupObj.onClick(() => {
 		powerupObj.click()
 	})
+
+	// particles
+	// let shimmer = add([
+	// 	anchor("center"),
+	// 	pos(powerupObj.pos),
+	// 	particles({
+	// 		max: 20,
+	// 		speed: [50, 100],
+	// 		angle: [0, 360],
+	// 		angularVelocity: [45, 90],
+	// 		lifeTime: [1.0, 1.5],
+	// 		colors: [WHITE],
+	// 		opacities: [0.1, 1.0, 0.0],
+	// 		texture: getSprite("hexagon").data.tex,
+	// 		quads: [getSprite("hexagon").data.frames[0]],
+	// 	}, {
+	// 		lifetime: 1.5,
+	// 		rate: 1,
+	// 		direction: 90,
+	// 		spread: 10,
+	// 	}),
+	// ])
+
+	// // let shimmerLoop = loop(0.5, () => {
+	// 	shimmer.emit(randi(5, 10))
+	// // })
+
+	// shimmer.onDestroy(() => {
+	// 	// shimmerLoop.cancel()
+	// })
+
 }
 
 export function powerupManagement() {

@@ -71,6 +71,9 @@ export let unlockables = {
 		"statsWin": {
 			condition: () => GameState.score >= 60
 		},
+		"extraWin": {
+			condition: () => GameState.score >= 149
+		},
 		"musicWin": {
 			condition: () => GameState.score >= 150
 		},
@@ -129,6 +132,11 @@ export let unlockables = {
 			"text": "Get 50.0000 of score, cool", 
 			"icon":"upgrades.c_6",
 			condition: () => GameState.score >= 50000
+		},
+		{"name":"scientificenotscore",
+			"text": "Get 1 sextillion of score, now using scientific e notation", 
+			"icon":"upgrades.c_6",
+			condition: () => GameState.score >= scoreManager.scientificENOT
 		},
 		// #endregion SCORE ACHIEVEMENTS ====================
 		// #region CLICKER/CURSOR ACHIEVEMENTS ==================
@@ -202,7 +210,7 @@ export let unlockables = {
 			"text":"Buy all available upgrades",
 			"icon":"icon_store",
 			"timeAfter": 1,
-			condition: () => isAchievementUnlocked("allclickupgrades") && GameState.cursorsUpgradesValue == fullUpgradeValues.cursors() && GameState.timeUntilAutoLoopEnds == 1
+			condition: () => GameState.clicksUpgradesValue == fullUpgradeValues.clicks() && GameState.cursorsUpgradesValue == fullUpgradeValues.cursors() && GameState.timeUntilAutoLoopEnds == 1
 		},
 		// #region POWERUP ACHIEVEMENTS =====================
 		{"name":"click1powerup",
@@ -416,121 +424,81 @@ export function addExclamation(obj:GameObj) {
 	}
 }
 
-export function unlockWindow(windowUnlocked:windowKey) {
+export function unlockWindow(windowJustUnlocked:windowKey) {
 	// does the actual stuff
-	GameState.unlockedWindows.push(windowUnlocked)
+	GameState.unlockedWindows.push(windowJustUnlocked)
 	playSfx("windowUnlocked")
 	
-	if (GameState.taskbar.length < 4) {
-		GameState.taskbar.push(windowUnlocked)
+	if (GameState.taskbar.length < 4 || windowJustUnlocked == "extraWin") {
+		GameState.taskbar.push(windowJustUnlocked)
 	}
 
 	else {
 		// i got a 'Too much recursion!' crash here, got pretty scared :(
-		if (!GameState.unlockedWindows.includes("extraWin")) {
-			unlockWindow("extraWin")
-			GameState.taskbar.push("extraWin")
-		}
+		// if (GameState.unlockedWindows.includes("extraWin") == false) {
+		// 	unlockWindow("extraWin")
+		// 	GameState.taskbar.push("extraWin")
+		// }
 	}
 
-	/**
-	* Used for checking when the extra window is opened and then check
-	* The unlocked gridMinibutton to add the exclamation to it
-	*/
-	function checkForExtraWinOpen() {
-		let checkForWinOpen = ROOT.on("winOpen", (windowOpened) => {
-			if (windowOpened == "extraWin") {
-				let extraWindowObj = get("window").filter(window => window.is("extraWin"))[0]
-				let gridSlot = gridContainer.get("gridShadow", { recursive: true }).filter(shadow => shadow.windowKey == windowUnlocked)[0]
-
-				let newBtn = makeGridMinibutton(
-					windowUnlocked,
-					gridSlot,
-					extraWindowObj
-				)
-
-				let newlyUnlockedBtn = gridContainer.add(newBtn)
-				
-				addExclamation(newlyUnlockedBtn)
-				checkForWinOpen.cancel()
-			}
-		})
-	}
-
-	// if folded i have to wait until it unfolds to add the exclamations and other stuff
+	// if the folderObj is folded
 	if (folded == true) {
-		// adds the exclamation, when the folderObj unfolds it 
 		addExclamation(folderObj)
 
-		// adds the exclamation to the new minibutton
-		let manageFoldEvent = folderObj.on("managefold", (folded:boolean) => {
-			// this is what happens when it unfolds
-			if (folded == false) {
-				destroyExclamation(folderObj)
+		let unfoldCheckEvent = folderObj.on("unfold", () => {
+			destroyExclamation(folderObj)
 
-				// the newly unlocked window is on the taskbar
-				if (GameState.taskbar.includes(windowUnlocked)) {
-					let thatOne = get("minibutton").filter(minibutton => minibutton.is(windowUnlocked))[0] 
-					addExclamation(thatOne)
-				}
-
-				// the newly unlocked window went to the extra window
-				else {
-					// grab the extraWin minibutton and add the exclamation to it
-					let thatOne = get("minibutton").filter(minibutton => minibutton.is("extraWin"))[0] 
-					addExclamation(thatOne)
-					// checkForExtraWinOpen()
-				}
+			// is on taskbar
+			if (GameState.taskbar.includes(windowJustUnlocked)) {
+				let newlyUnlockedBtn = get("minibutton").filter(btn => btn.windowKey == windowJustUnlocked)[0]
+				addExclamation(newlyUnlockedBtn)
 			}
 
-			manageFoldEvent.cancel() // when the event occurs it stops the event
+			// it went to extraa win
+			else if (GameState.taskbar.includes(windowJustUnlocked) == false) {
+				let extraWinBtn = get("minibutton").filter(btn => btn.windowKey == "extraWin")[0]
+				addExclamation(extraWinBtn)
+			}
+
+			unfoldCheckEvent.cancel()
 		})
 	}
 
-	// this is what if it is unfolded when the window was unlocked
-	else {
-		// If the window is on the taskbar add the new minibutton corresponding to it
-		if (windowUnlocked == "extraWin" || GameState.taskbar.includes(windowUnlocked)) {
-			let newIndex = GameState.taskbar.indexOf(windowUnlocked)
-
-			let newMinibutton = addMinibutton({
-				windowKey: windowUnlocked as windowKey,
+	// if the folderobj is unfolded
+	else if (folded == false) {
+		if (GameState.taskbar.includes(windowJustUnlocked)) {
+			// index in taskbar of the new button
+			let newIndex = GameState.taskbar.indexOf(windowJustUnlocked)
+			
+			let btnForNewWindow = addMinibutton({
+				windowKey: windowJustUnlocked,
 				taskbarIndex: newIndex,
 				initialPosition: folderObj.pos,
 				moveToPosition: true,
 			})
 
-			addExclamation(newMinibutton)
-		}
-
-		// If the window went to the extra window
-		else {
-			let extraWinButton = get("minibutton").filter(btn => btn.is("extraWin"))[0] 
-			addExclamation(extraWinButton)
-			// don't check for extra win open here
-		}
-	}
-
-	// it went to extra win
-	if (!GameState.taskbar.includes(windowUnlocked)) {
-		const getBtnAddExclam = () => {
-			let newBtn = get("gridMiniButton", { recursive: true }).filter(minibutton => minibutton.windowKey == windowUnlocked)[0]
-			addExclamation(newBtn)
-		}
-		
-		if (isWindowOpen("extraWin")) {
-			getBtnAddExclam()
+			addExclamation(btnForNewWindow)
 		}
 
 		else {
-			let checkForWinOpen = ROOT.on("winOpen", (winOpened) => {
-				if (winOpened == "extraWin") {
-					getBtnAddExclam()
-					checkForWinOpen.cancel()
-				}
-			})
+			let extraWinBtn = get("minibutton").filter(btn => btn.windowKey == "extraWin")[0]
+			addExclamation(extraWinBtn)
+			// if the window goes to the extra window but the extra win hasn't been unlocked yet 
+			// we're oging to have trouble
+			// i just unlock extra win before musicwin and hope that fixes everything
 		}
 	}
 
-	ROOT.trigger("winUnlock", windowUnlocked)
+	// if the window is on extra win i have to check if the extra win is opened to add the extra minibutton
+	// if is not open i have to wait until then
+	if (GameState.taskbar.includes(windowJustUnlocked) == false) {
+		let extraWinOpenCheck = ROOT.on("winOpen", () => {
+			let gridMinibtn = get("gridMiniButton", { recursive: true }).filter((btn) => btn.windowKey == windowJustUnlocked)[0]
+			addExclamation(gridMinibtn)
+
+			extraWinOpenCheck.cancel()
+		})
+	}
+
+	ROOT.trigger("winUnlock", windowJustUnlocked)
 }

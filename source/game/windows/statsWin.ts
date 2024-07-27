@@ -76,7 +76,7 @@ export function statsWinContent(winParent) {
 
 	let statsText = winParent.add([
 		text(createStats()),
-		pos(-180, -230),
+		pos(70, -230),
 		anchor("top"),
 		positionSetter(),
 		{

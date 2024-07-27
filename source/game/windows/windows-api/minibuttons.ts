@@ -18,6 +18,9 @@ type minibuttonOpt = {
 	taskbarIndex:number;
 	initialPosition:Vec2,
 	destPosition?:Vec2;
+	/**
+	 * Wheter to move to the destined position when added
+	 */
 	moveToPosition?:boolean;
 }
 

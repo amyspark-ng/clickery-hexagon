@@ -11,35 +11,35 @@ let cardsInfo = {
 	"clickersCard": { 
 		info: "Clickers are +[number]% more efficient",
 		basePrice: 1,
-		percentageIncrease: 200,
+		percentageIncrease: 140,
 		idx: 0,
 	},
 	"cursorsCard": { 
 		info: "Cursors are +[number]% more efficient",
-		basePrice: 50,
-		percentageIncrease: 200,
+		basePrice: 2,
+		percentageIncrease: 150,
 		idx: 1,
 	},
 	"powerupsCard": { 
 		info: "Powerups are +[number]% more efficient",
-		basePrice: 1000,
-		percentageIncrease: 50,
+		basePrice: 3,
+		percentageIncrease: 120,
 		idx: 2,
 	},
 	"critsCard": {
 		info: "Criticals are +[number]% more powerful",
-		basePrice: 1,
-		percentageIncrease: 50,
+		basePrice: 3,
+		percentageIncrease: 120,
 		idx: 3,
 	},
 	"hexColorCard": { 
 		info: "You can customize the hexagon's color",
-		unlockPrice: 1,
+		unlockPrice: 5,
 		idx: 4,
 	},
 	"bgColorCard": { 
 		info: "You can customize the background's color",
-		unlockPrice: 1,
+		unlockPrice: 6,
 		idx: 5,
 	},
 }
@@ -53,11 +53,18 @@ type card = keyof typeof cardsInfo
 
 let cardYPositions = {
 	hidden: 691,
-	dealing: 341, // this is when they're stacked
+	/**
+	 * The position they are when they're stacked
+	 */
+	dealing: 341,
 	unhovered: 544,
 	hovered: 524,
 }
 
+/**
+ * Gets a random additive value based on the card type
+ * @returns the additive  
+ */
 function getAdditive(type:card) {
 	let additive:number
 
@@ -73,9 +80,7 @@ function getAdditive(type:card) {
 		additive = 0
 	}
 
-	let stringVersion:string;
-	stringVersion = additive.toString()
-	return { number: additive, string: stringVersion }
+	return additive;
 }
 
 // clickersCard -> card_clickers
@@ -96,10 +101,6 @@ function flipCard(card:GameObj, newType:card | string) {
 			card.area.scale = vec2(1)
 			card.trigger("flip")
 		})
-	})
-
-	card.onUpdate(() => {
-		// debug.log(card.scale.x)
 	})
 }
 
@@ -133,7 +134,7 @@ function addCard(cardType:string | card, position: Vec2) {
 					break;
 				
 					case "cursorsCard":
-						this.gamestateInfo.key = "clickPercentage"
+						this.gamestateInfo.key = "cursorsPercentage"
 						this.gamestateInfo.objectAmount = "ascension.cursorsPercentagesBought"
 					break;
 
@@ -162,10 +163,12 @@ function addCard(cardType:string | card, position: Vec2) {
 
 				// sets price
 				if (!(this.type == "hexColorCard" || this.type == "bgColorCard")) {
+					let objectAmount = getVariable(GameState, this.gamestateInfo.objectAmount)
+
 					this.price = getPrice({
 						basePrice: cardsInfo[this.type].basePrice,
 						percentageIncrease: cardsInfo[this.type].percentageIncrease,
-						objectAmount: getVariable(GameState, this.gamestateInfo.objectAmount)
+						objectAmount: objectAmount
 					})
 				}
 
@@ -179,9 +182,10 @@ function addCard(cardType:string | card, position: Vec2) {
 				tween(this.angle, choose([-1.5, 1.5]), 0.25, (p) => this.angle = p, easings.easeOutQuart)
 	
 				// it adds the % on the info message
-				let message = cardsInfo[this.type].info.replace("[number]", this.additive.string)
+				let message = cardsInfo[this.type].info.replace("[number]", this.additive)
 				if (this.type != "hexColorCard" || this.type != "bgColorCard") {
-					message += ` (You have: ${getVariable(GameState, this.gamestateInfo.key)}%)`
+					let percentages = getVariable(GameState, this.gamestateInfo.key)
+					message += ` (You have: ${percentages}%)`
 				}
 				talk("card", message)
 			},
@@ -189,6 +193,7 @@ function addCard(cardType:string | card, position: Vec2) {
 			buy() {
 				tween(0.75, 1, 0.15, (p) => this.scale.y = p, easings.easeOutQuart)
 			
+				// unlock color window
 				if (this.type == "hexColorCard" || this.type == "bgColorCard") {
 					let oldType = this.type // get it before it changes
 					flipCard(card, cardTypes()[this.typeIdx - 2])
@@ -201,8 +206,20 @@ function addCard(cardType:string | card, position: Vec2) {
 					})
 				}
 
+				// add percentages
 				else {
-					setVariable(GameState, this.gamestateInfo.key, getVariable(GameState, this.gamestateInfo.key) + this.additive.number)
+					// actually add the stuff LOL!
+					let currentPercentage = getVariable(GameState, this.gamestateInfo.key)
+					let percentagesBought = getVariable(GameState, this.gamestateInfo.objectAmount)
+
+					// add the actual percentage
+					setVariable(GameState, this.gamestateInfo.key, currentPercentage + this.additive)
+					// set the percentagesBought
+					setVariable(GameState, this.gamestateInfo.objectAmount, percentagesBought + 1)
+
+					// get new additive
+					this.additive = getAdditive(this.type as card)
+					this.startHover() // talk
 				}
 
 				function subMana(amount:number) {
@@ -257,7 +274,7 @@ function addCard(cardType:string | card, position: Vec2) {
 
 			if (!(card.type == "hexColorCard" || card.type == "bgColorCard")) {
 				drawText({
-					text: `+${card.additive.string}`,
+					text: `+${card.additive}%`,
 					size: 15,
 					color: BLACK,
 					align: "left",

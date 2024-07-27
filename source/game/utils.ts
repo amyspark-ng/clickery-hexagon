@@ -6,7 +6,7 @@ import { hexagon } from "./hexagon";
 import { checkForUnlockable, unlockAchievement } from "./unlockables";
 import { isHoveringAWindow, openWindow } from "./windows/windows-api/windowsAPI";
 import { triggerAscension } from "./ascension/ascension";
-import { powerupTypes, spawnPowerup } from "./powerups";
+import { powerup, powerupTypes, spawnPowerup } from "./powerups";
 import { songsListened } from "./windows/musicWindow";
 
 // definetely not stack overflow
@@ -233,7 +233,7 @@ export function saveAnim() {
 export function randomPowerup() {
 	let list = Object.keys(powerupTypes)
 	if (scoreManager.autoScorePerSecond() < 1) list.splice(list.indexOf("time"), 1)
-	return choose(list)
+	return choose(list) as powerup
 }
 
 export function randomPos() {
@@ -324,7 +324,7 @@ export function debugFunctions() {
 
 	onUpdate(() => {
 		// if (isKeyDown("control")) {
-		if (isKeyPressed("c")) GameState.save(true)
+		if (isKeyPressed("c") && GameState.scoreAllTime > 25) GameState.save(true)
 		else if (isKeyPressed("v")) GameState.delete()
 		else if (isKeyPressed("b")) GameState.cheat()
 		else if (isKeyPressed("w")) hexagon.autoClick()
@@ -336,7 +336,7 @@ export function debugFunctions() {
 		else if (isKeyPressed("f")) {
 			spawnPowerup({
 				type: randomPowerup(),
-				pos: randomPos()
+				pos: mousePos()
 			})
 		}
 

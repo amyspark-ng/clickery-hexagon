@@ -2,10 +2,11 @@ import { GameObj, Vec2 } from "kaplay"
 import { GameState, scoreManager } from "../../../gamestate"
 import { playSfx } from "../../../sound"
 import { ROOT } from "../../../main"
-import { bop, formatNumber, getPrice, randomPos, randomPowerup } from "../../utils"
+import { bop, formatNumber, getPrice, getVariable, randomPos, randomPowerup } from "../../utils"
 import { addTooltip } from "../../additives"
 import { powerupTypes, spawnPowerup } from "../../powerups"
 import { isHoveringUpgrade, storeElements, storePitchJuice } from "./storeWindows"
+import { positionSetter } from "../../../plugins/positionSetter"
 
 export let storeElementsInfo = {
 	"clickersElement": { 
@@ -19,7 +20,7 @@ export let storeElementsInfo = {
 		percentageIncrease: 25
 	},
 	"powerupsElement": { 
-		gamestateKey: "powerupsBought",
+		gamestateKey: "stats.powerupsBought",
 		basePrice: 10500,
 		percentageIncrease: 180,
 		unlockPrice: 10100
@@ -292,24 +293,7 @@ export function addStoreElement(winParent:any, opts:storeElementOpt) {
 	])
 
 	// # EVENTS
-	// add the tooltip
 	if (opts.type == "powerupsElement") {
-		let tooltip = addTooltip(btn, {
-			text: `${formatNumber(btn.price)}`,
-			direction: "down",
-			lerpValue: 0.9
-		})
-
-		tooltip.tooltipText.onUpdate(() => {
-			tooltip.tooltipText.text = `${formatNumber(btn.price, { price: true })}`
-			if (GameState.score >= btn.price) tooltip.tooltipText.color = GREEN
-			else tooltip.tooltipText.color = RED
-		})
-
-		btn.onDestroy(() => {
-			tooltip.end()
-		})
-
 		if (GameState.hasUnlockedPowerups == false) btn.use(lockedPowerupStoreElement(winParent))
 		else btn.use(regularStoreElement(winParent))
 	}
@@ -322,13 +306,15 @@ export function addStoreElement(winParent:any, opts:storeElementOpt) {
 		if (isKeyDown("shift")) amountToBuy = 10
 		else amountToBuy = 1
 
+		const amountBought = getVariable(GameState, storeElementsInfo[opts.type].gamestateKey) 
+
 		// price
 		if (opts.type == "clickersElement" || opts.type == "cursorsElement") {
 			const elementInfo = storeElementsInfo[opts.type]
 			btn.price = getPrice({
 				basePrice: elementInfo.basePrice,
 				percentageIncrease: elementInfo.percentageIncrease,
-				objectAmount: GameState[elementInfo.gamestateKey],
+				objectAmount: amountBought,
 				amountToBuy: amountToBuy,
 				gifted: opts.type == "clickersElement" ? 1 : 0
 			}) * powerupTypes.store.multiplier
@@ -341,7 +327,7 @@ export function addStoreElement(winParent:any, opts:storeElementOpt) {
 				btn.price = getPrice({
 					basePrice: elementInfo.basePrice,
 					percentageIncrease: elementInfo.percentageIncrease,
-					objectAmount: GameState[elementInfo.gamestateKey],
+					objectAmount: amountBought,
 					amountToBuy: 1
 				}) * powerupTypes.store.multiplier
 			}
@@ -403,7 +389,9 @@ export function addStoreElement(winParent:any, opts:storeElementOpt) {
 				if (GameState.score >= btn.price) this.color = GREEN
 				else this.color = RED
 			
-				if (opts.type == "powerupsElement") this.destroy()
+				if (opts.type == "powerupsElement") {
+					this.pos = vec2(-5, 41)
+				}
 			}
 		}
 	])
@@ -428,6 +416,26 @@ export function addStoreElement(winParent:any, opts:storeElementOpt) {
 			}
 		}
 	])
+
+	if (opts.type == "powerupsElement") {
+		let powerupText = btn.add([
+			text("x1", {
+				size: 18,
+				align: "left",
+			}),
+			anchor("center"),
+			pos(-139, -52),
+			color(BLACK),
+			opacity(0.45),
+			z(btn.z + 1),
+			positionSetter(),
+			{
+				update() {
+					this.text = `Power: ${GameState.powerupPower}x`
+				}
+			}
+		])
+	}
 
 	return btn;
 }

@@ -22,9 +22,9 @@ class _GameState {
 
 	// powerups 
 	hasUnlockedPowerups = false
-	powerupPower = 0
+	powerupPower = 1
 
-	critPower = 0
+	critPower = 1
 
 	ascension = {
 		mana: 0,
@@ -36,7 +36,6 @@ class _GameState {
 		cursorsPercentagesBought: 0,
 		powerupPowersBought: 0,
 		critPercentagesBought: 0,
-		// other element missing
 	}
 
 	unlockedAchievements = []
@@ -108,6 +107,8 @@ class _GameState {
 export let GameState = new _GameState()
 
 class _scoreManager {
+	scientificENOT = 1000000000000000000000
+
 	combo = 1
 	
 	// score per click (no combo or powerups or percentage)

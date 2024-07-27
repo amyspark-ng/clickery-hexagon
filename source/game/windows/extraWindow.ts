@@ -92,7 +92,7 @@ export function makeGridMinibutton(windowKey:windowKey, gridSlot:any, winParent:
 		openWindowButton(),
 		"gridMiniButton",
 		{
-			windowKey: Object.keys(infoForWindows)[idx],
+			windowKey: windowKey,
 			beingHeld: false,
 
 			startHover() {

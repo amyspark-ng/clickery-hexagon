@@ -71,7 +71,7 @@ export function windowsDefinition() {
 export type windowKey = "storeWin" | "musicWin" | "ascendWin" | "statsWin" | "medalsWin" | "aboutWin" | "creditsWin" | "settingsWin" | "leaderboardsWin" | "hexColorWin" | "bgColorWin" | "extraWin"
 
 export function isWindowOpen(windowKey:windowKey) {
-	return get(windowKey).length > 0
+	return get(windowKey).filter(obj => obj.is("window")).length > 0
 }
 
 export function openWindow(windowKey:windowKey) {
@@ -388,6 +388,8 @@ export function folderObjManaging() {
 						})
 					})
 				}
+
+				this.trigger("unfold")
 			},
 			
 			fold() {
@@ -404,12 +406,12 @@ export function folderObjManaging() {
 				});
 
 				playSfx("fold", { detune: -150 })
+				this.trigger("fold")
 			},
 
 			manageFold() {
 				if (folded) folderObj.unfold()
 				else folderObj.fold()
-				this.trigger("managefold", folded)
 			},
 
 			addSlots() {
@@ -453,7 +455,7 @@ export function folderObjManaging() {
 				
 				if (curDraggin?.is("gridMiniButton") || curDraggin?.is("minibutton")) return
 				if (!movingMinibuttons) {
-					if (this.interactable == true && isKeyPressed("space") || (isMousePressed("left") && this.isHovering())) {
+					if (isKeyPressed("space") || (isMousePressed("left") && this.isHovering())) {
 						this.manageFold()
 						this.deleteSlots()
 						bop(this)
