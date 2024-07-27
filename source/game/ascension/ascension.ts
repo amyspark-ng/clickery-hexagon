@@ -1,192 +1,25 @@
 // # this code is such a mess im sorry
-import { Vec2 } from "kaplay";
+import { GameObj, Vec2 } from "kaplay";
 import { GameState, scoreManager } from "../../gamestate";
 import { ROOT } from "../../main"
 import { waver } from "../../plugins/wave";
 import { hexagon } from "../hexagon"
-import { bop } from "../utils";
+import { bop, getPrice, getVariable, randomPos } from "../utils";
 import { playSfx } from "../../sound";
 import { folderObj } from "../windows/windows-api/windowsAPI";
 import { hexagonIntro } from "../gamescene";
 import { isWindowUnlocked, unlockWindow } from "../unlockables";
 import { positionSetter } from "../../plugins/positionSetter";
 import { mouse } from "../additives";
+import { spawnCards } from "./cards";
 
-export let ascending = false;
-let canLeave = false
-export function set_ascending(value) {
-	ascending = value
-}
-
-let cardsInfo = {
-	"clickersCard": { 
-		info: "Clickers are +[number]% more efficient",
-		basePrice: 1,
-		percentageIncrease: 200,
-		idx: 0,
-	},
-	"cursorsCard": { 
-		info: "Cursors are +[number]% more efficient",
-		basePrice: 50,
-		percentageIncrease: 200,
-		idx: 1,
-	},
-	"powerupsCard": { 
-		info: "Powerups are +[number]% more efficient",
-		basePrice: 1000,
-		percentageIncrease: 50,
-		idx: 2,
-	},
-	"extraCard": {
-		info: "No info",
-		basePrice: 1,
-		percentageIncrease: 50,
-		idx: 3,
-	},
-	"hexColorCard": { 
-		info: "You can customize the hexagon's color",
-		unlockPrice: 10000,
-		idx: 4,
-	},
-	"bgColorCard": { 
-		info: "You can customize the background's color",
-		unlockPrice: 10000,
-		idx: 5,
-	},
-}
-
-// TODO: do this with powerups
-type cardType = keyof typeof cardsInfo
-
-let cardYPositions = {
-	hidden: 691,
-	dealing: 341,
-	unhovered: 544,
-	hovered: 524,
+export let ascension = {
+	ascending: false,
+	canLeave: false,
 }
 
 let activeLetterWaits = []
 let currentlySaying = ""
-
-// clickersCard -> card_clickers
-const typeToSprite = (type:cardType | string) => `card_${type.replace("Card", "")}`    
-
-function addCard(cardType:cardType, position:Vec2) {
-	let additive:number
-	if (cardType == "clickersCard" || cardType == "cursorsCard") additive = randi(8, 12)
-	else if (cardType == "powerupsCard") additive = rand(0.1, 0.4)
-	let stringAdditive = additive < 1 ? additive * 100 : additive
-
-	let card = add([
-		layer("ascension"),
-		z(6),
-		pos(position),
-		rotate(0),
-		scale(),
-		anchor("center"),
-		sprite("backcard"),
-		area({ scale: vec2(0) }),
-		"card",
-		"ascensionHover",
-		{
-			indexInDeck: 0,
-			infoIdx: cardsInfo[cardType].idx,
-			price: 1,
-			type: cardType,
-			// turning around to hide the text is not necessary because the text gets scaled
-			update() {
-				// this.price = getPrice({
-				// 	basePrice: cardsInfo[cardType].basePrice,
-				// 	percentageIncrease: cardsInfo[cardType].percentageIncrease,
-				// })
-			},
-			
-			buy() {
-				tween(0.75, 1, 0.15, (p) => this.scale.y = p, easings.easeOutQuart)
-				
-				if (this.infoIdx == 4 || this.infoIdx == 5) {
-					this.infoIdx -= 2
-					this.type = Object.keys(cardsInfo)[this.infoIdx]
-
-					let endascensioncheck = ROOT.on("endAscension", () => {
-						wait(1, () => {
-							unlockWindow(this.type.replace("Card", "Win"))
-						})
-					})
-					
-					tween(this.scale.x, 0, 0.075, (p) => this.scale.x = p).onEnd(() => {
-						this.use(sprite(typeToSprite(this.type)))
-						tween(this.scale.x, 1, 0.075, (p) => this.scale.x = p)
-					})
-				}
-
-				function subMana(amount:number) {
-					tween(GameState.ascension.mana, GameState.ascension.mana - amount, 0.32, (p) => GameState.ascension.mana = p, easings.easeOutExpo)
-				}
-
-				subMana(this.price)
-				playSfx("kaching", { detune: rand(-50, 50) })
-				if (canLeave == false) {canLeave = true; ROOT.trigger("canLeaveAscension")}
-			},
-
-			drawInspect() {
-				drawText({
-					text: `deck: ${this.indexInDeck}\ninfo: ${this.infoIdx}`,
-					pos: vec2(0, -this.height),
-					anchor: "center",
-					size: 25,
-					color: WHITE
-				})
-			}
-		}
-	])
-
-	card.on("ready", () => {
-		card.onHover(() => {
-			tween(card.pos.y, cardYPositions.hovered, 0.25, (p) => card.pos.y = p, easings.easeOutQuart)
-			tween(card.angle, choose([-1.5, 1.5]), 0.25, (p) => card.angle = p, easings.easeOutQuart)
-			
-			let message = cardsInfo[Object.keys(cardsInfo)[card.infoIdx]].info.replace("[number]", stringAdditive)
-			talk("card", message)
-		})
-
-		card.onHoverEnd(() => {
-			tween(card.pos.y, cardYPositions.unhovered, 0.25, (p) => card.pos.y = p, easings.easeOutQuart)
-		})
-
-		card.onClick(() => {
-			if (GameState.ascension.mana >= card.price) card.buy()
-			else {
-				tween(0.75, 1, 0.15, (p) => this.scale.x = p, easings.easeOutQuart)
-			}
-		})
-
-		const greenPrice = GREEN.lighten(30)
-		const redPrice = RED.lighten(30) 
-		card.onDraw(() => {
-			drawText({
-				text: `${card.price}✦`,
-				align: "center",
-				anchor: "center",
-				pos: vec2(0, 35),
-				size: 26,
-				color: GameState.ascension.mana >= card.price ? greenPrice : redPrice
-			})
-
-			if (!(cardType == "hexColorCard" || cardType == "bgColorCard")) {
-				drawText({
-					text: `+${stringAdditive}`,
-					size: 15,
-					color: BLACK,
-					align: "left",
-					pos: vec2(-59, -82)
-				})
-			}
-		})
-	}) // on ready
-
-	return card;
-}
 
 function addMage() {
 	let mage_color = rgb(0, 51, 102)
@@ -410,7 +243,7 @@ function addDialogueText() {
 	return textBox
 }
 
-function talk(speaker:"mage" | "card", thingToSay:string, speed?:number) {
+export function talk(speaker:"mage" | "card", thingToSay:string, speed?:number) {
 	dialogue.box.trigger("talk", speaker)
 
 	speaker = speaker || "card"
@@ -451,7 +284,7 @@ function skipTalk() {
 
 export function triggerAscension() {
 	// stuff
-	ascending = true
+	ascension.ascending = true
 
 	// the multiplier cool!!!
 	GameState.ascension.magicLevel++
@@ -503,62 +336,7 @@ export function triggerAscension() {
 	})
 
 	//#region CARD STUFF
-
-	let dealingXPosition = 947
-
-	// from left to right
-	let cardsToAdd = [
-		"clickersCard",
-		"cursorsCard",
-		!isWindowUnlocked("hexColorWin") ? "hexColorCard" : "powerupsCard",
-		!isWindowUnlocked("bgColorWin") ? "bgColorCard" : "extraCard"
-	]
-
-	// add the cards
-	for (let i = 0; i < cardsToAdd.length; i++) {
-		let cardType = cardsToAdd[i] as cardType
-		
-		let card = addCard(cardType, vec2(dealingXPosition, cardYPositions.hidden))
-		card.angle = rand(-4, 4)
-		card.pos.x = dealingXPosition + rand(-5, 5)
-		card.indexInDeck = i
-
-		// put it in the dealing position
-		let randOffset = rand(-5, 5)
-		// let randOffset = 0
-		tween(card.pos.y, cardYPositions.dealing + randOffset, 0.75, (p) => card.pos.y = p, easings.easeOutQuint)
-	}
-
-	wait(0.75, () => {
-		let cardSpacing = 150
-		get("card").forEach((card) => {
-			wait(0.25 * card.indexInDeck, () => {
-				
-				// 1 - 4 / left to right
-				function getCardXPos(index:number) {
-					let startPoint = 492
-					return (startPoint + cardSpacing) + cardSpacing * (index - 1);
-				}
-		
-				tween(card.angle, rand(-1.5, 1.5), 0.25, (p) => card.angle = p, easings.easeOutQuart)
-				
-				// pos
-				tween(card.pos.x, getCardXPos(card.indexInDeck), 0.25, (p) => card.pos.x = p, easings.easeOutQuart)
-				tween(card.pos.y, cardYPositions.unhovered, 0.25, (p) => card.pos.y = p, easings.easeOutQuart)
-				
-				// turn it over
-				tween(card.scale.x, 0, 0.25, (p) => card.scale.x = p, easings.easeOutQuart).onEnd(() => {
-					card.use(sprite(typeToSprite(card.type)))
-					
-					tween(card.scale.x, 1, 0.25, (p) => card.scale.x = p, easings.easeOutQuart).onEnd(() => {
-						card.area.scale = vec2(1)
-						card.trigger("ready")
-					})
-				})
-			})
-		})
-	})
-
+	spawnCards()
 	// #endregion
 
 	wait(0.1, () => {
@@ -598,7 +376,7 @@ export function triggerAscension() {
 			{
 				dscale: vec2(0.8),
 				update() {
-					if (canLeave == true) {
+					if (ascension.canLeave == true) {
 						this.area.scale = vec2(1)
 					}
 	
@@ -620,7 +398,7 @@ export function triggerAscension() {
 	
 		mage.on("endAnimating", () => {
 			leaveButton.onUpdate(() => {
-				if (canLeave == true) leaveButton.opacity = 1
+				if (ascension.canLeave == true) leaveButton.opacity = 1
 				else leaveButton.opacity = 0.75
 			})
 		})
@@ -687,6 +465,6 @@ export function endAscension() {
 	})
 
 	wait(0.5, () => {
-		ascending = false
+		ascension.canLeave = false
 	})
 }

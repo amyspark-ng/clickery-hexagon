@@ -199,7 +199,9 @@ export function addUpgrades(elementParent) {
 			if (!winParent.active) return
 		
 			if (!upgradeObj.isHovering()) return;
-			if (isUpgradeBought(upgradeObj.id) || GameState.score < upgradeObj.price) {bop(upgradeObj); return}
+			if (isUpgradeBought(upgradeObj.id) || GameState.score < upgradeObj.price) {
+				return
+			}
 
 			if (upgradeObj.id == "c_2" && !isUpgradeBought("c_1")) {
 				upgradeObj.tooltips?.filter(tooltip => tooltip.type == "price").forEach(tooltip => {
@@ -221,7 +223,7 @@ export function addUpgrades(elementParent) {
 				if (!upgradeObj.isHovering()) return
 	
 				if (upgradeObj.boughtProgress < 100) {
-					upgradeObj.boughtProgress += 1.5
+					upgradeObj.boughtProgress += 2 // time to hold
 					upgradeObj.scale.x = map(upgradeObj.boughtProgress, 0, 100, 1.1, 0.85)
 					upgradeObj.scale.y = map(upgradeObj.boughtProgress, 0, 100, 1.1, 0.85)
 				}
@@ -231,6 +233,8 @@ export function addUpgrades(elementParent) {
 					upgradeObj.manageBlinkText().end()
 				}
 			})
+
+			bop(upgradeObj);
 		})
 
 		upgradeObj.onMouseRelease(() => {

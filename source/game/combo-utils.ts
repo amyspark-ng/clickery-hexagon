@@ -42,6 +42,22 @@ export function addComboBar() {
 	barFrame.fadeIn(0.5)
 	tween(barFrame.pos.y, targetPos.y, 0.5, (p) => barFrame.pos.y = p, easings.easeOutQuint)
 
+	let barFrameBg = scoreText.onDraw(() => {
+		drawRect({
+			pos: barFrame.pos,
+			anchor: barFrame.anchor,
+			width: barFrame.width,
+			height: barFrame.height,
+			opacity: barFrame.opacity * 0.28,
+			radius: 5,
+			color: BLACK,
+		})
+	})
+
+	barFrame.onDestroy(() => {
+		barFrameBg.cancel()
+	})
+
 	comboBarContent = scoreText.add([
 		rect(0, barFrame.height, { radius: 5 }),
 		pos(-barFrame.width / 2, barFrame.pos.y),

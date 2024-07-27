@@ -1,11 +1,11 @@
-import { GameObj, LayerComp, TextAlign, ZComp } from "kaplay"
+import { GameObj } from "kaplay"
 import { GameState } from "../gamestate"
 import { curDraggin } from "../plugins/drag"
 import { trail } from "../plugins/trail"
 import { playSfx } from "../sound"
 import { hexagon } from "./hexagon"
 import { isWindowUnlocked } from "./unlockables"
-import { arrayToColor, blendColors, getPositionOfSide, getZBetween, parseAnimation } from "./utils"
+import { blendColors, parseAnimation } from "./utils"
 import { isDraggingAWindow, isHoveringAWindow, manageWindow } from "./windows/windows-api/windowsAPI"
 
 export let gameBg;

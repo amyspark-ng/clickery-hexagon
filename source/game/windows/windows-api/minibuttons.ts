@@ -3,7 +3,7 @@ import { dummyShadow } from "../../../plugins/dummyShadow";
 import { playSfx } from "../../../sound";
 import { bop } from "../../utils";
 import { mouse } from "../../additives";
-import { folderObj, infoForWindows, isDraggingAWindow, isHoveringAWindow, manageWindow, folded, buttonSpacing } from "./windowsAPI";
+import { folderObj, infoForWindows, isDraggingAWindow, isHoveringAWindow, manageWindow, folded, buttonSpacing, openWindow } from "./windowsAPI";
 import { GameState } from "../../../gamestate";
 import { destroyExclamation } from "../../unlockables";
 import { Vec2 } from "kaplay";
@@ -21,6 +21,7 @@ type minibuttonOpt = {
 	moveToPosition?:boolean;
 }
 
+// TODO: make this work with key instead of idxForInfo
 export function addMinibutton(opts:minibuttonOpt) {
 	let quad;
 

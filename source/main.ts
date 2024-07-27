@@ -73,5 +73,5 @@ onLoad(() => {
 })
 
 // @ts-ignore
-// if (DEBUG == true) document.body.style.backgroundColor = "rgb(1, 3, 13)";
-// else document.body.style.backgroundColor = "rgb(0, 0, 0)";
+if (DEBUG == true) document.body.style.backgroundColor = "rgb(1, 3, 13)";
+else document.body.style.backgroundColor = "rgb(0, 0, 0)";

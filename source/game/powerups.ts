@@ -37,6 +37,8 @@ function getTimerPos(index:number) {
 	return (width() + spaceBetweenTimers / 2) - spaceBetweenTimers * (index) - spaceBetweenTimers;
 }
 
+const powerupPowerToActualPower = (power:number) => power / 100
+
 function addTimer(opts:{ sprite: string, type: string }) {
 	let timerObj = add([
 		rect(60, 60),
@@ -293,23 +295,26 @@ export function spawnPowerup(opts?:powerupOpt) {
 				// # multipliers
 				let multiplier = 0
 				let time = 0
+				let powerupPower = powerupPowerToActualPower(GameState.powerupPower)
+
 				if (opts.multiplier == null) {
 					if (opts.type == "clicks" || opts.type == "cursors") {
-						multiplier = randi(2, 7) * GameState.powerupPower
+						multiplier = randi(2, 7) * 1 + powerupPower
 					}
 					
 					else if (opts.type == "awesome") {
-						multiplier = randi(15, 20) * GameState.powerupPower
+						multiplier = randi(15, 20) * 1 + powerupPower
 					}
 
 					else if (opts.type == "time") {
 						multiplier = 1
-						time = opts.time ?? 60 * GameState.powerupPower
+						time = opts.time ?? 60 * 1 + powerupPower
 						scoreManager.addTweenScore(scoreManager.scorePerSecond() * opts.time)
 					}
 
 					else if (opts.type == "store") {
-						multiplier = rand(0.15, 0.5)
+						multiplier = rand(0.15, 0.5) / 1 + powerupPower * 0.75
+						// multiplied by 0.75 so it's not too op
 					}
 				}
 

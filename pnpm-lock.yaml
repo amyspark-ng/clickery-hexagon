@@ -12,8 +12,8 @@ importers:
         specifier: ^0.20.2
         version: 0.20.2
       kaplay:
-        specifier: 3001.0.0-alpha.17
-        version: 3001.0.0-alpha.17
+        specifier: 3001.0.0-alpha.19.1
+        version: 3001.0.0-alpha.19.1
 
 packages:
 
@@ -160,8 +160,8 @@ packages:
     engines: {node: '>=12'}
     hasBin: true
 
-  kaplay@3001.0.0-alpha.17:
-    resolution: {integrity: sha512-cuSknXOGQOBgpcekFbsvLa7rQMeOFhyqcIAlr5+3i9kGb/ROHh7b3hIGHLHTGU4qwmYLADP6jAqnWSHYic1RTQ==}
+  kaplay@3001.0.0-alpha.19.1:
+    resolution: {integrity: sha512-jpLMy4ncFLAT6rt1jtjeTRUcSYSIfq9Mb4XOXH9ih7GqcgvLIzGXvfQFv17kNM0UN80nC8f8xgJnzH3KI7MWNQ==}
 
 snapshots:
 
@@ -260,4 +260,4 @@ snapshots:
       '@esbuild/win32-ia32': 0.20.2
       '@esbuild/win32-x64': 0.20.2
 
-  kaplay@3001.0.0-alpha.17: {}
+  kaplay@3001.0.0-alpha.19.1: {}

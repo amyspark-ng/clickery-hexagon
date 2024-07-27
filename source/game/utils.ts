@@ -114,7 +114,13 @@ export function toHHMMSS(timeInSeconds) {
     return `${formattedHours}${formattedMinutes}:${formattedSeconds}`;
 }
 
-export function percentage(percentageOf, number) {
+/**
+ * 
+ * @param percentageOf is the percentage you want
+ * @param number is the number you're taking the percentage of
+ * @returns % of number
+ */
+export function percentage(percentageOf:number, number:number) {
 	return Math.round((percentageOf * number) / 100)
 }
 
@@ -200,7 +206,6 @@ export function getPositionOfSide(obj) {
 	}
 }
 
-// TODO: add support for frames cursors.anim/10
 export function parseAnimation(obj, anim) {
 	let spriteName = !anim.includes(".") ? anim : [anim.split(".")[0], anim.split(".")[1]];
 	obj.unuse("sprite")
@@ -266,6 +271,11 @@ export function debugTexts() {
 		pos(0, height()),
 		fixed(),
 		layer("mouse"),
+		{
+			update() {
+				this.text = "DEBUG" + ` ${debug.fps()}`
+			}
+		}
 	])
 
 	let debugTexts = add([

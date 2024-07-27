@@ -9,7 +9,7 @@ import { waver } from "../plugins/wave.js";
 import { isDraggingASlider } from "./windows/colorWindow.ts";
 import { addPlusScoreText, getClicksFromCombo, increaseCombo, maxComboAnim, startCombo } from "./combo-utils.ts";
 import { addConfetti } from "../plugins/confetti.js";
-import { curDraggin } from "../plugins/drag.js";
+import { curDraggin } from "../plugins/drag.ts";
 import { cam } from "./gamescene.ts";
 import { powerupTypes } from "./powerups.ts";
 import { checkForUnlockable, isAchievementUnlocked, unlockAchievement } from "./unlockables.ts";

@@ -97,8 +97,8 @@ class _GameState {
 	}
 
 	cheat() {
-		this.clickers = 500
-		this.cursors = 500
+		this.clickers = 100
+		this.cursors = 100
 		this.score = scoreManager.seventyMillions - 1
 		this.scoreThisRun = scoreManager.seventyMillions - 1
 		this.scoreAllTime = scoreManager.seventyMillions - 1 
@@ -181,7 +181,7 @@ class _scoreManager {
 
 	// Is the actual formula that determines the amounts you get mana at
 	getScoreForManaAT = (manaAllTime:number) => {
-		return (manaAllTime ** 0.5) * this.seventyMillions
+		return (manaAllTime ** 0.15) * this.seventyMillions
 	}
 
 	// how much score is left until the next mana

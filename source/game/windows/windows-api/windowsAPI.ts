@@ -1,7 +1,7 @@
 import { GameState } from "../../../gamestate.ts";
 import { blendColors, bop, getPositionOfSide } from "../../utils.ts";
 import { mouse } from "../../additives.ts";
-import { drag, curDraggin, setCurDraggin } from "../../../plugins/drag.js";
+import { drag, curDraggin, setCurDraggin } from "../../../plugins/drag.ts";
 import { playSfx } from "../../../sound.ts";
 import { addMinibutton, getMinibuttonXPos } from "./minibuttons.ts";
 
@@ -17,7 +17,7 @@ import { statsWinContent } from "../statsWin.ts";
 import { isAchievementUnlocked, unlockAchievement } from "../../unlockables.ts";
 import { medalsWinContent } from "../medalsWin.ts";
 import { ROOT } from "../../../main.ts";
-import { ascending } from "../../ascension/ascension.ts";
+import { ascension } from "../../ascension/ascension.ts";
 
 export let infoForWindows = {};
 export let isHoveringAWindow = false;
@@ -262,8 +262,7 @@ export function openWindow(windowKey = "") {
 	windowObj.activate()
 
 	// add content
-	windowObj.add(infoForWindows[windowKey].content(windowObj, windowKey))
-	// searches for the key
+	infoForWindows[windowKey].content(windowObj, windowKey)
 
 	// animate it
 	tween(0, 1, 0.32, (p) => windowObj.opacity = p, easings.easeOutQuint)
@@ -475,7 +474,7 @@ export function folderObjManaging() {
 
 	// this can't be attached to the buttons because you won't be able to call the event if the buttons don't exist
 	folderObj.onCharInput((key) => {
-		if (ascending) return;
+		if (ascension.ascending == true) return;
 		if (isKeyDown("control")) return
 		if (curDraggin) return
 

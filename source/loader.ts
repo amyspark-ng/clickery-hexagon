@@ -577,19 +577,19 @@ export function loadEverything() {
 			"width": 123,
 			"height": 169,
 		},
-		"card_extra": {
+		"card_crits": {
 			"x": 133 * 3,
 			"y": 0,
 			"width": 123,
 			"height": 169,
 		},
-		"card_bgColor": {
+		"card_hexColor": {
 			"x": 133 * 4,
 			"y": 0,
 			"width": 123,
 			"height": 169,
 		},
-		"card_hexColor": {
+		"card_bgColor": {
 			"x": 133 * 5,
 			"y": 0,
 			"width": 123,

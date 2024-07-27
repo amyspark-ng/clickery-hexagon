@@ -7,9 +7,10 @@ import { bop } from './utils';
 import { ROOT } from '../main';
 import { addToast } from './additives';
 import { addConfetti } from '../plugins/confetti';
-import { gridContainer } from './windows/extraWindow';
+import { gridContainer, makeGridMinibutton } from './windows/extraWindow';
 import { upgradeInfo } from './windows/store/upgrades';
 import { songs, songsListened } from './windows/musicWindow';
+import { GameObj } from 'kaplay';
 
 // type achievementType = {
 // 	title: string, // what you have to do in order to get it
@@ -86,13 +87,11 @@ export let unlockables = {
 
 	// i have to use this fuckass format because javascript object sorting FUCKS. ME. UP
 	
-	// TODO: missing achievements
 	/* TODO: Missing types of achievements
 	- Score per second
 	- Score forfeited on ascending
 	- Score gained by tapping
 	- Score gained by cursors
-	- achievement for listening to all the songs
 	*/
 	"achievements": [
 		// #region SCORE ACHIEVEMENTS =====================
@@ -389,34 +388,35 @@ export function destroyExclamation(obj) {
 	});
 }
 
-export function unlockWindow(windowUnlocked:string) {
-	function addExclamation(obj:any) {
-		if (obj.get("exclamation").length == 0) {
-			let exclamation = obj.add([
-				text("!", { font: "lambdao", size: 45 }),
-				pos(obj.width / 2, -obj.height / 2),
-				anchor("center"),
-				scale(),
-				opacity(1),
-				"exclamation",
-				{
-					times: 0,
-				}
-			])
-		
-			tween(-obj.height, -obj.height / 2, 0.32, (p) => exclamation.pos.y = p, easings.easeOutBack).onEnd(() => {
-				exclamation.use(waver({ maxAmplitude: 5 }))
-				exclamation.startWave()
-			})
-			tween(0.5, 1, 0.32, (p) => exclamation.opacity = p, easings.easeOutQuad)
-		}
-
-		else {
-			let exclamation = obj.get("exclamation")[0]
-			bop(exclamation)
-		}
+export function addExclamation(obj:GameObj) {
+	// there's no exclamation
+	if (obj.get("exclamation").length == 0) {
+		let exclamation = obj.add([
+			text("!", { font: "lambdao", size: 45 }),
+			pos(obj.width / 2, -obj.height / 2),
+			anchor("center"),
+			scale(),
+			opacity(1),
+			waver({ maxAmplitude: 5 }),
+			"exclamation",
+			{
+				times: 0,
+			}
+		])
+	
+		tween(-obj.height, -obj.height / 2, 0.32, (p) => exclamation.pos.y = p, easings.easeOutBack).onEnd(() => {
+			exclamation.startWave()
+		})
+		tween(0.5, 1, 0.32, (p) => exclamation.opacity = p, easings.easeOutQuad)
 	}
 
+	else {
+		let exclamation = obj.get("exclamation")[0]
+		bop(exclamation)
+	}
+}
+
+export function unlockWindow(windowUnlocked:string) {
 	// does the actual stuff
 	GameState.unlockedWindows.push(windowUnlocked)
 	playSfx("hoverhex")
@@ -433,41 +433,58 @@ export function unlockWindow(windowUnlocked:string) {
 		}
 	}
 
+	/**
+	* Used for checking when the extra window is opened and then check
+	* The unlocked gridMinibutton to add the exclamation to it
+	*/
+	function checkForExtraWinOpen() {
+		let checkForWinOpen = ROOT.on("winOpen", (windowOpened) => {
+			if (windowOpened == "extraWin") {
+				let extraWindowObj = get("window").filter(window => window.is("extraWin"))[0]
+				// let newBtn = add(makeGridMinibutton(
+				// 	infoForWindows[windowUnlocked].idx,
+				// 	get("gridShadow").filter(shadow => shadow.idx == infoForWindows[windowUnlocked].idx)[0],
+				// 	extraWindowObj)
+				// )
+				
+				let newlyUnlockedBtn = gridContainer.get("*").filter(btn => btn.windowKey == windowUnlocked)[0]
+				checkForWinOpen.cancel()
+			}
+		})
+	}
+
+	// if folded i have to wait for it to unfold, and then do the extraWin stuff
 	if (folded) {
 		// adds the exclamation, when the folderObj unfolds it 
 		addExclamation(folderObj)
-		
-		// only add the exclamation to the button if the folderobj also has an exclamation
-		if (!folderObj.get("exclamation")) return
 
 		// adds the exclamation to the new minibutton
 		let manageFoldEvent = folderObj.on("managefold", (folded:boolean) => {
-			if (folderObj.get("exclamation")) {
-				destroyExclamation(folderObj)
-				manageFoldEvent.cancel() // behaves as a return??? kinda
-			}
+			destroyExclamation(folderObj)
 
 			if (folded == false) {
-				// if the newly unlocked one went to extra window
-				if (!GameState.taskbar.includes(windowUnlocked)) {
-					// grab the extraWin minibutton and add the exclamation to it
-					let thatOne = get("minibutton").filter(minibutton => minibutton.is("extraWin"))[0]
-					addExclamation(thatOne)
-				}
-				
-				else {
-					// why is it a foreach????
+				// the newly unlocked window is on the taskbar
+				if (GameState.taskbar.includes(windowUnlocked)) {
 					let thatOne = get("minibutton").filter(minibutton => minibutton.is(windowUnlocked))[0] 
 					addExclamation(thatOne)
 				}
 
-				manageFoldEvent.cancel()
+				// the newly unlocked window went to the extra window
+				else {
+					// grab the extraWin minibutton and add the exclamation to it
+					let thatOne = get("minibutton").filter(minibutton => minibutton.is("extraWin"))[0] 
+					addExclamation(thatOne)
+					checkForExtraWinOpen()
+				}
 			}
+
+			manageFoldEvent.cancel() // when the event occurs it stops the event
 		})
 	}
 
 	// unfolded, yikes!!
 	else {
+		// If the window is on the taskbar
 		if (windowUnlocked == "extraWin" || GameState.taskbar.includes(windowUnlocked)) {
 			let newIndex = GameState.taskbar.indexOf(windowUnlocked)
 
@@ -481,27 +498,17 @@ export function unlockWindow(windowUnlocked:string) {
 			addExclamation(newMinibutton)
 		}
 
-		// if the taskbar doesn't contain the new unlocked because taskbar is full then
-		// put an exclamation on the extrawinbutton
+		// If the window went to the extra window
 		else {
-			let extraWinButton = get("extraWin")?.filter(obj => obj.is("minibutton"))[0] 
-			if (extraWinButton) addExclamation(extraWinButton)
+			let extraWinButton = get("minibutton").filter(btn => btn.is("extraWin"))[0] 
+			addExclamation(extraWinButton)
+			checkForExtraWinOpen()
 		}
 	}
 
 	// if window goes to extraWindow
 	if (!GameState.taskbar.includes(windowUnlocked)) {
-		let winOpenEvent = ROOT.on("winOpen", (windowOpened) => {
-			if (windowUnlocked == "extraWin") return
-			if (windowOpened != "extraWin") return
-
-			wait(0.01, () => {
-				let thatOne = gridContainer.get("gridMiniButton").filter(gridminibutton => gridminibutton.windowKey == windowUnlocked)[0]
-				addExclamation(thatOne)
-			})
-
-			winOpenEvent?.cancel()
-		})
+		checkForExtraWinOpen()
 	}
 
 	ROOT.trigger("winUnlock", windowUnlocked)

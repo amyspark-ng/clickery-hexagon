@@ -7,8 +7,11 @@ export function setCurDraggin(value = null) {
 	curDraggin = value
 }
 
-// A custom component for handling drag & drop behavior
-export function drag() {
+/**
+ * Drag objects
+ * @param onlyX - only drag it on the Y axis
+ */
+export function drag(/**/onlyX:boolean = false/**/) {
 
 	// The displacement between object pos and mouse pos
 	let offset = vec2(0)
@@ -29,8 +32,8 @@ export function drag() {
 		// "update" is a lifecycle method gets called every frame the obj is in scene
 		update() {
 			if (curDraggin === this) {
-				if (this.is("sliderButton")) this.pos.x = mousePos().x - (offset.x)
-				else this.pos = mousePos().sub(offset) 
+				if (onlyX == true) this.pos.x = mousePos().x - (offset.x)
+				else this.pos = this.pos = mousePos().sub(offset) 
 				this.trigger("dragUpdate")
 			}
 
@@ -38,13 +41,13 @@ export function drag() {
 				this.dragging = false
 			}
 		},
-		onDrag(action) {
+		onDrag(action:() => void) {
 			return this.on("drag", action)
 		},
-		onDragUpdate(action) {
+		onDragUpdate(action: () => void) {
 			return this.on("dragUpdate", action)
 		},
-		onDragEnd(action) {
+		onDragEnd(action: () => void) {
 			return this.on("dragEnd", action)
 		},
 		inspect() {

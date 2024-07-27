@@ -56,7 +56,7 @@ function updateClosestMinibuttonToDrag() {
     }
 }
 
-export function makeGridMinibutton(idx, gridSlot, winParent) {
+export function makeGridMinibutton(idx:number, gridSlot, winParent) {
 	let selection;
 	let distanceToSlot
 	let distanceToClosestMinibutton;
@@ -308,9 +308,9 @@ export function extraWinContent(winParent) {
 		extraMinibutton.play(`open_${extraMinibutton.isHovering() ? "hover" : "default"}`)
 	}
 
+	// if a window is unlocked and this is opened
 	let winUnlockEvent = ROOT.on("winUnlock", (window) => {
 		let newMinibutton = gridContainer.add(makeGridMinibutton(infoForWindows[window].idx, get(`gridShadow_${infoForWindows[window].idx}`, { recursive: true })[0], winParent))
-		
 	})
 	
 	winParent.on("close", () => {

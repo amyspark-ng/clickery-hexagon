@@ -8,7 +8,7 @@ export function statsWinContent(winParent) {
 
 	winParent.onUpdate(() => {
 		stats = [
-			{ "Total score": formatNumber(GameState.scoreAllTime) },
+			{ "Score all time": formatNumber(GameState.scoreAllTime) },
 			{ "Times clicked": simpleNumberFormatting(GameState.stats.timesClicked) },
 			{ "Powerups clicked": simpleNumberFormatting(GameState.stats.powerupsClicked) },
 			{ "Powerups bought": simpleNumberFormatting(GameState.stats.powerupsBought) },

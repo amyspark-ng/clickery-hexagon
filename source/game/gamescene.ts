@@ -6,11 +6,11 @@ import { addToast, gameBg, mouse } from "./additives.ts"
 import { playMusic, playSfx } from "../sound.ts"
 import { folderObj, folderObjManaging, windowsDefinition } from "./windows/windows-api/windowsAPI.ts"
 import { songs } from "./windows/musicWindow.ts"
-import { curDraggin } from "../plugins/drag.js"
+import { curDraggin } from "../plugins/drag.ts"
 import { DEBUG, ROOT } from "../main.ts"
 import { powerupManagement, powerupTypes, spawnPowerup } from "./powerups.ts"
 import { checkForUnlockable, isAchievementUnlocked, unlockables, unlockAchievement } from "./unlockables.ts"
-import { ascending, set_ascending } from "./ascension/ascension.ts"
+import { ascension } from "./ascension/ascension.ts"
 
 let panderitoLetters = "panderito".split("")
 export let panderitoIndex = 0
@@ -186,7 +186,7 @@ function welcomeBack(idle = false) {
 	}
 
 	if (idle == false) {
-		if (GameState.cursors < 1) {addWelcomeBackToast(null, totalTimeOutsideTab / 1000); return;}
+		if (GameState.cursors < 1 || ascension.ascending == true) {addWelcomeBackToast(null, totalTimeOutsideTab / 1000); return;}
 		
 		autoLoopTime += totalTimeOutsideTab / 1000
 		excessTime = autoLoopTime - GameState.timeUntilAutoLoopEnds
@@ -207,7 +207,7 @@ function welcomeBack(idle = false) {
 	}
 
 	else {
-		if (GameState.cursors < 1) {addWelcomeBackToast(null, timeSlept); return;}
+		if (GameState.cursors < 1 || ascension.ascending == true) {addWelcomeBackToast(null, timeSlept); return;}
 		
 		// SECONDS FOR LOG
 		if (timeSlept > 60) {
@@ -257,7 +257,7 @@ export function gamescene() {
 	return scene("gamescene", () => {
 		GameState.load() // loadSave()
 		hasStartedGame = GameState.scoreAllTime > 1
-		set_ascending(false)
+		ascension.ascending = false
 
 		cam.scale = 1
 
@@ -334,7 +334,7 @@ export function gamescene() {
 				wait(60, () => {
 					loop(1, () => {
 						if (chance(0.0025)) {
-							if (ascending == true) return
+							if (ascension.ascending == true) return
 							if (!isAchievementUnlocked("gnome")) triggerGnome()
 						}
 					})
@@ -357,12 +357,13 @@ export function gamescene() {
 			if (GameState.score >= scoreManager.scoreTilNextMana()) {
 				GameState.ascension.mana++
 				GameState.ascension.manaAllTime++
+				ROOT.trigger("manaGained")
 			}
 			
 			GameState.stats.timesAscended = GameState.ascension.magicLevel - 1
 
 			// auto loop stuff
-			if (GameState.cursors >= 1 && ascending == false) {
+			if (GameState.cursors >= 1 && ascension.ascending == false) {
 				autoLoopTime += dt()
 				
 				// this runs when time's up
@@ -568,18 +569,6 @@ export function gamescene() {
 		ROOT.on("scoreGained", (amount) => {
 			// kill myself
 		})
-
-		// add([
-		// 	sprite("card_clickers"),
-		// 	pos(center()),
-		// 	anchor("center"),
-		// 	layer("ascension"),
-		// 	{
-		// 		update() {
-		// 			this.pos = mousePos()
-		// 		}
-		// 	}
-		// ])
 
 		if (DEBUG) debugFunctions()
 	})

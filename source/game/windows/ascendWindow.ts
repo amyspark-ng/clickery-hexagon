@@ -1,4 +1,5 @@
 import { GameState, scoreManager } from "../../gamestate"
+import { ROOT } from "../../main"
 import { positionSetter } from "../../plugins/positionSetter"
 import { triggerAscension } from "../ascension/ascension"
 import { formatNumber } from "../utils"
@@ -54,7 +55,11 @@ export function ascendWinContent(winParent) {
 	button.onClick(() => {
 		if (GameState.ascension.mana >= 1) triggerAscension()
 	})
-	
+
+	ROOT.on("manaGained", () => {
+		
+	})
+
 	// winParent.on("close", () => {
 	// 	debug.log("goodbye")
 	// })
