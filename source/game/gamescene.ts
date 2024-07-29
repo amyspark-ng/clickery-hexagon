@@ -313,7 +313,7 @@ export function gamescene() {
 						if (chance(0.25)) {
 							if (GameState.hasUnlockedPowerups) {
 								spawnPowerup({
-									type: choose(Object.keys(powerupTypes)) as powerup,
+									type: randomPowerup(),
 									pos: randomPos()
 								})
 							}

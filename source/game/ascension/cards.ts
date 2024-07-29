@@ -189,6 +189,7 @@ function addCard(cardType:string | card, position: Vec2) {
 				}
 
 				talk("card", message)
+				playSfx("onecard", { detune: rand(-75, 75) * this.indexInDeck })
 			},
 
 			buy() {
@@ -310,6 +311,7 @@ export function spawnCards() {
 
 	// now add the cards
 	let dealingXPosition = 947;
+	playSfx("allcards", { detune: rand(-25, 25) })
 	cardsToAdd.forEach((cardToAdd, index) => {
 		let card = addCard(cardToAdd, vec2(dealingXPosition, cardYPositions.hidden))
 		card.angle = rand(-4, 4)
@@ -329,6 +331,7 @@ export function spawnCards() {
 					return (startPoint + cardSpacing) + cardSpacing * (index - 1);
 				}
 
+				playSfx("onecard", { detune: rand(-25, 25) * card.indexInDeck})
 				tween(card.angle, rand(-1.5, 1.5), 0.25, (p) => card.angle = p, easings.easeOutQuart)
 			
 				// pos

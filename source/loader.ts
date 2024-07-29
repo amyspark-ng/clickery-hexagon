@@ -622,7 +622,7 @@ export function loadEverything() {
 	//#region ascension
 	loadSound("mage_e", "sounds/sfx/ascension/mage_e.mp3")
 	loadSound("onecard", "sounds/sfx/ascension/onecard.mp3")
-	loadSound("onecard", "sounds/sfx/ascension/allcards.mp3")
+	loadSound("allcards", "sounds/sfx/ascension/allcards.mp3")
 	//#endregion ascension
 
 	//#region ui

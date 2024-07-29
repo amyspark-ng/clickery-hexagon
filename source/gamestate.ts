@@ -155,7 +155,7 @@ class _scoreManager {
 	// the general score per second clicks and all
 	// no rounding because can be decimal (0.1)
 	scorePerSecond = () => {
-		return (clickVars.clicksPerSecond * (this.scorePerClick() + this.getScoreWithCrit())) + this.autoScorePerSecond()
+		return (clickVars.clicksPerSecond * (this.scorePerClick())) + this.autoScorePerSecond()
 	}
 
 	addScore(amount:number) {
