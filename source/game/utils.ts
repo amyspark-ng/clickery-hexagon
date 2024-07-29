@@ -1,4 +1,4 @@
-import { Color } from "kaplay";
+import { Color, Vec2 } from "kaplay";
 import { GameState, scoreManager } from "../gamestate";
 import { addToast, mouse } from "./additives";
 import { autoLoopTime, cam, triggerGnome } from "./gamescene";
@@ -8,10 +8,11 @@ import { isHoveringAWindow, openWindow } from "./windows/windows-api/windowsAPI"
 import { triggerAscension } from "./ascension/ascension";
 import { powerup, powerupTypes, spawnPowerup } from "./powerups";
 import { songsListened } from "./windows/musicWindow";
+import { sfxHandler, sfxHandlers } from "../sound";
 
 // definetely not stack overflow
 // dots are always for thousands, leave it like this
-export function simpleNumberFormatting(value) {
+export function formatNumberSimple(value:number) {
 	let integerStr = value.toString()
 	var len = integerStr.length;
 	var formatted = "";
@@ -206,6 +207,41 @@ export function getPositionOfSide(obj) {
 	}
 }
 
+/**
+ * This function gets the position an object would if it went in a random direction
+ * @param initialPos The initial pos the obj was in
+ * @param onlyCardinal Wheter to only move on the cardinals, if it's false it will also go diagonal
+ * @param mult How far it would go
+ * @returns vec2() of the object in that position
+ */
+export function getRandomDirection(initialPos:Vec2, onlyCardinal:boolean, mult:number) {
+	onlyCardinal = onlyCardinal || false
+
+	let directions = {
+		"left": LEFT,
+		"right": RIGHT,
+		"top": UP,
+		"bot": DOWN,
+	}
+
+	if (onlyCardinal == false) {
+		directions["botleft"] = vec2(-1, 1)
+		directions["topleft"] = vec2(-1, -1)
+
+		directions["botright"] = vec2(1, 1)
+		directions["botleft"] = vec2(1, -1)
+	}
+
+	let direction = choose(Object.values(directions))
+	direction = direction.scale(mult)
+	
+	let newPos = vec2()
+	newPos.x = initialPos.x + direction.x * mult
+	newPos.y = initialPos.y + direction.y * mult
+
+	return newPos
+}
+
 export function parseAnimation(obj, anim) {
 	let spriteName = !anim.includes(".") ? anim : [anim.split(".")[0], anim.split(".")[1]];
 	obj.unuse("sprite")
@@ -321,6 +357,7 @@ export function debugFunctions() {
 	window.globalThis.openWindow = openWindow
 	window.globalThis.powerupTypes = powerupTypes
 	window.globalThis.songsListened = songsListened
+	window.globalThis.sfxHandlers = sfxHandlers
 
 	onUpdate(() => {
 		// if (isKeyDown("control")) {
@@ -347,10 +384,10 @@ export function debugFunctions() {
 
 	// #region debug stuff
 	onScroll((delta)=>{
-		if (isMouseDown("right")) cam.scale = cam.scale * (1 - 0.1 * Math.sign(delta.y)) 
+		if (isKeyDown("shift")) cam.zoom = cam.zoom * (1 - 0.1 * Math.sign(delta.y)) 
 	})
 
 	onMousePress("middle", () => {
-		if (isMouseDown("right")) cam.scale = 1
+		if (isKeyDown("shift")) cam.zoom = 1
 	})
 }

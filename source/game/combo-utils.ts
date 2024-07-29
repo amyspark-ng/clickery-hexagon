@@ -85,14 +85,7 @@ export function addComboBar() {
 				
 				// # player "gave up"
 				if (this.width == 0 && !clickVars.constantlyClicking && clickVars.comboDropped == false) {
-					clickVars.comboDropped = true
-					clickVars.consecutiveClicks = 0
-					get("comboBar", { recursive: true }).forEach(comboBar => {
-						comboBar.fadeOut(0.25).onEnd(() => {
-							comboBar.destroy()
-							tween(spsText.pos.y, spsText.defaultYPos, 0.5, (p) => spsText.pos.y = p, easings.easeOutQuint)
-						})
-					})
+					dropCombo()
 				}
 
 				let blendFactor = map(scoreManager.combo, 1, COMBO_MAX, 0, 1)
@@ -148,6 +141,7 @@ export function addPlusScoreText(opts:plusScoreOpts) {
 		opacity(1),
 		pos(opts.pos),
 		rotate(0),
+		color(),
 		anchor("center"),
 		layer("ui"),
 		"plusScoreText",
@@ -217,6 +211,8 @@ export function addPlusScoreText(opts:plusScoreOpts) {
 
 		// totalScore.text = `(${formatNumber(opts.value * scoreManager.combo, true, false)})`
 	}
+
+	return plusScoreText;
 }
 
 export function increaseComboText() {
@@ -316,8 +312,8 @@ export function maxComboAnim() {
 export function increaseCombo() {
 	scoreManager.combo = getComboFromClicks(clickVars.consecutiveClicks)
 	playSfx("combo", {detune: scoreManager.combo > 1 ? 100 * scoreManager.combo : 0 })
-	tween(cam.scale, 0.95, 0.25 / 2, (p) => cam.scale = p, easings.easeOutQuint).onEnd(() => {
-		tween(cam.scale, 1, 0.25, (p) => cam.scale = p, easings.easeOutQuint)
+	tween(cam.zoom, 0.95, 0.25 / 2, (p) => cam.zoom = p, easings.easeOutQuint).onEnd(() => {
+		tween(cam.zoom, 1, 0.25, (p) => cam.zoom = p, easings.easeOutQuint)
 	})
 	if (scoreManager.combo != COMBO_MAX) increaseComboText()
 }
@@ -331,5 +327,12 @@ export function startCombo() {
 }
 
 export function dropCombo() {
-
+	clickVars.comboDropped = true
+	clickVars.consecutiveClicks = 0
+	get("comboBar", { recursive: true }).forEach(comboBar => {
+		comboBar.fadeOut(0.25).onEnd(() => {
+			comboBar.destroy()
+			tween(spsText.pos.y, spsText.defaultYPos, 0.5, (p) => spsText.pos.y = p, easings.easeOutQuint)
+		})
+	})
 }

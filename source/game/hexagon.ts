@@ -1,7 +1,7 @@
 
 import { GameState, scoreManager } from "../gamestate.ts";
 import { scoreText, spsText } from "./uicounters.ts";
-import { arrayToColor } from "./utils.ts";
+import { arrayToColor, blendColors, percentage } from "./utils.ts";
 import { addTooltip, mouse } from "./additives.ts";
 import { playSfx } from "../sound.ts";
 import { isDraggingAWindow, isHoveringAWindow, manageWindow } from "./windows/windows-api/windowsAPI.ts";
@@ -92,7 +92,7 @@ export function addHexagon() {
 				
 				if (this.isBeingHovered) maxRotSpeed = 4.75
 				else maxRotSpeed = 4
-				this.rotationSpeed = map(GameState.score, 0, scoreManager.scoreTilNextMana(), 0.01, maxRotSpeed)
+				this.rotationSpeed = map(GameState.score, 0, scoreManager.scoreYouGetNextManaAt(), 0.01, maxRotSpeed)
 				this.rotationSpeed = clamp(this.rotationSpeed, 0.01, maxRotSpeed)
 				this.angle += this.rotationSpeed
 				
@@ -119,7 +119,6 @@ export function addHexagon() {
 				tween(this.scaleIncrease, this.maxScaleIncrease, 0.35, (p) => this.scaleIncrease = p, easings.easeOutQuint)
 				this.isBeingClicked = false
 				clickVars.clicksPerSecond++
-				playSfx("clickRelease", {detune: rand(-50, 50)})
 				mouse.releaseAndPlay("point")
 
 				// # combo stuff
@@ -166,17 +165,58 @@ export function addHexagon() {
 				}
 
 				// # actual score additions
-				addPlusScoreText({
+				let scoreObtained = 0;
+				let isCritical = chance(rand(0.08, 0.1));
+				let isBigCrit:boolean;
+
+				if (isCritical == true) {
+					if (chance(0.2)) isBigCrit = true
+					else isBigCrit = false
+				} 
+
+				if (GameState.critPower > 1 && isCritical == true) {
+					// it's a critical hit
+					scoreObtained = scoreManager.getScoreWithCrit()
+					if (isBigCrit == true) scoreObtained *= rand(1.2, 1.5)
+				}
+
+				else {
+					scoreObtained = scoreManager.scorePerClick()
+				}
+
+				scoreObtained = Math.round(scoreObtained)
+				
+				let plusScoreText = addPlusScoreText({
 					pos: mousePos(),
-					value: scoreManager.scorePerClick(),
+					value: scoreObtained,
 					cursorRelated: false,
 				})
 
-				scoreManager.addScore(scoreManager.scorePerClick())
+				// actually adds the score
+				scoreManager.addScore(scoreObtained)
 
+				// do crit anim stuff
+				// if was critical and there was actually an increase
+				if (scoreObtained > scoreManager.scorePerClick()) {
+					if (isCritical == true && isBigCrit == false) {
+						// add particles
+						plusScoreText.color = blendColors(plusScoreText.color, RED, 0.1)
+						plusScoreText.text += "!"
+					}
+					
+					if (isCritical == true && isBigCrit == true) {
+						plusScoreText.color = blendColors(plusScoreText.color, BLUE, 0.1)
+						plusScoreText.text += "!!"
+					}
+				}
+
+				// other stuff
 				tween(scoreText.scaleIncrease, 1.05, 0.2, (p) => scoreText.scaleIncrease = p, easings.easeOutQuint).onEnd(() => {
 					tween(scoreText.scaleIncrease, 1, 0.2, (p) => scoreText.scaleIncrease = p, easings.easeOutQuint)
 				})
+
+				const tune = rand(-50, isCritical == true ? 100 : 50) 
+				playSfx("clickRelease", {detune: tune})
 
 				if (GameState.settings.panderitoMode) {
 					let smallpanderito = add([

@@ -5,7 +5,6 @@ import { triggerAscension } from "../ascension/ascension"
 import { formatNumber } from "../utils"
 
 export function ascendWinContent(winParent) {
-	// TODO: do a little bar that indicates score til next mana
 	// TODO: if mana is increased while the ascend window is open add a little spark and a sound
 
 	let manaText = winParent.add([
@@ -20,13 +19,16 @@ export function ascendWinContent(winParent) {
 		positionSetter(),
 		{
 			update() {
-				let scoreTilNextMana = formatNumber(scoreManager.scoreTilNextMana() - GameState.scoreAllTime)
+				let scoreTilNextMana = formatNumber(Math.round(scoreManager.scoreYouGetNextManaAt()) - Math.round(GameState.scoreAllTime))
 
 				let text = [
+					// TODO: make it so it shows how much mana you've  gotten since the run started
 					`${GameState.ascension.mana}✦`,
 					`Score 'til next mana: ${scoreTilNextMana}`,
 					`+${GameState.ascension.magicLevel}MG`
 				].join("\n")
+
+				// let manaSinceRunStart = formatNumber(GameState.ascension.mana - GameState.ascension.manaAtStartOfRun)
 
 				this.text = text
 			}
@@ -41,7 +43,7 @@ export function ascendWinContent(winParent) {
 		}),
 		anchor("center"),
 		color(WHITE),
-		pos(0, 0),
+		pos(0, -100),
 		area(),
 		opacity(),
 		{
@@ -82,15 +84,21 @@ export function ascendWinContent(winParent) {
 		rect(0, barFrame.height, { radius: 5 }),
 		pos(-barFrame.width / 2, barFrame.pos.y),
 		anchor("left"),
-		color(BLUE.lighten(300)),
+		color(WHITE),
 		opacity(1),
 		z(barFrame.z - 1),
 		{
 			update() {
-				let actualScoreUntilNextMana = scoreManager.scoreTilNextMana() - GameState.scoreAllTime
+				let scoreTilNextMana = Math.round(scoreManager.scoreYouGetNextManaAt() - GameState.scoreAllTime)
 	
-				let mappedWidth = map(actualScoreUntilNextMana, 0, 0, 0, barFrame.width)
+				let mappedWidth = map(scoreTilNextMana, 0, GameState.scoreAllTime + scoreManager.scoreYouGetNextManaAt(), barFrame.width, 0)
 				this.width = lerp(this.width, mappedWidth, 0.5)
+			
+				const lighter = rgb(178, 208, 247)
+				const darker = rgb(100, 157, 232)
+				this.color.r = wave(lighter.r, darker.r, time() * 2)
+				this.color.g = wave(lighter.g, darker.g, time() * 2)
+				this.color.b = wave(lighter.b, darker.b, time() * 2)
 			}
 		}
 	])

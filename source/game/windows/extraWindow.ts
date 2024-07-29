@@ -151,14 +151,11 @@ export function makeGridMinibutton(windowKey:windowKey, gridSlot:any, winParent:
 							windowKey: thisThing.windowKey,
 							taskbarIndex: closestMinibutton.taskbarIndex,
 							initialPosition: thisThing.pos,
-							destPosition: closestMinibutton.pos
+							destPosition: closestMinibutton.pos,
+							moveToPosition: true
 						})
 
-						GameState.taskbar[closestMinibutton.taskbarIndex] = newMinibutton.windowKey
-						
-						// Snap the button to the closest minibutton
-						tween(thisThing.pos.x, closestMinibutton.pos.x, 0.32, (p) => thisThing.pos.x = p, easings.easeOutQuint);
-						tween(thisThing.pos.y, closestMinibutton.pos.y, 0.32, (p) => thisThing.pos.y = p, easings.easeOutQuint);
+						GameState.taskbar[closestMinibutton.taskbarIndex] = thisThing.windowKey
 						
 						// destroy closestminibutton and grid minibutton
 						tween(closestMinibutton.opacity, 0, 0.32, (p) => closestMinibutton.opacity = p, easings.easeOutQuint)
@@ -168,10 +165,10 @@ export function makeGridMinibutton(windowKey:windowKey, gridSlot:any, winParent:
 						destroy(thisThing)
 						
 						// cmb => closest minibutton
-						let cmbShadow = get(`gridShadow_${closestMinibutton.idxForInfo}`, { recursive: true })[0]
+						let cmbShadow = get(`gridShadow`, { recursive: true }).filter(cmb => cmb.windowKey == closestMinibutton.windowKey)[0]
 		
 						// make the new gridminibutton to the one that was just unpinned
-						gridContainer.add(makeGridMinibutton(windowKey, cmbShadow, winParent))
+						gridContainer.add(makeGridMinibutton(closestMinibutton.windowKey, cmbShadow, winParent))
 						playSfx("plop")
 	
 						get("minibutton").forEach(minibutton => {

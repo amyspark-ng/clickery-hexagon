@@ -5,6 +5,7 @@ import { GameState, scoreManager } from "../gamestate";
 import { bop, formatMusicTime, formatNumber, parseAnimation, randomPos, randomPowerup } from "./utils";
 import { positionSetter } from "../plugins/positionSetter";
 import { checkForUnlockable } from "./unlockables";
+import { ascension } from "./ascension/ascension";
 
 /*
 types of powerups
@@ -213,6 +214,7 @@ export function addPowerupLog(powerupType) {
 }
 
 export function spawnPowerup(opts?:powerupOpt) {
+	if (ascension.ascending == true) return
 	if (opts == undefined) opts = {} as powerupOpt 
 
 	opts.type = opts.type || randomPowerup()
@@ -296,7 +298,7 @@ export function spawnPowerup(opts?:powerupOpt) {
 				let multiplier = 0
 				let time = 0
 
-				const power = GameState.powerupPower / 100
+				const power = GameState.powerupPower
 
 				if (opts.multiplier == null) {
 					if (opts.type == "clicks" || opts.type == "cursors") {

@@ -1,7 +1,8 @@
 import { GameState, scoreManager } from "../gamestate.ts";
 import { positionSetter } from "../plugins/positionSetter.ts";
 import { waver } from "../plugins/wave.js";
-import { bop, formatNumber, getPositionOfSide, simpleNumberFormatting } from "./utils.ts";
+import { clickVars } from "./hexagon.ts";
+import { bop, formatNumber, getPositionOfSide, formatNumberSimple } from "./utils.ts";
 import { isHoveringAWindow } from "./windows/windows-api/windowsAPI.ts";
 
 export let scoreText:any;
@@ -88,22 +89,28 @@ export function uiCounters() {
 				this.value = scoreManager.scorePerSecond() * multiplyValue
 			},
 			update() {
-				if (isMousePressed("left") && this.isHovering() && isHoveringAWindow == false) {
+				this.text = this.formatSpsText(this.value, GameState.settings.spsTextMode)
+			},
+
+			click() {
+				if (isHoveringAWindow == false) {
 					// 1 second, 2 minute, 3 hour
 					GameState.settings.spsTextMode++
 					if (GameState.settings.spsTextMode > 3) GameState.settings.spsTextMode = 1
 					this.updateValue()
 					bop(this, 0.05)
 				}
-
-				this.text = this.formatSpsText(this.value, GameState.settings.spsTextMode)
 			}
 		}
 	])
 
+	spsText.onClick(() => {
+		spsText.click()
+	})
+
 	let buildingTextTextOpts = { size: 40, lineSpacing: 1.5, font: "lambdao" }
 	buildingsText = add([
-		text(`${simpleNumberFormatting(GameState.cursors)}<\n${simpleNumberFormatting(GameState.clickers)}`, buildingTextTextOpts),
+		text(`${formatNumberSimple(GameState.cursors)}<\n${formatNumberSimple(GameState.clickers)}`, buildingTextTextOpts),
 		opacity(1),
 		anchor("left"),
 		layer("ui"),
@@ -111,12 +118,12 @@ export function uiCounters() {
 		waver({ maxAmplitude: 8, wave_speed: 0.8 }),
 		{
 			update() {
-				this.text = `${simpleNumberFormatting(GameState.cursors)}\n${simpleNumberFormatting(GameState.clickers)}`
+				this.text = `${formatNumberSimple(GameState.cursors)}\n${formatNumberSimple(GameState.clickers)}`
 			},
 
 			draw() {
-				let clickersWidth = formatText({ text: `${simpleNumberFormatting(GameState.clickers)}`, ...buildingTextTextOpts }).width	
-				let cursorsWidth = formatText({ text: `${simpleNumberFormatting(GameState.cursors)}`, ...buildingTextTextOpts }).width	
+				let clickersWidth = formatText({ text: `${formatNumberSimple(GameState.clickers)}`, ...buildingTextTextOpts }).width	
+				let cursorsWidth = formatText({ text: `${formatNumberSimple(GameState.cursors)}`, ...buildingTextTextOpts }).width	
 				
 				// clickers
 				drawSprite({

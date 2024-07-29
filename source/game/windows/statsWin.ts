@@ -1,7 +1,7 @@
 import { GameState } from "../../gamestate";
 import { positionSetter } from "../../plugins/positionSetter";
 import { unlockables } from "../unlockables";
-import { formatNumber, simpleNumberFormatting, toHHMMSS } from "../utils";
+import { formatNumber, formatNumberSimple, toHHMMSS } from "../utils";
 
 export function statsWinContent(winParent) {
 	let stats = [];
@@ -9,9 +9,9 @@ export function statsWinContent(winParent) {
 	winParent.onUpdate(() => {
 		stats = [
 			{ "Score all time": formatNumber(GameState.scoreAllTime) },
-			{ "Times clicked": simpleNumberFormatting(GameState.stats.timesClicked) },
-			{ "Powerups clicked": simpleNumberFormatting(GameState.stats.powerupsClicked) },
-			{ "Powerups bought": simpleNumberFormatting(GameState.stats.powerupsBought) },
+			{ "Times clicked": formatNumberSimple(GameState.stats.timesClicked) },
+			{ "Powerups clicked": formatNumberSimple(GameState.stats.powerupsClicked) },
+			{ "Powerups bought": formatNumberSimple(GameState.stats.powerupsBought) },
 			{ "Achievements unlocked": `${GameState.unlockedAchievements.length}/${unlockables.achievements.length}` },
 			{ "Total time played": toHHMMSS(Math.round(GameState.stats.totalTimePlayed)) },
 		]
@@ -19,7 +19,7 @@ export function statsWinContent(winParent) {
 		if (GameState.stats.timesAscended > 0) {
 			stats[0] = { "Score all time": formatNumber(GameState.scoreAllTime) }
 			stats[1] = { "Score this run": formatNumber(GameState.scoreThisRun) }
-			stats.splice(2, 0, { "Times clicked": `${simpleNumberFormatting(GameState.stats.timesClicked)}` });
+			stats.splice(2, 0, { "Times clicked": `${formatNumberSimple(GameState.stats.timesClicked)}` });
 
 			let ascendStatObject = { "Times ascended": `${GameState.stats.timesAscended}` }
 			if (stats.indexOf(ascendStatObject) == -1) stats.push(ascendStatObject)

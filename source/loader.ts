@@ -333,6 +333,8 @@ export function loadEverything() {
 			}
 		}
 	})
+	loadSprite("upgrade", "sprites/windows/storeWin/upgrade.png")
+	loadSprite("upgradelock", "sprites/windows/storeWin/upgradelock.png")
 
 	loadSprite("upgrades", "sprites/upgrades.png", {
 		sliceX: 18,
@@ -619,6 +621,8 @@ export function loadEverything() {
 	
 	//#region ascension
 	loadSound("mage_e", "sounds/sfx/ascension/mage_e.mp3")
+	loadSound("onecard", "sounds/sfx/ascension/onecard.mp3")
+	loadSound("onecard", "sounds/sfx/ascension/allcards.mp3")
 	//#endregion ascension
 
 	//#region ui
@@ -638,6 +642,10 @@ export function loadEverything() {
 	loadSound("windowUnlocked", "sounds/sfx/window/windowUnlocked.wav")
 	loadSound("openWin", "sounds/sfx/window/openWin.wav")
 	loadSound("closeWin", "sounds/sfx/window/closeWin.wav")
+	loadSound("progress", "sounds/sfx/window/progress.wav")
+	loadSound("wrong", "sounds/sfx/window/wrong.wav")
+	loadSound("chainwrong", "sounds/sfx/window/chainwrong.mp3")
+	loadSound("chainbreak", "sounds/sfx/window/chainbreak.mp3")
 	//#endregion window
 	
 	loadSound("gnome", "sounds/sfx/gnome.ogg")

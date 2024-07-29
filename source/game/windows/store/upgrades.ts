@@ -1,8 +1,8 @@
 import { GameState, scoreManager } from "../../../gamestate";
 import { ROOT } from "../../../main";
-import { playSfx } from "../../../sound";
+import { playSfx, sfxHandler, sfxHandlers } from "../../../sound";
 import { addTooltip } from "../../additives";
-import { blendColors, bop, formatNumber } from "../../utils";
+import { blendColors, bop, formatNumber, getRandomDirection, parseAnimation } from "../../utils";
 
 export let upgradeInfo = {
 	"k_0": { value: 2, price: 500 },
@@ -38,16 +38,23 @@ export function addUpgrades(elementParent) {
 		if (i == 3) {desiredPos.y += spacing.y; desiredPos.x = initialPos.x}
 		desiredPos.x += spacing.x
 		
+		let progressSound = playSfx()
+		progressSound.volume = 0
+		
+		let downEvent = null
+		
 		let elementColor = elementParent.is("clickersElement") ? rgb(49, 156, 222) : rgb(49, 222, 58)
-		let newColor = blendColors(WHITE, elementColor, map(i, 0, 6, 0.5, 1))
+		let newColor = blendColors(elementColor.lighten(310), elementColor, map(i, 0, 6, 0.5, 1))
+		
 		let upgradeObj = elementParent.add([
+			sprite("upgrade"),
 			pos(desiredPos),
-			rect(45, 45, { radius: 10 }),
 			color(newColor),
 			anchor("center"),
 			scale(1),
 			z(winParent.z + 1),
 			area(),
+			outline(5, BLACK),
 			"upgrade",
 			"hoverObj",
 			{
@@ -109,6 +116,9 @@ export function addUpgrades(elementParent) {
 				dropBuy() {
 					tween(this.scale, this.isHovering() ? vec2(1.1) : vec2(1), 0.15, (p) => this.scale = p, easings.easeOutQuad)
 					tween(this.boughtProgress, 0, 0.15, (p) => this.boughtProgress = p, easings.easeOutQuad)
+					this.trigger("dropBuy")
+					downEvent?.cancel()
+					downEvent = null
 				},
 
 				startHover() {
@@ -123,17 +133,13 @@ export function addUpgrades(elementParent) {
 					this.parent.startHover()
 					tween(this.parent.opacity, 1, 0.15, (p) => this.parent.opacity = p, easings.easeOutQuad)
 
-					if (!isUpgradeBought(upgradeObj.id)) this.dropBuy()
+					if (!isUpgradeBought(upgradeObj.id) && this.boughtProgress > 0) this.dropBuy()
 					tween(this.scale, vec2(1), 0.15, (p) => this.scale = p, easings.easeOutQuad)
-					if (!isUpgradeBought(this.id)) {
-						upgradeObj.tooltips?.filter(tooltip => tooltip.type == "price").forEach(tooltip => {
-							tooltip.end()
-						});
-					}
+					this.tooltips?.forEach(tooltip => tooltip.end())
 				},
 
 				buy() {
-					upgradeObj.tooltips?.filter(tooltip => tooltip.type == "price").forEach(tooltip => {
+					upgradeObj.tooltips?.forEach(tooltip => {
 						tooltip.end()
 					});
 					GameState.upgradesBought.push(this.id)
@@ -162,19 +168,31 @@ export function addUpgrades(elementParent) {
 					drawText({
 						text: this.freq != null ? `${this.freq}s` : `x${this.value}`,
 						anchor: "center",
+						font: "lambda",
 						size: this.height / 2,
 						align: "center",
 					})
 					
 					if (isUpgradeBought(upgradeObj.id)) return
+					// draw the bought progress bar
 					drawRect({
 						width: this.width,
 						height: map(this.boughtProgress, 0, 100, this.height, 0),
 						anchor: "bot",
-						radius: this.radius,
+						radius: 10,
 						color: BLACK,
+						opacity: map(this.boughtProgress, 0, 100, 0.5, 0.05),
 						pos: vec2(0, this.height / 2),
-						opacity: 0.5,
+					})
+
+					// draw lock
+					drawSprite({
+						sprite: "upgradelock",
+						pos: vec2((upgradeObj.width / 2), (-upgradeObj.height / 2) + 5),
+						anchor: "center",
+						scale: vec2(0.7),
+						color: GameState.score >= this.price ? GREEN.lighten(100) : RED.lighten(100),
+						opacity: map(this.boughtProgress, 0, 100, 1, 0.10),
 					})
 				},
 
@@ -183,6 +201,25 @@ export function addUpgrades(elementParent) {
 				},
 			}
 		])
+
+		const addPriceTooltip = () => {
+			let tooltip = addTooltip(upgradeObj, {
+				text: formatNumber(upgradeObj.price, { price: true, fixAmount: 1 }),
+				textSize: upgradeObj.height / 2,
+				direction: "down",
+				lerpValue: 0.75,
+				type: "price",
+			})
+			
+			tooltip.tooltipText.onUpdate(() => {
+				if (GameState.score >= upgradeObj.price) tooltip.tooltipText.color = GREEN
+				else tooltip.tooltipText.color = RED
+			})
+			
+			return tooltip;
+		}
+		
+		const addedPosition = upgradeObj.pos
 		
 		// sets info like id price and value/freq
 		upgradeObj.id = upgradeObj.type + upgradeObj.idx
@@ -194,81 +231,138 @@ export function addUpgrades(elementParent) {
 			else upgradeObj.value = upgradeInfo[upgradeObj.id].value
 		}
 
-		let downEvent = null;
-		upgradeObj.onMousePress("left", () => {
+		upgradeObj.outline.color = upgradeObj.color.darken(10)
+
+		upgradeObj.onClick(() => {
 			if (!winParent.active) return
-		
-			if (!upgradeObj.isHovering()) return;
-			if (isUpgradeBought(upgradeObj.id) || GameState.score < upgradeObj.price) {
+
+			if (isUpgradeBought(upgradeObj.id)) {
+				bop(upgradeObj)
+				upgradeObj.trigger("dummyClick")
+
+				// add a little particle silly
+				let sillyParticle = elementParent.add([
+					sprite("cursors"),
+					opacity(),
+					pos(upgradeObj.pos.x, upgradeObj.pos.y - upgradeObj.height / 2 + 5),
+					anchor("center"),
+					z(upgradeObj.z - 1),
+					scale(rand(0.25, 0.5)),
+					{
+						update() {
+							this.pos.y -= 1.5
+							this.pos.x = wave(upgradeObj.pos.x - 5, upgradeObj.pos.x + 5, time() * 5)
+						}
+					}
+				])
+
+				sillyParticle.fadeIn(0.1).onEnd(() => sillyParticle.fadeOut(0.25).onEnd(() => sillyParticle.destroy()))
+				
+				if (upgradeObj.type == "k_") parseAnimation(sillyParticle, "cursors.cursor")
+				else if (upgradeObj.type == "c_") parseAnimation(sillyParticle, "cursors.point")
+
 				return
 			}
 
-			if (upgradeObj.id == "c_2" && !isUpgradeBought("c_1")) {
-				upgradeObj.tooltips?.filter(tooltip => tooltip.type == "price").forEach(tooltip => {
-					tooltip.end()
-				});
+			// hasn't bought it
+			else {
+				if (upgradeObj.id == "c_2" && !isUpgradeBought("c_1")) {
+					// remove all tooltips that are not buy previous one
+					upgradeObj.tooltips.filter(tooltip => tooltip.type != "buypreviousupgrade").forEach(tooltip => tooltip.end())
+	
+					if (upgradeObj.tooltips.filter(tooltip => tooltip.type == "buypreviousupgrade").length == 0) {
+						let tooltip = addTooltip(upgradeObj, {
+							text: "You have to buy the previous one",
+							textSize: upgradeObj.height / 2,
+							direction: "down",
+							type: "buypreviousupgrade",
+						})
+					}
 
-				let tooltip = addTooltip(upgradeObj, {
-					text: "You have to buy the previous one",
-					textSize: upgradeObj.height / 2,
-					direction: "down",
-					type: "price",
-				})
+					upgradeObj.trigger("dummyClick")
+					
+					return // end the event
+				}
+			
+				else if (GameState.score < upgradeObj.price) {
+					upgradeObj.trigger("notEnoughMoney")
+					return
+				}
 
-				return // end the event
+				else if (GameState.score > upgradeObj.price) {
+					progressSound.stop()
+					progressSound = playSfx("progress")		
+
+					// down event
+					downEvent = upgradeObj.onMouseDown(() => {
+						if (isUpgradeBought(upgradeObj.id)) return
+						if (upgradeObj.boughtProgress > 5) {
+							// there's a tutorial tooltip, get rid of it
+							if (upgradeObj.tooltips.filter(tooltip => tooltip.type == "tutorial").length > 0) {
+								upgradeObj.tooltips.forEach(tooltip => tooltip.end())
+								addPriceTooltip()
+							
+								progressSound.stop()
+								let speed = map(upgradeObj.boughtProgress, 0, 100, 1, 1.25)
+								progressSound = playSfx("progress", { detune: upgradeObj.boughtProgress })
+							}
+						}
+						
+						if (upgradeObj.boughtProgress < 100) {
+							upgradeObj.boughtProgress += 2 // time to hold
+							upgradeObj.scale.x = map(upgradeObj.boughtProgress, 0, 100, 1.1, 0.85)
+							upgradeObj.scale.y = map(upgradeObj.boughtProgress, 0, 100, 1.1, 0.85)
+							progressSound.detune = upgradeObj.boughtProgress
+						}
+			
+						if (upgradeObj.boughtProgress >= 100) {
+							upgradeObj.buy()
+							upgradeObj.manageBlinkText().end()
+						}
+					})
+				}
 			}
-
-			downEvent = upgradeObj.onMouseDown(() => {
-				if (isUpgradeBought(upgradeObj.id)) return
-				if (!upgradeObj.isHovering()) return
-	
-				if (upgradeObj.boughtProgress < 100) {
-					upgradeObj.boughtProgress += 2 // time to hold
-					upgradeObj.scale.x = map(upgradeObj.boughtProgress, 0, 100, 1.1, 0.85)
-					upgradeObj.scale.y = map(upgradeObj.boughtProgress, 0, 100, 1.1, 0.85)
-				}
-	
-				if (upgradeObj.boughtProgress >= 100) {
-					upgradeObj.buy()
-					upgradeObj.manageBlinkText().end()
-				}
-			})
-
-			bop(upgradeObj);
 		})
 
 		upgradeObj.onMouseRelease(() => {
 			if (!winParent.active) return
 		
 			if (isUpgradeBought(upgradeObj.id)) return
+			if (!upgradeObj.isHovering()) return
 			upgradeObj.dropBuy()
-			downEvent?.cancel()
-			downEvent = null
+
+			if (GameState.score >= upgradeObj.price) {
+				// this is what happens when you click several times but you're not buying!!
+				// you're confused!!!!!
+				if (upgradeObj.boughtProgress < 1 && upgradeObj.tooltips.filter(tooltip => tooltip.type == "buypreviousupgrade").length == 0) {
+					let tutorialtooltips = upgradeObj.tooltips.filter(tooltip => tooltip.type == "tutorial")
+					if (tutorialtooltips.length == 0) {
+						upgradeObj.tooltips.forEach(tooltip => tooltip.end())
+						let tutorialTooltip = addTooltip(upgradeObj, {
+							text: "Hold down to buy!",
+							lerpValue: 0.75,
+							type: "tutorial",
+							direction: "down",
+						})
+					}
+				}
+
+				upgradeObj.trigger("dummyClick")
+			}
 		})
 
+		let tooltip = null;
 		upgradeObj.onHover(() => {
 			if (!winParent.active) return
 			upgradeObj.startHover()
-		
+			
 			let textInBlink = upgradeObj.value != null ? `+${upgradeObj.value}` : `Cursors now click every ${upgradeObj.freq} seconds`;
 			if (!isUpgradeBought(upgradeObj.id) && !upgradeObj.hasTooltip) {
-				upgradeObj.tooltips?.filter(tooltip => tooltip.type == "price").forEach(tooltip => {
+				upgradeObj.tooltips?.forEach(tooltip => {
 					tooltip.end()
 				});
 
-				let tooltip = addTooltip(upgradeObj, {
-					text: formatNumber(upgradeObj.price, { price: true, fixAmount: 1 }),
-					textSize: upgradeObj.height / 2,
-					direction: "down",
-					lerpValue: 0.75,
-					type: "price",
-				})
-
-				tooltip.tooltipText.onUpdate(() => {
-					if (GameState.score >= upgradeObj.price) tooltip.tooltipText.color = GREEN
-					else tooltip.tooltipText.color = RED
-				})
-
+				tooltip = addPriceTooltip()
 				upgradeObj.manageBlinkText(textInBlink).addT()
 			}
 		})
@@ -276,27 +370,38 @@ export function addUpgrades(elementParent) {
 		upgradeObj.onHoverEnd(() => {
 			if (!winParent.active) return
 			upgradeObj.endHover()
-		
-			upgradeObj.tooltips?.filter(tooltip => tooltip.type == "price").forEach(tooltip => {
-				tooltip.end()
-			});
 			upgradeObj.manageBlinkText().end()
 		})
 
-		let drawShadow = elementParent.onDraw(() => {
-			// drawRect({
-			// 	width: upgradeObj.width,
-			// 	height: upgradeObj.height,
-			// 	color: BLACK,
-			// 	pos: vec2(upgradeObj.pos.x, upgradeObj.pos.y + 4),
-			// 	radius: upgradeObj.radius,
-			// 	opacity: 0.75,
-			// 	anchor: "center",
-			// })
+		upgradeObj.on("notEnoughMoney", () => {
+			// opts.pos is the position it was added to
+			const direction = getRandomDirection(addedPosition, false, 1.25)
+			tween(direction, addedPosition, 0.25, (p) => upgradeObj.pos = p, easings.easeOutQuint)
+			tween(choose([-15, 15]), 0, 0.25, (p) => tooltip.tooltipText.angle = p, easings.easeOutQuint)
+			playSfx("wrong", { detune: rand(25, 75) })
 		})
 
-		upgradeObj.onDestroy(() => {
-			drawShadow.cancel()
+		upgradeObj.on("dropBuy", () => {
+			tween(progressSound.volume, 0, 0.35, (p) => progressSound.volume = p).onEnd(() => {
+				progressSound.stop()
+			})
+			sfxHandlers.delete(progressSound)
+		})
+
+		upgradeObj.on("dummyClick", () => {
+			tween(choose([-15, 15]), 0, 0.15, (p) => upgradeObj.angle = p, easings.easeOutQuint)
+			playSfx("clickButton", { detune: rand(-25, 25) })
+		})
+
+		// draw dumb shadow
+		let drawShadow = elementParent.onDraw(() => {
+			drawSprite({
+				sprite: upgradeObj.sprite,
+				opacity: 0.25,
+				pos: vec2(upgradeObj.pos.x, upgradeObj.pos.y + 2),
+				anchor: upgradeObj.anchor,
+				color: BLACK,
+			})
 		})
 	}
 }

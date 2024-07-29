@@ -15,22 +15,20 @@ this game MIGHT be getting done
 - there's a point where stuff is too expensive and you have to click too much to buy at least
 ^ that's where you got to ascend
 
-- increase the prices of click upgrades
-^ just a little
 - make powerups a little bit cheaper
-- add chains sound
-- add cards sound
+- implement cards sound
 - make new graphic for upgrades
-- why are prices so cheap in cursor upgrades
+- increase the prices of click upgrades and cursor upgradess
+^ just a little
 - make cursors more powerful so you don't have to click too much
-- fix the powerup store element so the icon it's centered
+- add the mute dialogue option 
+- make it so spamming the powerup unlock store element is nicer
+- what the hell happens why the fuck do achievements appear and appear and appear and appear
+- unified format time function
+- AudioParam.value setter value being assigned is not a finite floating point value
+^ this happens in the sfxHandler.volume update line in the audiomanager
 
-<!-- some powerup stuff -->
-<!-- bugs -->
-- BU-GS I HATE THEM -
-- add the mute dialogue option
-
-- IDEA: make a component that manages the mouse animation for objects outside of windows
+- make a component that manages the hovers of objects inside and outside of a window
 
 ## Complex stuff
 - I REALLYYY need to fix the hover animations

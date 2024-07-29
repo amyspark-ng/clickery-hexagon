@@ -117,13 +117,13 @@ export function storeWinContent(winParent) {
 		winParent.onUpdate(() => {
 			if (!winParent.is("window")) return
 			
-			if (GameState.clickers == 1 && GameState.scoreThisRun >= storeElementsInfo.clickersElement.basePrice) {
+			if (GameState.clickers == 1 && GameState.score >= storeElementsInfo.clickersElement.basePrice) {
 				if (getTooltip("tutorialClickers").length == 0) {
 					clickersTutToolTip()
 				}
 			}
 			
-			if (GameState.cursors == 0 && GameState.scoreThisRun >= storeElementsInfo.cursorsElement.basePrice) {
+			if (GameState.cursors == 0 && GameState.score >= storeElementsInfo.cursorsElement.basePrice) {
 				if (getTooltip("tutorialCursors").length == 0) {
 					cursorsTutToolTip()
 				}

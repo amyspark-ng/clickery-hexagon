@@ -22,9 +22,9 @@ class _GameState {
 
 	// powerups 
 	hasUnlockedPowerups = false
+	
 	powerupPower = 1
-
-	critPower = 1
+	critPower = 0
 
 	ascension = {
 		mana: 0,
@@ -35,7 +35,7 @@ class _GameState {
 		clickPercentagesBought: 0,
 		cursorsPercentagesBought: 0,
 		powerupPowersBought: 0,
-		critPercentagesBought: 0,
+		critPowersBought: 0,
 	}
 
 	unlockedAchievements = []
@@ -101,6 +101,11 @@ class _GameState {
 		this.score = scoreManager.seventyMillions - 1
 		this.scoreThisRun = scoreManager.seventyMillions - 1
 		this.scoreAllTime = scoreManager.seventyMillions - 1 
+	
+		this.critPower = 10
+		this.powerupPower = 10
+		this.clickPercentage = 50
+		this.cursorsPercentage = 50
 	}
 }
 
@@ -122,6 +127,10 @@ class _scoreManager {
 		let noPercentage = (vanillaValue * (powerupTypes.clicks.multiplier * powerupTypes.awesome.multiplier) * this.combo)
 		let returnValue = noPercentage + percentage(GameState.clickPercentage, noPercentage)
 		return Math.round(returnValue)
+	}
+
+	getScoreWithCrit = () => {
+		return Math.round(this.scorePerClick() * (GameState.critPower * 0.5))
 	}
 
 	// score per cursor click (not including powerups or percentages)
@@ -146,7 +155,7 @@ class _scoreManager {
 	// the general score per second clicks and all
 	// no rounding because can be decimal (0.1)
 	scorePerSecond = () => {
-		return (clickVars.clicksPerSecond * this.scorePerClick()) + this.autoScorePerSecond()
+		return (clickVars.clicksPerSecond * (this.scorePerClick() + this.getScoreWithCrit())) + this.autoScorePerSecond()
 	}
 
 	addScore(amount:number) {
@@ -186,7 +195,7 @@ class _scoreManager {
 	}
 
 	// how much score is left until the next mana
-	scoreTilNextMana = () => {
+	scoreYouGetNextManaAt = () => {
 		let nextManaAt = this.getScoreForManaAT(GameState.ascension.manaAllTime + 1);
 		return nextManaAt;
 	}

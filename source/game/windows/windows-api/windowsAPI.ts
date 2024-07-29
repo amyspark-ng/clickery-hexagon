@@ -337,7 +337,7 @@ export function openWindow(windowKey:windowKey) {
 		drawShadowEvent.cancel()
 	})
 
-	ROOT.trigger("winOpen", windowKey)
+	ROOT.trigger("winOpen", windowKey as windowKey)
 
 	return windowObj;
 }
@@ -455,7 +455,7 @@ export function folderObjManaging() {
 				
 				if (curDraggin?.is("gridMiniButton") || curDraggin?.is("minibutton")) return
 				if (!movingMinibuttons) {
-					if (isKeyPressed("space") || (isMousePressed("left") && this.isHovering())) {
+					if (this.interactable == true && isKeyPressed("space") || (isMousePressed("left") && this.isHovering())) {
 						this.manageFold()
 						this.deleteSlots()
 						bop(this)

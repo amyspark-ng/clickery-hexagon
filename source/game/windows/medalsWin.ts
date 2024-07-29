@@ -86,6 +86,7 @@ export function medalsWinContent(winParent) {
 			let tooltip = addTooltip(medalObj, { 
 				text: getAchievementFor(medalObj.achievementId).text,
 				direction: "down",
+				lerpValue: 0.9,
 			})
 		})
 
@@ -103,6 +104,8 @@ export function medalsWinContent(winParent) {
 		addMedal(indexToGrid(i), medalInfo)
 	}
 
+	let scrollSpeed = 0
+
 	function scrollDown() {
 		// if the idx of last medal is the same as the last medal in the unlockables.achievements
 		let allMedals = medalsContainer.get("medal") // have to reverse the one before idk why
@@ -115,10 +118,10 @@ export function medalsWinContent(winParent) {
 
 		medalsContainer.get("medal").forEach(medal => {
 			medal.row--
-			tween(medal.pos.y, medal.pos.y - spacing.y, 0.2, (p) => medal.pos.y = p, easings.easeInOutSine)
+			tween(medal.pos.y, medal.pos.y - spacing.y, scrollSpeed, (p) => medal.pos.y = p, easings.easeInOutSine)
 		})
 
-		wait(0.2 / 2, () => {
+		wait(scrollSpeed / 2, () => {
 			let indexOfLastAchievementInList = allAchivementsNames().indexOf(medalsContainer.get("medal")[medalsContainer.get("medal").length - 1].achievementId)
 			let nextMedals = allAchivementsNames().slice(indexOfLastAchievementInList + 1, allAchivementsNames().length)
 			nextMedals.length = Math.min(nextMedals.length, totalColumns)
@@ -144,10 +147,10 @@ export function medalsWinContent(winParent) {
 
 		medalsContainer.get("medal").forEach(medal => {
 			medal.row++
-			tween(medal.pos.y, medal.pos.y + spacing.y, 0.2, (p) => medal.pos.y = p, easings.easeInOutSine)
+			tween(medal.pos.y, medal.pos.y + spacing.y, scrollSpeed, (p) => medal.pos.y = p, easings.easeInOutSine)
 		})
 
-		wait(0.2 / 2, () => {
+		wait(scrollSpeed / 2, () => {
 			// grabs all the next achievements to the last in the list
 			let previousMedalsNames = allAchivementsNames().slice(0, allAchivementsNames().indexOf(medalsContainer.get("medal")[0].achievementId));
 			let previousMedalsInfo = previousMedalsNames.map(medal => getAchievementFor(medal))

@@ -11,26 +11,42 @@ let cardsInfo = {
 	"clickersCard": { 
 		info: "Clickers are +[number]% more efficient",
 		basePrice: 1,
-		percentageIncrease: 140,
+		percentageIncrease: 100,
 		idx: 0,
+		gamestateInfo: {
+			key: "clickPercentage",
+			objectAmount: "ascension.clickPercentagesBought"
+		}
 	},
 	"cursorsCard": { 
 		info: "Cursors are +[number]% more efficient",
-		basePrice: 2,
-		percentageIncrease: 150,
+		basePrice: 1,
+		percentageIncrease: 110,
 		idx: 1,
+		gamestateInfo: {
+			key: "cursorsPercentage",
+			objectAmount: "ascension.cursorsPercentagesBought"
+		}
 	},
 	"powerupsCard": { 
-		info: "Powerups are +[number]% more efficient",
-		basePrice: 3,
+		info: "Powerups will be +[number]x more powerful",
+		basePrice: 2,
 		percentageIncrease: 120,
 		idx: 2,
+		gamestateInfo: {
+			key: "powerupPower",
+			objectAmount: "ascension.powerupPowersBought"
+		}
 	},
 	"critsCard": {
-		info: "Criticals are +[number]% more powerful",
+		info: "Criticals will be +[number]x more powerful",
 		basePrice: 3,
-		percentageIncrease: 120,
+		percentageIncrease: 122,
 		idx: 3,
+		gamestateInfo: {
+			key: "critPower",
+			objectAmount: "ascension.critPowersBought"
+		}
 	},
 	"hexColorCard": { 
 		info: "You can customize the hexagon's color",
@@ -39,7 +55,7 @@ let cardsInfo = {
 	},
 	"bgColorCard": { 
 		info: "You can customize the background's color",
-		unlockPrice: 6,
+		unlockPrice: 5,
 		idx: 5,
 	},
 }
@@ -68,12 +84,17 @@ let cardYPositions = {
 function getAdditive(type:card) {
 	let additive:number
 
-	if (!(type == "hexColorCard" || type == "bgColorCard") && type != "powerupsCard") {
+	if (type == "clickersCard" || type == "cursorsCard") {
 		additive = randi(8, 12)
 	}
 
 	else if (type == "powerupsCard") {
 		additive = randi(1, 5)
+	}
+
+	else if (type == "critsCard") {
+		if (GameState.ascension.critPowersBought == 0) additive = 1
+		else additive = randi(10, 15) 
 	}
 
 	else if (type == "hexColorCard" || type == "bgColorCard") {
@@ -123,47 +144,11 @@ function addCard(cardType:string | card, position: Vec2) {
 			price: 1,
 			type: cardType,
 			typeIdx: cardsInfo[cardType].idx,
-			gamestateInfo: { key: "", objectAmount: "" }, // used to know what to increase and what to check
 			additive: getAdditive(cardType as card),
 			update() {
-				// sets gamestate key
-				switch (this.type as card) {
-					case "clickersCard":
-						this.gamestateInfo.key = "clickPercentage"
-						this.gamestateInfo.objectAmount = "ascension.clickPercentagesBought"
-					break;
-				
-					case "cursorsCard":
-						this.gamestateInfo.key = "cursorsPercentage"
-						this.gamestateInfo.objectAmount = "ascension.cursorsPercentagesBought"
-					break;
-
-					case "powerupsCard":
-						this.gamestateInfo.key = "powerupPower"
-						this.gamestateInfo.objectAmount = "ascension.powerupPowersBought"
-					break;
-
-					case "critsCard":
-						this.gamestateInfo.key = "critPower"
-						this.gamestateInfo.objectAmount = "ascension.critPercentagesBought"
-					break;
-
-					case "hexColorCard": 
-						this.gamestateInfo.key = "hexColor"
-						this.gamestateInfo.objectAmount = "0"
-					break;
-
-					case "bgColorCard": 
-						this.gamestateInfo.key = "bgColor"
-						this.gamestateInfo.objectAmount = "0"
-					break;
-
-					default: throw new Error("Unknown card type in ascension.ts: " + cardType)
-				}
-
 				// sets price
 				if (!(this.type == "hexColorCard" || this.type == "bgColorCard")) {
-					let objectAmount = getVariable(GameState, this.gamestateInfo.objectAmount)
+					let objectAmount = getVariable(GameState, cardsInfo[this.type].gamestateInfo.objectAmount)
 
 					this.price = getPrice({
 						basePrice: cardsInfo[this.type].basePrice,
@@ -181,12 +166,28 @@ function addCard(cardType:string | card, position: Vec2) {
 				tween(this.pos.y, cardYPositions.hovered, 0.25, (p) => this.pos.y = p, easings.easeOutQuart)
 				tween(this.angle, choose([-1.5, 1.5]), 0.25, (p) => this.angle = p, easings.easeOutQuart)
 	
-				// it adds the % on the info message
-				let message = cardsInfo[this.type].info.replace("[number]", this.additive)
-				if (this.type != "hexColorCard" || this.type != "bgColorCard") {
-					let percentages = getVariable(GameState, this.gamestateInfo.key)
-					message += ` (You have: ${percentages}%)`
+				let message:string;
+
+				if (this.type == "critsCard" && GameState.ascension.critPowersBought == 0) {
+					message = "When you click, you will have a random chance of getting more score per click"
 				}
+
+				else {
+					// it adds the % on the info message
+					message = cardsInfo[this.type].info.replace("[number]", this.additive)
+					if (!(this.type == "hexColorCard" || this.type == "bgColorCard")) {
+						let addition = getVariable(GameState, cardsInfo[this.type].gamestateInfo.objectAmount)
+						
+						if (this.type == "powerupsCard" || this.type == "critsCard") {
+							message += ` (Current power: ${addition}x)`
+						}
+						
+						else {
+							message += ` (You have: ${addition}%)`
+						}
+					}
+				}
+
 				talk("card", message)
 			},
 
@@ -208,14 +209,21 @@ function addCard(cardType:string | card, position: Vec2) {
 
 				// add percentages
 				else {
-					// actually add the stuff LOL!
-					let currentPercentage = getVariable(GameState, this.gamestateInfo.key)
-					let percentagesBought = getVariable(GameState, this.gamestateInfo.objectAmount)
+					if (this.type == "critsCard" && GameState.ascension.critPowersBought == 0) {
+						GameState.critPower = 1
+						GameState.ascension.critPowersBought = 1
+					}
 
-					// add the actual percentage
-					setVariable(GameState, this.gamestateInfo.key, currentPercentage + this.additive)
-					// set the percentagesBought
-					setVariable(GameState, this.gamestateInfo.objectAmount, percentagesBought + 1)
+					else {
+						// actually add the stuff LOL!
+						let currentPercentage = getVariable(GameState, cardsInfo[this.type].gamestateInfo.key)
+						let percentagesBought = getVariable(GameState, cardsInfo[this.type].gamestateInfo.objectAmount)
+	
+						// add the actual percentage
+						setVariable(GameState, cardsInfo[this.type].gamestateInfo.key, currentPercentage + this.additive)
+						// set the percentagesBought
+						setVariable(GameState, cardsInfo[this.type].gamestateInfo.objectAmount, percentagesBought + 1)
+					}
 
 					// get new additive
 					this.additive = getAdditive(this.type as card)

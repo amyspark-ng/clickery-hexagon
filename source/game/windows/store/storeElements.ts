@@ -2,7 +2,7 @@ import { GameObj, Vec2 } from "kaplay"
 import { GameState, scoreManager } from "../../../gamestate"
 import { playSfx } from "../../../sound"
 import { ROOT } from "../../../main"
-import { bop, formatNumber, getPrice, getVariable, randomPos, randomPowerup } from "../../utils"
+import { bop, formatNumber, getPrice, getRandomDirection, getVariable, randomPos, randomPowerup } from "../../utils"
 import { addTooltip } from "../../additives"
 import { powerupTypes, spawnPowerup } from "../../powerups"
 import { isHoveringUpgrade, storeElements, storePitchJuice } from "./storeWindows"
@@ -62,8 +62,11 @@ function regularStoreElement(winParent) {
 				
 				if (isHoveringUpgrade) return
 				if (!thisElement.isHovering()) return;
-				if (GameState.score < thisElement.price) return;
-		
+				if (GameState.score < thisElement.price) {
+					thisElement.trigger("notEnoughMoney")
+					return
+				}
+				
 				downEvent = thisElement.onMouseDown(() => {
 					thisElement.isBeingClicked = true
 					if (GameState.score < thisElement.price) return
@@ -114,6 +117,7 @@ function regularStoreElement(winParent) {
 
 function lockedPowerupStoreElement(winParent:GameObj) {
 	let thisElement = null;
+	let progressSound = null;
 	return {
 		id: "lockedPowerupStoreElement",
 		chains: null,
@@ -154,10 +158,12 @@ function lockedPowerupStoreElement(winParent:GameObj) {
 				downEvent?.cancel()
 				if (!thisElement.isHovering()) return;
 
-				if (GameState.score < storeElementsInfo.powerupsElement.unlockPrice) {
-					bop(thisElement)
-					return;
-				} 
+				if (GameState.score < thisElement.price) {
+					thisElement.trigger("notEnoughMoney")
+					return
+				}
+
+				progressSound = playSfx("progress")
 
 				downEvent = thisElement.onMouseDown("left", () => {
 					if (thisElement.boughtProgress < 100) {
@@ -165,6 +171,7 @@ function lockedPowerupStoreElement(winParent:GameObj) {
 						thisElement.scale.x = map(thisElement.boughtProgress, 0, 100, 1.025, 0.9)
 						thisElement.scale.y = map(thisElement.boughtProgress, 0, 100, 1.025, 0.9)
 						thisElement.chains.opacity = map(thisElement.boughtProgress, 0, 100, 1, 0.25)
+						progressSound.detune = thisElement.boughtProgress * 1.1
 					}
 		
 					if (thisElement.boughtProgress >= 100 && !GameState.hasUnlockedPowerups) {
@@ -179,12 +186,21 @@ function lockedPowerupStoreElement(winParent:GameObj) {
 				if (!thisElement.isHovering()) return;
 	
 				thisElement.dropUnlock()
+				if (thisElement.boughtProgress > 0) {
+					progressSound.seek(1)
+				}
+
+				else {
+					progressSound.stop()
+				}
 			})
 		},
 
 		unlock() {
 			GameState.hasUnlockedPowerups = true
 			playSfx("kaching")
+			playSfx("chainbreak")
+			
 			let copyOfOld = thisElement
 			
 			thisElement.destroy()
@@ -268,6 +284,7 @@ export function addStoreElement(winParent:any, opts:storeElementOpt) {
 				if (this.timesBoughtConsecutively == 5) {
 					addSmoke(winParent, this)
 				}
+				
 				ROOT.trigger("buy", { element: "storeElement", type: opts.type == "clickersElement" ? "clickers" : "cursors", price: this.price })
 			
 				if (opts.type == "powerupsElement") {
@@ -293,13 +310,26 @@ export function addStoreElement(winParent:any, opts:storeElementOpt) {
 	])
 
 	// # EVENTS
-	if (opts.type == "powerupsElement") {
-		if (GameState.hasUnlockedPowerups == false) btn.use(lockedPowerupStoreElement(winParent))
-		else btn.use(regularStoreElement(winParent))
+	let tooltip = null;
+	if (opts.type == "powerupsElement" && GameState.hasUnlockedPowerups == false) {
+		btn.use(lockedPowerupStoreElement(winParent))
+		tooltip = addTooltip(btn, {
+			text: `${formatNumber(storeElementsInfo.powerupsElement.unlockPrice, { price: true })}`,
+			direction: "down",
+			lerpValue: 1,
+		})
+
+		const greenPrice = GREEN.lighten(30)
+		const redPrice = RED.lighten(30) 
+
+		tooltip.tooltipText.onUpdate(() => {
+			if (GameState.score >= storeElementsInfo.powerupsElement.unlockPrice) tooltip.tooltipText.color = greenPrice
+			else tooltip.tooltipText.color = redPrice  
+		})
 	}
 
 	else btn.use(regularStoreElement(winParent))
-
+	
 	// update
 	btn.onUpdate(() => {
 		// sets amountToBuy
@@ -390,7 +420,8 @@ export function addStoreElement(winParent:any, opts:storeElementOpt) {
 				else this.color = RED
 			
 				if (opts.type == "powerupsElement") {
-					this.pos = vec2(-5, 41)
+					if (GameState.hasUnlockedPowerups == false) this.destroy()
+					else this.pos = vec2(-5, 41) 
 				}
 			}
 		}
@@ -431,11 +462,29 @@ export function addStoreElement(winParent:any, opts:storeElementOpt) {
 			positionSetter(),
 			{
 				update() {
+					if (GameState.hasUnlockedPowerups == false) this.destroy() 
 					this.text = `Power: ${GameState.powerupPower}x`
 				}
 			}
 		])
 	}
+
+	btn.on("notEnoughMoney", () => {
+		// opts.pos is the position it was added to
+		const direction = getRandomDirection(opts.pos, false, 1.25)
+		tween(direction, opts.pos, 0.25, (p) => btn.pos = p, easings.easeOutQuint)
+		
+		if (btn.is("lockedPowerupStoreElement")) {
+			tween(choose([-15, 15]), 0, 0.25, (p) => tooltip.tooltipText.angle = p, easings.easeOutQuint)
+			playSfx("chainwrong", { detune: rand(-50, 50) })
+		}
+		
+		else {
+			tween(choose([-15, 15]), 0, 0.25, (p) => priceText.angle = p, easings.easeOutQuint)
+		}
+
+		playSfx("wrong", { detune: rand(-50, 50) })
+	})
 
 	return btn;
 }

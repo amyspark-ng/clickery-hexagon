@@ -12,14 +12,27 @@ let trayVolElements:any;
 let volumeBars:any;
 
 export let sfxHandler:any;
+
+export let sfxHandlers = new Set()
 export function playSfx(sound = "clickPress", opts?:AudioPlayOpt) {
-	sfxHandler = play(sound, {
-		volume: GameState.settings.sfx.volume,
-		detune: opts?.detune || 0,
-		speed: opts?.speed || 1,
-		loop: opts?.loop || false,
+	opts = opts || {}
+	opts.detune = opts.detune || 0
+	opts.speed = opts.speed || 1
+	opts.loop = opts.loop || false
+	opts.volume = opts.volume || GameState.settings.sfx.volume
+	
+	let handle = play(sound, {
+		volume: opts.volume,
+		detune: opts.detune,
+		speed: opts.speed,
+		loop: opts.loop,
 	})
-	return sfxHandler;
+
+	sfxHandlers.add(handle)
+	handle.onEnd(() => sfxHandlers.delete(handle))
+
+	sfxHandler = handle
+	return handle;
 }
 
 export let musicHandler:any;

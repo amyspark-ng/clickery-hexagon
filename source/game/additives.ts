@@ -341,11 +341,18 @@ export function addToast(opts:toastOpts) {
 type tooltipOpts = {
 	text:string;
 	direction?: "up" | "down" | "left" | "right",
+	/**
+	 * How "closely" will the tooltip follow the object, from 0.1 to 1
+	 */
 	lerpValue?:number,
 	textSize?:number,
 	type?:string,
 }
 
+/**
+ * Adds a tooltip to an object and pushes itself to a tooltips array
+ * @returns An object that contains bg, text and an end() function 
+ */
 export function addTooltip(obj:GameObj, opts?:tooltipOpts) {
 	if (opts == undefined) opts = {} as tooltipOpts 
 	opts.direction = opts.direction ?? "up";
@@ -439,8 +446,8 @@ export function addTooltip(obj:GameObj, opts?:tooltipOpts) {
 				else if (opts.direction == "left") xPos = tooltipBg.pos.x - padding / 2
 				else xPos = tooltipBg.pos.x
 
-				this.pos.x = lerp(this.pos.x, xPos, opts.lerpValue * 1.5)
-				this.pos.y = lerp(this.pos.y, tooltipBg.pos.y, opts.lerpValue * 1.5)
+				this.pos.x = xPos
+				this.pos.y = tooltipBg.pos.y
 			}
 		}
 	])

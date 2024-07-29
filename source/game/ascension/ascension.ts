@@ -249,6 +249,7 @@ export function talk(speaker:"mage" | "card", thingToSay:string, speed?:number) 
 	thingToSay = thingToSay || "No dialogue, missing a dialogue here"
 	speed = speed || 0.025
 	
+	if (thingToSay == currentlySaying) return
 	currentlySaying = thingToSay
 
 	activeLetterWaits.forEach(waitCall => waitCall.cancel());

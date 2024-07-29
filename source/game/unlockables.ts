@@ -382,7 +382,6 @@ export function unlockAchievement(achievementName:string) {
 			title: "Unlocked Achievement!",
 			body: `${achievementInfo.text}`,
 		})
-	
 
 		if (achievementName == "allachievements") {
 			addConfetti({ pos: mousePos() })
@@ -492,11 +491,13 @@ export function unlockWindow(windowJustUnlocked:windowKey) {
 	// if the window is on extra win i have to check if the extra win is opened to add the extra minibutton
 	// if is not open i have to wait until then
 	if (GameState.taskbar.includes(windowJustUnlocked) == false) {
-		let extraWinOpenCheck = ROOT.on("winOpen", () => {
-			let gridMinibtn = get("gridMiniButton", { recursive: true }).filter((btn) => btn.windowKey == windowJustUnlocked)[0]
-			addExclamation(gridMinibtn)
-
-			extraWinOpenCheck.cancel()
+		let extraWinOpenCheck = ROOT.on("winOpen", (windowOpened) => {
+			if (windowOpened == "extraWin") {
+				let gridMinibtn = get("gridMiniButton", { recursive: true }).filter((btn) => btn.windowKey == windowJustUnlocked)[0]
+				addExclamation(gridMinibtn)
+	
+				extraWinOpenCheck.cancel()
+			}
 		})
 	}
 

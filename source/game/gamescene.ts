@@ -8,9 +8,10 @@ import { folderObj, folderObjManaging, isWindowOpen, windowsDefinition } from ".
 import { songs } from "./windows/musicWindow.ts"
 import { curDraggin } from "../plugins/drag.ts"
 import { DEBUG, ROOT } from "../main.ts"
-import { powerupManagement, powerupTypes, spawnPowerup } from "./powerups.ts"
+import { powerup, powerupManagement, powerupTypes, spawnPowerup } from "./powerups.ts"
 import { checkForUnlockable, isAchievementUnlocked, unlockables, unlockAchievement } from "./unlockables.ts"
 import { ascension } from "./ascension/ascension.ts"
+import { Vec2 } from "kaplay"
 
 let panderitoLetters = "panderito".split("")
 export let panderitoIndex = 0
@@ -27,9 +28,10 @@ let sleeping = false;
 let timeSlept = 0;
 
 export let cam = {
-	scale: 1,
+	pos: 0 as unknown,
+	zoom: 1,
 	rotation: 0,
-}
+};
 
 export function togglePanderito() {
 	GameState.settings.panderitoMode = !GameState.settings.panderitoMode
@@ -282,7 +284,11 @@ export function gamescene() {
 		hasStartedGame = GameState.scoreAllTime > 1
 		ascension.ascending = false
 
-		cam.scale = 1
+		cam = {
+			pos: vec2(center()),
+			zoom: 1,
+			rotation: 0,
+		}
 
 		addHexagon()
 		uiCounters()
@@ -307,7 +313,7 @@ export function gamescene() {
 						if (chance(0.25)) {
 							if (GameState.hasUnlockedPowerups) {
 								spawnPowerup({
-									type: choose(Object.keys(powerupTypes)),
+									type: choose(Object.keys(powerupTypes)) as powerup,
 									pos: randomPos()
 								})
 							}
@@ -367,7 +373,9 @@ export function gamescene() {
 
 		onUpdate(() => {
 			camRot(cam.rotation)
-			camScale(vec2(cam.scale))
+			camScale(vec2(cam.zoom))
+			camPos(cam.pos as Vec2)
+			
 			if (isKeyDown("shift") && isKeyPressed("r") && panderitoIndex != 6) go("gamescene")
 			if (isKeyDown("shift") && isKeyPressed("s") && GameState.scoreAllTime > 25) GameState.save()
 			
@@ -377,7 +385,7 @@ export function gamescene() {
 			GameState.score = Math.round(GameState.score)
 
 			// INCREASES MANA
-			if (GameState.score >= scoreManager.scoreTilNextMana()) {
+			if (GameState.scoreAllTime >= scoreManager.scoreYouGetNextManaAt()) {
 				GameState.ascension.mana++
 				GameState.ascension.manaAllTime++
 				ROOT.trigger("manaGained")
