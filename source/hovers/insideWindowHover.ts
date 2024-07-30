@@ -18,8 +18,6 @@ export function insideWindowHover(winParent:any) {
 
 		add() {
 			this.startHoverFunction = function() {
-				if (this.winParent.active == false) return
-				
 				if (this.isBeingHovered == false) {
 					this.startHoverAnim()
 					
@@ -29,8 +27,6 @@ export function insideWindowHover(winParent:any) {
 			}
 
 			this.endHoverFunction = function () {
-				if (this.winParent.active == false) return
-
 				if (this.isBeingHovered == true) {
 					this.endHoverAnim()
 
@@ -40,6 +36,7 @@ export function insideWindowHover(winParent:any) {
 			}
 
 			this.onHover(() => {
+				if (this.winParent.active == false) return
 				// only check for these conditions here
 				// if (allObjWindows.isHoveringAWindow == false && allObjWindows.isDraggingAWindow == false) {
 					this.startHoverFunction()
@@ -47,18 +44,9 @@ export function insideWindowHover(winParent:any) {
 			})
 
 			this.onHoverEnd(() => {
+				if (this.winParent.active == false) return
 				this.endHoverFunction()
 			})
-
-			// this.on("insideHoverStart", () => {
-			// 	if (this.isBeingHovered == true) {
-			// 		this.endHoverFunction()
-			// 	}
-
-			// 	else {
-			// 		this.startHoverFunction()
-			// 	}
-			// })
 		},
 
 		startingHover(action: () => void) {

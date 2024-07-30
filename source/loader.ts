@@ -286,6 +286,7 @@ function loadSprites() {
 
 	//#region Store
 	loadSprite("storeWin", "sprites/windows/storeWin/storeWin.png")
+	loadSprite("stroeWin", "sprites/windows/storeWin/stroeWin.png")
 	loadSpriteAtlas("sprites/windows/storeWin/storeElements.png", {
 		"clickersElement": {
 			sliceX: 2,
@@ -417,18 +418,21 @@ function loadSprites() {
 
 	//#region Music
 	loadSprite("musicWin", "sprites/windows/musicWin/musicWin.png")
-	loadSpriteAtlas("sprites/windows/musicWin/musicWinElements.png", {
+	loadSpriteAtlas("sprites/windows/musicWin/discs.png", {
 		"discs": {
 			"x": 0,
 			"y": 0,
-			"width": 50 * 3,
+			"width": 50 * 6,
 			"height": 50,
-			"sliceX": 3,
+			"sliceX": 6,
 			"sliceY": 1,
 			"anims": {
-				"defaultCover": 0,
-				"catnipCover": 1,
-				"okCover": 2,
+				"wav": 0,
+				"ok": 1,
+				"bb1": 2,
+				"bb2": 3,
+				"cat": 4,
+				"bb3": 5,
 			}
 		}
 	})

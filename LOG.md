@@ -16,8 +16,6 @@ this game MIGHT be getting done
 ^ that's where you got to ascend
 
 - make powerups a little bit cheaper
-- implement cards sound
-- make new graphic for upgrades
 - increase the prices of click upgrades and cursor upgradess
 ^ just a little
 - make cursors more powerful so you don't have to click too much
@@ -25,18 +23,15 @@ this game MIGHT be getting done
 - make it so spamming the powerup unlock store element is nicer
 - what the hell happens why the fuck do achievements appear and appear and appear and appear
 - unified format time function
+
 - AudioParam.value setter value being assigned is not a finite floating point value
 ^ this happens in the sfxHandler.volume update line in the audiomanager
 
+- change color of upgrades
+- you can see hexagon in ascend substate even if scale is 0
 - make it so when you come back check if time since leave is greater than 10 seconds if it is create a new toast if not keep the same one
 
 - when a new window opens grab the active one and get all the insideWindowHovers and trigger cursorExitWindow
-
-## Complex stuff
-- I REALLYYY need to fix the hover animations
-	* and the mouse animations
-	^ Maybe do keep the tag system, just uhhhhhhhhhhhhhhhhhhhhhhhhhhhhh
-	* I think i had this crazy idea that 
 
 # Missing
 - balancing

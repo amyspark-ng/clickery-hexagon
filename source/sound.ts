@@ -20,6 +20,9 @@ export function playSfx(sound:string, opts?:AudioPlayOpt) {
 	opts.speed = opts.speed || 1
 	opts.loop = opts.loop || false
 	opts.volume = opts.volume || GameState.settings.sfx.volume
+	// TODO: the reason why sfxhandlers don't work is because the onUpdate event
+	// that set the sfxHandler.volume, i have to stop doing that and instead when volume changes
+	// grab all the handlers and set their volume to it 
 
 	let handle = play(sound, {
 		volume: opts.volume,

@@ -5,17 +5,17 @@ import { isAchievementUnlocked } from "../unlockables";
 import { bop, formatMusicTime } from "../utils";
 
 export let songs = {
-	"clicker.wav": { name: "clicker.wav", idx: 0, speed: 2.5, cover: "defaultCover", duration: 61},
-	"menu.wav": { name: "menu.wav", idx: 1, speed: 1.6, cover: "defaultCover", duration: 36 },
-	"whatttt.wav": { name: "whatttt.wav", idx: 2, speed: 2, cover: "defaultCover", duration: 51},
-	"simple.wav": { name: "simple.wav", idx: 3, speed: 1.3, cover: "defaultCover", duration: 99},
-	"jazz.wav": { name: "jazz.wav", idx: 4, speed: 2.1, cover: "defaultCover", duration: 43},
-	"sweet.wav": { name: "sweet.wav", idx: 5, speed: 2.5, cover: "defaultCover", duration: 46},
-	"ok_instrumental": { name: "ok (Inst)", idx: 6, speed: 2, cover: "okCover", duration: 102},
-	"magic": { name: "magic.", idx: 7, speed: 1, cover: "defaultCover", duration: 46},
-	"watchout": { name: "Watch out!", idx: 8, speed: 2.4, cover: "defaultCover", duration: 49,},
-	"catnip": { name: "catnip", idx: 9, speed: 2.1, cover: "catnipCover", duration: 67},
-	"project_23": { name: "Project_23", idx: 10, speed: 2.1, cover: "defaultCover", duration: 45},
+	"clicker.wav": { name: "clicker.wav", idx: 0, speed: 2.5, cover: "wav", duration: 61},
+	"menu.wav": { name: "menu.wav", idx: 1, speed: 1.6, cover: "wav", duration: 36 },
+	"whatttt.wav": { name: "whatttt.wav", idx: 2, speed: 2, cover: "wav", duration: 51},
+	"simple.wav": { name: "simple.wav", idx: 3, speed: 1.3, cover: "wav", duration: 99},
+	"jazz.wav": { name: "jazz.wav", idx: 4, speed: 2.1, cover: "wav", duration: 43},
+	"sweet.wav": { name: "sweet.wav", idx: 5, speed: 2.5, cover: "wav", duration: 46},
+	"ok_instrumental": { name: "ok (Inst)", idx: 6, speed: 2, cover: "ok", duration: 102},
+	"magic": { name: "magic.", idx: 7, speed: 1, cover: "bb1", duration: 46},
+	"watchout": { name: "Watch out!", idx: 8, speed: 2.4, cover: "bb2", duration: 49,},
+	"catnip": { name: "catnip", idx: 9, speed: 2.1, cover: "cat", duration: 67},
+	"project_23": { name: "Project_23", idx: 10, speed: 2.1, cover: "bb3", duration: 45},
 }
 
 export let songsListened = [];

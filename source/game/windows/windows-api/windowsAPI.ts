@@ -6,7 +6,7 @@ import { playSfx } from "../../../sound.ts";
 
 // window contents
 import { storeWinContent } from "../store/storeWindows.ts";
-import { musicWinContent, setTimeSinceSkip, timeSinceSkip } from "../musicWindow.ts";
+import { musicWinContent } from "../musicWindow.ts";
 import { colorWinContent } from "../colorWindow.ts";
 import { settingsWinContent } from "../settingsWindow.ts";
 import { ascendWinContent } from "../ascendWindow.ts";
@@ -17,6 +17,7 @@ import { isAchievementUnlocked, unlockAchievement } from "../../unlockables.ts";
 import { medalsWinContent } from "../medalsWin.ts";
 import { ROOT } from "../../../main.ts";
 import { folderObj } from "./folderObj.ts";
+import { insideWindowHover } from "../../../hovers/insideWindowHover.ts";
 
 export let infoForWindows = {};
 
@@ -72,6 +73,54 @@ export function isWindowOpen(windowKey:windowKey) {
 	return get(windowKey).filter(obj => obj.is("window")).length > 0
 }
 
+/**
+ * Creates a new property in the windowObj that holds this 
+ */
+export function addXButton(windowParent:any) {
+	let xButton = windowParent.add([
+		text("X", {
+			font: "lambda",
+		}),
+		color(WHITE),
+		pos(),
+		anchor("center"),
+		insideWindowHover(windowParent),
+		z(windowParent.z + 1),
+		area({ scale: vec2(1.8, 1.1), offset: vec2(-5, 0)}),
+		"xButton",
+		{
+			add() {
+				// can't use getPositionOfSide because it will be root and not relative to windowParent
+				let offset = vec2(-18, 23)
+				this.pos.x += windowParent.width / 2
+				this.pos.y -= windowParent.height / 2
+				this.pos = this.pos.add(offset)
+			},
+		}
+	])
+
+	xButton.startingHover(() => {
+		xButton.color = RED
+	})
+
+	xButton.endingHover(() => {
+		xButton.color = WHITE
+	})
+
+	xButton.onClick(() => {
+		if (!windowParent.active) {
+			// if it's not dragging a window AND a window that is not this one is being hovered
+			if (!allObjWindows.isDraggingAWindow && !get("window").some(window => window.isHovering() && window != windowParent)) {
+				windowParent.close()
+			}
+		}
+
+		else windowParent.close()
+	})
+
+	return xButton;
+}
+
 export function openWindow(windowKey:windowKey) {
 	if (!infoForWindows.hasOwnProperty(windowKey)) throw new Error(`No such window for: ${windowKey}`)
 	
@@ -86,13 +135,14 @@ export function openWindow(windowKey:windowKey) {
 		layer("windows"),
 		z(0),
 		drag(),
-		area({ scale: vec2(1.04, 1) }),
+		area({ scale: vec2(1, 1) }),
 		"window",
 		`${windowKey}`,
 		{
 			idx: infoForWindows[windowKey].idx,
 			windowKey: windowKey,
 			active: true,
+			xButton: null,
 			close() {
 				this.trigger("close")
 				this.removeAll()
@@ -128,6 +178,11 @@ export function openWindow(windowKey:windowKey) {
 				this.get("*", { recursive: true }).forEach((obj) => {
 					obj.unuse("shader")
 				})
+
+				// trigger some hovers
+				this.get("*").filter(obj => obj.is("insideHover") && obj.isHovering() == true && obj.isBeingHovered == false).forEach(obj => {
+					obj.startHoverFunction()
+				})
 			},
 
 			deactivate() {
@@ -138,6 +193,13 @@ export function openWindow(windowKey:windowKey) {
 				this.use(shader("grayscale"))
 				this.get("*", { recursive: true }).forEach((obj) => {
 					obj.use(shader("grayscale"))
+				})
+
+				// untrigger some hovers
+				let objsWithHover = this.get("*").filter(obj => obj.is("insideHover") && obj.isBeingHovered == true)
+
+				objsWithHover.forEach(obj => {
+					obj.endHoverFunction()
 				})
 			},
 
@@ -159,52 +221,15 @@ export function openWindow(windowKey:windowKey) {
 		}
 	])
 
+	// lol!
+	if (windowKey == "storeWin" && chance(0.01)) {
+		windowObj.sprite = "stroeWin" 
+		debug.log("stroeWin")
+	}
+
 	infoForWindows[windowKey].lastPos.x = clamp(infoForWindows[windowKey].lastPos.x, 196, 827)
 	infoForWindows[windowKey].lastPos.y = clamp(infoForWindows[windowKey].lastPos.y, height() - windowObj.height / 2, -windowObj.height / 2)
 	windowObj.pos = infoForWindows[windowKey].lastPos
-
-	let xButton = windowObj.add([
-		text("X", {
-			font: "lambda",
-		}),
-		color(WHITE),
-		pos(-windowObj.width / 2, -windowObj.height / 2),
-		z(windowObj.z + 1),
-		area({ scale: vec2(1.8, 1.1), offset: vec2(-5, 0)}),
-		"xButton",
-		"hover_outsideWindow",
-		{
-			startHover() {
-				this.color = RED
-			},
-			endHover() {
-				this.color = WHITE
-			}
-		}
-	])
-
-	xButton.pos.x += windowObj.width - xButton.width - 5
-
-	xButton.onHover(() => {
-		if (allObjWindows.isDraggingAWindow) return
-		xButton.startHover()
-	})
-
-	xButton.onHoverEnd(() => {
-		if (allObjWindows.isDraggingAWindow) return
-		xButton.endHover()
-	})
-
-	xButton.onClick(() => {
-		if (!windowObj.active) {
-			// if it's not dragging a window AND a window that is not this one is being hovered
-			if (!allObjWindows.isDraggingAWindow && !get("window").some(window => window.isHovering() && window != windowObj)) {
-				windowObj.close()
-			}
-		}
-
-		else windowObj.close()
-	})
 
 	windowObj.onHover(() => {
 		get("outsideHover", { recursive: true }).forEach(obj => {
@@ -226,11 +251,13 @@ export function openWindow(windowKey:windowKey) {
 		})
 	})
 
+	windowObj.xButton = addXButton(windowObj)
+
 	windowObj.onMousePress(() => {
 		// if has been closed don't do anything
 		if (!windowObj.is("window")) return
 
-		if (!xButton.isHovering()) {
+		if (!windowObj.xButton.isHovering()) {
 			if (curDraggin) {
 				return
 			}

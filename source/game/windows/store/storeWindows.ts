@@ -1,5 +1,6 @@
 import { GameState } from "../../../gamestate";
 import { ROOT } from "../../../main";
+import { positionSetter } from "../../../plugins/positionSetter";
 import { addTooltip, mouse } from "../../additives";
 import { addStoreElement, storeElementsInfo } from "./storeElements";
 import { addUpgrades, isUpgradeBought, upgradeInfo } from "./upgrades";
@@ -20,7 +21,7 @@ let powerupsElement:any;
 
 export function storeWinContent(winParent) {
 	// clickers
-	clickersElement = addStoreElement(winParent, { type: "clickersElement", pos: vec2(0, -160) })
+	clickersElement = addStoreElement(winParent, { type: "clickersElement", pos: vec2(0, -128) })
 	addUpgrades(clickersElement)
 	
 	// cursors
