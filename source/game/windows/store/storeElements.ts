@@ -3,10 +3,11 @@ import { GameState, scoreManager } from "../../../gamestate"
 import { playSfx } from "../../../sound"
 import { ROOT } from "../../../main"
 import { bop, formatNumber, getPrice, getRandomDirection, getVariable, randomPos, randomPowerup } from "../../utils"
-import { addTooltip } from "../../additives"
+import { addTooltip, mouse } from "../../additives"
 import { powerupTypes, spawnPowerup } from "../../powerups"
 import { isHoveringUpgrade, storeElements, storePitchJuice } from "./storeWindows"
 import { positionSetter } from "../../../plugins/positionSetter"
+import { insideWindowHover } from "../../../hovers/insideWindowHover"
 
 export let storeElementsInfo = {
 	"clickersElement": { 
@@ -21,9 +22,9 @@ export let storeElementsInfo = {
 	},
 	"powerupsElement": { 
 		gamestateKey: "stats.powerupsBought",
-		basePrice: 10500,
+		basePrice: 15500,
 		percentageIncrease: 180,
-		unlockPrice: 10100
+		unlockPrice: 10500
 	},
 }
 
@@ -58,6 +59,7 @@ function regularStoreElement(winParent) {
 			thisElement = this
 
 			thisElement.onMousePress("left", () => {
+				if (thisElement.isBeingHovered == false) return
 				if (!winParent.active) return
 				
 				if (isHoveringUpgrade) return
@@ -153,6 +155,7 @@ function lockedPowerupStoreElement(winParent:GameObj) {
 	
 			let downEvent = null;
 			thisElement.onMousePress("left", () => {
+				if (thisElement.isBeingHovered == false) return
 				if (!winParent.active) return
 			
 				downEvent?.cancel()
@@ -166,6 +169,8 @@ function lockedPowerupStoreElement(winParent:GameObj) {
 				progressSound = playSfx("progress")
 
 				downEvent = thisElement.onMouseDown("left", () => {
+					if (thisElement.isBeingHovered == false) return
+					
 					if (thisElement.boughtProgress < 100) {
 						thisElement.boughtProgress += 1.5
 						thisElement.scale.x = map(thisElement.boughtProgress, 0, 100, 1.025, 0.9)
@@ -233,20 +238,27 @@ export function addStoreElement(winParent:any, opts:storeElementOpt) {
 		scale(1),
 		anchor("center"),
 		z(winParent.z + 1),
-		"hoverObj",
+		insideWindowHover(winParent),
 		"storeElement",
 		`${opts.type}`,
 		{
 			price: 0,
-			isBeingHovered: false,
 			isBeingClicked: false,
 			down: false,
 			timesBoughtConsecutively: 0,
+			add() {
+				if (opts.type == "powerupsElement") {
+					if (this.isBeingHovered == true) {
+						if (GameState.score >= this.price) mouse.play("point")
+						else this.play("cursor")
+					}
+				}
+			},
+			
 			buy(amount:number) {
 				if (winParent.dragging) return
 				
 				GameState[storeElementsInfo[opts.type].gamestateKey] += amount
-				scoreManager.subTweenScore(this.price)
 
 				storePitchJuice.hasBoughtRecently = true;
 				storePitchJuice.timeSinceBought = 0;
@@ -294,17 +306,11 @@ export function addStoreElement(winParent:any, opts:storeElementOpt) {
 					})
 					GameState.stats.powerupsBought++
 				}
-			},
+				
+				if (GameState.score - this.price >= btn.price) mouse.play("point")
+				else mouse.play("cursor")
 
-			startHover() {
-				tween(this.scale, vec2(1.025), 0.15, (p) => this.scale = p, easings.easeOutQuad)
-				this.isBeingHovered = true
-			},
-
-			endHover() {
-				tween(this.scale, vec2(1), 0.15, (p) => this.scale = p, easings.easeOutQuad)
-				this.isBeingHovered = false
-				this.trigger("endHover")
+				this.trigger("buy")
 			},
 		}
 	])
@@ -333,13 +339,21 @@ export function addStoreElement(winParent:any, opts:storeElementOpt) {
 	// update
 	btn.onUpdate(() => {
 		// sets amountToBuy
-		if (isKeyDown("shift")) amountToBuy = 10
+		if (isKeyDown("shift")) amountToBuy = 10 // this could be moved to storeWin
 		else amountToBuy = 1
 
-		const amountBought = getVariable(GameState, storeElementsInfo[opts.type].gamestateKey) 
+		// area
+		btn.area.scale = vec2(1 / btn.scale.x, 1 / btn.scale.y)
 
-		// price
-		if (opts.type == "clickersElement" || opts.type == "cursorsElement") {
+		if (opts.type == "powerupsElement") {
+			btn.price = storeElementsInfo.powerupsElement.unlockPrice
+			return
+		}
+
+		else {
+			const amountBought = getVariable(GameState, storeElementsInfo[opts.type].gamestateKey) 
+	
+			// price
 			const elementInfo = storeElementsInfo[opts.type]
 			btn.price = getPrice({
 				basePrice: elementInfo.basePrice,
@@ -349,35 +363,22 @@ export function addStoreElement(winParent:any, opts:storeElementOpt) {
 				gifted: opts.type == "clickersElement" ? 1 : 0
 			}) * powerupTypes.store.multiplier
 		}
-
-		else if (opts.type == "powerupsElement") {
-			if (!GameState.hasUnlockedPowerups) btn.price = storeElementsInfo.powerupsElement.unlockPrice
-			else {
-				const elementInfo = storeElementsInfo.powerupsElement
-				btn.price = getPrice({
-					basePrice: elementInfo.basePrice,
-					percentageIncrease: elementInfo.percentageIncrease,
-					objectAmount: amountBought,
-					amountToBuy: 1
-				}) * powerupTypes.store.multiplier
-			}
-		}
-
-		// area
-		btn.area.scale = vec2(1 / btn.scale.x, 1 / btn.scale.y)
 	})
-
+	
 	// ### HOVERS
-	btn.onHover(() => {
-		if (!winParent.active) return
-		
-		btn.startHover()
+	// the component checks for the window being active
+	btn.startingHover(() => {
+		tween(btn.scale, vec2(1.025), 0.15, (p) => btn.scale = p, easings.easeOutQuad)
+		if (GameState.score >= btn.price) mouse.play("point")
+		else mouse.play("cursor")
 	})
 
-	btn.onHoverEnd(() => {
-		if (!winParent.active) return
-		if (btn.isBeingClicked) btn.isBeingClicked = false
-		btn.endHover()
+	btn.endingHover(() => {
+		tween(btn.scale, vec2(1), 0.15, (p) => btn.scale = p, easings.easeOutQuad)
+		if (btn.isBeingClicked == true) btn.isBeingClicked = false
+		btn.trigger("endHover")
+	
+		if (mouse.getCurAnim().name == "point") mouse.play("cursor")
 	})
 
 	// # Other objects
@@ -484,6 +485,10 @@ export function addStoreElement(winParent:any, opts:storeElementOpt) {
 		}
 
 		playSfx("wrong", { detune: rand(-50, 50) })
+	})
+
+	btn.on("buy", () => {
+		// if i check the price here it just gets the one before the buy
 	})
 
 	return btn;

@@ -320,7 +320,7 @@ export function gamescene() {
 
 			if (!GameState.hasUnlockedPowerups) {
 				ROOT.on("powerupunlock", () => {
-					wait(60, () => {
+					wait(30, () => {
 						naturalPowerupSpawningManagement()
 						spawnPowerup({
 							type: randomPowerup(),

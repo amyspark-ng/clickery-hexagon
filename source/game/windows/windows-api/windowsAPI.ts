@@ -211,18 +211,19 @@ export function openWindow(windowKey:windowKey) {
 			obj.trigger("cursorEnterWindow")
 		})
 
-		// get("insideHover", { recursive: true }).forEach(obj => {
-		// 	obj.trigger("cursorEnterWindow")
-		// })
+		get("insideHover", { recursive: true }).forEach(obj => {
+			obj.trigger("cursorEnterWindow")
+		})
 	})
 	
 	windowObj.onHoverEnd(() => {
 		get("outsideHover", { recursive: true }).forEach(obj => {
 			obj.trigger("cursorExitWindow")
 		})
-		// get("insideHover", { recursive: true }).forEach(obj => {
-		// 	obj.trigger("cursorExitWindow")
-		// })
+
+		get("insideHover", { recursive: true }).forEach(obj => {
+			obj.trigger("cursorExitWindow")
+		})
 	})
 
 	windowObj.onMousePress(() => {

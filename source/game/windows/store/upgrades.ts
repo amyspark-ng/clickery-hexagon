@@ -1,8 +1,9 @@
 import { GameState, scoreManager } from "../../../gamestate";
+import { insideWindowHover } from "../../../hovers/insideWindowHover";
 import { ROOT } from "../../../main";
 import { playSfx, sfxHandler, sfxHandlers } from "../../../sound";
-import { addTooltip } from "../../additives";
-import { blendColors, bop, formatNumber, getRandomDirection, parseAnimation } from "../../utils";
+import { addTooltip, mouse } from "../../additives";
+import { blendColors, bop, formatNumber, getPositionOfSide, getRandomDirection, parseAnimation } from "../../utils";
 
 export let upgradeInfo = {
 	"k_0": { value: 2, price: 500 },
@@ -54,7 +55,7 @@ export function addUpgrades(elementParent) {
 			z(winParent.z + 1),
 			area(),
 			outline(5, BLACK),
-			"upgrade",
+			insideWindowHover(elementParent.parent),
 			"hoverObj",
 			{
 				type: elementParent.is("clickersElement") ? "k_" : "c_",
@@ -120,23 +121,6 @@ export function addUpgrades(elementParent) {
 					downEvent = null
 				},
 
-				startHover() {
-					this.parent.endHover()
-					tween(this.parent.opacity, 0.9, 0.15, (p) => this.parent.opacity = p, easings.easeOutQuad)
-					
-					tween(this.scale, vec2(1.1), 0.15, (p) => this.scale = p, easings.easeOutQuad)
-					// let value = this.value != null ? this.value : this.freq;
-				},
-
-				endHover() {
-					this.parent.startHover()
-					tween(this.parent.opacity, 1, 0.15, (p) => this.parent.opacity = p, easings.easeOutQuad)
-
-					if (!isUpgradeBought(upgradeObj.id) && this.boughtProgress > 0) this.dropBuy()
-					tween(this.scale, vec2(1), 0.15, (p) => this.scale = p, easings.easeOutQuad)
-					this.tooltips?.forEach(tooltip => tooltip.end())
-				},
-
 				buy() {
 					upgradeObj.tooltips?.forEach(tooltip => {
 						tooltip.end()
@@ -161,6 +145,7 @@ export function addUpgrades(elementParent) {
 					
 					scoreManager.subTweenScore(this.price)
 					ROOT.trigger("buy", { element: "upgrade", id: this.id, price: this.price })
+					this.trigger("buy")
 				},
 
 				draw() {
@@ -232,6 +217,49 @@ export function addUpgrades(elementParent) {
 
 		upgradeObj.outline.color = upgradeObj.color.darken(10)
 
+		upgradeObj.startingHover(() => {
+			// end the hover of the storeElement
+			upgradeObj.parent.endHoverFunction()
+
+			// animation
+			tween(upgradeObj.parent.opacity, 0.9, 0.15, (p) => upgradeObj.parent.opacity = p, easings.easeOutQuad)
+			tween(upgradeObj.scale, vec2(1.1), 0.15, (p) => upgradeObj.scale = p, easings.easeOutQuad)
+		
+			// tooltips
+			let textInBlink = upgradeObj.value != null ? `+${upgradeObj.value}` : `Cursors now click every ${upgradeObj.freq} seconds`;
+			if (!isUpgradeBought(upgradeObj.id) && !upgradeObj.hasTooltip) {
+				upgradeObj.tooltips?.forEach(tooltip => {
+					tooltip.end()
+				});
+
+				tooltip = addPriceTooltip()
+				upgradeObj.manageBlinkText(textInBlink).addT()
+			}
+
+			// mouse animation
+			if (isUpgradeBought(upgradeObj.id) || GameState.score < upgradeObj.price) {
+				mouse.play("cursor")
+			}
+
+			// if the upgrade can be bought
+			else {
+				mouse.play("point")
+			}
+		})
+
+		upgradeObj.endingHover(() => {
+			upgradeObj.parent.startHoverFunction()
+			tween(upgradeObj.parent.opacity, 1, 0.15, (p) => upgradeObj.parent.opacity = p, easings.easeOutQuad)
+
+			if (!isUpgradeBought(upgradeObj.id) && upgradeObj.boughtProgress > 0 && GameState.score >= upgradeObj.price) upgradeObj.dropBuy()
+			tween(upgradeObj.scale, vec2(1), 0.15, (p) => upgradeObj.scale = p, easings.easeOutQuad)
+			upgradeObj.tooltips?.forEach(tooltip => tooltip.end())
+		
+			upgradeObj.manageBlinkText().end()
+
+			// cursor animation is managed by the store element in that case
+		})
+		
 		upgradeObj.onClick(() => {
 			if (!winParent.active) return
 
@@ -251,6 +279,9 @@ export function addUpgrades(elementParent) {
 						update() {
 							this.pos.y -= 1.5
 							this.pos.x = wave(upgradeObj.pos.x - 5, upgradeObj.pos.x + 5, time() * 5)
+						
+							if (this.pos.y < getPositionOfSide(upgradeObj).top) this.z = upgradeObj.z + 1
+							else this.z = upgradeObj.z - 1
 						}
 					}
 				])
@@ -288,14 +319,14 @@ export function addUpgrades(elementParent) {
 					return
 				}
 
-				else if (GameState.score > upgradeObj.price) {
+				else if (GameState.score >= upgradeObj.price) {
 					progressSound?.stop()
 					progressSound = playSfx("progress")		
 
 					// down event
 					downEvent = upgradeObj.onMouseDown(() => {
 						if (isUpgradeBought(upgradeObj.id)) return
-						if (upgradeObj.boughtProgress > 5) {
+						if (upgradeObj.boughtProgress >= 5) {
 							// there's a tutorial tooltip, get rid of it
 							if (upgradeObj.tooltips.filter(tooltip => tooltip.type == "tutorial").length > 0) {
 								upgradeObj.tooltips.forEach(tooltip => tooltip.end())
@@ -311,7 +342,7 @@ export function addUpgrades(elementParent) {
 							upgradeObj.boughtProgress += 2 // time to hold
 							upgradeObj.scale.x = map(upgradeObj.boughtProgress, 0, 100, 1.1, 0.85)
 							upgradeObj.scale.y = map(upgradeObj.boughtProgress, 0, 100, 1.1, 0.85)
-							progressSound.detune = upgradeObj.boughtProgress
+							progressSound.detune = upgradeObj.boughtProgress * upgradeObj.idx / 2
 						}
 			
 						if (upgradeObj.boughtProgress >= 100) {
@@ -351,26 +382,6 @@ export function addUpgrades(elementParent) {
 		})
 
 		let tooltip = null;
-		upgradeObj.onHover(() => {
-			if (!winParent.active) return
-			upgradeObj.startHover()
-			
-			let textInBlink = upgradeObj.value != null ? `+${upgradeObj.value}` : `Cursors now click every ${upgradeObj.freq} seconds`;
-			if (!isUpgradeBought(upgradeObj.id) && !upgradeObj.hasTooltip) {
-				upgradeObj.tooltips?.forEach(tooltip => {
-					tooltip.end()
-				});
-
-				tooltip = addPriceTooltip()
-				upgradeObj.manageBlinkText(textInBlink).addT()
-			}
-		})
-
-		upgradeObj.onHoverEnd(() => {
-			if (!winParent.active) return
-			upgradeObj.endHover()
-			upgradeObj.manageBlinkText().end()
-		})
 
 		upgradeObj.on("notEnoughMoney", () => {
 			// opts.pos is the position it was added to
@@ -381,15 +392,21 @@ export function addUpgrades(elementParent) {
 		})
 
 		upgradeObj.on("dropBuy", () => {
-			tween(progressSound.volume, 0, 0.35, (p) => progressSound.volume = p).onEnd(() => {
-				progressSound.stop()
-			})
-			sfxHandlers.delete(progressSound)
+			if (progressSound != null || progressSound != undefined) {
+				tween(progressSound.volume, 0, 0.35, (p) => progressSound.volume = p).onEnd(() => {
+					progressSound.stop()
+				})
+				sfxHandlers.delete(progressSound)
+			}
 		})
 
 		upgradeObj.on("dummyClick", () => {
 			tween(choose([-15, 15]), 0, 0.15, (p) => upgradeObj.angle = p, easings.easeOutQuint)
 			playSfx("clickButton", { detune: rand(-25, 25) })
+		})
+
+		upgradeObj.on("buy", () => {
+			mouse.play("cursor")
 		})
 
 		// draw dumb shadow

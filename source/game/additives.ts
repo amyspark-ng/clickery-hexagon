@@ -92,40 +92,7 @@ export function addMouse() {
 			}
 		}
 	])
-
-	onHover("xButton", () => {
-		mouse.play("point")
-	})
-
-	onHoverEnd("xButton", () => {
-		mouse.play("cursor")
-	})
-
-	onHover("hover_outsideWindow", () => {
-		if (!allObjWindows.isHoveringAWindow && !allObjWindows.isDraggingAWindow && !curDraggin?.is("minibutton")) {
-			mouse.play("point")
-		}
-	})
-
-	onHoverEnd("hover_outsideWindow", () => {
-		if (!allObjWindows.isHoveringAWindow && !allObjWindows.isDraggingAWindow && !curDraggin?.is("minibutton")) {
-			mouse.play("cursor")
-		}
-	})
-
-	onHover("hover_insideWindow", () => {
-		mouse.play("point")
-	})
-
-	onHoverEnd("hover_insideWindow", () => {
-		mouse.play("cursor")
-	})
-
-	mouse.use(trail({
-		sprite: mouse.sprite,
-		color: BLUE
-	}))
-}1 
+} 
 
 let maxLogs = 100;
 let toastQueue = [];

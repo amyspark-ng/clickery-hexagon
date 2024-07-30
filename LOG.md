@@ -27,9 +27,10 @@ this game MIGHT be getting done
 - unified format time function
 - AudioParam.value setter value being assigned is not a finite floating point value
 ^ this happens in the sfxHandler.volume update line in the audiomanager
-- add critical sound
 
-- make a component that manages the hovers of objects inside and outside of a window
+- make it so when you come back check if time since leave is greater than 10 seconds if it is create a new toast if not keep the same one
+
+- when a new window opens grab the active one and get all the insideWindowHovers and trigger cursorExitWindow
 
 ## Complex stuff
 - I REALLYYY need to fix the hover animations

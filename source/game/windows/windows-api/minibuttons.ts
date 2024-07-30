@@ -9,7 +9,7 @@ import { destroyExclamation } from "../../unlockables";
 import { Vec2 } from "kaplay";
 import { openWindowButton } from "./windowButtonClass";
 import { folded, folderObj } from "./folderObj";
-import { outsideWindowHover } from "../../hovers";
+import { outsideWindowHover } from "../../../hovers/outsideWindowHover";
 
 export function getMinibuttonXPos(index, buttonSpacing = 75) {
     return folderObj.pos.x - buttonSpacing * (index) - buttonSpacing;

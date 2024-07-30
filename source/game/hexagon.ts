@@ -12,7 +12,7 @@ import { curDraggin } from "../plugins/drag.ts";
 import { cam } from "./gamescene.ts";
 import { checkForUnlockable, isAchievementUnlocked, isWindowUnlocked, unlockAchievement } from "./unlockables.ts";
 import { ROOT } from "../main.ts";
-import { outsideWindowHover } from "./hovers.ts";
+import { outsideWindowHover } from "../hovers/outsideWindowHover.ts";
 import { mouse } from "./additives.ts";
 
 export let clickVars = {

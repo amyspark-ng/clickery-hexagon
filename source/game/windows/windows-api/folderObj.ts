@@ -3,7 +3,7 @@ import { curDraggin } from "../../../plugins/drag";
 import { playSfx } from "../../../sound";
 import { mouse } from "../../additives";
 import { ascension } from "../../ascension/ascension";
-import { outsideWindowHover } from "../../hovers";
+import { outsideWindowHover } from "../../../hovers/outsideWindowHover";
 import { blendColors, bop } from "../../utils";
 import { setTimeSinceSkip, timeSinceSkip } from "../musicWindow";
 import { addMinibutton, getMinibuttonXPos } from "./minibuttons";
@@ -175,11 +175,18 @@ export function folderObjManaging() {
 	});
 
 	folderObj.on("winClose", () => {
-		wait(0.05, () => {
+		// wait(0.05, () => {
 			// gets the topmost window
 			let allWindows = get("window")
 			if (allWindows.length > 0) allWindows.reverse()[0].activate()
-		})
+		// })
+
+		let isAnyObjGettingHovered = get("outsideHover", { recursive: true }).some((outsideHover) => outsideHover.isHovering() == true && outsideHover.isBeingHovered == false)
+		if (isAnyObjGettingHovered == true) {
+			// get all the objs that are being hovered
+			let allHoveredObjs = get("outsideHover", { recursive: true }).filter((outsideHover) => outsideHover.isHovering() == true && outsideHover.isBeingHovered == false)
+			allHoveredObjs.forEach((obj) => obj.startHoverFunction())
+		}
 	})
 
 	folderObj.onUpdate(() => {

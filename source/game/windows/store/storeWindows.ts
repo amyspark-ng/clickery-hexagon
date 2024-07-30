@@ -1,6 +1,6 @@
 import { GameState } from "../../../gamestate";
 import { ROOT } from "../../../main";
-import { addTooltip } from "../../additives";
+import { addTooltip, mouse } from "../../additives";
 import { addStoreElement, storeElementsInfo } from "./storeElements";
 import { addUpgrades, isUpgradeBought, upgradeInfo } from "./upgrades";
 
