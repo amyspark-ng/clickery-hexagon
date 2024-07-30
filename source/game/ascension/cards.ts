@@ -64,7 +64,6 @@ function cardTypes() {
 	return Object.keys(cardsInfo).sort((a, b) => cardsInfo[a].idx - cardsInfo[b].idx)
 }
 
-// TODO: do this with powerups
 type card = keyof typeof cardsInfo
 
 let cardYPositions = {

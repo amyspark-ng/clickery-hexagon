@@ -11,18 +11,13 @@ let speaker:any;
 let trayVolElements:any;
 let volumeBars:any;
 
-export let sfxHandler:any;
-
-export let sfxHandlers = new Set()
+export let sfxHandlers = new Set();
 export function playSfx(sound:string, opts?:AudioPlayOpt) {
 	opts = opts || {}
 	opts.detune = opts.detune || 0
 	opts.speed = opts.speed || 1
 	opts.loop = opts.loop || false
-	opts.volume = opts.volume || GameState.settings.sfx.volume
-	// TODO: the reason why sfxhandlers don't work is because the onUpdate event
-	// that set the sfxHandler.volume, i have to stop doing that and instead when volume changes
-	// grab all the handlers and set their volume to it 
+	opts.volume = opts.volume || GameState.settings.sfx.muted == true ? 0 : GameState.settings.sfx.volume
 
 	let handle = play(sound, {
 		volume: opts.volume,
@@ -34,18 +29,55 @@ export function playSfx(sound:string, opts?:AudioPlayOpt) {
 	sfxHandlers.add(handle)
 	handle.onEnd(() => sfxHandlers.delete(handle))
 
-	sfxHandler = handle
 	return handle;
 }
 
-export let musicHandler:any;
-export function playMusic(sound = "clickRelease") {
-	musicHandler.stop()
-	musicHandler = play(sound, {
-		volume: GameState.settings.music.volume,
-		detune: 0,
-		loop: true,	
+export function stopAllSounds() {
+	sfxHandlers.forEach((handler) => {
+		handler.stop()
 	})
+}
+
+export let musicHandler:any;
+export function playMusic(song:string, opts?:AudioPlayOpt) {
+	opts = opts || {}
+	
+	// IF VOLUME IS NOT SET DO THE SETTING CHECK
+	opts.volume = opts.volume || GameState.settings.music.muted == true ? 0 : GameState.settings.music.volume
+	
+	opts.loop = opts.loop || true
+	opts.detune = opts.detune || 0
+
+	musicHandler?.stop()
+	musicHandler = play(song, {
+		volume: opts.volume,
+		loop: opts.loop,	
+		detune: opts.detune,
+	})
+}
+
+export function changeVolume(type: "sfx" | "music", volume:number) {
+	if (type == "sfx") {
+		sfxHandlers.forEach((handler) => {
+			handler.volume = volume
+		})
+	}
+
+	else if (type == "music") {
+		musicHandler.volume = volume
+	}
+}
+
+export function manageMute(type: "sfx" | "music", mute:boolean) {
+	if (type == "sfx") {
+		GameState.settings.sfx.muted = mute
+		changeVolume("sfx", mute == true ? 0 : GameState.settings.sfx.volume)
+	}
+
+	else if (type == "music") {
+		GameState.settings.music.muted = mute
+		changeVolume("music", mute == true ? 0 : GameState.settings.music.volume)
+	}
 }
 
 // takes 1.25 seconds
@@ -141,7 +173,6 @@ export function volumeManager() {
 	let changeVolTune = 0
 	let waitingTimer = wait(0, function(){})
 
-	sfxHandler = play("clickPress", { volume: 0 })
 	musicHandler = play("clickRelease", { volume: 0 })
 	musicHandler.winding = true
 	musicHandler.currentTime = 0 // time()
@@ -213,7 +244,7 @@ export function volumeManager() {
 					// have to trigger this before because else the objects will not exist
 					this.trigger("show")
 					
-					GameState.settings.sfx.muted = !GameState.settings.sfx.muted
+					manageMute("sfx", !GameState.settings.sfx.muted)
 					volumeText.text = `SFX: ${GameState.settings.sfx.muted ? "OFF" : "ON"}`
 					
 					get("trayVolBar", { recursive: true }).forEach(trayVolBar => {
@@ -249,16 +280,9 @@ export function volumeManager() {
 						if (GameState.settings.music.muted) get("musicCheckbox", { recursive: true })[0]?.turnOff()
 						else get("musicCheckbox", { recursive: true })[0]?.turnOn()
 					}
-				}
 
-				if (!GameState.settings.sfx.muted) GameState.settings.sfx.volume = GameState.settings.volume; 
-				else GameState.settings.sfx.volume = 0
-				
-				if (!GameState.settings.music.muted) GameState.settings.music.volume = GameState.settings.volume; 
-				else GameState.settings.music.volume = 0
-			
-				sfxHandler.volume = GameState.settings.sfx.volume
-				if (!musicHandler.winding) musicHandler.volume = GameState.settings.music.volume
+					manageMute("music", GameState.settings.music.muted)
+				}
 			}
 		}
 	])

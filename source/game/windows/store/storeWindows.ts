@@ -153,4 +153,10 @@ export function storeWinContent(winParent) {
 			tooltip.end()
 		})
 	})
+
+	// lol!
+	if (chance(0.01)) {
+		winParent.sprite = "stroeWin"
+		debug.log("stroeWin")
+	}
 }

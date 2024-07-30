@@ -3,8 +3,8 @@ import { addHexagon, hexagon } from "./hexagon.ts"
 import { buildingsText, scoreText, spsText, uiCounters } from "./uicounters.ts"
 import { arrayToColor, arrToVec, debugFunctions, formatNumber, randomPos, randomPowerup, toHHMMSS } from "./utils.ts"
 import { addToast, gameBg, mouse } from "./additives.ts"
-import { playMusic, playSfx } from "../sound.ts"
-import { windowsDefinition } from "./windows/windows-api/windowsAPI.ts"
+import { musicHandler, playMusic, playSfx, stopAllSounds } from "../sound.ts"
+import { allObjWindows, windowsDefinition } from "./windows/windows-api/windowsAPI.ts"
 import { songs } from "./windows/musicWindow.ts"
 import { curDraggin } from "../plugins/drag.ts"
 import { DEBUG, ROOT } from "../main.ts"
@@ -139,6 +139,9 @@ function triggerZZZ(idle = true) {
 }
 
 function welcomeBack(idle = false) {
+	let timeSinceLeave = 0
+	let scoreGained = 0
+
 	function addWelcomeBackToast(score:any, timeInSeconds:number) {
 		
 		// an hour is 3600 seconds
@@ -198,17 +201,10 @@ function welcomeBack(idle = false) {
 			}
 		}
 	}
-	
-	let welcomeBackToasts = get("toast").filter(toast => toast.type == "welcome")
-	if (welcomeBackToasts.length > 0) {
-		welcomeBackToasts.forEach(toast => {
-			toast.destroy()
-		})
-	}
 
 	if (idle == false) {
-		if (GameState.cursors < 1 || ascension.ascending == true) {addWelcomeBackToast(null, totalTimeOutsideTab / 1000); return;}
-		
+		timeSinceLeave = totalTimeOutsideTab / 1000
+
 		autoLoopTime += totalTimeOutsideTab / 1000
 		excessTime = autoLoopTime - GameState.timeUntilAutoLoopEnds
 		let gainedScore = 0
@@ -217,25 +213,40 @@ function welcomeBack(idle = false) {
 			excessTime -= GameState.timeUntilAutoLoopEnds * gainedScore // I use it before to shave off the extra time
 			// actual gainedScore
 			gainedScore = gainedScore * scoreManager.scorePerAutoClick()
-	
-			// SECONDS FOR LOG
-			if ((totalTimeOutsideTab / 1000) > 60) {
-				addWelcomeBackToast(gainedScore, totalTimeOutsideTab / 1000)
-			}
-	
 			scoreManager.addTweenScore(gainedScore)
+			
+			scoreGained = gainedScore // this is for the log
 		}
 	}
 
 	else {
+		timeSinceLeave = timeSlept
 		if (GameState.cursors < 1 || ascension.ascending == true) {addWelcomeBackToast(null, timeSlept); return;}
 		
 		// SECONDS FOR LOG
 		if (timeSlept > 60) {
-			addWelcomeBackToast(Math.round(scoreManager.autoScorePerSecond() * timeSlept), timeSlept)
 			timeSlept = 0
 		}
+
+		scoreGained = Math.round(scoreManager.autoScorePerSecond() * timeSinceLeave) // this is for the log
 		// don't add no score because it is aded in the loop
+	}
+
+	// now add the toast
+	let welcomebacktoasts = get("toast").filter(t => t.type == "welcome")
+	
+	// if time since leave is greater than 10 seconds and there's already a log
+	// it means the player came back, but left again, so add another one
+	if (timeSinceLeave > 10 && welcomebacktoasts.length > 0) {
+		welcomebacktoasts.forEach(toast => toast.destroy())
+	} 
+
+	if (GameState.cursors < 1 || ascension.ascending == true) {
+		addWelcomeBackToast(null, timeSinceLeave)
+	}
+
+	else {
+		addWelcomeBackToast(scoreGained, timeSinceLeave)
 	}
 }
 
@@ -372,7 +383,12 @@ export function gamescene() {
 			camScale(vec2(cam.zoom))
 			camPos(cam.pos)
 			
-			if (isKeyDown("shift") && isKeyPressed("r") && panderitoIndex != 6) go("gamescene")
+			if (isKeyDown("shift") && isKeyPressed("r") && panderitoIndex != 6) {
+				musicHandler.stop()
+				stopAllSounds()
+				
+				go("gamescene")
+			}
 			if (isKeyDown("shift") && isKeyPressed("s") && GameState.scoreAllTime > 25) GameState.save()
 			
 			GameState.stats.totalTimePlayed += dt()
@@ -487,7 +503,8 @@ export function gamescene() {
 			},
 			intro_playMusic() {
 				// don't check anything for muted, it will play but no sound, that's good
-				playMusic(GameState.settings.music.favoriteIdx == null ? "clicker.wav" : Object.keys(songs)[GameState.settings.music.favoriteIdx])
+				let song = GameState.settings.music.favoriteIdx == null ? "clicker.wav" : Object.keys(songs)[GameState.settings.music.favoriteIdx]
+				playMusic(song)
 			},
 			intro_hexagon() {
 				tween(vec2(center().x, center().y + 110), vec2(center().x, center().y + 55), 0.5, (p) => hexagon.pos = p, easings.easeOutQuad).onEnd(() => {

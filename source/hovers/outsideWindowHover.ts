@@ -62,6 +62,14 @@ export function outsideWindowHover() {
 					this.startHoverFunction()
 				}
 			})
+
+			this.onMouseMove(() => {
+				if (this.isBeingHovered == true) {
+					if (allObjWindows.isHoveringAWindow == true) {
+						this.endHoverFunction()
+					}
+				}
+			})
 		},
 
 		startingHover(action: () => void) {

@@ -8,7 +8,7 @@ import { playSfx } from "../../../sound.ts";
 import { storeWinContent } from "../store/storeWindows.ts";
 import { musicWinContent } from "../musicWindow.ts";
 import { colorWinContent } from "../colorWindow.ts";
-import { settingsWinContent } from "../settingsWindow.ts";
+import { settingsWinContent } from "../settings/settingsWindow.ts";
 import { ascendWinContent } from "../ascendWindow.ts";
 import { extraWinContent } from "../extraWindow.ts";
 import { creditsWinContent } from "../creditsWin.ts";
@@ -220,12 +220,6 @@ export function openWindow(windowKey:windowKey) {
 			},
 		}
 	])
-
-	// lol!
-	if (windowKey == "storeWin" && chance(0.01)) {
-		windowObj.sprite = "stroeWin" 
-		debug.log("stroeWin")
-	}
 
 	infoForWindows[windowKey].lastPos.x = clamp(infoForWindows[windowKey].lastPos.x, 196, 827)
 	infoForWindows[windowKey].lastPos.y = clamp(infoForWindows[windowKey].lastPos.y, height() - windowObj.height / 2, -windowObj.height / 2)

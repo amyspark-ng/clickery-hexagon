@@ -2,7 +2,7 @@ import { clickVars } from "./game/hexagon"
 import { powerupTypes } from "./game/powerups"
 import { percentage, saveAnim } from "./game/utils"
 import { ROOT } from "./main"
-import { musicHandler, sfxHandler } from "./sound"
+import { musicHandler, sfxHandlers, stopAllSounds } from "./sound"
 
 class _GameState {	
 	score = 0
@@ -89,7 +89,8 @@ class _GameState {
 		Object.assign(this, new _GameState())
 
 		musicHandler?.stop()
-		sfxHandler?.stop()
+		stopAllSounds()
+		
 		this.settings.volume = oldvolume
 		
 		go("gamescene")
