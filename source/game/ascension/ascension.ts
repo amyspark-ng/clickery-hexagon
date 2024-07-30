@@ -6,11 +6,11 @@ import { waver } from "../../plugins/wave";
 import { hexagon } from "../hexagon"
 import { bop, getPrice, getVariable, randomPos } from "../utils";
 import { playSfx } from "../../sound";
-import { folderObj } from "../windows/windows-api/windowsAPI";
 import { hexagonIntro } from "../gamescene";
 import { positionSetter } from "../../plugins/positionSetter";
 import { mouse } from "../additives";
 import { spawnCards } from "./cards";
+import { folderObj } from "../windows/windows-api/folderObj";
 
 export let ascension = {
 	ascending: false,

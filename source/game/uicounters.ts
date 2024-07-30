@@ -3,7 +3,7 @@ import { positionSetter } from "../plugins/positionSetter.ts";
 import { waver } from "../plugins/wave.js";
 import { clickVars } from "./hexagon.ts";
 import { bop, formatNumber, getPositionOfSide, formatNumberSimple } from "./utils.ts";
-import { isHoveringAWindow } from "./windows/windows-api/windowsAPI.ts";
+import { allObjWindows } from "./windows/windows-api/windowsAPI.ts";
 
 export let scoreText:any;
 export let spsText:any;
@@ -93,7 +93,7 @@ export function uiCounters() {
 			},
 
 			click() {
-				if (isHoveringAWindow == false) {
+				if (allObjWindows.isHoveringAWindow == false) {
 					// 1 second, 2 minute, 3 hour
 					GameState.settings.spsTextMode++
 					if (GameState.settings.spsTextMode > 3) GameState.settings.spsTextMode = 1

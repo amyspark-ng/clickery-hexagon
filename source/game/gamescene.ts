@@ -1,17 +1,17 @@
 import { GameState, scoreManager } from "../gamestate.ts"
 import { addHexagon, hexagon } from "./hexagon.ts"
 import { buildingsText, scoreText, spsText, uiCounters } from "./uicounters.ts"
-import { arrayToColor, debugFunctions, formatNumber, randomPos, randomPowerup, toHHMMSS } from "./utils.ts"
+import { arrayToColor, arrToVec, debugFunctions, formatNumber, randomPos, randomPowerup, toHHMMSS } from "./utils.ts"
 import { addToast, gameBg, mouse } from "./additives.ts"
 import { playMusic, playSfx } from "../sound.ts"
-import { folderObj, folderObjManaging, isWindowOpen, windowsDefinition } from "./windows/windows-api/windowsAPI.ts"
+import { windowsDefinition } from "./windows/windows-api/windowsAPI.ts"
 import { songs } from "./windows/musicWindow.ts"
 import { curDraggin } from "../plugins/drag.ts"
 import { DEBUG, ROOT } from "../main.ts"
 import { powerup, powerupManagement, powerupTypes, spawnPowerup } from "./powerups.ts"
 import { checkForUnlockable, isAchievementUnlocked, unlockables, unlockAchievement } from "./unlockables.ts"
 import { ascension } from "./ascension/ascension.ts"
-import { Vec2 } from "kaplay"
+import { folderObj, folderObjManaging } from "./windows/windows-api/folderObj.ts"
 
 let panderitoLetters = "panderito".split("")
 export let panderitoIndex = 0
@@ -27,11 +27,7 @@ let idleWaiter:any;
 let sleeping = false;
 let timeSlept = 0;
 
-export let cam = {
-	pos: 0 as unknown,
-	zoom: 1,
-	rotation: 0,
-};
+export let cam = null;
 
 export function togglePanderito() {
 	GameState.settings.panderitoMode = !GameState.settings.panderitoMode
@@ -285,7 +281,7 @@ export function gamescene() {
 		ascension.ascending = false
 
 		cam = {
-			pos: vec2(center()),
+			pos: center(),
 			zoom: 1,
 			rotation: 0,
 		}
@@ -374,7 +370,7 @@ export function gamescene() {
 		onUpdate(() => {
 			camRot(cam.rotation)
 			camScale(vec2(cam.zoom))
-			camPos(cam.pos as Vec2)
+			camPos(cam.pos)
 			
 			if (isKeyDown("shift") && isKeyPressed("r") && panderitoIndex != 6) go("gamescene")
 			if (isKeyDown("shift") && isKeyPressed("s") && GameState.scoreAllTime > 25) GameState.save()

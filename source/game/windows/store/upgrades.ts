@@ -38,8 +38,7 @@ export function addUpgrades(elementParent) {
 		if (i == 3) {desiredPos.y += spacing.y; desiredPos.x = initialPos.x}
 		desiredPos.x += spacing.x
 		
-		let progressSound = playSfx()
-		progressSound.volume = 0
+		let progressSound = null
 		
 		let downEvent = null
 		
@@ -290,7 +289,7 @@ export function addUpgrades(elementParent) {
 				}
 
 				else if (GameState.score > upgradeObj.price) {
-					progressSound.stop()
+					progressSound?.stop()
 					progressSound = playSfx("progress")		
 
 					// down event
@@ -302,7 +301,7 @@ export function addUpgrades(elementParent) {
 								upgradeObj.tooltips.forEach(tooltip => tooltip.end())
 								addPriceTooltip()
 							
-								progressSound.stop()
+								progressSound?.stop()
 								let speed = map(upgradeObj.boughtProgress, 0, 100, 1, 1.25)
 								progressSound = playSfx("progress", { detune: upgradeObj.boughtProgress })
 							}

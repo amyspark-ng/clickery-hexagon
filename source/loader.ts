@@ -90,9 +90,7 @@ function drawDevkyLoadScreen(progress) {
 	})
 }
 
-// Sprite atlas were made with this awesome website
-// https://www.finalparsec.com/tools/sprite_sheet_maker
-export function loadEverything() {
+function loadSprites() {
 	loadBean()
 	loadSprite("hexagon", "./assets/sprites/hexagon.png")
 	loadSprite("devky", "./image.png")
@@ -114,6 +112,7 @@ export function loadEverything() {
 		},
 	});
 	
+	loadSprite("part_star", "sprites/part_star.png")
 	loadSprite("osaka", "sprites/osaka.png")
 	loadSprite("floppy", "sprites/floppy.png")
 	loadSprite("panderito", "sprites/panderito.png")
@@ -604,20 +603,36 @@ export function loadEverything() {
 	loadSprite("pinch", "sprites/pinch.png")
 	//#endregion
 	//#endregion SPRITES
+}
+
+function loadSounds() {
+
+}
+
+function loadSongs() {
+
+}
+
+// Sprite atlas were made with this awesome website
+// https://www.finalparsec.com/tools/sprite_sheet_maker
+export function loadEverything() {
+
+	loadSprites()
 
 	// #region SOUNDS
 	if (!DEBUG) {load(new Promise<void>((res) => { setTimeout(() => { res() }, 5000) })) }
 
-	//#region hexagonintro
-	loadSound("biglight", "sounds/sfx/hexagonintro/biglight.mp3")
-	loadSound("ominus", "sounds/sfx/hexagonintro/ominus.mp3")
+	//#region hexagon-intro
+	loadSound("biglight", "sounds/sfx/hexagon-intro/biglight.mp3")
+	loadSound("ominus", "sounds/sfx/hexagon-intro/ominus.mp3")
 
-	loadSound("clickPress", "sounds/sfx/hexagonintro/clickPress.mp3")
-	loadSound("clickRelease", "sounds/sfx/hexagonintro/clickRelease.mp3")
-	loadSound("powerup", "sounds/sfx/hexagonintro/powerup.wav")
-	loadSound("fullcombo", "sounds/sfx/hexagonintro/fullcombo.wav")
-	loadSound("combo", "sounds/sfx/hexagonintro/combo.wav")
-	//#endregion hexagonintro
+	loadSound("clickPress", "sounds/sfx/hexagon-intro/clickPress.mp3")
+	loadSound("clickRelease", "sounds/sfx/hexagon-intro/clickRelease.mp3")
+	loadSound("powerup", "sounds/sfx/hexagon-intro/powerup.wav")
+	loadSound("fullcombo", "sounds/sfx/hexagon-intro/fullcombo.wav")
+	loadSound("combo", "sounds/sfx/hexagon-intro/combo.wav")
+	loadSound("punch", "sounds/sfx/hexagon-intro/punch.mp3")
+	//#endregion hexagon-intro
 	
 	//#region ascension
 	loadSound("mage_e", "sounds/sfx/ascension/mage_e.mp3")

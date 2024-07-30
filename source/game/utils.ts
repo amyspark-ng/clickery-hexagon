@@ -3,12 +3,11 @@ import { GameState, scoreManager } from "../gamestate";
 import { addToast, mouse } from "./additives";
 import { autoLoopTime, cam, triggerGnome } from "./gamescene";
 import { hexagon } from "./hexagon";
-import { checkForUnlockable, unlockAchievement } from "./unlockables";
-import { isHoveringAWindow, openWindow } from "./windows/windows-api/windowsAPI";
-import { triggerAscension } from "./ascension/ascension";
+import { unlockAchievement } from "./unlockables";
+import { allObjWindows, openWindow } from "./windows/windows-api/windowsAPI";
 import { powerup, powerupTypes, spawnPowerup } from "./powerups";
 import { songsListened } from "./windows/musicWindow";
-import { sfxHandler, sfxHandlers } from "../sound";
+import { sfxHandlers } from "../sound";
 
 // definetely not stack overflow
 // dots are always for thousands, leave it like this
@@ -103,6 +102,11 @@ export function formatMusicTime(timeInSeconds) {
 	return `${Math.floor(timeInSeconds / 60)}:${Math.floor(timeInSeconds % 60) < 10 ? '0' + Math.floor(timeInSeconds % 60) : Math.floor(timeInSeconds % 60)}`
 }
 
+export function arrToVec(arr:Array<number>): Vec2 {
+	let vector = vec2(arr[0], arr[1])
+	return vector;
+}
+
 export function toHHMMSS(timeInSeconds) {
     const hours = Math.floor(timeInSeconds / 3600);
     const minutes = Math.floor((timeInSeconds % 3600) / 60);
@@ -116,7 +120,6 @@ export function toHHMMSS(timeInSeconds) {
 }
 
 /**
- * 
  * @param percentageOf is the percentage you want
  * @param number is the number you're taking the percentage of
  * @returns % of number
@@ -154,12 +157,6 @@ export function getPrice(opts:getPriceOpts) {
 
 export function getCompletedAchievementPercentage(unlockeds, total) {
 	return Math.round((unlockeds * 100) / total)
-}
-
-export function changeValueBasedOnAnother(value, maxValue, determiningValue, maxDetValue, rate) {
-	value = rate + (determiningValue / (maxDetValue / maxValue))
-	value = Math.min(value, maxValue)
-	return value;
 }
 
 export function getRandomElementDifferentFrom(arr, element) {
@@ -334,7 +331,6 @@ export function debugTexts() {
 					"Auto loop time: ": autoLoopTime.toFixed(2),
 					"Time until auto loop ends: ": GameState.timeUntilAutoLoopEnds,
 					"Taskbar: ": GameState.taskbar,
-					"isHoveringAWindow": isHoveringAWindow
 				}
 
 				this.text = createKeys()

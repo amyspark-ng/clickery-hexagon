@@ -1,19 +1,19 @@
 
 import { GameState, scoreManager } from "../gamestate.ts";
 import { scoreText, spsText } from "./uicounters.ts";
-import { arrayToColor, blendColors, percentage } from "./utils.ts";
-import { addTooltip, mouse } from "./additives.ts";
+import { arrayToColor, blendColors, getRandomDirection } from "./utils.ts";
 import { playSfx } from "../sound.ts";
-import { isDraggingAWindow, isHoveringAWindow, manageWindow } from "./windows/windows-api/windowsAPI.ts";
+import { manageWindow } from "./windows/windows-api/windowsAPI.ts";
 import { waver } from "../plugins/wave.js";
 import { isDraggingASlider } from "./windows/colorWindow.ts";
 import { addPlusScoreText, getClicksFromCombo, increaseCombo, maxComboAnim, startCombo } from "./combo-utils.ts";
 import { addConfetti } from "../plugins/confetti.js";
 import { curDraggin } from "../plugins/drag.ts";
 import { cam } from "./gamescene.ts";
-import { powerupTypes } from "./powerups.ts";
-import { checkForUnlockable, isAchievementUnlocked, unlockAchievement } from "./unlockables.ts";
+import { checkForUnlockable, isAchievementUnlocked, isWindowUnlocked, unlockAchievement } from "./unlockables.ts";
 import { ROOT } from "../main.ts";
+import { outsideWindowHover } from "./hovers.ts";
+import { mouse } from "./additives.ts";
 
 export let clickVars = {
 	clicksPerSecond: 0, // to properly calculate sps
@@ -53,6 +53,7 @@ export function addHexagon() {
 		rotate(0),
 		scale(),
 		opacity(1),
+		outsideWindowHover(),
 		color(arrayToColor(GameState.settings.hexColor)),
 		area({
 			shape: new Polygon([
@@ -65,13 +66,11 @@ export function addHexagon() {
 			]),
 			offset: vec2(-512, -293),
 			scale: vec2(1.08), 
-		}),		
+		}),
 		z(0),
 		layer("hexagon"),
 		"hexagon",
-		"hoverObj",
 		{
-			isBeingHovered: false,
 			smallestScale: 0.985,
 			biggestScale: 1.0015,
 			defaultScale: vec2(1),
@@ -195,6 +194,37 @@ export function addHexagon() {
 				// actually adds the score
 				scoreManager.addScore(scoreObtained)
 
+				const addCriticalParticles = (big:boolean) => {
+					let redcritcolor = RED.lighten(rand(110, 130))
+					let bluecritcolor = BLUE.lighten(rand(110, 130))
+					
+					let angles = [big ? 45 : 0, big ? 45 : 0]
+					let color = [big ? bluecritcolor : redcritcolor, big ? bluecritcolor : redcritcolor]
+					
+					let starparticle = add([
+						layer("ui"),
+						pos(mousePos()),
+						opacity(),
+						particles({
+							max: 4,
+							texture: getSprite("part_star").data.tex,
+							quads: [getSprite("part_star").data.frames[0]],
+							speed: [50, 100],
+							// angle: angles,
+							colors: color,
+							lifeTime: [1.0, 1.5],
+						}, {
+							lifetime: 1.5,
+							rate: 100,
+							direction: -90,
+							spread: 25,
+						})
+					])
+					starparticle.fadeIn(0.1)
+
+					starparticle.emit(4)
+				}
+
 				// do crit anim stuff
 				// if was critical and there was actually an increase
 				if (scoreObtained > scoreManager.scorePerClick()) {
@@ -202,11 +232,26 @@ export function addHexagon() {
 						// add particles
 						plusScoreText.color = blendColors(plusScoreText.color, RED, 0.1)
 						plusScoreText.text += "!"
+
+						let randomDir = getRandomDirection(center(), false, 2.5)
+						tween(randomDir, center(), 0.35, (p) => cam.pos = p, easings.easeOutQuint)
+						
+						let tone = rand(-60, 45)
+						playSfx("punch", { detune: tone })
+						addCriticalParticles(isBigCrit)
 					}
 					
 					if (isCritical == true && isBigCrit == true) {
 						plusScoreText.color = blendColors(plusScoreText.color, BLUE, 0.1)
 						plusScoreText.text += "!!"
+					
+						let randomDir = getRandomDirection(center(), false, 2.5)
+						tween(randomDir, center(), 0.35, (p) => cam.pos = p, easings.easeOutQuint)
+						tween(choose([-1, 1]), 0, 0.35, (p) => cam.rotation = p, easings.easeOutQuint)
+						
+						let tone = rand(35, 80)
+						playSfx("punch", { detune: tone })
+						addCriticalParticles(isBigCrit)
 					}
 				}
 
@@ -370,50 +415,29 @@ export function addHexagon() {
 					})
 				})
 			},
-
-			startHover() {
-				if (this.interactable) {
-					tween(this.scaleIncrease, 1.05, 0.35, (p) => this.scaleIncrease = p, easings.easeOutCubic);
-					this.rotationSpeed += hoverRotSpeedIncrease
-					this.isBeingHovered = true
-					mouse.play("point")
-					this.maxScaleIncrease = 1.05
-				}
-			},
-
-			endHover() {
-				if (this.interactable) {
-					tween(this.scaleIncrease, 1, 0.35, (p) => this.scaleIncrease = p, easings.easeOutCubic);
-					this.isBeingClicked = false
-					this.rotationSpeed = 0
-					this.isBeingHovered = false
-					mouse.play("cursor")
-					this.maxScaleIncrease = 1
-				}
-			}
 		}
 	])
+
+	hexagon.startingHover(() => {
+		tween(hexagon.scaleIncrease, 1.05, 0.35, (p) => hexagon.scaleIncrease = p, easings.easeOutCubic);
+		hexagon.rotationSpeed += hoverRotSpeedIncrease
+		hexagon.maxScaleIncrease = 1.05
+	})
+
+	hexagon.endingHover(() => {
+		tween(hexagon.scaleIncrease, 1, 0.35, (p) => hexagon.scaleIncrease = p, easings.easeOutCubic);
+		hexagon.isBeingClicked = false
+		hexagon.rotationSpeed = 0
+		hexagon.maxScaleIncrease = 1
+	})
 
 	hexagon.on("startAnimEnd", () => {
 		hexagon.use(waver({ maxAmplitude: 5, wave_speed: 1 }))
 		hexagon.startWave()
 	})
 
-	hexagon.onHover(() => {
-		if (!isHoveringAWindow && !hexagon.isBeingHovered && !curDraggin) {
-			hexagon.startHover()
-		}
-	})
-
-	hexagon.onHoverEnd(() => {
-		if (isDraggingAWindow || isDraggingASlider) return
-		if (!isHoveringAWindow && !curDraggin) {
-			hexagon.endHover()
-		}
-	});
-
 	hexagon.onClick(() => {
-		if (hexagon.interactable && hexagon.isBeingHovered && !isHoveringAWindow) {
+		if (hexagon.isBeingHovered) {
 			hexagon.clickPress()
 			GameState.stats.timesClicked++
 		}
@@ -421,18 +445,12 @@ export function addHexagon() {
 	
 	hexagon.onMouseRelease("left", () => {
 		if (hexagon.isBeingHovered) {
-			if (hexagon.interactable && hexagon.isBeingClicked && !isHoveringAWindow) {
-				hexagon.clickRelease()
-			}
+			hexagon.clickRelease()
 		}
 	})
 
 	hexagon.onMousePress("right", () => {
-		if (!GameState.unlockedWindows.includes("hexColorWin")) return;
-	
-		if (hexagon.isBeingHovered) {
-			manageWindow("hexColorWin")
-		}
+		if (isWindowUnlocked("hexColorWin") && hexagon.isBeingHovered) manageWindow("hexColorWin")
 	})
 
 	// score setting stuff

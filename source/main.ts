@@ -4,6 +4,7 @@ import "kaplay/global";
 import { drawSeriousLoadScreen, loadEverything } from "./loader.ts"
 import { addBackground, addMouse, gameBg } from "./game/additives.ts";
 import { volumeManager } from "./sound.ts";
+import { consoleManager } from "./console.ts";
 
 export const DEBUG:boolean = true
 export const k = kaplay({
@@ -39,11 +40,11 @@ layers([
 
 loadEverything()
 onLoad(() => {
+	volumeManager()
 	addBackground()
+
 	gameBg.movAngle = -5
 	gameBg.color = BLACK
-
-	volumeManager()
 
 	if (!DEBUG) {
 		let opacity = 1
@@ -60,6 +61,7 @@ onLoad(() => {
 	}
 	
 	else {
+		// consoleManager()
 		wait(0.05, () => {
 			ROOT.trigger("rungame")
 		})

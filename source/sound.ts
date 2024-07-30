@@ -14,13 +14,13 @@ let volumeBars:any;
 export let sfxHandler:any;
 
 export let sfxHandlers = new Set()
-export function playSfx(sound = "clickPress", opts?:AudioPlayOpt) {
+export function playSfx(sound:string, opts?:AudioPlayOpt) {
 	opts = opts || {}
 	opts.detune = opts.detune || 0
 	opts.speed = opts.speed || 1
 	opts.loop = opts.loop || false
 	opts.volume = opts.volume || GameState.settings.sfx.volume
-	
+
 	let handle = play(sound, {
 		volume: opts.volume,
 		detune: opts.detune,

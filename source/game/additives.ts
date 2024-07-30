@@ -6,7 +6,7 @@ import { playSfx } from "../sound"
 import { hexagon } from "./hexagon"
 import { isWindowUnlocked } from "./unlockables"
 import { blendColors, parseAnimation } from "./utils"
-import { isDraggingAWindow, isHoveringAWindow, manageWindow } from "./windows/windows-api/windowsAPI"
+import { allObjWindows, manageWindow } from "./windows/windows-api/windowsAPI"
 
 export let gameBg;
 export function addBackground() {
@@ -28,7 +28,7 @@ export function addBackground() {
 				if (isMousePressed("right")) {
 					if (!isWindowUnlocked("bgColorWin")) return
 					// doesn't check for hovering this because you will always be hovering it lol
-					if (!hexagon?.isHovering() && !get("folderObj")[0]?.isHovering() && !get("minibutton")[0]?.isHovering() && !get("window")[0]?.isHovering() && !isDraggingAWindow) {
+					if (!hexagon?.isHovering() && !get("folderObj")[0]?.isHovering() && !get("minibutton")[0]?.isHovering() && !get("window")[0]?.isHovering() && !allObjWindows.isDraggingAWindow) {
 						manageWindow("bgColorWin")
 					}
 				}
@@ -102,13 +102,13 @@ export function addMouse() {
 	})
 
 	onHover("hover_outsideWindow", () => {
-		if (!isHoveringAWindow && !isDraggingAWindow && !curDraggin?.is("minibutton")) {
+		if (!allObjWindows.isHoveringAWindow && !allObjWindows.isDraggingAWindow && !curDraggin?.is("minibutton")) {
 			mouse.play("point")
 		}
 	})
 
 	onHoverEnd("hover_outsideWindow", () => {
-		if (!isHoveringAWindow && !isDraggingAWindow && !curDraggin?.is("minibutton")) {
+		if (!allObjWindows.isHoveringAWindow && !allObjWindows.isDraggingAWindow && !curDraggin?.is("minibutton")) {
 			mouse.play("cursor")
 		}
 	})

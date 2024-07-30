@@ -27,6 +27,7 @@ this game MIGHT be getting done
 - unified format time function
 - AudioParam.value setter value being assigned is not a finite floating point value
 ^ this happens in the sfxHandler.volume update line in the audiomanager
+- add critical sound
 
 - make a component that manages the hovers of objects inside and outside of a window
 

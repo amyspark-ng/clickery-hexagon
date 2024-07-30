@@ -87,6 +87,7 @@ function addRgbSlider(winParent, posToAdd = vec2(0), coloredObj, type = "r") {
 		anchor("center"),
 		area({ scale: vec2(3.5, 1) }),
 		drag(true),
+		rotate(0),
 		color(typeToColor(type)),
 		"hoverObj",
 		"sliderButton",
@@ -204,7 +205,6 @@ function addRgbSlider(winParent, posToAdd = vec2(0), coloredObj, type = "r") {
 			size: 25,
 			font: "lambdao"
 		}),
-		area(),
 		color(WHITE),
 		type + "slider",
 		pos(getPositionOfSide(theOneBehind).right + 5, theOneBehind.pos.y),
@@ -216,22 +216,6 @@ function addRgbSlider(winParent, posToAdd = vec2(0), coloredObj, type = "r") {
 			}
 		}
 	])
-
-	// textValue.onClick(() => {
-		// let charInputEvent = onCharInput((ch) => {
-			// add([
-			// 	rect(textValue.width, textValue.height),
-			// 	pos(textValue.pos),
-			// 	anchor("center"),
-			// ])
-			// add a square behind to make you know that is a textbox
-			// deactivate everything else, make this the only one active
-			// if number make convert textvalue to the number that is being written
-			// if !textvalue.active text will be sliderInfo.value, else it will be what i want to be written
-			// onFocusLose of textvalue sliderButton.pos will be converted to the position corresponding to that value
-			// or enter, also this will be canceled
-		// })
-	// })
 
 	sliderInfo.button = sliderButton;
 	sliderInfo.currentBar = currentBar;

@@ -1,5 +1,5 @@
 import { GameState, scoreManager } from '../gamestate';
-import { folded, folderObj, infoForWindows, isWindowOpen, windowKey } from './windows/windows-api/windowsAPI';
+import { windowKey } from './windows/windows-api/windowsAPI';
 import { playSfx } from '../sound';
 import { waver } from '../plugins/wave';
 import { addMinibutton} from './windows/windows-api/minibuttons';
@@ -11,6 +11,7 @@ import { gridContainer, makeGridMinibutton } from './windows/extraWindow';
 import { upgradeInfo } from './windows/store/upgrades';
 import { songs, songsListened } from './windows/musicWindow';
 import { GameObj } from 'kaplay';
+import { folded, folderObj } from './windows/windows-api/folderObj';
 
 // type achievementType = {
 // 	title: string, // what you have to do in order to get it
@@ -335,7 +336,7 @@ export function allAchivementsNames() {
 	return unlockables.achievements.map(achievement => achievement.name)
 }
 
-export function isWindowUnlocked(windowName:string) {
+export function isWindowUnlocked(windowName:windowKey) {
 	return GameState.unlockedWindows.includes(windowName)
 }
 
@@ -349,7 +350,7 @@ export function checkForUnlockable() {
 		if (unlockabletype == "windows") {
 			// gets all the windows unlockable
 			//  and filters the one that are not already unlocked AND have a condition
-			Object.keys(unlockables["windows"]).filter(window => !isWindowUnlocked(window) && unlockables["windows"][window].condition).forEach(unlockableWindow => {
+			Object.keys(unlockables["windows"]).filter(window => !isWindowUnlocked(window as windowKey) && unlockables["windows"][window].condition).forEach(unlockableWindow => {
 				// if condition is met
 				if (unlockables["windows"][unlockableWindow].condition()) {
 					unlockWindow(unlockableWindow as windowKey)

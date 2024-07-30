@@ -3,11 +3,13 @@ import { dummyShadow } from "../../../plugins/dummyShadow";
 import { playSfx } from "../../../sound";
 import { bop } from "../../utils";
 import { mouse } from "../../additives";
-import { folderObj, infoForWindows, isDraggingAWindow, isHoveringAWindow, manageWindow, folded, buttonSpacing, openWindow, windowKey } from "./windowsAPI";
+import { infoForWindows, manageWindow, buttonSpacing, openWindow, allObjWindows, windowKey, } from "./windowsAPI";
 import { GameState } from "../../../gamestate";
 import { destroyExclamation } from "../../unlockables";
 import { Vec2 } from "kaplay";
 import { openWindowButton } from "./windowButtonClass";
+import { folded, folderObj } from "./folderObj";
+import { outsideWindowHover } from "../../hovers";
 
 export function getMinibuttonXPos(index, buttonSpacing = 75) {
     return folderObj.pos.x - buttonSpacing * (index) - buttonSpacing;
@@ -55,8 +57,8 @@ export function addMinibutton(opts:minibuttonOpt) {
 		z(folderObj.z - 1),
 		dummyShadow(),
 		openWindowButton(),
+		outsideWindowHover(),
 		`${opts.windowKey}`,
-		"hoverObj",
 		"minibutton",
 		infoForWindows[opts.windowKey].icon == "extra" ? "extraMinibutton" : "",
 		{
@@ -71,43 +73,8 @@ export function addMinibutton(opts:minibuttonOpt) {
 			defaultScale: vec2(1),
 			dragHasSurpassed: false,
 			destinedPosition: destinedPosition,
-			isBeingHovered: false,
 			extraMb: infoForWindows[opts.windowKey].icon == "extra" ? true : null,
 			shut: get("extraWin")[0] ? false : true,
-			startHover() {
-				if (folded) return
-				if (isDraggingAWindow) return
-				tween(this.pos.y, this.destinedPosition.y - 5, 0.32, (p) => this.pos.y = p, easings.easeOutQuint)
-				tween(this.scale, vec2(1.05), 0.32, (p) => this.scale = p, easings.easeOutQuint)
-
-				if (this.extraMb) this.shut ? this.play("shut_hover") : this.play("open_hover")
-				else this.play("hover")
-				mouse.play("point")
-				this.isBeingHovered = true
-
-				if (this.extraMb || this.dragging) return
-				tween(this.pos.x, getMinibuttonXPos(this.taskbarIndex), 0.32, (p) => this.pos.x = p, easings.easeOutQuint)
-			},
-
-			endHover() {
-				if (folded) return
-				if (isDraggingAWindow) return
-				tween(this.pos.y, this.destinedPosition.y, 0.32, (p) => this.pos.y = p, easings.easeOutQuint)
-				tween(this.angle, 0, 0.32, (p) => this.angle = p, easings.easeOutQuint)
-				tween(this.scale, vec2(1), 0.32, (p) => this.scale = p, easings.easeOutQuint)
-				this.defaultScale = vec2(1.05)
-				
-				if (this.extraMb) this.shut ? this.play("shut_default") : this.play("open_default")
-				else this.play("default")
-				mouse.play("cursor")
-
-				// reset some stuff
-				this.isBeingHovered = false
-
-				if (this.extraMb || this.dragging) return
-				tween(this.pos.x, getMinibuttonXPos(this.taskbarIndex), 0.32, (p) => this.pos.x = p, easings.easeOutQuint)
-			},
-			
 			update() {
 				if (this.dragging == false) {
 					if (curDraggin?.is("minibutton") && !this.extraMb) {
@@ -257,13 +224,11 @@ export function addMinibutton(opts:minibuttonOpt) {
 					destroy(minibuttonslot)
 				})
 				
-				this.isBeingHovered = false
 				// when it ends it destroys its slot
 				movingTween.onEnd(() => {
 					let currentSlot = get(`slot_${this.taskbarIndex}`)[0]
 					currentSlot?.fadeOut(0.32).onEnd(() => currentSlot?.destroy())
-					// isBeingHoveredOn doesn't work
-					if (this.isHovering() && !isHoveringAWindow) this.startHover()
+					if (this.isHovering() && !allObjWindows.isHoveringAWindow) this.startHover()
 					else this.endHover()
 				})
 
@@ -323,24 +288,37 @@ export function addMinibutton(opts:minibuttonOpt) {
 		"u_size": vec2(quad.w, quad.h),
 	})))
 
-	currentMinibutton.onHover(() => {
-		if (curDraggin) return
-		if (!isHoveringAWindow && !isDraggingAWindow) {
-			currentMinibutton.startHover() // don't add the sound here because then it gets called whenever a window is closed
-			playSfx("hoverMiniButton", {detune: 100 * currentMinibutton.windowInfo.idx / 4})
-		}
+	currentMinibutton.startingHover(() => {
+		if (folded) return
+		playSfx("hoverMiniButton", {detune: 100 * currentMinibutton.windowInfo.idx / 4})
+		tween(currentMinibutton.pos.y, currentMinibutton.destinedPosition.y - 5, 0.32, (p) => currentMinibutton.pos.y = p, easings.easeOutQuint)
+		tween(currentMinibutton.scale, vec2(1.05), 0.32, (p) => currentMinibutton.scale = p, easings.easeOutQuint)
+
+		if (currentMinibutton.extraMb) currentMinibutton.shut ? currentMinibutton.play("shut_hover") : currentMinibutton.play("open_hover")
+		else currentMinibutton.play("hover")
+
+		if (currentMinibutton.extraMb || currentMinibutton.dragging) return
+		tween(currentMinibutton.pos.x, getMinibuttonXPos(currentMinibutton.taskbarIndex), 0.32, (p) => currentMinibutton.pos.x = p, easings.easeOutQuint)
 	})
 
-	currentMinibutton.onHoverEnd(() => {
-		if (curDraggin) return
-		if (isDraggingAWindow) return
-		if (!isHoveringAWindow) {
-			currentMinibutton.endHover()  
-		}
+	currentMinibutton.endingHover(() => {
+		if (folded) return
+		if (allObjWindows.isDraggingAWindow) return
+		tween(currentMinibutton.pos.y, currentMinibutton.destinedPosition.y, 0.32, (p) => currentMinibutton.pos.y = p, easings.easeOutQuint)
+		tween(currentMinibutton.angle, 0, 0.32, (p) => currentMinibutton.angle = p, easings.easeOutQuint)
+		tween(currentMinibutton.scale, vec2(1), 0.32, (p) => currentMinibutton.scale = p, easings.easeOutQuint)
+		currentMinibutton.defaultScale = vec2(1.05)
+		
+		if (currentMinibutton.extraMb) currentMinibutton.shut ? currentMinibutton.play("shut_default") : currentMinibutton.play("open_default")
+		else currentMinibutton.play("default")
+		mouse.play("cursor")
+
+		if (currentMinibutton.extraMb || currentMinibutton.dragging) return
+		tween(currentMinibutton.pos.x, getMinibuttonXPos(currentMinibutton.taskbarIndex), 0.32, (p) => currentMinibutton.pos.x = p, easings.easeOutQuint)
 	})
 
 	currentMinibutton.onPress(() => {
-		if (isHoveringAWindow || isDraggingAWindow) return
+		if (allObjWindows.isHoveringAWindow || allObjWindows.isDraggingAWindow) return
 		currentMinibutton.click()
 	})
 
