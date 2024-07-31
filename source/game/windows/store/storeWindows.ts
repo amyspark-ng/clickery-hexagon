@@ -67,7 +67,7 @@ export function storeWinContent(winParent) {
 
 		const cursorsTutToolTip = () => {
 			let tooltip = addTooltip(cursorsElement, {
-				text: "← You can buy these to get automatically get score!",
+				text: "← You can buy these to\nautomatically get score!",
 				direction: "right",
 				type: "tutorialCursors",
 			})
@@ -97,7 +97,8 @@ export function storeWinContent(winParent) {
 			// adds the tooltip to the first upgrade
 			let k_0Upgrade = clickersElement.get("upgrade").filter(upgrade => upgrade.id == "k_0")[0]
 			let tooltip = addTooltip(k_0Upgrade, {
-				text: "With these you can make clicks or cursors more efficient! →",
+				// TODO: make this more readable, the tooltip looks crazy!!!
+				text: "These will make your clicks and cursors →\nmore efficient!",
 				direction: "left",
 				type: "tutorialUpgrades",
 			})

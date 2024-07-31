@@ -5,11 +5,11 @@ import { bop } from "../../utils";
 import { mouse } from "../../additives";
 import { infoForWindows, manageWindow, buttonSpacing, openWindow, allObjWindows, windowKey, } from "./windowManaging";
 import { GameState } from "../../../gamestate";
-import { destroyExclamation } from "../../unlockables";
 import { Vec2 } from "kaplay";
 import { openWindowButton } from "./windowButtonClass";
 import { folded, folderObj } from "./folderObj";
 import { outsideWindowHover } from "../../../hovers/outsideWindowHover";
+import { destroyExclamation } from "../../unlockables/unlockablewindows";
 
 export function getMinibuttonXPos(index, buttonSpacing = 75) {
     return folderObj.pos.x - buttonSpacing * (index) - buttonSpacing;

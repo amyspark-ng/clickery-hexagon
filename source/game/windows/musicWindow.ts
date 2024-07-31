@@ -1,7 +1,7 @@
 import { GameState } from "../../gamestate";
 import { waver } from "../../plugins/wave";
 import { musicHandler, playMusic, playSfx, scratchSong } from "../../sound";
-import { isAchievementUnlocked } from "../unlockables";
+import { isAchievementUnlocked } from "../unlockables/achievements";
 import { bop, formatMusicTime } from "../utils";
 
 export let songs = {
@@ -56,7 +56,6 @@ export function musicWinContent(winParent) {
 		scale(1),
 		area(),
 		"bpmChange",
-		"hoverObj",
 		"pauseButton",
 		"musicButton",
 		"windowButton",
@@ -176,7 +175,6 @@ export function musicWinContent(winParent) {
 		area(),
 		scale(),
 		anchor("center"),
-		"hoverObj",
 		"musicButton",
 		"windowButton",
 		"backButton",
@@ -190,7 +188,6 @@ export function musicWinContent(winParent) {
 		area(),
 		scale(),
 		anchor("center"),
-		"hoverObj",
 		"musicButton",
 		"windowButton",
 		"pauseButton",
@@ -210,7 +207,6 @@ export function musicWinContent(winParent) {
 		area(),
 		scale(),
 		anchor("center"),
-		"hoverObj",
 		"musicButton",
 		"windowButton",
 		"skipButton",

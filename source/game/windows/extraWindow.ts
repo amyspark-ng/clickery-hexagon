@@ -7,9 +7,9 @@ import { bop } from "../utils";
 import { mouse } from "../additives";
 import { buttonSpacing, infoForWindows, openWindow, windowKey } from "./windows-api/windowManaging";
 import { addMinibutton } from "./windows-api/minibuttons";
-import { destroyExclamation } from "../unlockables";
 import { openWindowButton } from "./windows-api/windowButtonClass";
 import { Vec2 } from "kaplay";
+import { destroyExclamation } from "../unlockables/unlockablewindows";
 
 export let gridContainer;
 

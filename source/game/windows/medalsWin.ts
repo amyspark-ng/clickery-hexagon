@@ -1,5 +1,5 @@
 import { addTooltip } from "../additives";
-import { allAchivementsNames, getAchievementFor, getIndexForAchievement, isAchievementUnlocked, unlockables, unlockAchievement } from "../unlockables";
+import { achievements, achievementsInfo, getAchievement, isAchievementUnlocked, unlockAchievement } from "../unlockables/achievements";
 import { parseAnimation } from "../utils";
 
 let totalColumns = 5;
@@ -38,7 +38,9 @@ export function medalsWinContent(winParent) {
 		anchor("top"),
 	])
 
-	function addMedal(gridPosition:{ row:number, column:number }, medalInfo:any) {
+	function addMedal(gridPosition:{ row:number, column:number }, medalid:string) {
+		let achievementInfo = getAchievement(medalid)
+		
 		let medalObj = medalsContainer.add([
 			sprite("white_noise"),
 			pos(),
@@ -50,7 +52,7 @@ export function medalsWinContent(winParent) {
 			"medal",
 			{
 				achievementIdx: 0,
-				achievementId: getAchievementFor(medalInfo.name).name,
+				achievementId: medalid,
 				row: gridPosition.row,
 				column: gridPosition.column,
 				
@@ -69,9 +71,9 @@ export function medalsWinContent(winParent) {
 
 		// one less, i don't know why!!
 		medalObj.pos = getPositionInWindow(gridPosition.row - 1, gridPosition.column - 1)
-		medalObj.achievementIdx = getIndexForAchievement(medalObj.achievementId)
+		medalObj.achievementIdx = achievements.indexOf(getAchievement(medalid))
 
-		parseAnimation(medalObj, `${medalInfo.icon}`)
+		parseAnimation(medalObj, `${achievementInfo.icon}`)
 
 		medalObj.width = 60
 		medalObj.height = 60
@@ -84,7 +86,7 @@ export function medalsWinContent(winParent) {
 
 		medalObj.onHover(() => {
 			let tooltip = addTooltip(medalObj, { 
-				text: getAchievementFor(medalObj.achievementId).text,
+				text: getAchievement(medalObj.achievementId).description,
 				direction: "down",
 				lerpValue: 0.9,
 			})
@@ -97,11 +99,11 @@ export function medalsWinContent(winParent) {
 
 	// add all the medals
 	// for (let i = 0; i < 5; i++) {
-	for (let i = 0; i < Object.keys(unlockables["achievements"]).length; i++) {
+	for (let i = 0; i < achievements.length; i++) {
 		if (i == totalColumns * totalRows) break;
 
-		let medalInfo = unlockables.achievements[i]
-		addMedal(indexToGrid(i), medalInfo)
+		let medalid = achievements[i].id
+		addMedal(indexToGrid(i), medalid)
 	}
 
 	let scrollSpeed = 0
@@ -109,8 +111,9 @@ export function medalsWinContent(winParent) {
 	function scrollDown() {
 		// if the idx of last medal is the same as the last medal in the unlockables.achievements
 		let allMedals = medalsContainer.get("medal") // have to reverse the one before idk why
-		let sortedMedals = allMedals.sort((a, b) => b.achievementIdx - a.achievementIdx).reverse();		
-		if (sortedMedals[sortedMedals.length - 1].achievementIdx == Object.keys(unlockables.achievements).length - 1) return
+		let sortedMedals = allMedals.sort((a, b) => b.achievementIdx - a.achievementIdx).reverse();
+		// if the idx of the last medal is the same as the last medal don't scroll
+		if (sortedMedals[sortedMedals.length - 1].achievementIdx == achievements.length - 1) return
 
 		medalsContainer.get("medal").filter(medal => medal.row == 1).forEach(medal => {
 			destroy(medal)
@@ -122,15 +125,15 @@ export function medalsWinContent(winParent) {
 		})
 
 		wait(scrollSpeed / 2, () => {
-			let indexOfLastAchievementInList = allAchivementsNames().indexOf(medalsContainer.get("medal")[medalsContainer.get("medal").length - 1].achievementId)
-			let nextMedals = allAchivementsNames().slice(indexOfLastAchievementInList + 1, allAchivementsNames().length)
+			let indexOfLastAchievementInList = achievements.map(achievement => achievement.id).indexOf(medalsContainer.get("medal")[medalsContainer.get("medal").length - 1].achievementId)
+			let nextMedals = achievements.map(achievement => achievement.id).slice(indexOfLastAchievementInList + 1, achievements.map(achievement => achievement.id).length)
 			nextMedals.length = Math.min(nextMedals.length, totalColumns)
 
-			let medalsInfo = nextMedals.map(medal => unlockables.achievements[getIndexForAchievement(medal)])
+			let medalsInfo = nextMedals.map(medal => getAchievement(medal))
 
 			// adds the new ones
 			for (let i = 0; i < nextMedals.length; i++) {
-				addMedal({ row: totalRows, column: indexToGrid(indexOfLastAchievementInList + 1 + i).column }, medalsInfo[i])
+				addMedal({ row: totalRows, column: indexToGrid(indexOfLastAchievementInList + 1 + i).column }, medalsInfo.map(achievement => achievement.id)[i])
 			}
 		})
 	}
@@ -152,12 +155,12 @@ export function medalsWinContent(winParent) {
 
 		wait(scrollSpeed / 2, () => {
 			// grabs all the next achievements to the last in the list
-			let previousMedalsNames = allAchivementsNames().slice(0, allAchivementsNames().indexOf(medalsContainer.get("medal")[0].achievementId));
-			let previousMedalsInfo = previousMedalsNames.map(medal => getAchievementFor(medal))
+			let previousMedalsNames = achievementsInfo.ids.slice(0, achievementsInfo.ids.indexOf(medalsContainer.get("medal")[0].achievementId));
+			let previousMedalsInfo = previousMedalsNames.map(medal => getAchievement(medal))
 
 			// adds the new ones
 			for (let i = 0; i < previousMedalsInfo.length; i++) {
-				addMedal({ row: 1, column: indexToGrid(i).column }, previousMedalsInfo[i])
+				addMedal({ row: 1, column: indexToGrid(i).column }, previousMedalsInfo.map(achievement => achievement.id)[i])
 			}
 		})
 	}

@@ -4,7 +4,7 @@ import { playSfx } from "../sound";
 import { GameState, scoreManager } from "../gamestate";
 import { bop, formatMusicTime, formatNumber, parseAnimation, randomPos, randomPowerup } from "./utils";
 import { positionSetter } from "../plugins/positionSetter";
-import { checkForUnlockable } from "./unlockables";
+import { checkForUnlockable } from "./unlockables/achievements";
 import { ascension } from "./ascension/ascension";
 
 /*

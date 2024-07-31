@@ -56,7 +56,7 @@ export function addUpgrades(elementParent) {
 			area(),
 			outline(5, BLACK),
 			insideWindowHover(elementParent.parent),
-			"hoverObj",
+			"upgrade",
 			{
 				type: elementParent.is("clickersElement") ? "k_" : "c_",
 				idx: i,

@@ -79,7 +79,7 @@ export function addCheckbox(opts:checkBoxOpt, parent?:any) {
 	checkBox.onClick(() => {
 		bop(checkBox)
 
-		// if is not volume and the value is true
+		// gets the result of the click
 		let resultOfClick = opts.onCheck()
 
 		if (resultOfClick == true) {

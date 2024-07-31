@@ -89,7 +89,6 @@ function addRgbSlider(winParent, posToAdd = vec2(0), coloredObj, type = "r") {
 		drag(true),
 		rotate(0),
 		color(typeToColor(type)),
-		"hoverObj",
 		"sliderButton",
 		"windowButton",
 		"slider",

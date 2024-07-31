@@ -4,9 +4,9 @@ import { curDraggin } from "../plugins/drag"
 import { trail } from "../plugins/trail"
 import { playSfx } from "../sound"
 import { hexagon } from "./hexagon"
-import { isWindowUnlocked } from "./unlockables"
 import { blendColors, parseAnimation } from "./utils"
 import { allObjWindows, manageWindow } from "./windows/windows-api/windowManaging"
+import { isWindowUnlocked } from "./unlockables/unlockablewindows"
 
 export let gameBg;
 export function addBackground() {
@@ -102,7 +102,7 @@ export type toastOpts = {
 	title?: string,
 	body?: string,
 	icon?: string,
-	time?: number,
+	duration?: number,
 }
 
 export function addToast(opts:toastOpts) {
@@ -242,7 +242,7 @@ export function addToast(opts:toastOpts) {
 
 		tween(-toastBg.width, toastBg.width / 2, 0.5, (p) => toastBg.pos.x = p, easings.easeOutQuint);
 
-		wait(opts.time ?? 3, () => {
+		wait(opts.duration ?? 3, () => {
 			toastBg.close();
 		});
 

@@ -3,7 +3,7 @@ import { GameState, scoreManager } from "../gamestate";
 import { addToast, mouse } from "./additives";
 import { autoLoopTime, cam, triggerGnome } from "./gamescene";
 import { hexagon } from "./hexagon";
-import { unlockAchievement } from "./unlockables";
+import { unlockAchievement } from "./unlockables/achievements";
 import { allObjWindows, openWindow } from "./windows/windows-api/windowManaging";
 import { powerup, powerupTypes, spawnPowerup } from "./powerups";
 import { songsListened } from "./windows/musicWindow";
@@ -351,9 +351,6 @@ export function debugFunctions() {
 	window.globalThis.spawnPowerup = spawnPowerup
 	window.globalThis.hexagon = hexagon
 	window.globalThis.openWindow = openWindow
-	window.globalThis.powerupTypes = powerupTypes
-	window.globalThis.songsListened = songsListened
-	window.globalThis.sfxHandlers = sfxHandlers
 
 	onUpdate(() => {
 		// if (isKeyDown("control")) {

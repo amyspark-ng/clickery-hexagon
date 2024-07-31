@@ -1,6 +1,6 @@
 import { GameState } from "../../gamestate";
 import { positionSetter } from "../../plugins/positionSetter";
-import { unlockables } from "../unlockables";
+import { achievements } from "../unlockables/achievements";
 import { formatNumber, formatNumberSimple, toHHMMSS } from "../utils";
 
 export function statsWinContent(winParent) {
@@ -12,7 +12,7 @@ export function statsWinContent(winParent) {
 			{ "Times clicked": formatNumberSimple(GameState.stats.timesClicked) },
 			{ "Powerups clicked": formatNumberSimple(GameState.stats.powerupsClicked) },
 			{ "Powerups bought": formatNumberSimple(GameState.stats.powerupsBought) },
-			{ "Achievements unlocked": `${GameState.unlockedAchievements.length}/${unlockables.achievements.length}` },
+			{ "Achievements unlocked": `${GameState.unlockedAchievements.length}/${achievements.length}` },
 			{ "Total time played": toHHMMSS(Math.round(GameState.stats.totalTimePlayed)) },
 		]
 

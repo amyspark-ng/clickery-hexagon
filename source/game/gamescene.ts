@@ -9,7 +9,7 @@ import { songs } from "./windows/musicWindow.ts"
 import { curDraggin } from "../plugins/drag.ts"
 import { DEBUG, ROOT } from "../main.ts"
 import { powerup, powerupManagement, powerupTypes, spawnPowerup } from "./powerups.ts"
-import { checkForUnlockable, isAchievementUnlocked, unlockables, unlockAchievement } from "./unlockables.ts"
+import { checkForUnlockable, isAchievementUnlocked, unlockables, unlockAchievement } from "./unlockables/achievements.ts"
 import { ascension } from "./ascension/ascension.ts"
 import { folderObj, folderObjManaging } from "./windows/windows-api/folderObj.ts"
 

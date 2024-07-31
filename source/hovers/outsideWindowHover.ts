@@ -48,26 +48,18 @@ export function outsideWindowHover() {
 				this.endHoverFunction()
 			})
 
-			this.on("cursorEnterWindow", () => {
+			this.on("cursorEnterWindow", (windowObj) => {
 				// if the hover animation is playing then stop playing it
 				if (this.isBeingHovered == true) {
 					this.endHoverFunction()
-				} 
+				}
 			})
 
-			this.on("cursorExitWindow", () => {
+			this.on("cursorExitWindow", (windowObj) => {
 				// if is being hovered but the animation is not playing
 				// due to being inside a window
 				if (this.isHovering()) {
 					this.startHoverFunction()
-				}
-			})
-
-			this.onMouseMove(() => {
-				if (this.isBeingHovered == true) {
-					if (allObjWindows.isHoveringAWindow == true) {
-						this.endHoverFunction()
-					}
 				}
 			})
 		},

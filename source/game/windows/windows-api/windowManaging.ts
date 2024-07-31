@@ -16,10 +16,31 @@ import { ascendWinContent } from "../ascendWindow.ts";
 import { extraWinContent } from "../extraWindow.ts";
 import { creditsWinContent } from "../creditsWin.ts";
 import { statsWinContent } from "../statsWin.ts";
-import { isAchievementUnlocked, unlockAchievement } from "../../unlockables.ts";
+import { isAchievementUnlocked, unlockAchievement } from "../../unlockables/achievements.ts";
 import { medalsWinContent } from "../medalsWin.ts";
+import { Vec2 } from "kaplay";
 
-export let infoForWindows = {};
+class Window {
+	key: string;
+	idx: number;
+	pos: Vec2;
+	content: (winParent:any) => void;
+	icon?: string;
+
+	// they can't be the same names lol
+	constructor(public windowKey: string, public index: number, public position: Vec2, public contentObjs: (winParent:any) => void, public iconing?: string) {
+		this.key = windowKey
+		this.idx = index
+		this.pos = position
+		this.content = contentObjs
+		this.icon = iconing
+	}
+}
+
+// TODO: look into this, the 'vec2 is not defined' issue still persist, but it's a better alternative to the infoForWindows object
+// let windowMaybe = new Window("storeWin", 0, vec2(264, 285), storeWinContent, "icon_store")
+
+export let infoForWindows = {}
 
 export let allObjWindows = {
 	isHoveringAWindow: false,
@@ -225,22 +246,22 @@ export function openWindow(windowKey:windowKey) {
 	windowObj.pos = infoForWindows[windowKey].lastPos
 
 	windowObj.onHover(() => {
-		get("outsideHover", { recursive: true }).forEach(obj => {
-			obj.trigger("cursorEnterWindow")
-		})
-
-		get("insideHover", { recursive: true }).forEach(obj => {
-			obj.trigger("cursorEnterWindow")
+		query({
+			include: [ "outsideHover", "insideHover" ],
+			includeOp: "or",
+			hierarchy: "descendants",
+		}).forEach((obj) => {
+			obj.trigger("cursorEnterWindow", windowObj)
 		})
 	})
 	
 	windowObj.onHoverEnd(() => {
-		get("outsideHover", { recursive: true }).forEach(obj => {
-			obj.trigger("cursorExitWindow")
-		})
-
-		get("insideHover", { recursive: true }).forEach(obj => {
-			obj.trigger("cursorExitWindow")
+		query({
+			include: [ "outsideHover", "insideHover" ],
+			includeOp: "or",
+			hierarchy: "descendants",
+		}).forEach((obj) => {
+			obj.trigger("cursorExitWindow", windowObj)
 		})
 	})
 

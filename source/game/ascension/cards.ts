@@ -3,9 +3,9 @@ import { getPrice, getVariable, setVariable } from "../utils"
 import { GameState } from "../../gamestate"
 import { ascension, talk } from "./ascension"
 import { ROOT } from "../../main"
-import { isWindowUnlocked, unlockWindow } from "../unlockables"
 import { playSfx } from "../../sound"
 import { windowKey } from "../windows/windows-api/windowManaging"
+import { isWindowUnlocked, unlockWindow } from "../unlockables/unlockablewindows"
 
 let cardsInfo = {
 	"clickersCard": { 

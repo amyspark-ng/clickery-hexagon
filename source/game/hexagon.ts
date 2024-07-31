@@ -10,10 +10,11 @@ import { addPlusScoreText, getClicksFromCombo, increaseCombo, maxComboAnim, star
 import { addConfetti } from "../plugins/confetti.js";
 import { curDraggin } from "../plugins/drag.ts";
 import { cam } from "./gamescene.ts";
-import { checkForUnlockable, isAchievementUnlocked, isWindowUnlocked, unlockAchievement } from "./unlockables.ts";
+import { checkForUnlockable, isAchievementUnlocked, unlockAchievement } from "./unlockables/achievements.ts";
 import { ROOT } from "../main.ts";
 import { outsideWindowHover } from "../hovers/outsideWindowHover.ts";
 import { mouse } from "./additives.ts";
+import { isWindowUnlocked } from "./unlockables/unlockablewindows.ts";
 
 export let clickVars = {
 	clicksPerSecond: 0, // to properly calculate sps

@@ -28,15 +28,16 @@ this game MIGHT be getting done
 ^ that's where you got to ascend
 
 <!-- code -->
-- rework the way unlockables work to do the achievement type and the title and description for the toasts
-- what the hell happens why the fuck do achievements appear and appear and appear and appear
 - update extra window minibuttons to work with insideWindowHover
 	* also the stuff that uses endHover when dropping on cursor exit canvas
 - what happens when minibutton releasedrop endhoverfunction what
 - if you intend to hold a minibutton and then move your mouse the minibutton behaves weirdly
 - minibutton behaviour for outsideHoverWindow generally works very weirdly
+- probably because they're curDraggin
 - make that getPosOnGrid function and make it so stuff like the timers and the buttons work with it
 - check what the hell does the moveToPosition parameter in minibutton does
+- move addtooltip to be children of obj, idk why it doesn't work like this but it causes problem with some other stuff in layering and z
+- make the wait() timer in the toast be part of the obj so it you close it nothing weird will happen
 
 <!-- graphics -->
 - change color of upgrades
