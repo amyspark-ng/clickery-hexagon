@@ -5,7 +5,7 @@ import { ascension, talk } from "./ascension"
 import { ROOT } from "../../main"
 import { isWindowUnlocked, unlockWindow } from "../unlockables"
 import { playSfx } from "../../sound"
-import { windowKey } from "../windows/windows-api/windowsAPI"
+import { windowKey } from "../windows/windows-api/windowManaging"
 
 let cardsInfo = {
 	"clickersCard": { 

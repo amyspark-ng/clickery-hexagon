@@ -1,5 +1,5 @@
 import { curDraggin } from "../plugins/drag"
-import { allObjWindows } from "../game/windows/windows-api/windowsAPI";
+import { allObjWindows } from "../game/windows/windows-api/windowManaging";
 import { mouse } from "../game/additives";
 
 // =========================

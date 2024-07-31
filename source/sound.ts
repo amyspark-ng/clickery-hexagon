@@ -1,5 +1,4 @@
-
-import { AudioPlayOpt, Key } from "kaplay";
+import { AudioPlay, AudioPlayOpt, Key } from "kaplay";
 import { GameState } from "./gamestate.ts"
 import { positionSetter } from "./plugins/positionSetter.ts";
 import { panderitoIndex } from "./game/gamescene.ts";
@@ -11,7 +10,7 @@ let speaker:any;
 let trayVolElements:any;
 let volumeBars:any;
 
-export let sfxHandlers = new Set();
+export let sfxHandlers = new Set<AudioPlay>();
 export function playSfx(sound:string, opts?:AudioPlayOpt) {
 	opts = opts || {}
 	opts.detune = opts.detune || 0

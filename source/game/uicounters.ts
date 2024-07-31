@@ -3,7 +3,7 @@ import { positionSetter } from "../plugins/positionSetter.ts";
 import { waver } from "../plugins/wave.js";
 import { clickVars } from "./hexagon.ts";
 import { bop, formatNumber, getPositionOfSide, formatNumberSimple } from "./utils.ts";
-import { allObjWindows } from "./windows/windows-api/windowsAPI.ts";
+import { allObjWindows } from "./windows/windows-api/windowManaging.ts";
 
 export let scoreText:any;
 export let spsText:any;

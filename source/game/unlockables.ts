@@ -1,5 +1,5 @@
 import { GameState, scoreManager } from '../gamestate';
-import { windowKey } from './windows/windows-api/windowsAPI';
+import { windowKey } from './windows/windows-api/windowManaging';
 import { playSfx } from '../sound';
 import { waver } from '../plugins/wave';
 import { addMinibutton} from './windows/windows-api/minibuttons';

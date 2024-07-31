@@ -3,6 +3,9 @@ import { bop, getPositionOfSide } from "../../utils.ts";
 import { mouse } from "../../additives.ts";
 import { drag, curDraggin, setCurDraggin } from "../../../plugins/drag.ts";
 import { playSfx } from "../../../sound.ts";
+import { ROOT } from "../../../main.ts";
+import { folderObj } from "./folderObj.ts";
+import { insideWindowHover } from "../../../hovers/insideWindowHover.ts";
 
 // window contents
 import { storeWinContent } from "../store/storeWindows.ts";
@@ -15,9 +18,6 @@ import { creditsWinContent } from "../creditsWin.ts";
 import { statsWinContent } from "../statsWin.ts";
 import { isAchievementUnlocked, unlockAchievement } from "../../unlockables.ts";
 import { medalsWinContent } from "../medalsWin.ts";
-import { ROOT } from "../../../main.ts";
-import { folderObj } from "./folderObj.ts";
-import { insideWindowHover } from "../../../hovers/insideWindowHover.ts";
 
 export let infoForWindows = {};
 
@@ -57,13 +57,12 @@ export function windowsDefinition() {
 		"ascendWin": { idx: 2, content: ascendWinContent, lastPos: vec2(center().x, center().y) },
 		"statsWin": { idx: 3, content: statsWinContent, lastPos: vec2(center().x, center().y) },
 		"medalsWin": { idx: 4, content: medalsWinContent, lastPos: vec2(center().x, center().y) },
-		"aboutWin": { idx: 5, content: emptyWinContent, lastPos: vec2(center().x, center().y) },
-		"creditsWin": { idx: 6, content: creditsWinContent, lastPos: vec2(center().x, center().y) },
-		"settingsWin": { idx: 7, content: settingsWinContent, lastPos: vec2(center().x, center().y) },
-		"leaderboardsWin": { idx: 8, content: emptyWinContent, lastPos: vec2(center().x, center().y) },
-		"hexColorWin": { idx: 9, content: colorWinContent, lastPos: vec2(208, 160) },
-		"bgColorWin": { idx: 10, content: colorWinContent, lastPos: vec2(width() - 200, 200) },
-		"extraWin": { idx: 11, icon: "extra", content: extraWinContent, lastPos: center() },
+		"creditsWin": { idx: 5, content: creditsWinContent, lastPos: vec2(center().x, center().y) },
+		"settingsWin": { idx: 6, content: settingsWinContent, lastPos: vec2(center().x, center().y) },
+		"leaderboardsWin": { idx: 7, content: emptyWinContent, lastPos: vec2(center().x, center().y) },
+		"hexColorWin": { idx: 8, content: colorWinContent, lastPos: vec2(208, 160) },
+		"bgColorWin": { idx: 9, content: colorWinContent, lastPos: vec2(width() - 200, 200) },
+		"extraWin": { idx: 10, icon: "extra", content: extraWinContent, lastPos: center() },
 	}
 }
 

@@ -5,7 +5,7 @@ import { dummyShadow } from "../../plugins/dummyShadow";
 import { playSfx } from "../../sound";
 import { bop } from "../utils";
 import { mouse } from "../additives";
-import { buttonSpacing, infoForWindows, openWindow, windowKey } from "./windows-api/windowsAPI";
+import { buttonSpacing, infoForWindows, openWindow, windowKey } from "./windows-api/windowManaging";
 import { addMinibutton } from "./windows-api/minibuttons";
 import { destroyExclamation } from "../unlockables";
 import { openWindowButton } from "./windows-api/windowButtonClass";
@@ -259,6 +259,8 @@ export function makeGridMinibutton(windowKey:windowKey, gridSlot:any, winParent:
 	return gridMiniButton
 }
 
+let amountOfElementsX = 5
+let amountOfElementsY = 2
 export function extraWinContent(winParent) {
 	winParent.width += 50
 	
@@ -271,10 +273,10 @@ export function extraWinContent(winParent) {
 		let buttonPositionY = 0
 		
 		// 75 buttonSpacing
-		if (i < 6) buttonPositionX = 1 + i * 75;
-		else buttonPositionX = (1 + (i - 6) * 75) + 75 / 2
+		if (i < amountOfElementsX) buttonPositionX = 1 + i * 75;
+		else buttonPositionX = (1 + (i - amountOfElementsX) * 75) + 75 / amountOfElementsX
 
-		if (i < 6) buttonPositionY = 0;
+		if (i < amountOfElementsX) buttonPositionY = 0;
 		else buttonPositionY = buttonSpacing + 10
 
 		// add the shadow/empty-spot one

@@ -3,7 +3,7 @@ import { dummyShadow } from "../../../plugins/dummyShadow";
 import { playSfx } from "../../../sound";
 import { bop } from "../../utils";
 import { mouse } from "../../additives";
-import { infoForWindows, manageWindow, buttonSpacing, openWindow, allObjWindows, windowKey, } from "./windowsAPI";
+import { infoForWindows, manageWindow, buttonSpacing, openWindow, allObjWindows, windowKey, } from "./windowManaging";
 import { GameState } from "../../../gamestate";
 import { destroyExclamation } from "../../unlockables";
 import { Vec2 } from "kaplay";
@@ -228,8 +228,8 @@ export function addMinibutton(opts:minibuttonOpt) {
 				movingTween.onEnd(() => {
 					let currentSlot = get(`slot_${this.taskbarIndex}`)[0]
 					currentSlot?.fadeOut(0.32).onEnd(() => currentSlot?.destroy())
-					if (this.isHovering() && !allObjWindows.isHoveringAWindow) this.startHover()
-					else this.endHover()
+					if (this.isHovering() && !allObjWindows.isHoveringAWindow) this.startHoverFunction()
+					else this.endHoverFunction()
 				})
 
 				// reset their angles

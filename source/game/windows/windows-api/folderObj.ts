@@ -7,7 +7,7 @@ import { outsideWindowHover } from "../../../hovers/outsideWindowHover";
 import { blendColors, bop } from "../../utils";
 import { setTimeSinceSkip, timeSinceSkip } from "../musicWindow";
 import { addMinibutton, getMinibuttonXPos } from "./minibuttons";
-import { manageWindow, allObjWindows } from "./windowsAPI";
+import { manageWindow, allObjWindows } from "./windowManaging";
 
 export let folderObj;
 export let folded = true;

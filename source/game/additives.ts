@@ -6,7 +6,7 @@ import { playSfx } from "../sound"
 import { hexagon } from "./hexagon"
 import { isWindowUnlocked } from "./unlockables"
 import { blendColors, parseAnimation } from "./utils"
-import { allObjWindows, manageWindow } from "./windows/windows-api/windowsAPI"
+import { allObjWindows, manageWindow } from "./windows/windows-api/windowManaging"
 
 export let gameBg;
 export function addBackground() {

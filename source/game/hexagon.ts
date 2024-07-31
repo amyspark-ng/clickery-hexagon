@@ -3,7 +3,7 @@ import { GameState, scoreManager } from "../gamestate.ts";
 import { scoreText, spsText } from "./uicounters.ts";
 import { arrayToColor, blendColors, getRandomDirection } from "./utils.ts";
 import { playSfx } from "../sound.ts";
-import { manageWindow } from "./windows/windows-api/windowsAPI.ts";
+import { manageWindow } from "./windows/windows-api/windowManaging.ts";
 import { waver } from "../plugins/wave.js";
 import { isDraggingASlider } from "./windows/colorWindow.ts";
 import { addPlusScoreText, getClicksFromCombo, increaseCombo, maxComboAnim, startCombo } from "./combo-utils.ts";

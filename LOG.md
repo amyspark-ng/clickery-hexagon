@@ -30,6 +30,13 @@ this game MIGHT be getting done
 <!-- code -->
 - rework the way unlockables work to do the achievement type and the title and description for the toasts
 - what the hell happens why the fuck do achievements appear and appear and appear and appear
+- update extra window minibuttons to work with insideWindowHover
+	* also the stuff that uses endHover when dropping on cursor exit canvas
+- what happens when minibutton releasedrop endhoverfunction what
+- if you intend to hold a minibutton and then move your mouse the minibutton behaves weirdly
+- minibutton behaviour for outsideHoverWindow generally works very weirdly
+- make that getPosOnGrid function and make it so stuff like the timers and the buttons work with it
+- check what the hell does the moveToPosition parameter in minibutton does
 
 <!-- graphics -->
 - change color of upgrades

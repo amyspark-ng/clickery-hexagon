@@ -20,7 +20,7 @@ export function settingsWinContent(winParent) {
 	let fullscreenCheckbox = addCheckbox({
 		pos: vec2(-144, 38),
 		name: "fullscreenCheckbox",
-		checked: false,
+		checked: GameState.settings.fullscreen,
 		onCheck: function (): boolean {
 			GameState.settings.fullscreen = !GameState.settings.fullscreen
 			setFullscreen(GameState.settings.fullscreen)
@@ -32,7 +32,7 @@ export function settingsWinContent(winParent) {
 	let commaCheckbox = addCheckbox({
 		pos: vec2(-144, fullscreenCheckbox.pos.y + 60),
 		name: "commaCheckbox",
-		checked: false,
+		checked: GameState.settings.commaInsteadOfDot,
 		onCheck: function (): boolean {
 			GameState.settings.commaInsteadOfDot = !GameState.settings.commaInsteadOfDot
 			return GameState.settings.commaInsteadOfDot;

@@ -4,7 +4,7 @@ import { addToast, mouse } from "./additives";
 import { autoLoopTime, cam, triggerGnome } from "./gamescene";
 import { hexagon } from "./hexagon";
 import { unlockAchievement } from "./unlockables";
-import { allObjWindows, openWindow } from "./windows/windows-api/windowsAPI";
+import { allObjWindows, openWindow } from "./windows/windows-api/windowManaging";
 import { powerup, powerupTypes, spawnPowerup } from "./powerups";
 import { songsListened } from "./windows/musicWindow";
 import { sfxHandlers } from "../sound";
