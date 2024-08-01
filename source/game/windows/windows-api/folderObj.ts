@@ -6,7 +6,7 @@ import { ascension } from "../../ascension/ascension";
 import { outsideWindowHover } from "../../../hovers/outsideWindowHover";
 import { blendColors, bop } from "../../utils";
 import { setTimeSinceSkip, timeSinceSkip } from "../musicWindow";
-import { addMinibutton, getMinibuttonXPos } from "./minibuttons";
+import { addMinibutton, getMinibuttonPos,  } from "./minibuttons";
 import { manageWindow, allObjWindows } from "./windowManaging";
 
 export let folderObj;
@@ -90,7 +90,7 @@ export function folderObjManaging() {
 					// add slots
 					add([
 						rect(20, 20, { radius: 4 }),
-						pos(getMinibuttonXPos(index), folderObj.pos.y),
+						pos(getMinibuttonPos(index)),
 						color(BLACK),
 						anchor("center"),
 						opacity(0.5),

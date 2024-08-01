@@ -196,7 +196,7 @@ function lockedPowerupStoreElement(winParent:GameObj) {
 				}
 
 				else {
-					progressSound.stop()
+					progressSound?.stop()
 				}
 			})
 		},

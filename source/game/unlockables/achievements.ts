@@ -1,6 +1,6 @@
 import { GameState, scoreManager } from '../../gamestate';
 import { windowKey } from '../windows/windows-api/windowManaging';
-import { addToast } from '../additives';
+import { addToast, toastQueue } from '../additives';
 import { addConfetti } from '../../plugins/confetti';
 import { addUpgrades, upgradeInfo } from '../windows/store/upgrades';
 import { songs, songsListened } from '../windows/musicWindow';
@@ -447,13 +447,17 @@ export function unlockAchievement(id:string) {
 			title: achievement.title,
 			body: achievement.description,
 			duration: achievement.duration,
+			type: "achievement",
+		})
+
+		toast.onAdd(() => {
+			playSfx("unlockachievement", { detune: this.index * 100 })
 		})
 
 		if (id == "allachievements") {
 			addConfetti({ pos: mousePos() })
 		}
 
-		playSfx("unlockachievement", { detune: 50 * toast.index })
 		ROOT.trigger("achivementUnlock", id)
 	})
 }

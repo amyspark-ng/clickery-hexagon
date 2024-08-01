@@ -1,5 +1,7 @@
 // # found in kaplay examples
 
+import { Color, Vec2 } from "kaplay"
+
 const DEF_COUNT = 80
 const DEF_GRAVITY = 800
 const DEF_AIR_DRAG = 0.9
@@ -11,7 +13,23 @@ const DEF_SPIN = [2, 8]
 const DEF_SATURATION = 0.7
 const DEF_LIGHTNESS = 0.6
 
-export function addConfetti(opt = {}) {
+type confettiOpt = {
+	count?: number
+	gravity?: number
+	pos: Vec2
+	airDrag?: number
+	velocity?: number,
+	angularVelocity?: number,
+	color?: Color
+	heading?: number
+	spread?: number
+	fade?: number
+	spin?: number
+	saturation?: number
+	lightness?: number
+}
+
+export function addConfetti(opt:confettiOpt) {
 	const sample = (s) => typeof s === "function" ? s() : s
 	for (let i = 0; i < (opt.count ?? DEF_COUNT); i++) {
 		const p = add([

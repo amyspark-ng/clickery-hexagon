@@ -193,7 +193,11 @@ export function addUpgrades(elementParent) {
 				direction: "down",
 				lerpValue: 0.75,
 				type: "price",
+				layer: winParent.layer,
+				z: winParent.z
 			})
+
+			tooltip.tooltipBg.z += 1
 			
 			tooltip.tooltipText.onUpdate(() => {
 				if (GameState.score >= upgradeObj.price) tooltip.tooltipText.color = GREEN

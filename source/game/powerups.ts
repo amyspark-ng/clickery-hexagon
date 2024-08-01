@@ -2,7 +2,7 @@ import { TextCompOpt, Vec2 } from "kaplay"
 import { waver } from "../plugins/wave";
 import { playSfx } from "../sound";
 import { GameState, scoreManager } from "../gamestate";
-import { bop, formatMusicTime, formatNumber, parseAnimation, randomPos, randomPowerup } from "./utils";
+import { bop, formatMusicTime, formatNumber, getPosInGrid, parseAnimation, randomPos, randomPowerup } from "./utils";
 import { positionSetter } from "../plugins/positionSetter";
 import { checkForUnlockable } from "./unlockables/achievements";
 import { ascension } from "./ascension/ascension";
@@ -34,10 +34,10 @@ type powerupOpt = {
 	time?: number,
 }
 
-// isn't spaceBetweenTimers same as timerSpacing????????????
-let spaceBetweenTimers = 65
+let timerSpacing = 65
 function getTimerPos(index:number) {
-	return (width() + spaceBetweenTimers / 2) - spaceBetweenTimers * (index) - spaceBetweenTimers;
+	let initialPos = vec2(width() + timerSpacing / 2)
+	return getPosInGrid(initialPos, 0, -index - 1, vec2(timerSpacing, 0))
 }
 
 function addTimer(opts:{ sprite: string, type: string }) {
@@ -83,7 +83,7 @@ function addTimer(opts:{ sprite: string, type: string }) {
 	tween(30, 40, 0.32, (p) => timerObj.pos.y = p, easings.easeOutQuint)
 	tween(90, 0, 0.32, (p) => timerObj.angle = p, easings.easeOutQuint)
 
-	timerObj.pos.x = getTimerPos(timerObj.index)
+	timerObj.pos = getTimerPos(timerObj.index)
 
 	// add the text object
 	timerObj.add([

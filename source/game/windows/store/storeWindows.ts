@@ -55,6 +55,8 @@ export function storeWinContent(winParent) {
 				text: "← You can buy these to get more\nscore per click",
 				direction: "right",
 				type: "tutorialClickers",
+				layer: winParent.layer,
+				z: winParent.z
 			})
 
 			let buyClickersEvent = ROOT.on("buy", (data) => {
@@ -70,6 +72,8 @@ export function storeWinContent(winParent) {
 				text: "← You can buy these to\nautomatically get score!",
 				direction: "right",
 				type: "tutorialCursors",
+				layer: winParent.layer,
+				z: winParent.z
 			})
 
 			let buyCursorsEvent = ROOT.on("buy", (data) => {
@@ -85,6 +89,8 @@ export function storeWinContent(winParent) {
 				text: "← Power-ups give you a small help!\nFor a time limit.",
 				direction: "right",
 				type: "tutorialPowerups",
+				layer: winParent.layer,
+				z: winParent.z
 			})
 	
 			let unlockPowerupsEvent = ROOT.on("powerupunlock", () => {
@@ -101,6 +107,8 @@ export function storeWinContent(winParent) {
 				text: "These will make your clicks and cursors →\nmore efficient!",
 				direction: "left",
 				type: "tutorialUpgrades",
+				layer: winParent.layer,
+				z: winParent.z
 			})
 
 			let buyUpgradeEvent = ROOT.on("buy", (data) => {
@@ -112,7 +120,7 @@ export function storeWinContent(winParent) {
 		}
 
 		const getTooltip = (type:string) => {
-			return get("tooltip").filter(tooltip => tooltip.is("text") == false && tooltip.type == type)
+			return get("tooltip", { recursive: true }).filter(tooltip => tooltip.is("text") == false && tooltip.type == type)
 		}
 
 		// EVENT THAT CHECKS FOR THE STUFF
@@ -150,7 +158,7 @@ export function storeWinContent(winParent) {
 			if (element.endHover) element.endHover()
 		});
 	
-		get("tooltip").filter(tooltip => tooltip.is("text") == false).forEach(tooltip => {
+		get("tooltip", { recursive: true }).filter(tooltip => tooltip.is("text") == false).forEach(tooltip => {
 			tooltip.end()
 		})
 	})

@@ -19,7 +19,7 @@ export let unlockableWindows = {
 		condition: () => GameState.score >= 60
 	},
 	"extraWin": {
-		condition: () => GameState.score >= 149
+		condition: () => GameState.score >= 150
 	},
 	"musicWin": {
 		condition: () => GameState.score >= 150

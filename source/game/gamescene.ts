@@ -175,7 +175,7 @@ function welcomeBack(idle = false) {
 		else if (hasCombo && hasPowerup) applicationMessage += "\n(Combo nor Power-ups are applicable)"
 		body += applicationMessage
 
-		let toast = addToast({ icon: "cursors.cursor", title: "Welcome back!", body: body })
+		let toast = addToast({ icon: "cursors.cursor", title: "Welcome back!", body: body, type: "welcome" })
 		toast.on("closed", () => checkForUnlockable())
 	
 		if (GameState.hasUnlockedPowerups == true) {

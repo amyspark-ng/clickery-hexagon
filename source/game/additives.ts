@@ -1,7 +1,5 @@
 import { GameObj } from "kaplay"
 import { GameState } from "../gamestate"
-import { curDraggin } from "../plugins/drag"
-import { trail } from "../plugins/trail"
 import { playSfx } from "../sound"
 import { hexagon } from "./hexagon"
 import { blendColors, parseAnimation } from "./utils"
@@ -73,20 +71,6 @@ export function addMouse() {
 				mouse.play(newAnim)
 			},
 
-			pinch() {
-				// debug.log("pinch")
-				// for (let i = 0; i < 1; i++) {
-				// 	let circ = add([
-				// 		circle(1),
-				// 		scale(0),
-				// 		anchor("center"),
-				// 		pos(this.pos),
-				// 		// rotate(90 * (i + 1)),
-				// 	])
-				// 	tween(circ.radius, 20, 0.1, (p) => circ.radius = p, easings.easeOutQuint)
-				// }
-			},
-			
 			update() {
 				this.pos = mousePos()
 			}
@@ -95,14 +79,15 @@ export function addMouse() {
 } 
 
 let maxLogs = 100;
-let toastQueue = [];
+export let toastQueue = [];
 const initialYPosition = 50;
 
 export type toastOpts = {
-	title?: string,
-	body?: string,
-	icon?: string,
+	title: string,
+	body: string,
+	icon: string,
 	duration?: number,
+	type?: string,
 }
 
 export function addToast(opts:toastOpts) {
@@ -126,14 +111,8 @@ export function addToast(opts:toastOpts) {
 			"toast",
 			{
 				index: idx,
-				type: "",
+				type: opts.type,
 				add() {
-					if (opts.title.toLowerCase().includes("unlocked")) {
-						if (opts.title.toLowerCase().includes("window")) this.type = "window"
-						else this.type = "achievement"
-					}
-					else if (opts.title.toLowerCase().includes("saved")) this.type = "save"
-					else if (opts.title.toLowerCase().includes("welcome")) this.type = "welcome"
 				},
 				close() {
 					wait(0.7).onEnd(() => this.trigger("closed"))
@@ -315,6 +294,8 @@ type tooltipOpts = {
 	lerpValue?:number,
 	textSize?:number,
 	type?:string,
+	layer?:string,
+	z?:number
 }
 
 /**
@@ -326,6 +307,9 @@ export function addTooltip(obj:GameObj, opts?:tooltipOpts) {
 	opts.direction = opts.direction ?? "up";
 	opts.lerpValue = opts.lerpValue ?? 0.35;
 	opts.textSize = opts.textSize ?? 20;
+
+	opts.layer = opts.layer ?? "windows"
+	opts.z = opts.z ?? 0
 
 	let sizeOfText = { x: 0, y: 0 };
 
@@ -341,8 +325,8 @@ export function addTooltip(obj:GameObj, opts?:tooltipOpts) {
 		opacity(0.95),
 		opacity(),
 		anchor("center"),
-		layer("windows"),
-		z(obj.z ? obj.z + 1 : 0),
+		layer(opts.layer),
+		z(opts.z),
 		"tooltip",
 		{
 			end: null,
@@ -398,8 +382,8 @@ export function addTooltip(obj:GameObj, opts?:tooltipOpts) {
 		anchor(tooltipBg.anchor),
 		opacity(),
 		pos(tooltipBg.pos),
-		layer("windows"),
-		z(obj.z ? obj.z + 1 : 0),
+		layer(opts.layer),
+		z(opts.z + 1),
 		"tooltip",
 		{
 			bg: tooltipBg,
@@ -408,6 +392,8 @@ export function addTooltip(obj:GameObj, opts?:tooltipOpts) {
 				sizeOfText.y = formatText({ text: tooltipText.text, size: tooltipText.textSize }).height
 			
 				this.anchor = tooltipBg.anchor
+				this.layer = tooltipBg.layer
+				this.z = tooltipBg.z
 				let xPos:number;
 
 				if (opts.direction == "right") xPos = tooltipBg.pos.x + padding / 2

@@ -7,7 +7,7 @@ import { unlockAchievement } from "./unlockables/achievements";
 import { allObjWindows, openWindow } from "./windows/windows-api/windowManaging";
 import { powerup, powerupTypes, spawnPowerup } from "./powerups";
 import { songsListened } from "./windows/musicWindow";
-import { sfxHandlers } from "../sound";
+import { playSfx, sfxHandlers } from "../sound";
 
 // definetely not stack overflow
 // dots are always for thousands, leave it like this
@@ -107,7 +107,27 @@ export function arrToVec(arr:Array<number>): Vec2 {
 	return vector;
 }
 
-export function toHHMMSS(timeInSeconds) {
+// 3 columns means 3 objects laid horizontally, 3 rows is 3 objects laid vertically
+// from top to bottom
+//   ccc
+//  r...
+//  r...
+
+
+/**
+ * Function to get the position of an object in a grid, it works like this:
+ * Row 0 and Column 0 mean initialPos btw
+ * @param initialpos It's the initial pos the objects will be at, column 0 and row 0 means this exact position
+ * @param row These are objects displayed vertically, the greater it is the more to the bottom they'll be
+ * @param column These are objects displayed horizontally, the greater then column the more to the right 
+ * @param spacing It's the spacing objects will have, if you set Y spacing to 0, the objects won't be more apart when changing the row  
+ * @returns A Vec2 with the position of the object
+ */
+export function getPosInGrid(initialpos:Vec2, row:number, column:number, spacing:Vec2) {
+	return vec2(initialpos.x + spacing.x * (column), initialpos.y + spacing.y * (row));
+}
+
+export function toHHMMSS(timeInSeconds:number) {
     const hours = Math.floor(timeInSeconds / 3600);
     const minutes = Math.floor((timeInSeconds % 3600) / 60);
     const seconds = Math.floor(timeInSeconds % 60);
@@ -260,7 +280,8 @@ export function setVariable(obj, path, value) {
 }
 
 export function saveAnim() {
-	addToast({ icon: "floppy", title: "Game saved!", body: `Time played: ${toHHMMSS(GameState.stats.totalTimePlayed)}` })
+	let toast = addToast({ icon: "floppy", title: "Game saved!", body: `Time played: ${toHHMMSS(GameState.stats.totalTimePlayed)}` })
+	toast.onAdd(() => { playSfx("gamesaved", { detune: rand(-10, 10) }) })
 }
 
 export function randomPowerup() {

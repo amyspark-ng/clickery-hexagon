@@ -14,7 +14,7 @@ export function dummyShadow() {
 					pos(this.pos),
 					sprite(this.sprite),
 					z(this.z - 1),
-					rotate(),
+					rotate(0),
 					color(BLACK),
 					layer(this.layer),
 					opacity(0.8),
