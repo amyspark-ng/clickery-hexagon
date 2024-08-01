@@ -1,6 +1,6 @@
 import { GameState, scoreManager } from "../../gamestate"
 import { ROOT } from "../../main"
-import { positionSetter } from "../../plugins/positionSetter"
+import { positionSetter } from ".././plugins/positionSetter"
 import { triggerAscension } from "../ascension/ascension"
 import { formatNumber } from "../utils"
 

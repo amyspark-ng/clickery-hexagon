@@ -1,7 +1,7 @@
 import { GameObj } from "kaplay";
 import { GameState, scoreManager } from "../../gamestate";
 import { windowKey } from "../windows/windows-api/windowManaging";
-import { waver } from "../../plugins/wave";
+import { waver } from ".././plugins/wave";
 import { bop } from "../utils";
 import { playSfx } from "../../sound";
 import { folded, folderObj } from "../windows/windows-api/folderObj";

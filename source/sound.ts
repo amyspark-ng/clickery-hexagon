@@ -1,6 +1,5 @@
 import { AudioPlay, AudioPlayOpt, Key } from "kaplay";
 import { GameState } from "./gamestate.ts"
-import { positionSetter } from "./plugins/positionSetter.ts";
 import { panderitoIndex } from "./game/gamescene.ts";
 import { bop } from "./game/utils.ts";
 
@@ -127,7 +126,6 @@ export function addSoundElements() {
 		sprite("speakers"),
 		opacity(1),
 		pos(0, -64),
-		positionSetter(),
 		scale(),
 		anchor("center"),
 		layer("sound"),

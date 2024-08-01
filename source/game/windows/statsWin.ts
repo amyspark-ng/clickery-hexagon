@@ -1,5 +1,5 @@
 import { GameState } from "../../gamestate";
-import { positionSetter } from "../../plugins/positionSetter";
+import { positionSetter } from ".././plugins/positionSetter";
 import { achievements } from "../unlockables/achievements";
 import { formatNumber, formatNumberSimple, toHHMMSS } from "../utils";
 

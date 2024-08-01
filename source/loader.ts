@@ -1,8 +1,7 @@
-import { gamescene } from "./game/gamescene.ts"
-import { introscene } from "./scenes/introScene.ts"
-import { focuscene } from "./scenes/focuscene.js"
-import { ascendscene } from "./scenes/ascendscene.ts"
 import { DEBUG } from "./main.js"
+import { introscene } from "./game/scenes/introScene.ts";
+import { gamescene } from "./game/gamescene.ts";
+import { focuscene } from "./game/scenes/focuscene.ts";
 
 export function drawSeriousLoadScreen(progress, op = 1) {
 	function drawHexagon(opts = {
@@ -767,7 +766,6 @@ export function loadEverything() {
 	focuscene()
 	introscene()
 	gamescene()
-	ascendscene()
 	//#endregion OTHER STUFF
 
 	// 20% of getting devky's funny loading screen 

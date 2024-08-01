@@ -1,5 +1,5 @@
 import { Vec2 } from "kaplay"
-import { drag } from "../../../plugins/drag"
+import { drag } from "../.././plugins/drag"
 
 type infoWinOpts = {
 	width: number,

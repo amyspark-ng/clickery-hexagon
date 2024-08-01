@@ -1,5 +1,5 @@
 import { GameState } from "../../gamestate";
-import { waver } from "../../plugins/wave";
+import { waver } from ".././plugins/wave";
 import { musicHandler, playMusic, playSfx, scratchSong } from "../../sound";
 import { isAchievementUnlocked } from "../unlockables/achievements";
 import { bop, formatMusicTime } from "../utils";

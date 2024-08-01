@@ -6,8 +6,8 @@ import { bop, formatNumber, getPrice, getRandomDirection, getVariable, randomPos
 import { addTooltip, mouse } from "../../additives"
 import { powerupTypes, spawnPowerup } from "../../powerups"
 import { isHoveringUpgrade, storeElements, storePitchJuice } from "./storeWindows"
-import { positionSetter } from "../../../plugins/positionSetter"
-import { insideWindowHover } from "../../../hovers/insideWindowHover"
+import { positionSetter } from "../.././plugins/positionSetter"
+import { insideWindowHover } from "../../hovers/insideWindowHover"
 
 export let storeElementsInfo = {
 	"clickersElement": { 

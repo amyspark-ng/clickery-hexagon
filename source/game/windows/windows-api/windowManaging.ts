@@ -1,11 +1,13 @@
 import { GameState } from "../../../gamestate.ts";
 import { bop, getPositionOfSide } from "../../utils.ts";
 import { mouse } from "../../additives.ts";
-import { drag, curDraggin, setCurDraggin } from "../../../plugins/drag.ts";
+import { drag, curDraggin, setCurDraggin } from "../.././plugins/drag.ts";
 import { playSfx } from "../../../sound.ts";
 import { ROOT } from "../../../main.ts";
 import { folderObj } from "./folderObj.ts";
-import { insideWindowHover } from "../../../hovers/insideWindowHover.ts";
+import { Vec2 } from "kaplay";
+import { insideWindowHover } from "../../hovers/insideWindowHover.ts";
+import { isAchievementUnlocked, unlockAchievement } from "../../unlockables/achievements.ts";
 
 // window contents
 import { storeWinContent } from "../store/storeWindows.ts";
@@ -16,9 +18,7 @@ import { ascendWinContent } from "../ascendWindow.ts";
 import { extraWinContent } from "../extraWindow.ts";
 import { creditsWinContent } from "../creditsWin.ts";
 import { statsWinContent } from "../statsWin.ts";
-import { isAchievementUnlocked, unlockAchievement } from "../../unlockables/achievements.ts";
 import { medalsWinContent } from "../medalsWin.ts";
-import { Vec2 } from "kaplay";
 
 class Window {
 	key: string;

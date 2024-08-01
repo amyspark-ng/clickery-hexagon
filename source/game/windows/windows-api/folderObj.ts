@@ -1,13 +1,13 @@
 import { GameState } from "../../../gamestate";
-import { curDraggin } from "../../../plugins/drag";
+import { curDraggin } from "../.././plugins/drag";
 import { playSfx } from "../../../sound";
 import { mouse } from "../../additives";
 import { ascension } from "../../ascension/ascension";
-import { outsideWindowHover } from "../../../hovers/outsideWindowHover";
 import { blendColors, bop } from "../../utils";
 import { setTimeSinceSkip, timeSinceSkip } from "../musicWindow";
 import { addMinibutton, getMinibuttonPos,  } from "./minibuttons";
 import { manageWindow, allObjWindows } from "./windowManaging";
+import { outsideWindowHover } from "../../hovers/outsideWindowHover";
 
 export let folderObj;
 export let folded = true;

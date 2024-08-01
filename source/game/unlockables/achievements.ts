@@ -1,7 +1,7 @@
 import { GameState, scoreManager } from '../../gamestate';
 import { windowKey } from '../windows/windows-api/windowManaging';
 import { addToast, toastQueue } from '../additives';
-import { addConfetti } from '../../plugins/confetti';
+import { addConfetti } from '.././plugins/confetti';
 import { addUpgrades, upgradeInfo } from '../windows/store/upgrades';
 import { songs, songsListened } from '../windows/musicWindow';
 import { isWindowUnlocked, unlockableWindows, unlockWindow } from './unlockablewindows';

@@ -1,6 +1,6 @@
 import { GameState } from "../gamestate"
-import { positionSetter } from "../plugins/positionSetter"
-import { waver } from "../plugins/wave"
+import { positionSetter } from "./plugins/positionSetter"
+import { waver } from "./plugins/wave"
 import { playSfx } from "../sound"
 import { gameBg } from "../game/additives"
 import { bop, getRandomElementDifferentFrom } from "../game/utils"

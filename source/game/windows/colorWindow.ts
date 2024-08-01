@@ -1,5 +1,5 @@
 import { GameState } from "../../gamestate";
-import { curDraggin, drag, setCurDraggin } from "../../plugins/drag";
+import { curDraggin, drag, setCurDraggin } from ".././plugins/drag";
 import { playSfx } from "../../sound";
 import { hexagon } from "../hexagon";
 import { blendColors, bop, getPositionOfSide } from "../utils";

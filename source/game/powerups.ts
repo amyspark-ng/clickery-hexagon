@@ -1,9 +1,9 @@
 import { TextCompOpt, Vec2 } from "kaplay"
-import { waver } from "../plugins/wave";
+import { waver } from "./plugins/wave";
 import { playSfx } from "../sound";
 import { GameState, scoreManager } from "../gamestate";
 import { bop, formatMusicTime, formatNumber, getPosInGrid, parseAnimation, randomPos, randomPowerup } from "./utils";
-import { positionSetter } from "../plugins/positionSetter";
+import { positionSetter } from "./plugins/positionSetter";
 import { checkForUnlockable } from "./unlockables/achievements";
 import { ascension } from "./ascension/ascension";
 

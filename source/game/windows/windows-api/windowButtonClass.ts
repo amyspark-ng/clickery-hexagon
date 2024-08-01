@@ -1,5 +1,5 @@
 import { Vec2 } from "kaplay";
-import { curDraggin } from "../../../plugins/drag"
+import { curDraggin } from "../.././plugins/drag"
 
 const timeForHold = 0.1
 

@@ -1,17 +1,17 @@
 import { GameState, scoreManager } from "../gamestate.ts"
 import { addHexagon, hexagon } from "./hexagon.ts"
 import { buildingsText, scoreText, spsText, uiCounters } from "./uicounters.ts"
-import { arrayToColor, arrToVec, debugFunctions, formatNumber, randomPos, randomPowerup, toHHMMSS } from "./utils.ts"
+import { arrayToColor, debugFunctions, formatNumber, randomPos, randomPowerup, toHHMMSS } from "./utils.ts"
 import { addToast, gameBg, mouse } from "./additives.ts"
 import { musicHandler, playMusic, playSfx, stopAllSounds } from "../sound.ts"
-import { allObjWindows, windowsDefinition } from "./windows/windows-api/windowManaging.ts"
+import { windowsDefinition } from "./windows/windows-api/windowManaging.ts"
 import { songs } from "./windows/musicWindow.ts"
-import { curDraggin } from "../plugins/drag.ts"
 import { DEBUG, ROOT } from "../main.ts"
-import { powerup, powerupManagement, powerupTypes, spawnPowerup } from "./powerups.ts"
+import { powerupManagement, spawnPowerup } from "./powerups.ts"
 import { checkForUnlockable, isAchievementUnlocked, unlockAchievement } from "./unlockables/achievements.ts"
 import { ascension } from "./ascension/ascension.ts"
 import { folderObj, folderObjManaging } from "./windows/windows-api/folderObj.ts"
+import { curDraggin } from "./plugins/drag.ts"
 
 let panderitoLetters = "panderito".split("")
 export let panderitoIndex = 0

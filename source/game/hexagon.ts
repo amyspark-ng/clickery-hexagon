@@ -4,15 +4,13 @@ import { scoreText, spsText } from "./uicounters.ts";
 import { arrayToColor, blendColors, getRandomDirection } from "./utils.ts";
 import { playSfx } from "../sound.ts";
 import { manageWindow } from "./windows/windows-api/windowManaging.ts";
-import { waver } from "../plugins/wave.js";
-import { isDraggingASlider } from "./windows/colorWindow.ts";
+import { waver } from "./plugins/wave.js";
 import { addPlusScoreText, getClicksFromCombo, increaseCombo, maxComboAnim, startCombo } from "./combo-utils.ts";
-import { addConfetti } from "../plugins/confetti.js";
-import { curDraggin } from "../plugins/drag.ts";
+import { addConfetti } from "./plugins/confetti.js";
 import { cam } from "./gamescene.ts";
 import { checkForUnlockable, isAchievementUnlocked, unlockAchievement } from "./unlockables/achievements.ts";
 import { ROOT } from "../main.ts";
-import { outsideWindowHover } from "../hovers/outsideWindowHover.ts";
+import { outsideWindowHover } from "./hovers/outsideWindowHover.ts";
 import { mouse } from "./additives.ts";
 import { isWindowUnlocked } from "./unlockables/unlockablewindows.ts";
 

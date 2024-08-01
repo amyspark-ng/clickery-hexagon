@@ -4,8 +4,7 @@ import { blendColors, bop } from "../../utils"
 import { manageMute, playSfx, volChangeTune } from "../../../sound"
 import { GameState } from "../../../gamestate"
 import { addTooltip } from "../../additives"
-import { insideWindowHover } from "../../../hovers/insideWindowHover"
-import { positionSetter } from "../../../plugins/positionSetter"
+import { insideWindowHover } from "../../hovers/insideWindowHover"
 
 type checkBoxOpt = {
 	pos: Vec2,
@@ -235,7 +234,6 @@ export function addVolumeControl(opts:volumeControlOpt, parent:any) {
 export function addDeleteSaveButton(otherButtonsBg, winParent) {
 	let deleteSaveButton = otherButtonsBg.add([
 		text("X", { size: 50 }),
-		// positionSetter(),
 		pos(-140, 24),
 		anchor("center"),
 		color(blendColors(WHITE, RED, 0.5)),

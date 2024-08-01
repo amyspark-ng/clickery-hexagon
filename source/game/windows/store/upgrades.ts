@@ -1,8 +1,8 @@
 import { GameState, scoreManager } from "../../../gamestate";
-import { insideWindowHover } from "../../../hovers/insideWindowHover";
 import { ROOT } from "../../../main";
 import { playSfx, sfxHandlers } from "../../../sound";
 import { addTooltip, mouse } from "../../additives";
+import { insideWindowHover } from "../../hovers/insideWindowHover";
 import { blendColors, bop, formatNumber, getPositionOfSide, getRandomDirection, parseAnimation } from "../../utils";
 
 export let upgradeInfo = {

@@ -1,9 +1,11 @@
-import { curDraggin } from "../plugins/drag"
-import { allObjWindows } from "../game/windows/windows-api/windowManaging";
-import { mouse } from "../game/additives";
 
 // =========================
 // OUTSIDE HOVER COMPONENT
+
+import { mouse } from "../additives"
+import { curDraggin } from "../plugins/drag"
+import { allObjWindows } from "../windows/windows-api/windowManaging"
+
 // =========================
 export function outsideWindowHover() {
 	return {

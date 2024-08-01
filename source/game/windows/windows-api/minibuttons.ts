@@ -1,5 +1,5 @@
-import { curDraggin, drag, setCurDraggin } from "../../../plugins/drag";
-import { dummyShadow } from "../../../plugins/dummyShadow";
+import { curDraggin, drag, setCurDraggin } from "../.././plugins/drag";
+import { dummyShadow } from "../.././plugins/dummyShadow";
 import { playSfx } from "../../../sound";
 import { bop, getPosInGrid } from "../../utils";
 import { mouse } from "../../additives";
@@ -8,8 +8,8 @@ import { GameState } from "../../../gamestate";
 import { Vec2 } from "kaplay";
 import { openWindowButton } from "./windowButtonClass";
 import { folded, folderObj } from "./folderObj";
-import { outsideWindowHover } from "../../../hovers/outsideWindowHover";
 import { destroyExclamation } from "../../unlockables/unlockablewindows";
+import { outsideWindowHover } from "../../hovers/outsideWindowHover";
 
 type minibuttonOpt = {
 	windowKey:windowKey

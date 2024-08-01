@@ -1,12 +1,4 @@
-import { GameState } from "../gamestate.ts";
-import { DEBUG } from "../main";
-import { volumeManager } from "../sound";
-import { addBackground, addMouse, gameBg } from "../game/additives.ts";
-
-function scaryIntro() {
-	// gameBg.color.a = 1
-	// play lights out sound
-}
+import { gameBg } from "../additives"
 
 export function focuscene() {
 	return scene("focuscene", () => {
