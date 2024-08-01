@@ -6,6 +6,7 @@ import { addUpgrades, upgradeInfo } from '../windows/store/upgrades';
 import { songs, songsListened } from '../windows/musicWindow';
 import { isWindowUnlocked, unlockableWindows, unlockWindow } from './unlockablewindows';
 import { playSfx } from '../../sound';
+import { ROOT } from '../../main';
 
 type achievementOpt = {
 	/**
@@ -26,11 +27,9 @@ type achievementOpt = {
 	*/
 	icon: string,
 	/**
-	 * Wheter the achievement it's regularly visible or not.
-	 * It being secret means it won't show its icon, description or title in the medals window
-	 * The condition is the condition that the player has to have for it to stop being visible
+	 * This means the achievement is secret, and will only show it's description title and icon if the condition is met
 	 */
-	visible?: { secret: boolean, condition: () => boolean },
+	secretCondition?: () => boolean;
 	/**
 	 * How much time (in seconds) after the achievement was unlocked for
 	 * The toast to appear
@@ -57,6 +56,7 @@ class Achievement {
 	visible: { secret: boolean, condition: () => boolean };
 	duration: number;
 	condition: () => boolean;
+	secretCondition: () => boolean;
 	
 	constructor(public opts: achievementOpt) {
 		this.id = opts.id
@@ -66,7 +66,7 @@ class Achievement {
 		this.timeAfter = opts.timeAfter || 0
 		this.duration = opts.duration || 3
 		this.condition = opts.condition || null
-		this.visible = opts.visible || { secret: false, condition: () => true }
+		this.secretCondition = opts.secretCondition || null
 	}
 }
 
@@ -331,7 +331,7 @@ achievements = [
 		title: "Oh. So you've met him?",
 		description: "Ascend for the first time",
 		icon: "icon_ascend",
-		visible: { secret: true, condition: () => GameState.stats.timesAscended == 1 },
+		secretCondition: () => GameState.stats.timesAscended >= 1
 	}),
 
 	new Achievement({
@@ -340,7 +340,7 @@ achievements = [
 		description: "Ascend for the fifth time",
 		icon: "icon_ascend",
 		condition: () => GameState.stats.timesAscended >= 5,
-		visible: { secret: true, condition: () => GameState.stats.timesAscended >= 5 },
+		secretCondition: () => GameState.stats.timesAscended >= 5,
 	}),
 	// #endregion ASCENSION ACHIEVEMENTS =====================
 
@@ -379,8 +379,9 @@ achievements = [
 		title: "HOLY SHIT GUYS DID YOU SEE THAT???",
 		description: "WHAT THE FUCK WAS THAT DID WE GET THAT ON CAMERA??????!!",
 		icon: "gnome",
-		visible: { secret: true, condition: () => false },
 		timeAfter: 1.5,
+		duration: 5,
+		secretCondition: () => GameState.stats.timesGnomed >= 1,
 	}),
 
 	new Achievement({
@@ -402,7 +403,6 @@ achievements = [
 
 // TODO: Find a working api for the secret achievements
 // TODO: Find a way to make that achievementId type
-
 export function getAchievement(achievementId:string) {
 	return achievements.filter(achievementObject => achievementObject.id == achievementId)[0]
 }
@@ -438,9 +438,10 @@ export function checkForUnlockable() {
 
 export function unlockAchievement(id:string) {
 	let achievement = getAchievement(id)
-	GameState.unlockedAchievements.push(id)
-
+	
 	wait(achievement.timeAfter || 0, () => {
+		GameState.unlockedAchievements.push(id)
+
 		let toast = addToast({
 			icon: achievement.icon,
 			title: achievement.title,
@@ -453,5 +454,6 @@ export function unlockAchievement(id:string) {
 		}
 
 		playSfx("unlockachievement", { detune: 50 * toast.index })
+		ROOT.trigger("achivementUnlock", id)
 	})
 }

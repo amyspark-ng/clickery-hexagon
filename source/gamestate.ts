@@ -49,6 +49,7 @@ class _GameState {
 		timesAscended: 0,
 		powerupsBought: 0,
 		totalTimePlayed: 0,
+		timesGnomed: 0,
 	}
 
 	settings = {

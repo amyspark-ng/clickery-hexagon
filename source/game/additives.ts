@@ -122,6 +122,7 @@ export function addToast(opts:toastOpts) {
 			fixed(),
 			layer("logs"),
 			z(0),
+			timer(),
 			"toast",
 			{
 				index: idx,
@@ -242,7 +243,7 @@ export function addToast(opts:toastOpts) {
 
 		tween(-toastBg.width, toastBg.width / 2, 0.5, (p) => toastBg.pos.x = p, easings.easeOutQuint);
 
-		wait(opts.duration ?? 3, () => {
+		toastBg.wait(opts.duration ?? 3, () => {
 			toastBg.close();
 		});
 

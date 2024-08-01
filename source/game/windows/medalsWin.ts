@@ -1,3 +1,4 @@
+import { ROOT } from "../../main";
 import { addTooltip } from "../additives";
 import { achievements, achievementsInfo, getAchievement, isAchievementUnlocked, unlockAchievement } from "../unlockables/achievements";
 import { parseAnimation } from "../utils";
@@ -73,11 +74,16 @@ export function medalsWinContent(winParent) {
 		medalObj.pos = getPositionInWindow(gridPosition.row - 1, gridPosition.column - 1)
 		medalObj.achievementIdx = achievements.indexOf(getAchievement(medalid))
 
-		parseAnimation(medalObj, `${achievementInfo.icon}`)
+		if (isAchievementUnlocked(medalid)) {
+			parseAnimation(medalObj, getAchievement(medalid).icon)
+			medalObj.width = 60
+			medalObj.height = 60
+		}
 
-		medalObj.width = 60
-		medalObj.height = 60
-	
+		else {
+			parseAnimation(medalObj, "medals.unknown")
+		}
+
 		medalObj.onClick(() => {
 			if (medalObj.achievementId == "tapachievementslot") {
 				if (!isAchievementUnlocked(medalObj.achievementId)) unlockAchievement(medalObj.achievementId)
@@ -86,7 +92,7 @@ export function medalsWinContent(winParent) {
 
 		medalObj.onHover(() => {
 			let tooltip = addTooltip(medalObj, { 
-				text: getAchievement(medalObj.achievementId).description,
+				text: isAchievementUnlocked(medalObj.achievementId) ? getAchievement(medalObj.achievementId).description : "This achievement is secret",
 				direction: "down",
 				lerpValue: 0.9,
 			})
@@ -94,7 +100,15 @@ export function medalsWinContent(winParent) {
 
 		medalObj.onHoverEnd(() => {
 			medalObj.tooltips[0].end()
-		}) 
+		})
+
+		ROOT.on("achivementUnlock", (id) => {
+			if (id == medalid) {
+				parseAnimation(medalObj, getAchievement(id).icon)
+				medalObj.width = 60
+				medalObj.height = 60
+			}
+		})
 	}
 
 	// add all the medals

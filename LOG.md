@@ -26,6 +26,7 @@ this game MIGHT be getting done
 - maybe 40 millions is good too, game gets boring a little bit after 30
 - there's a point where stuff is too expensive and you have to click too much to buy at least
 ^ that's where you got to ascend
+- balance powerups they are TOOOO FUCKING OP TOOK ME 5 MINUTES REACH 70 MILLIONS
 
 <!-- code -->
 - update extra window minibuttons to work with insideWindowHover
@@ -38,6 +39,9 @@ this game MIGHT be getting done
 - check what the hell does the moveToPosition parameter in minibutton does
 - move addtooltip to be children of obj, idk why it doesn't work like this but it causes problem with some other stuff in layering and z
 - make the wait() timer in the toast be part of the obj so it you close it nothing weird will happen
+- detuen in bought progress is not working i thikn
+- why does mouse play cursor when buying sometimes 
+- tooltip is re added every time you hover upgrade
 
 <!-- graphics -->
 - change color of upgrades

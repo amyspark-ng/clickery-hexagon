@@ -486,6 +486,14 @@ function loadSprites() {
 	})
 	//#endregion Settings
 
+	loadSprite("medals", "sprites/windows/medalsWin/medals.png", {
+		sliceX: 1,
+		sliceY: 1,
+		anims: {
+			"unknown": 0,
+		}
+	})
+
 	//#region Other ones huh
 	loadSprite("hexColorWin", "sprites/windows/colorWin/hexColorWin.png")
 	loadSprite("bgColorWin", "sprites/windows/colorWin/bgColorWin.png")
