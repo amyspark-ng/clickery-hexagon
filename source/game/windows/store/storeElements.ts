@@ -120,6 +120,8 @@ function regularStoreElement(winParent) {
 function lockedPowerupStoreElement(winParent:GameObj) {
 	let thisElement = null;
 	let progressSound = null;
+
+	const unlockPrice = storeElementsInfo.powerupsElement.unlockPrice
 	return {
 		id: "lockedPowerupStoreElement",
 		chains: null,
@@ -192,12 +194,13 @@ function lockedPowerupStoreElement(winParent:GameObj) {
 	
 				thisElement.dropUnlock()
 				if (thisElement.boughtProgress > 0) {
-					progressSound.seek(1)
+				}
+				
+				else {
+					if (GameState.score >= this.price) bop(thisElement)
 				}
 
-				else {
-					progressSound?.stop()
-				}
+				progressSound?.seek(1)
 			})
 		},
 
@@ -216,7 +219,7 @@ function lockedPowerupStoreElement(winParent:GameObj) {
 			if (index > -1) storeElements[index] = newElement 
 			
 			ROOT.trigger("powerupunlock")
-			scoreManager.subTweenScore(storeElementsInfo.powerupsElement.unlockPrice)
+			scoreManager.subTweenScore(unlockPrice)
 		},
 	}
 }
@@ -325,6 +328,8 @@ export function addStoreElement(winParent:any, opts:storeElementOpt) {
 			text: `${formatNumber(storeElementsInfo.powerupsElement.unlockPrice, { price: true })}`,
 			direction: "down",
 			lerpValue: 1,
+			layer: winParent.layer,
+			z: winParent.z
 		})
 
 		const greenPrice = GREEN.lighten(30)

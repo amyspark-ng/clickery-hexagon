@@ -113,7 +113,7 @@ export function addHexagon() {
 			clickRelease() {
 				this.maxScaleIncrease = this.isBeingHovered ? 1.05 : 1
 				
-				this.clickPressTween.cancel()
+				this.clickPressTween?.cancel()
 				tween(this.scaleIncrease, this.maxScaleIncrease, 0.35, (p) => this.scaleIncrease = p, easings.easeOutQuint)
 				this.isBeingClicked = false
 				clickVars.clicksPerSecond++

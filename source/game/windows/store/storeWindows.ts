@@ -2,6 +2,7 @@ import { GameState } from "../../../gamestate";
 import { ROOT } from "../../../main";
 import { positionSetter } from "../.././plugins/positionSetter";
 import { addTooltip, mouse } from "../../additives";
+import { cam } from "../../gamescene";
 import { addStoreElement, storeElementsInfo } from "./storeElements";
 import { addUpgrades, isUpgradeBought, upgradeInfo } from "./upgrades";
 
@@ -34,6 +35,8 @@ export function storeWinContent(winParent) {
 	// save them
 	storeElements = [clickersElement, cursorsElement, powerupsElement]
 
+	let firstUpgrade = clickersElement.get("upgrade").filter(upgrade => upgrade.id == "k_0")[0]
+
 	// determines store pitch
 	winParent.onUpdate(() => {
 		if (storePitchJuice.timeSinceBought < 1) {
@@ -46,126 +49,119 @@ export function storeWinContent(winParent) {
 		}
 
 		isHoveringUpgrade = get("upgrade", { recursive: true }).some((upgrade) => upgrade.isHovering())
-	})
-
-	// tutorial stuff
-	if (GameState.stats.timesAscended < 1) {
-		const clickersTutToolTip = () => {
-			let tooltip = addTooltip(clickersElement, {
-				text: "← You can buy these to get more\nscore per click",
-				direction: "right",
-				type: "tutorialClickers",
-				layer: winParent.layer,
-				z: winParent.z
-			})
-
-			let buyClickersEvent = ROOT.on("buy", (data) => {
-				if (data.type == "clickers") {
-					tooltip.end()
-					buyClickersEvent.cancel()
-				}
-			})
-		}
-
-		const cursorsTutToolTip = () => {
-			let tooltip = addTooltip(cursorsElement, {
-				text: "← You can buy these to\nautomatically get score!",
-				direction: "right",
-				type: "tutorialCursors",
-				layer: winParent.layer,
-				z: winParent.z
-			})
-
-			let buyCursorsEvent = ROOT.on("buy", (data) => {
-				if (data.type == "cursors") {
-					tooltip.end()
-					buyCursorsEvent.cancel()
-				}
-			})
-		}
-
-		const powerupsTutToolTip = () => {
-			let tooltip = addTooltip(powerupsElement, {
-				text: "← Power-ups give you a small help!\nFor a time limit.",
-				direction: "right",
-				type: "tutorialPowerups",
-				layer: winParent.layer,
-				z: winParent.z
-			})
 	
-			let unlockPowerupsEvent = ROOT.on("powerupunlock", () => {
-				tooltip.end()
-				unlockPowerupsEvent.cancel()
-			})
-		}
-
-		const upgradesTutToolTip = () => {
-			// adds the tooltip to the first upgrade
-			let k_0Upgrade = clickersElement.get("upgrade").filter(upgrade => upgrade.id == "k_0")[0]
-			let tooltip = addTooltip(k_0Upgrade, {
-				// TODO: make this more readable, the tooltip looks crazy!!!
-				text: "These will make your clicks and cursors →\nmore efficient!",
-				direction: "left",
-				type: "tutorialUpgrades",
-				layer: winParent.layer,
-				z: winParent.z
-			})
-
-			let buyUpgradeEvent = ROOT.on("buy", (data) => {
-				if (data.element == "upgrade" && data.id == "k_0") {
+		// tutorial stuff
+		if (GameState.stats.timesAscended < 1) {
+			const clickersTutorialTooltip = () => {
+				let tooltip = addTooltip(clickersElement, {
+					text: "← You can buy these to get more\nscore per click",
+					direction: "right",
+					type: "tutorialClickers",
+					layer: winParent.layer,
+					z: winParent.z
+				})
+	
+				let buyClickersEvent = ROOT.on("buy", (data) => {
+					if (data.type == "clickers") {
+						tooltip.end()
+						buyClickersEvent.cancel()
+					}
+				})
+			}
+	
+			const cursorsTutorialTooltip = () => {
+				let tooltip = addTooltip(cursorsElement, {
+					text: "← You can buy these to\nautomatically get score!",
+					direction: "right",
+					type: "tutorialCursors",
+					layer: winParent.layer,
+					z: winParent.z
+				})
+	
+				let buyCursorsEvent = ROOT.on("buy", (data) => {
+					if (data.type == "cursors") {
+						tooltip.end()
+						buyCursorsEvent.cancel()
+					}
+				})
+			}
+	
+			const powerupsTutorialTooltip = () => {
+				let tooltip = addTooltip(powerupsElement, {
+					text: "← Power-ups give you a small help!\nFor a time limit.",
+					direction: "right",
+					type: "tutorialPowerups",
+					layer: winParent.layer,
+					z: winParent.z
+				})
+		
+				let unlockPowerupsEvent = ROOT.on("powerupunlock", () => {
 					tooltip.end()
-					buyUpgradeEvent.cancel()
-				}
-			})
-		}
+					unlockPowerupsEvent.cancel()
+				})
+			}
 
-		const getTooltip = (type:string) => {
-			return get("tooltip", { recursive: true }).filter(tooltip => tooltip.is("text") == false && tooltip.type == type)
-		}
+			const upgradesTutorialTooltip = () => {
+				let tutorialObj = firstUpgrade.add([
+					pos(),
+					anchor(firstUpgrade.anchor),
+				])
 
-		// EVENT THAT CHECKS FOR THE STUFF
-		winParent.onUpdate(() => {
-			if (!winParent.is("window")) return
-			
+				let tooltip = addTooltip(tutorialObj, {
+					text: "← Upgrades help make your clicks worth!",
+					direction: "left",
+					type: "tutorialUpgrades",
+					layer: winParent.layer,
+					z: winParent.z
+				})
+		
+				let buyFirstUpgradeCheck = ROOT.on("buy", (data) => {
+					if (data.element == "upgrade" && data.id == "k_0") {
+						tooltip.end()
+						buyFirstUpgradeCheck.cancel()
+					}
+				})
+			}
+	
+			const getTooltip = (type:string) => {
+				return get("tooltip", { recursive: true }).filter(tooltip => tooltip.is("text") == false && tooltip.type == type)
+			}
+	
+			// EVENT THAT CHECKS FOR THE STUFF
 			if (GameState.clickers == 1 && GameState.score >= storeElementsInfo.clickersElement.basePrice) {
 				if (getTooltip("tutorialClickers").length == 0) {
-					clickersTutToolTip()
+					clickersTutorialTooltip()
 				}
 			}
 			
 			if (GameState.cursors == 0 && GameState.score >= storeElementsInfo.cursorsElement.basePrice) {
 				if (getTooltip("tutorialCursors").length == 0) {
-					cursorsTutToolTip()
+					cursorsTutorialTooltip()
 				}
 			}
-
+	
 			if (GameState.hasUnlockedPowerups == false && GameState.score >= storeElementsInfo.powerupsElement.unlockPrice) {
 				if (getTooltip("tutorialPowerups").length == 0) {
-					powerupsTutToolTip()
+					powerupsTutorialTooltip()
 				}
 			}
 
-			if (!isUpgradeBought("k_0") && GameState.score >= upgradeInfo.k_0.price) {
+			if (!isUpgradeBought("k_0") && GameState.score >= firstUpgrade.price) {
 				if (getTooltip("tutorialUpgrades").length == 0) {
-					upgradesTutToolTip()
+					upgradesTutorialTooltip()
 				}
 			}
-		})
-	}
+		}
+	})
 
 	winParent.on("close", () => {
 		winParent.get("*", { recursive: true }).forEach(element => {
 			if (element.endHover) element.endHover()
 		});
-	
-		get("tooltip", { recursive: true }).filter(tooltip => tooltip.is("text") == false).forEach(tooltip => {
-			tooltip.end()
-		})
 	})
 
 	// lol!
 	if (chance(0.01)) {
 		winParent.sprite = "stroeWin"
-		debug.log("stroeWin")
 	}
 }

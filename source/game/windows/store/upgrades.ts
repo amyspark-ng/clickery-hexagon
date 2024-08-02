@@ -3,24 +3,24 @@ import { ROOT } from "../../../main";
 import { playSfx, sfxHandlers } from "../../../sound";
 import { addTooltip, mouse } from "../../additives";
 import { insideWindowHover } from "../../hovers/insideWindowHover";
-import { blendColors, bop, formatNumber, getPositionOfSide, getRandomDirection, parseAnimation } from "../../utils";
+import { blendColors, bop, formatNumber, getPositionOfSide, getRandomDirection, insertAtStart, parseAnimation } from "../../utils";
 
 export let upgradeInfo = {
 	"k_0": { value: 2, price: 500 },
-	"k_1": { value: 4, price: 2500 }, // TODO: look into this, between first and second there's a 5x gap, i think that's good
-	"k_2": { value: 8, price: 6750 },
+	"k_1": { value: 4, price: 2_500 }, // TODO: look into this, between first and second there's a 5x gap, i think that's good
+	"k_2": { value: 8, price: 12_500 },
 	// ending
-	"k_3": { value: 16, price: 20200,},
-	"k_4": { value: 32, price: 22500,},
-	"k_5": { value: 64, price: 30500,},
+	"k_3": { value: 16, price: 65_500,},
+	"k_4": { value: 32, price: 340_000,},
+	"k_5": { value: 64, price: 850_000,},
 	// freq
 	"c_0": { freq: 10 }, // 10 seconds
-	"c_1": { freq: 5, price: 15500 }, // 5 seconds
-	"c_2": { freq: 1, price: 45500 }, // 1 second
+	"c_1": { freq: 5, price: 50_000 }, // 5 seconds
+	"c_2": { freq: 1, price: 500_000 }, // 1 second
 	// cursor values
-	"c_3": { value: 16, price: 8500 }, 
-	"c_4": { value: 32, price: 10500 },
-	"c_5": { value: 48, price: 12400 },
+	"c_3": { value: 16, price: 12_500 }, 
+	"c_4": { value: 32, price: 45_000 },
+	"c_5": { value: 64, price: 12400 },
 }
 
 export function isUpgradeBought(id:string):boolean {
@@ -118,9 +118,8 @@ export function addUpgrades(elementParent) {
 				},
 
 				buy() {
-					upgradeObj.tooltips?.forEach(tooltip => {
-						tooltip.end()
-					});
+					this.tooltip?.end()
+					
 					GameState.upgradesBought.push(this.id)
 					playSfx("kaching", { detune: 25 * this.idx })
 					tween(this.scale, vec2(1.1), 0.15, (p) => this.scale = p, easings.easeOutQuad)
@@ -182,27 +181,6 @@ export function addUpgrades(elementParent) {
 			}
 		])
 
-		const addPriceTooltip = () => {
-			let tooltip = addTooltip(upgradeObj, {
-				text: formatNumber(upgradeObj.price, { price: true, fixAmount: 1 }),
-				textSize: upgradeObj.height / 2,
-				direction: "down",
-				lerpValue: 0.75,
-				type: "price",
-				layer: winParent.layer,
-				z: winParent.z
-			})
-
-			tooltip.tooltipBg.z += 1
-			
-			tooltip.tooltipText.onUpdate(() => {
-				if (GameState.score >= upgradeObj.price) tooltip.tooltipText.color = GREEN
-				else tooltip.tooltipText.color = RED
-			})
-			
-			return tooltip;
-		}
-		
 		const addedPosition = upgradeObj.pos
 		
 		// sets info like id price and value/freq
@@ -217,6 +195,28 @@ export function addUpgrades(elementParent) {
 
 		upgradeObj.outline.color = upgradeObj.color.darken(10)
 
+		let upgradeTooltip = null
+
+		const addPriceTooltip = () => {
+			let tooltip = addTooltip(upgradeObj, {
+				text: `${formatNumber(upgradeObj.price, { price: true })}`,
+				textSize: upgradeObj.height / 2,
+				direction: "down",
+				lerpValue: 0.75,
+				type: "price",
+				layer: winParent.layer,
+				z: winParent.z
+			})
+
+			tooltip.tooltipText.onUpdate(() => {
+				GameState.score >= upgradeObj.price ? tooltip.tooltipText.color = GREEN : tooltip.tooltipText.color = RED
+			})
+
+			tooltip.tooltipBg.z += 1
+			
+			return tooltip;
+		}
+		
 		upgradeObj.startingHover(() => {
 			upgradeObj.parent.endHoverFunction()
 			
@@ -226,13 +226,12 @@ export function addUpgrades(elementParent) {
 		
 			// tooltips
 			let textInBlink = upgradeObj.value != null ? `+${upgradeObj.value}` : `Cursors now click every ${upgradeObj.freq} seconds`;
-			if (!isUpgradeBought(upgradeObj.id) && !upgradeObj.hasTooltip) {
-				upgradeObj.tooltips?.forEach(tooltip => {
-					tooltip.end()
-				});
-
-				tooltip = addPriceTooltip()
-				upgradeObj.manageBlinkText(textInBlink).addT()
+			
+			if (!isUpgradeBought(upgradeObj.id)) {
+				if (upgradeObj.tooltip == null) {
+					upgradeTooltip = addPriceTooltip()
+					upgradeObj.manageBlinkText(textInBlink).addT()
+				}
 			}
 
 			// mouse animation
@@ -253,9 +252,11 @@ export function addUpgrades(elementParent) {
 
 			if (!isUpgradeBought(upgradeObj.id) && upgradeObj.boughtProgress > 0 && GameState.score >= upgradeObj.price) upgradeObj.dropBuy()
 			tween(upgradeObj.scale, vec2(1), 0.15, (p) => upgradeObj.scale = p, easings.easeOutQuad)
-			upgradeObj.tooltips?.forEach(tooltip => tooltip.end())
-		
-			upgradeObj.manageBlinkText().end()
+			
+			if (upgradeObj.tooltip != null) {
+				upgradeObj.tooltip?.end()
+				upgradeObj.manageBlinkText().end()
+			}
 
 			// cursor animation is managed by the store element in that case
 		})
@@ -298,16 +299,16 @@ export function addUpgrades(elementParent) {
 			else {
 				if (upgradeObj.id == "c_2" && !isUpgradeBought("c_1")) {
 					// remove all tooltips that are not buy previous one
-					upgradeObj.tooltips.filter(tooltip => tooltip.type != "buypreviousupgrade").forEach(tooltip => tooltip.end())
-	
-					if (upgradeObj.tooltips.filter(tooltip => tooltip.type == "buypreviousupgrade").length == 0) {
-						let tooltip = addTooltip(upgradeObj, {
-							text: "You have to buy the previous one",
-							textSize: upgradeObj.height / 2,
-							direction: "down",
-							type: "buypreviousupgrade",
-						})
-					}
+					upgradeObj.tooltip.end()
+
+					addTooltip(upgradeObj, {
+						text: "You have to buy the previous one",
+						textSize: upgradeObj.height / 2,
+						direction: "down",
+						type: "buypreviousupgrade",
+						layer: winParent.layer,
+						z: winParent.z
+					})
 
 					upgradeObj.trigger("dummyClick")
 					
@@ -327,22 +328,22 @@ export function addUpgrades(elementParent) {
 					downEvent = upgradeObj.onMouseDown(() => {
 						if (isUpgradeBought(upgradeObj.id)) return
 						if (upgradeObj.boughtProgress >= 5) {
-							// there's a tutorial tooltip, get rid of it
-							if (upgradeObj.tooltips.filter(tooltip => tooltip.type == "tutorial").length > 0) {
-								upgradeObj.tooltips.forEach(tooltip => tooltip.end())
-								addPriceTooltip()
 							
+							if (upgradeObj.tooltip.type == "holddowntobuy") {
+								upgradeObj.tooltip.end()
+								addPriceTooltip()
+								// there's a tutorial tooltip, get rid of it
+	
 								progressSound?.stop()
-								let speed = map(upgradeObj.boughtProgress, 0, 100, 1, 1.25)
 								progressSound = playSfx("progress", { detune: upgradeObj.boughtProgress })
 							}
 						}
-						
+
 						if (upgradeObj.boughtProgress < 100) {
 							upgradeObj.boughtProgress += 2 // time to hold
 							upgradeObj.scale.x = map(upgradeObj.boughtProgress, 0, 100, 1.1, 0.85)
 							upgradeObj.scale.y = map(upgradeObj.boughtProgress, 0, 100, 1.1, 0.85)
-							progressSound.detune = upgradeObj.boughtProgress * upgradeObj.idx / 2
+							progressSound.detune = (upgradeObj.boughtProgress * upgradeObj.idx / 2) + 1
 						}
 			
 						if (upgradeObj.boughtProgress >= 100) {
@@ -364,30 +365,27 @@ export function addUpgrades(elementParent) {
 			if (GameState.score >= upgradeObj.price) {
 				// this is what happens when you click several times but you're not buying!!
 				// you're confused!!!!!
-				if (upgradeObj.boughtProgress < 1 && upgradeObj.tooltips.filter(tooltip => tooltip.type == "buypreviousupgrade").length == 0) {
-					let tutorialtooltips = upgradeObj.tooltips.filter(tooltip => tooltip.type == "tutorial")
-					if (tutorialtooltips.length == 0) {
-						upgradeObj.tooltips.forEach(tooltip => tooltip.end())
-						let tutorialTooltip = addTooltip(upgradeObj, {
-							text: "Hold down to buy!",
-							lerpValue: 0.75,
-							type: "tutorial",
-							direction: "down",
-						})
-					}
+
+				if (upgradeObj.boughtProgress < 1) {
+					upgradeObj.tooltip.end()
+
+					let tutorialTooltip = addTooltip(upgradeObj, {
+						text: "Hold down to buy!",
+						lerpValue: 0.75,
+						type: "holddowntobuy",
+						direction: "down",
+					})
 				}
 
 				upgradeObj.trigger("dummyClick")
 			}
 		})
 
-		let tooltip = null;
-
 		upgradeObj.on("notEnoughMoney", () => {
 			// opts.pos is the position it was added to
 			const direction = getRandomDirection(addedPosition, false, 1.25)
 			tween(direction, addedPosition, 0.25, (p) => upgradeObj.pos = p, easings.easeOutQuint)
-			tween(choose([-15, 15]), 0, 0.25, (p) => tooltip.tooltipText.angle = p, easings.easeOutQuint)
+			tween(choose([-15, 15]), 0, 0.25, (p) => upgradeTooltip.tooltipText.angle = p, easings.easeOutQuint)
 			playSfx("wrong", { detune: rand(25, 75) })
 		})
 

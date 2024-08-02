@@ -100,14 +100,9 @@ class _GameState {
 	cheat() {
 		this.clickers = 100
 		this.cursors = 100
-		this.score = scoreManager.seventyMillions - 1
-		this.scoreThisRun = scoreManager.seventyMillions - 1
-		this.scoreAllTime = scoreManager.seventyMillions - 1 
-	
-		this.critPower = 10
-		this.powerupPower = 10
-		this.clickPercentage = 50
-		this.cursorsPercentage = 50
+		this.score = scoreManager.ascensionConstant * 0.95
+		this.scoreThisRun = scoreManager.ascensionConstant * 0.95
+		this.scoreAllTime = scoreManager.ascensionConstant * 0.95
 	}
 }
 
@@ -184,19 +179,21 @@ class _scoreManager {
 	// =====================
 	//   ASCENSION STUFF
 	// =====================
-	// This is just a constant
-	seventyMillions = 70000000 // 70.000.000
-	
 	// Mana is a spendable currency
 	// When score is greater than scoreTilNextMana, mana is added by one
 	// Magic level is as multiplier
 
+	/**
+	 * This is the number you start getting mana at
+	 */
+	ascensionConstant = 50_000_000
+
 	// Is the actual formula that determines the amounts you get mana at
 	getScoreForManaAT = (manaAllTime:number) => {
-		return (manaAllTime ** 0.15) * this.seventyMillions
+		return (manaAllTime ** 0.15) * this.ascensionConstant
 	}
 
-	// how much score is left until the next mana
+	// The score you get the next mana at
 	scoreYouGetNextManaAt = () => {
 		let nextManaAt = this.getScoreForManaAT(GameState.ascension.manaAllTime + 1);
 		return nextManaAt;

@@ -7,9 +7,9 @@ import { bop } from "../utils";
 import { mouse } from "../additives";
 import { buttonSpacing, infoForWindows, openWindow, windowKey } from "./windows-api/windowManaging";
 import { addMinibutton } from "./windows-api/minibuttons";
-import { openWindowButton } from "./windows-api/windowButtonClass";
-import { Vec2 } from "kaplay";
+import { openWindowButton } from "./windows-api/openWindowButton";
 import { destroyExclamation } from "../unlockables/unlockablewindows";
+import { insideWindowHover } from "../hovers/insideWindowHover";
 
 export let gridContainer;
 
@@ -89,30 +89,12 @@ export function makeGridMinibutton(windowKey:windowKey, gridSlot:any, winParent:
 		area(),
 		rotate(0),
 		dummyShadow(),
+		insideWindowHover(winParent),
 		openWindowButton(),
 		"gridMiniButton",
 		{
 			windowKey: windowKey,
 			beingHeld: false,
-
-			startHover() {
-				playSfx("hoverMiniButton", {detune: 100 * idx / 4})
-				this.play("hover")
-				
-				selection = gridSlot.add([
-					pos(),
-					rect(this.width, this.height, { radius: 5 }),
-					opacity(0.15),
-					anchor("center"),
-					"gridMinibuttonSelection",
-				])
-			},
-
-			endHover() {
-				this.play("default")
-				tween(this.angle, 0, 0.32, (p) => this.angle = p, easings.easeOutQuint)
-				selection?.destroy()
-			},
 
 			releaseDrop(defaultShadow = true) {
 				if (curDraggin == this) {
@@ -140,7 +122,7 @@ export function makeGridMinibutton(windowKey:windowKey, gridSlot:any, winParent:
 						});
 
 						get("gridMiniButton", { recursive: true }).forEach(element => {
-							if (element.isHovering()) element.startHover()
+							if (element.isHovering()) element.startHoverFunction()
 						})
 					}
 
@@ -152,7 +134,6 @@ export function makeGridMinibutton(windowKey:windowKey, gridSlot:any, winParent:
 							taskbarIndex: closestMinibutton.taskbarIndex,
 							initialPosition: thisThing.pos,
 							destPosition: closestMinibutton.pos,
-							moveToPosition: true
 						})
 
 						GameState.taskbar[closestMinibutton.taskbarIndex] = thisThing.windowKey
@@ -207,20 +188,23 @@ export function makeGridMinibutton(windowKey:windowKey, gridSlot:any, winParent:
 		}
 	})
 
-	gridMiniButton.onHover(() => {
-		if (curDraggin) return
-		gridMiniButton.startHover()
-	})
-	
-	gridMiniButton.onHoverEnd(() => {
-		if (curDraggin) return
-		gridMiniButton.endHover()
+	gridMiniButton.startingHover(() => {
+		playSfx("hoverMiniButton", {detune: 100 * idx / 4})
+		gridMiniButton.play("hover")
+		
+		selection = gridSlot.add([
+			pos(),
+			rect(gridMiniButton.width, gridMiniButton.height, { radius: 5 }),
+			opacity(0.15),
+			anchor("center"),
+			"gridMinibuttonSelection",
+		])
 	})
 
-	gridMiniButton.onDrag(() => {
-		get("gridMinibuttonSelection", { recursive: true }).forEach(selection => {
-			selection?.destroy()
-		})
+	gridMiniButton.endingHover(() => {
+		gridMiniButton.play("default")
+		tween(gridMiniButton.angle, 0, 0.32, (p) => gridMiniButton.angle = p, easings.easeOutQuint)
+		selection?.destroy()
 	})
 
 	// press, hold and release hold functions
@@ -236,6 +220,10 @@ export function makeGridMinibutton(windowKey:windowKey, gridSlot:any, winParent:
 	})
 
 	gridMiniButton.onHold(() => {
+		get("gridMinibuttonSelection", { recursive: true }).forEach(selection => {
+			selection?.destroy()
+		})
+		
 		// get out of the parent and sends him to the real world (root)
 		gridMiniButton.parent.children.splice(gridMiniButton.parent.children.indexOf(gridMiniButton), 1)
 		gridMiniButton.parent = ROOT

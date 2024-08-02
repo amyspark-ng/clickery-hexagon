@@ -267,7 +267,7 @@ export function openWindow(windowKey:windowKey) {
 
 	windowObj.xButton = addXButton(windowObj)
 
-	windowObj.onMousePress(() => {
+	windowObj.onClick(() => {
 		// if has been closed don't do anything
 		if (!windowObj.is("window")) return
 
@@ -299,7 +299,7 @@ export function openWindow(windowKey:windowKey) {
 	})
 
 	windowObj.onMouseRelease(() => {
-		windowObj.releaseDrop()
+		if (windowObj.dragging) windowObj.releaseDrop() 
 	})
 
 	windowObj.onKeyPress("escape", () => {

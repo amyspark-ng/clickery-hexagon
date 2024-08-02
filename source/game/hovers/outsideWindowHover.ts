@@ -31,7 +31,7 @@ export function outsideWindowHover() {
 			}
 
 			this.endHoverFunction = function() {
-				if (this.isBeingHovered == false) return
+				if (this.isBeingHovered == false || this.dragging == true) return
 				this.endHoverAnim()
 				
 				this.trigger("outsideHoverEnd")

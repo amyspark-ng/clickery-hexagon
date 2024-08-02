@@ -1,5 +1,5 @@
 import { Vec2 } from "kaplay";
-import { curDraggin } from "../.././plugins/drag"
+import { curDraggin } from "../../plugins/drag"
 
 const timeForHold = 0.1
 
@@ -14,11 +14,11 @@ export function openWindowButton() {
 			let waitingHold = wait(0, () => {})
 			this.onMousePress("left", () => {
 				lastPosClicked = mousePos()
-				if (!this.isHovering()) return
+				if (!this.isBeingHovered) return
 			
 				waitingHold.cancel()
 				waitingHold = wait(timeForHold, () => {
-					if (!this.isHovering()) return
+					if (!this.isBeingHovered) return
 					if (curDraggin) {
 						return
 					}
@@ -37,7 +37,7 @@ export function openWindowButton() {
 				else {
 					waitingHold.cancel()
 					// if last posclicked is inside gridminibutton
-					if (!this.isHovering()) return
+					if (!this.isBeingHovered) return
 					if (!this.hasPoint(lastPosClicked)) return
 					if (curDraggin) return
 	

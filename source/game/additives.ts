@@ -116,6 +116,10 @@ export function addToast(opts:toastOpts) {
 					if (this.type == "achievement") {
 						playSfx("unlockachievement", { detune: this.index * 100 })
 					}
+
+					else if (this.type == "gamesaved") {
+						playSfx("gamesaved", { detune: rand(0, 30) })
+					}
 				},
 				close() {
 					wait(0.7).onEnd(() => this.trigger("closed"))
@@ -298,7 +302,7 @@ type tooltipOpts = {
 	textSize?:number,
 	type?:string,
 	layer?:string,
-	z?:number
+	z?:number,
 }
 
 /**
@@ -410,16 +414,13 @@ export function addTooltip(obj:GameObj, opts?:tooltipOpts) {
 	])
 
 	let tooltipinfo = { tooltipBg, tooltipText, end, type: opts.type }
-	if (obj.tooltips == null) obj.tooltips = []
-	obj.tooltips.push(tooltipinfo)
+	if (obj.tooltip == null) obj.tooltip = tooltipinfo
 	
 	function end() {
 		destroy(tooltipBg)
 		destroy(tooltipText)
 
-		if (obj.tooltips == null) return
-		let index = obj.tooltips.indexOf(tooltipinfo)
-		if (index > -1) obj.tooltips.splice(index, 1)
+		obj.tooltip = null
 	}
 
 	obj.onDestroy(() => {

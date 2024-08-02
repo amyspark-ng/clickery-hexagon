@@ -91,23 +91,42 @@ export function medalsWinContent(winParent) {
 		})
 
 		medalObj.onHover(() => {
+			let achievement = getAchievement(medalObj.achievementId)
+			let texting:string;
+
+			if (!isAchievementUnlocked(achievement.id)) {
+				// is not secret
+				if (achievement.secretCondition == null) texting = achievement.description
+				// is secret
+				else texting = "This achievement is secret"
+			}
+
+			// is unlocked
+			else {
+				texting = achievement.description
+			}
+			
 			let tooltip = addTooltip(medalObj, { 
-				text: isAchievementUnlocked(medalObj.achievementId) ? getAchievement(medalObj.achievementId).description : "This achievement is secret",
+				text: texting,
 				direction: "down",
-				lerpValue: 0.9,
+				lerpValue: 1, // TODO: make this just appear, it looks ugly 
 			})
 		})
 
 		medalObj.onHoverEnd(() => {
-			medalObj.tooltips[0].end()
+			medalObj.tooltip.end()
 		})
 
-		ROOT.on("achivementUnlock", (id) => {
+		let checkforunlock = ROOT.on("achivementUnlock", (id) => {
 			if (id == medalid) {
 				parseAnimation(medalObj, getAchievement(id).icon)
 				medalObj.width = 60
 				medalObj.height = 60
 			}
+		})
+
+		medalObj.onDestroy(() => {
+			checkforunlock.cancel()
 		})
 	}
 

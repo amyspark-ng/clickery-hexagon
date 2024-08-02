@@ -1,5 +1,8 @@
 // =========================
 // INSIDE HOVER WINDOW COMPONENT
+
+import { curDraggin } from "../plugins/drag"
+
 // =========================
 export function insideWindowHover(winParent:any) {
 	
@@ -36,6 +39,7 @@ export function insideWindowHover(winParent:any) {
 			}
 
 			this.onHover(() => {
+				if (curDraggin) return
 				if (this.winParent.active == false) return
 				// only check for these conditions here
 				// if (allObjWindows.isHoveringAWindow == false && allObjWindows.isDraggingAWindow == false) {
@@ -44,6 +48,7 @@ export function insideWindowHover(winParent:any) {
 			})
 
 			this.onHoverEnd(() => {
+				if (this.dragging == true) return
 				if (this.winParent.active == false) return
 				this.endHoverFunction()
 			})

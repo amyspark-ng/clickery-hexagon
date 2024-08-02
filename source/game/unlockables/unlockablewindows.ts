@@ -31,7 +31,7 @@ export let unlockableWindows = {
 		condition: () => GameState.score >= 200
 	},
 	"ascendWin": {
-		condition: () => GameState.scoreAllTime >= scoreManager.seventyMillions
+		condition: () => GameState.scoreAllTime >= scoreManager.ascensionConstant
 	},
 }
 
@@ -58,6 +58,9 @@ export function addExclamation(obj:any) {
 			"exclamation",
 			{
 				times: 0,
+				update() {
+					if (obj.opacity != null) this.opacity = obj.opacity
+				}
 			}
 		])
 	
@@ -123,7 +126,6 @@ export function unlockWindow(windowJustUnlocked:windowKey) {
 				windowKey: windowJustUnlocked,
 				taskbarIndex: newIndex,
 				initialPosition: folderObj.pos,
-				moveToPosition: true,
 			})
 
 			addExclamation(btnForNewWindow)

@@ -3,7 +3,7 @@ import { playSfx } from "../sound"
 import { cam } from "./gamescene"
 import { COMBO_MINCLICKS, COMBO_MAX, COMBO_MAXCLICKS, clickVars } from "./hexagon"
 import { scoreText, spsText } from "./uicounters";
-import { blendColors, formatNumber, randomPos } from "./utils";
+import { blendColors, formatNumber, insertAtStart, randomPos } from "./utils";
 import { spawnPowerup } from "./powerups";
 import { GameState, scoreManager } from "../gamestate";
 
@@ -155,7 +155,7 @@ export function addPlusScoreText(opts:plusScoreOpts) {
 
 	plusScoreText.text = `+${formatNumber(opts.value)}`
 	if (scoreManager.combo > 1 && !opts.cursorRelated) {
-		plusScoreText.text = plusScoreText.text.replace (/^/,'[combo]');
+		plusScoreText.text = insertAtStart(plusScoreText.text, "[combo]")
 		// if (scoreManager.combo > 1) plusScoreText.text += `x${Math.floor(scoreManager.combo)}`
 		plusScoreText.text += `[/combo]`;
 	}

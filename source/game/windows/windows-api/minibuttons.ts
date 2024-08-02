@@ -6,7 +6,7 @@ import { mouse } from "../../additives";
 import { infoForWindows, manageWindow, buttonSpacing, openWindow, allObjWindows, windowKey, } from "./windowManaging";
 import { GameState } from "../../../gamestate";
 import { Vec2 } from "kaplay";
-import { openWindowButton } from "./windowButtonClass";
+import { openWindowButton } from "./openWindowButton";
 import { folded, folderObj } from "./folderObj";
 import { destroyExclamation } from "../../unlockables/unlockablewindows";
 import { outsideWindowHover } from "../../hovers/outsideWindowHover";
@@ -16,10 +16,6 @@ type minibuttonOpt = {
 	taskbarIndex:number;
 	initialPosition:Vec2,
 	destPosition?:Vec2;
-	/**
-	 * Wheter to move to the destined position when added
-	 */
-	moveToPosition?:boolean;
 }
 
 export function getMinibuttonPos(taskbarIndex:number) {
@@ -169,10 +165,6 @@ export function addMinibutton(opts:minibuttonOpt) {
 			},
 
 			pickFromTaskbar() {
-				if (curDraggin) {
-					return
-				}
-		
 				mouse.grab()
 				this.pick()
 
@@ -251,10 +243,7 @@ export function addMinibutton(opts:minibuttonOpt) {
 	// animate them
 	currentMinibutton.opacity = 0
     tween(currentMinibutton.opacity, 1, 0.32, (p) => currentMinibutton.opacity = p, easings.easeOutQuad)
-	
-	if (opts.moveToPosition == true) {
-		tween(currentMinibutton.pos, currentMinibutton.destinedPosition, 0.32, (p) => currentMinibutton.pos = p, easings.easeOutBack)
-	}
+	tween(currentMinibutton.pos, currentMinibutton.destinedPosition, 0.32, (p) => currentMinibutton.pos = p, easings.easeOutBack)
 	
 	// currentMinibutton is the one being swapped to met the curDragging wish
 	currentMinibutton.on("dragHasSurpassed", (left) => {
@@ -325,19 +314,23 @@ export function addMinibutton(opts:minibuttonOpt) {
 		if (allObjWindows.isHoveringAWindow || allObjWindows.isDraggingAWindow) return
 		currentMinibutton.click()
 	})
-
-	currentMinibutton.onHold(() => {
-		currentMinibutton.pickFromTaskbar()
-		
-		// unlocking stuff
-		destroyExclamation(currentMinibutton)
-	})
-
-	currentMinibutton.onHoldRelease(() => {
-		if (curDraggin == currentMinibutton) {
-			currentMinibutton.releaseDrop()
-		}
-	})
+	
+	if (currentMinibutton.windowKey != "extraWin") {
+		currentMinibutton.onHold(() => {
+			if (curDraggin) return
+			
+			currentMinibutton.pickFromTaskbar()
+			
+			// unlocking stuff
+			destroyExclamation(currentMinibutton)
+		})
+	
+		currentMinibutton.onHoldRelease(() => {
+			if (curDraggin == currentMinibutton) {
+				currentMinibutton.releaseDrop()
+			}
+		})
+	}
 
 	return currentMinibutton;
 }

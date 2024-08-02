@@ -191,6 +191,16 @@ export function getRandomElementDifferentFrom(arr, element) {
     return filteredArray[randomIndex];
 }
 
+/**
+ * Inserts a string at the start of another 
+ * @param str The string of which the start wants to be inserted
+ * @param replacement The string that will be inserted
+ * @returns The result
+ */
+export function insertAtStart(str:string, replacement:string) {
+	return str.replace(/^/,`${replacement}`);
+}
+
 export function getZBetween(a, b) {
 	return Math.floor(a + b / 2)
 }
@@ -280,10 +290,7 @@ export function setVariable(obj, path, value) {
 }
 
 export function saveAnim() {
-	let toast = addToast({ icon: "floppy", title: "Game saved!", body: `Time played: ${toHHMMSS(GameState.stats.totalTimePlayed)}` })
-	toast.onAdd(() => {
-		playSfx("gamesaved", { detune: rand(-10, 10) })
-	})
+	let toast = addToast({ icon: "floppy", title: "Game saved!", body: `Time played: ${toHHMMSS(GameState.stats.totalTimePlayed)}`, type: "gamesaved" })
 }
 
 export function randomPowerup() {
