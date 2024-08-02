@@ -15,11 +15,13 @@ this game MIGHT be getting done
 - start work on newgrounds api and leaderboards -->
 
 <!-- balancing -->
-- make powerups a little bit cheaper
 - increase the prices of click upgrades and cursor upgradess
 ^ just a little
 - make cursors more powerful so you don't have to click too much
 - unified format time function
+- make the start ascending at 50 millions
+- everything is too easy to get but at the same time it's too hard
+- you shouldn't be able to buy awesome powerup
 
 <!-- ascension -->
 - takes 10-15-20 mins to reach 75 million of total score, that's good
@@ -29,6 +31,12 @@ this game MIGHT be getting done
 - balance powerups they are TOOOO FUCKING OP TOOK ME 5 MINUTES REACH 70 MILLIONS
 
 <!-- code -->
+- clicking an upgrade and then trying to hover the hexagon but it doesn't hover
+	* it's only when it fucking pleases
+- make exclamation have the same opacity as the obj
+- why do achivements come in 2
+- why do all achievements say this achievement is a secret
+- fullscreen checkbox doesn't listen for fullscreen change
 - update extra window minibuttons to work with insideWindowHover
 	* also the stuff that uses endHover when dropping on cursor exit canvas
 - what happens when minibutton releasedrop endhoverfunction what
@@ -42,6 +50,7 @@ this game MIGHT be getting done
 - detuen in bought progress is not working i thikn
 - why does mouse play cursor when buying sometimes 
 - tooltip is re added every time you hover upgrade
+- why are achievements added over and over again
 
 <!-- graphics -->
 - change color of upgrades

@@ -281,7 +281,9 @@ export function setVariable(obj, path, value) {
 
 export function saveAnim() {
 	let toast = addToast({ icon: "floppy", title: "Game saved!", body: `Time played: ${toHHMMSS(GameState.stats.totalTimePlayed)}` })
-	toast.onAdd(() => { playSfx("gamesaved", { detune: rand(-10, 10) }) })
+	toast.onAdd(() => {
+		playSfx("gamesaved", { detune: rand(-10, 10) })
+	})
 }
 
 export function randomPowerup() {

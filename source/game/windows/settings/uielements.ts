@@ -41,31 +41,38 @@ export function addCheckbox(opts:checkBoxOpt, parent?:any) {
 		scale(),
 		opts.name,
 		{
-			addTick(opts = { anim: true}) {
-				const tick = this.add([
-					sprite("tick"),
-					anchor("center"),
-					scale(1),
-					"tick",
-					{
-						goAway() {
-							destroy(this)
-						}
-					}
-				])
-			},
+			tick: null,
 
-			turnOn(opts = { anim: true }) {
+			turnOn() {
 				this.play("on")
-				this.addTick({ anim: opts.anim });
+				this.tick.appear();
 			},
 			
 			turnOff() {
 				this.play("off")
-				this.get("tick", { recursive: true })[0]?.goAway()
+				this.tick.dissapear();
 			},
 		}
 	])
+
+	let tick = checkBox.add([
+		sprite("tick"),
+		anchor("center"),
+		pos(),
+		scale(1),
+		"tick",
+		{
+			appear() {
+				this.hidden = false
+			},
+
+			dissapear() {
+				this.hidden = true
+			}
+		}
+	])
+
+	checkBox.tick = tick
 
 	if (opts.checked == true) {
 		checkBox.turnOn()

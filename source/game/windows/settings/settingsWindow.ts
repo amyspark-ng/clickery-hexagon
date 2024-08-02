@@ -1,4 +1,5 @@
 import { GameState } from "../../../gamestate"
+import { ROOT } from "../../../main";
 import { addCheckbox, addDeleteSaveButton, addVolumeControl } from "./uielements"
 
 let otherCheckboxesBg:any;
@@ -29,6 +30,12 @@ export function settingsWinContent(winParent) {
 		title: "Fullscreen"
 	}, otherCheckboxesBg)
 
+	let checkForFullscreen = ROOT.on("fullscreenchange", () => {
+		if (isFullscreen()) fullscreenCheckbox.turnOn()
+		else fullscreenCheckbox.turnOff()
+		GameState.settings.fullscreen = isFullscreen()
+	})
+
 	let commaCheckbox = addCheckbox({
 		pos: vec2(-144, fullscreenCheckbox.pos.y + 60),
 		name: "commaCheckbox",
@@ -51,5 +58,9 @@ export function settingsWinContent(winParent) {
 	])
 
 	addDeleteSaveButton(otherButtonsBg, winParent)
+
+	winParent.on("close", () => {
+		checkForFullscreen.cancel()
+	})
 
 }

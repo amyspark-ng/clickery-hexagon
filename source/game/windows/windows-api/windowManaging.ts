@@ -155,7 +155,7 @@ export function openWindow(windowKey:windowKey) {
 		layer("windows"),
 		z(0),
 		drag(),
-		area({ scale: vec2(1, 1) }),
+		area({ scale: vec2(1.05, 1) }),
 		"window",
 		`${windowKey}`,
 		{

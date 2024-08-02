@@ -442,16 +442,12 @@ export function unlockAchievement(id:string) {
 	wait(achievement.timeAfter || 0, () => {
 		GameState.unlockedAchievements.push(id)
 
-		let toast = addToast({
+		addToast({
 			icon: achievement.icon,
 			title: achievement.title,
 			body: achievement.description,
 			duration: achievement.duration,
 			type: "achievement",
-		})
-
-		toast.onAdd(() => {
-			playSfx("unlockachievement", { detune: this.index * 100 })
 		})
 
 		if (id == "allachievements") {

@@ -113,6 +113,9 @@ export function addToast(opts:toastOpts) {
 				index: idx,
 				type: opts.type,
 				add() {
+					if (this.type == "achievement") {
+						playSfx("unlockachievement", { detune: this.index * 100 })
+					}
 				},
 				close() {
 					wait(0.7).onEnd(() => this.trigger("closed"))
@@ -414,6 +417,7 @@ export function addTooltip(obj:GameObj, opts?:tooltipOpts) {
 		destroy(tooltipBg)
 		destroy(tooltipText)
 
+		if (obj.tooltips == null) return
 		let index = obj.tooltips.indexOf(tooltipinfo)
 		if (index > -1) obj.tooltips.splice(index, 1)
 	}

@@ -425,7 +425,6 @@ export function gamescene() {
 			if (sleeping) timeSlept += dt()
 
 			powerupManagement()
-			GameState.settings.fullscreen = isFullscreen()
 		})
 
 		// #region OUTSIDE OF TAB STUFF
@@ -477,9 +476,7 @@ export function gamescene() {
 		}, false);
 
 		document.getElementById("kanva").addEventListener("fullscreenchange", () => {
-			wait(0.01, () => {
-				ROOT.trigger("fullscreenchange")
-			})
+			ROOT.trigger("fullscreenchange")
 		})
 	
 		let introAnimations = {

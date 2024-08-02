@@ -2,7 +2,7 @@ import { GameObj, Vec2 } from "kaplay"
 import { GameState, scoreManager } from "../../../gamestate"
 import { playSfx } from "../../../sound"
 import { ROOT } from "../../../main"
-import { bop, formatNumber, getPrice, getRandomDirection, getVariable, randomPos, randomPowerup } from "../../utils"
+import { bop, formatNumber, getPrice, getRandomDirection, getVariable, percentage, randomPos, randomPowerup } from "../../utils"
 import { addTooltip, mouse } from "../../additives"
 import { powerupTypes, spawnPowerup } from "../../powerups"
 import { isHoveringUpgrade, storeElements, storePitchJuice } from "./storeWindows"
@@ -22,8 +22,8 @@ export let storeElementsInfo = {
 	},
 	"powerupsElement": { 
 		gamestateKey: "stats.powerupsBought",
-		basePrice: 15500,
-		percentageIncrease: 180,
+		basePrice: 25200,
+		percentageIncrease: 200,
 		unlockPrice: 10500
 	},
 }
@@ -266,6 +266,8 @@ export function addStoreElement(winParent:any, opts:storeElementOpt) {
 				storePitchJuice.storeTune = clamp(storePitchJuice.storeTune, -100, 500)
 				playSfx("kaching", { detune: storePitchJuice.storeTune })
 				
+				scoreManager.subTweenScore(this.price)
+
 				if (this.isBeingClicked) {
 					this.play("down")
 					this.get("*").forEach(element => {
@@ -345,9 +347,8 @@ export function addStoreElement(winParent:any, opts:storeElementOpt) {
 		// area
 		btn.area.scale = vec2(1 / btn.scale.x, 1 / btn.scale.y)
 
-		if (opts.type == "powerupsElement") {
+		if (opts.type == "powerupsElement" && GameState.hasUnlockedPowerups == false) {
 			btn.price = storeElementsInfo.powerupsElement.unlockPrice
-			return
 		}
 
 		else {
@@ -356,7 +357,7 @@ export function addStoreElement(winParent:any, opts:storeElementOpt) {
 			// price
 			const elementInfo = storeElementsInfo[opts.type]
 			btn.price = getPrice({
-				basePrice: elementInfo.basePrice,
+				basePrice: elementInfo.basePrice + (percentage(elementInfo.basePrice, elementInfo.percentageIncrease) * GameState.stats.timesAscended),
 				percentageIncrease: elementInfo.percentageIncrease,
 				objectAmount: amountBought,
 				amountToBuy: amountToBuy,

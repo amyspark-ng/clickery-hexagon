@@ -53,7 +53,7 @@ export function addUpgrades(elementParent) {
 			anchor("center"),
 			scale(1),
 			z(winParent.z + 1),
-			area(),
+			area({ scale: vec2(1.15, 1.15) }),
 			outline(5, BLACK),
 			insideWindowHover(elementParent.parent),
 			"upgrade",
@@ -68,10 +68,6 @@ export function addUpgrades(elementParent) {
 				
 				boughtProgress: 0,
 				
-				update() {
-					this.area.scale = vec2(1 / this.scale.x, 1 / this.scale.y)
-				},
-
 				manageBlinkText(texty:string = "missing a text there buddy") {
 					let thisUpgrade = this
 					
@@ -222,9 +218,8 @@ export function addUpgrades(elementParent) {
 		upgradeObj.outline.color = upgradeObj.color.darken(10)
 
 		upgradeObj.startingHover(() => {
-			// end the hover of the storeElement
 			upgradeObj.parent.endHoverFunction()
-
+			
 			// animation
 			tween(upgradeObj.parent.opacity, 0.9, 0.15, (p) => upgradeObj.parent.opacity = p, easings.easeOutQuad)
 			tween(upgradeObj.scale, vec2(1.1), 0.15, (p) => upgradeObj.scale = p, easings.easeOutQuad)
@@ -253,6 +248,7 @@ export function addUpgrades(elementParent) {
 
 		upgradeObj.endingHover(() => {
 			upgradeObj.parent.startHoverFunction()
+			
 			tween(upgradeObj.parent.opacity, 1, 0.15, (p) => upgradeObj.parent.opacity = p, easings.easeOutQuad)
 
 			if (!isUpgradeBought(upgradeObj.id) && upgradeObj.boughtProgress > 0 && GameState.score >= upgradeObj.price) upgradeObj.dropBuy()
