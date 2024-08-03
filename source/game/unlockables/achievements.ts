@@ -106,7 +106,7 @@ achievements = [
 		title: "It starts...",
 		description: "Get 100 of score",
 		icon: "upgrades.k_0",
-		condition: () => GameState.score >= 100,
+		condition: () => GameState.scoreAllTime >= 100,
 	}),
 
 	new Achievement({
@@ -114,7 +114,7 @@ achievements = [
 		title: "Wake and click",
 		description: "Get 500 of score",
 		icon: "upgrades.k_1",
-		condition: () => GameState.score >= 500,
+		condition: () => GameState.scoreAllTime >= 500,
 	}),
 
 	new Achievement({
@@ -122,7 +122,7 @@ achievements = [
 		title: "Wake and click",
 		description: "Get 1.000 of score",
 		icon: "upgrades.k_1",
-		condition: () => GameState.score >= 1000,
+		condition: () => GameState.scoreAllTime >= 1000,
 	}),
 
 	new Achievement({
@@ -130,7 +130,7 @@ achievements = [
 		title: "Wake and click",
 		description: "Get 5.000 of score",
 		icon: "upgrades.k_1",
-		condition: () => GameState.score >= 5000,
+		condition: () => GameState.scoreAllTime >= 5000,
 	}),
 
 	new Achievement({
@@ -138,7 +138,7 @@ achievements = [
 		title: "Wake and click",
 		description: "Get 10.000 of score",
 		icon: "upgrades.k_1",
-		condition: () => GameState.score >= 10000,
+		condition: () => GameState.scoreAllTime >= 10000,
 	}),
 
 	new Achievement({
@@ -146,7 +146,7 @@ achievements = [
 		title: "Wake and click",
 		description: "Get 25.000 of score",
 		icon: "upgrades.k_1",
-		condition: () => GameState.score >= 25000,
+		condition: () => GameState.scoreAllTime >= 25000,
 	}),
 
 	new Achievement({
@@ -154,7 +154,7 @@ achievements = [
 		title: "Wake and click",
 		description: "Get 50.000 of score",
 		icon: "upgrades.k_1",
-		condition: () => GameState.score >= 50000,
+		condition: () => GameState.scoreAllTime >= 50000,
 	}),
 
 	new Achievement({
@@ -163,7 +163,7 @@ achievements = [
 		description: "Get 1 sextillion of score",
 		icon: "upgrades.k_1",
 		duration: 4,
-		condition: () => GameState.score >= scoreManager.scientificENOT,
+		condition: () => GameState.scoreAllTime >= scoreManager.scientificENOT,
 	}),
 
 	new Achievement({

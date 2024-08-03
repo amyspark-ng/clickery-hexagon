@@ -3,7 +3,7 @@ import { GameState, scoreManager } from "../../../gamestate"
 import { playSfx } from "../../../sound"
 import { ROOT } from "../../../main"
 import { bop, formatNumber, getPrice, getRandomDirection, getVariable, percentage, randomPos, randomPowerup } from "../../utils"
-import { addTooltip, mouse } from "../../additives"
+import { addTooltip } from "../../additives"
 import { powerupTypes, spawnPowerup } from "../../powerups"
 import { isHoveringUpgrade, storeElements, storePitchJuice } from "./storeWindows"
 import { positionSetter } from "../.././plugins/positionSetter"
@@ -249,15 +249,6 @@ export function addStoreElement(winParent:any, opts:storeElementOpt) {
 			isBeingClicked: false,
 			down: false,
 			timesBoughtConsecutively: 0,
-			add() {
-				if (opts.type == "powerupsElement") {
-					if (this.isBeingHovered == true) {
-						if (GameState.score >= this.price) mouse.play("point")
-						else this.play("cursor")
-					}
-				}
-			},
-			
 			buy(amount:number) {
 				if (winParent.dragging) return
 				
@@ -307,14 +298,11 @@ export function addStoreElement(winParent:any, opts:storeElementOpt) {
 				if (opts.type == "powerupsElement") {
 					spawnPowerup({
 						pos: randomPos(),
-						type: randomPowerup(),
+						type: randomPowerup(false),
 					})
 					GameState.stats.powerupsBought++
 				}
 				
-				if (GameState.score - this.price >= btn.price) mouse.play("point")
-				else mouse.play("cursor")
-
 				this.trigger("buy")
 			},
 		}
@@ -375,16 +363,12 @@ export function addStoreElement(winParent:any, opts:storeElementOpt) {
 	// the component checks for the window being active
 	btn.startingHover(() => {
 		tween(btn.scale, vec2(1.025), 0.15, (p) => btn.scale = p, easings.easeOutQuad)
-		if (GameState.score >= btn.price) mouse.play("point")
-		else mouse.play("cursor")
 	})
 
 	btn.endingHover(() => {
 		tween(btn.scale, vec2(1), 0.15, (p) => btn.scale = p, easings.easeOutQuad)
 		if (btn.isBeingClicked == true) btn.isBeingClicked = false
 		btn.trigger("endHover")
-	
-		if (mouse.getCurAnim().name == "point") mouse.play("cursor")
 	})
 
 	// # Other objects

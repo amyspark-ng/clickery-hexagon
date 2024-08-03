@@ -35,9 +35,9 @@ type powerupOpt = {
 }
 
 let timerSpacing = 65
-function getTimerPos(index:number) {
+function getTimerXPos(index:number) {
 	let initialPos = vec2(width() + timerSpacing / 2)
-	return getPosInGrid(initialPos, 0, -index - 1, vec2(timerSpacing, 0))
+	return getPosInGrid(initialPos, 0, -index - 1, vec2(timerSpacing, 0)).x
 }
 
 function addTimer(opts:{ sprite: string, type: string }) {
@@ -73,7 +73,7 @@ function addTimer(opts:{ sprite: string, type: string }) {
 					// decreases the index (moves it to the right)
 					element.index--
 					// moves them accordingly
-					tween(element.pos.x, getTimerPos(element.index), 0.32, (p) => element.pos.x = p, easings.easeOutQuint)
+					tween(element.pos.x, getTimerXPos(element.index), 0.32, (p) => element.pos.x = p, easings.easeOutQuint)
 				});
 				// # holy shit im a genius
 			},
@@ -83,7 +83,7 @@ function addTimer(opts:{ sprite: string, type: string }) {
 	tween(30, 40, 0.32, (p) => timerObj.pos.y = p, easings.easeOutQuint)
 	tween(90, 0, 0.32, (p) => timerObj.angle = p, easings.easeOutQuint)
 
-	timerObj.pos = getTimerPos(timerObj.index)
+	timerObj.pos.x = getTimerXPos(timerObj.index)
 
 	// add the text object
 	timerObj.add([
@@ -253,6 +253,7 @@ export function spawnPowerup(opts?:powerupOpt) {
 				tween(this.scale, vec2(this.maxScale).sub(0.2), 0.15, (p) => this.scale = p, easings.easeOutBack)
 			},
 			dieAnim() {
+				this.area.scale = vec2(0)
 				tween(this.scale, vec2(this.maxScale).add(0.4), 0.15, (p) => this.scale = p, easings.easeOutBack)
 				tween(this.opacity, 0, 0.15, (p) => this.opacity = p, easings.easeOutBack).onEnd(() => {
 					destroy(this)
@@ -316,7 +317,7 @@ export function spawnPowerup(opts?:powerupOpt) {
 					}
 
 					else if (opts.type == "store") {
-						multiplier = rand(0.15, 0.5) / power * 0.75
+						multiplier = rand(0.05, 0.25) / power
 						// multiplied by 0.75 so it's not too op
 					}
 				}

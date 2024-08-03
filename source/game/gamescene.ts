@@ -176,7 +176,6 @@ function welcomeBack(idle = false) {
 		body += applicationMessage
 
 		let toast = addToast({ icon: "cursors.cursor", title: "Welcome back!", body: body, type: "welcome" })
-		toast.on("closed", () => checkForUnlockable())
 	
 		if (GameState.hasUnlockedPowerups == true) {
 			// if you left for 60 seconds there's a 10% chance you get a powerup
@@ -200,6 +199,8 @@ function welcomeBack(idle = false) {
 				}
 			}
 		}
+
+		return toast;
 	}
 
 	if (idle == false) {
@@ -320,10 +321,7 @@ export function gamescene() {
 					loop(60, () => {
 						if (chance(0.25)) {
 							if (GameState.hasUnlockedPowerups) {
-								spawnPowerup({
-									type: randomPowerup(),
-									pos: randomPos()
-								})
+								spawnPowerup()
 							}
 						}
 					})
@@ -334,10 +332,7 @@ export function gamescene() {
 				ROOT.on("powerupunlock", () => {
 					wait(30, () => {
 						naturalPowerupSpawningManagement()
-						spawnPowerup({
-							type: randomPowerup(),
-							pos: randomPos(),
-						})
+						spawnPowerup()
 					})
 				})
 			}

@@ -15,7 +15,7 @@ this game MIGHT be getting done
 - start work on newgrounds api and leaderboards -->
 
 <!-- balancing -->
-- increase the prices of click upgrades and cursor upgradess
+- increase the prices of click upgrades and cursor upgrades
 ^ just a little
 - make cursors more powerful so you don't have to click too much
 - unified format time function
@@ -31,11 +31,8 @@ this game MIGHT be getting done
 - balance powerups they are TOOOO FUCKING OP TOOK ME 5 MINUTES REACH 70 MILLIONS
 
 <!-- code -->
-- if lerpvalue is null just place it on the position it should be instead of lerping it
 - KILL the multiple tooltips system, i hate this shit so much
 - tooltip is re added every time you hover upgrade
-
-- why does mouse play cursor when buying sometimes 
 
 <!-- graphics -->
 - add a slight retsu sound for stroe

@@ -5,6 +5,7 @@ import { hexagon } from "./hexagon"
 import { blendColors, parseAnimation } from "./utils"
 import { allObjWindows, manageWindow } from "./windows/windows-api/windowManaging"
 import { isWindowUnlocked } from "./unlockables/unlockablewindows"
+import { checkForUnlockable } from "./unlockables/achievements"
 
 export let gameBg;
 export function addBackground() {
@@ -123,11 +124,12 @@ export function addToast(opts:toastOpts) {
 				},
 				close() {
 					wait(0.7).onEnd(() => this.trigger("closed"))
-					tween(toastBg.pos.x, -toastBg.width, 0.8, (p) => (toastBg.pos.x = p), easings.easeOutQuint).onEnd(() => {
+					tween(toastBg.pos.x, -toastBg.width, 0.8, (p) => toastBg.pos.x = p, easings.easeOutQuint).onEnd(() => {
 						// updateLogPositions();
 						destroy(toastBg);
 						processQueue();
 					});
+					checkForUnlockable()
 				},
 			},
 		]);
@@ -296,7 +298,7 @@ type tooltipOpts = {
 	text:string;
 	direction?: "up" | "down" | "left" | "right",
 	/**
-	 * How "closely" will the tooltip follow the object, from 0.1 to 1
+	 * How "closely" will the tooltip follow the object, from 0 to 1
 	 */
 	lerpValue?:number,
 	textSize?:number,
@@ -307,12 +309,12 @@ type tooltipOpts = {
 
 /**
  * Adds a tooltip to an object and pushes itself to a tooltips array
- * @returns An object that contains bg, text and an end() function 
+ * @returns An object that contains the bg, text and an end() function 
  */
 export function addTooltip(obj:GameObj, opts?:tooltipOpts) {
 	if (opts == undefined) opts = {} as tooltipOpts 
 	opts.direction = opts.direction ?? "up";
-	opts.lerpValue = opts.lerpValue ?? 0.35;
+	opts.lerpValue = opts.lerpValue ?? 1;
 	opts.textSize = opts.textSize ?? 20;
 
 	opts.layer = opts.layer ?? "windows"

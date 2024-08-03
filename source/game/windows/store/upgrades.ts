@@ -1,7 +1,7 @@
 import { GameState, scoreManager } from "../../../gamestate";
 import { ROOT } from "../../../main";
 import { playSfx, sfxHandlers } from "../../../sound";
-import { addTooltip, mouse } from "../../additives";
+import { addTooltip } from "../../additives";
 import { insideWindowHover } from "../../hovers/insideWindowHover";
 import { blendColors, bop, formatNumber, getPositionOfSide, getRandomDirection, insertAtStart, parseAnimation } from "../../utils";
 
@@ -15,12 +15,12 @@ export let upgradeInfo = {
 	"k_5": { value: 64, price: 850_000,},
 	// freq
 	"c_0": { freq: 10 }, // 10 seconds
-	"c_1": { freq: 5, price: 50_000 }, // 5 seconds
-	"c_2": { freq: 1, price: 500_000 }, // 1 second
+	"c_1": { freq: 5, price: 100_000 }, // 5 seconds
+	"c_2": { freq: 1, price: 650_000 }, // 1 second
 	// cursor values
 	"c_3": { value: 16, price: 12_500 }, 
 	"c_4": { value: 32, price: 45_000 },
-	"c_5": { value: 64, price: 12400 },
+	"c_5": { value: 64, price: 100_400 },
 }
 
 export function isUpgradeBought(id:string):boolean {
@@ -202,7 +202,7 @@ export function addUpgrades(elementParent) {
 				text: `${formatNumber(upgradeObj.price, { price: true })}`,
 				textSize: upgradeObj.height / 2,
 				direction: "down",
-				lerpValue: 0.75,
+				lerpValue: 0.95,
 				type: "price",
 				layer: winParent.layer,
 				z: winParent.z
@@ -225,23 +225,13 @@ export function addUpgrades(elementParent) {
 			tween(upgradeObj.scale, vec2(1.1), 0.15, (p) => upgradeObj.scale = p, easings.easeOutQuad)
 		
 			// tooltips
-			let textInBlink = upgradeObj.value != null ? `+${upgradeObj.value}` : `Cursors now click every ${upgradeObj.freq} seconds`;
+			let textInBlink = upgradeObj.value != null ? `+${upgradeObj.value}` : `Cursors now click every ${upgradeObj.freq} ${upgradeObj.freq > 1 ? "seconds" : "second"}`;
 			
 			if (!isUpgradeBought(upgradeObj.id)) {
 				if (upgradeObj.tooltip == null) {
 					upgradeTooltip = addPriceTooltip()
 					upgradeObj.manageBlinkText(textInBlink).addT()
 				}
-			}
-
-			// mouse animation
-			if (isUpgradeBought(upgradeObj.id) || GameState.score < upgradeObj.price) {
-				mouse.play("cursor")
-			}
-
-			// if the upgrade can be bought
-			else {
-				mouse.play("point")
 			}
 		})
 
@@ -305,6 +295,7 @@ export function addUpgrades(elementParent) {
 						text: "You have to buy the previous one",
 						textSize: upgradeObj.height / 2,
 						direction: "down",
+						lerpValue: 0.65,
 						type: "buypreviousupgrade",
 						layer: winParent.layer,
 						z: winParent.z
@@ -401,10 +392,6 @@ export function addUpgrades(elementParent) {
 		upgradeObj.on("dummyClick", () => {
 			tween(choose([-15, 15]), 0, 0.15, (p) => upgradeObj.angle = p, easings.easeOutQuint)
 			playSfx("clickButton", { detune: rand(-25, 25) })
-		})
-
-		upgradeObj.on("buy", () => {
-			mouse.play("cursor")
 		})
 
 		// draw dumb shadow

@@ -281,7 +281,7 @@ export function addHexagon() {
 					smallpanderito.vel.x = rand(30, 75)
 					
 					let randomColor = rgb(rand(0, 255), rand(0, 255), rand(0, 255))
-					smallpanderito.color = smallpanderito.color.lerp(randomColor, 0.1)
+					smallpanderito.color = blendColors(smallpanderito.color, randomColor, 0.1)
 					if (chance(0.5)) {
 						tween(smallpanderito.angle, smallpanderito.angle + 90, 1, (p) => smallpanderito.angle = p, )
 					}

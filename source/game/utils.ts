@@ -293,9 +293,16 @@ export function saveAnim() {
 	let toast = addToast({ icon: "floppy", title: "Game saved!", body: `Time played: ${toHHMMSS(GameState.stats.totalTimePlayed)}`, type: "gamesaved" })
 }
 
-export function randomPowerup() {
+/**
+ * @param natural Wheter the powerup is natural (if it's not it excludes the awesome powerup) 
+ * @returns A powerup from the powerups types
+ */
+export function randomPowerup(natural?:boolean) {
+	natural = natural || true
+	
 	let list = Object.keys(powerupTypes)
 	if (scoreManager.autoScorePerSecond() < 1) list.splice(list.indexOf("time"), 1)
+	if (natural != true) list.splice(list.indexOf("awesome"), 1) 
 	return choose(list) as powerup
 }
 
@@ -395,7 +402,7 @@ export function debugFunctions() {
 	
 		else if (isKeyPressed("f")) {
 			spawnPowerup({
-				type: randomPowerup(),
+				type: randomPowerup(true),
 				pos: mousePos()
 			})
 		}

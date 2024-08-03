@@ -253,7 +253,7 @@ export function addDeleteSaveButton(otherButtonsBg, winParent) {
 	
 	let deleteSaveButtonTooltip = null;
 	deleteSaveButton.startingHover(() => {
-		if (deleteSaveButton.tooltips == null) {
+		if (deleteSaveButton.tooltip == null) {
 			deleteSaveButtonTooltip = addTooltip(deleteSaveButton, {
 				direction: "up",
 				text: "WILL DELETE YOUR SAVE"
@@ -264,7 +264,6 @@ export function addDeleteSaveButton(otherButtonsBg, winParent) {
 	deleteSaveButton.endingHover(() => {
 		deleteSaveButton.count = 3
 		deleteSaveButtonTooltip.end()
-		deleteSaveButton.tooltips = null
 		deleteSaveButton.color = blendColors(WHITE, RED, 0.5)
 	})
 
