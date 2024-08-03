@@ -1,7 +1,7 @@
 import { Vec2 } from "kaplay";
 import { curDraggin } from "../../plugins/drag"
 
-const timeForHold = 0.1
+const timeForHold = 0.18
 
 export function openWindowButton() {
 	let lastPosClicked:Vec2;

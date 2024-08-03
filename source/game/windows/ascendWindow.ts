@@ -111,6 +111,18 @@ export function ascendWinContent(winParent) {
 		
 	})
 
+	let masked = winParent.add([
+		// mask("intersect"),
+		anchor("center"),
+		pos(),
+	])
+
+	winParent.add([
+		sprite("mage_body"),
+		anchor("center"),
+		pos(),
+	])
+
 	winParent.on("close", () => {
 		manaGainedCheck.cancel()
 	})

@@ -301,8 +301,8 @@ export function randomPowerup(natural?:boolean) {
 	natural = natural || true
 	
 	let list = Object.keys(powerupTypes)
-	if (scoreManager.autoScorePerSecond() < 1) list.splice(list.indexOf("time"), 1)
-	if (natural != true) list.splice(list.indexOf("awesome"), 1) 
+	if (scoreManager.autoScorePerSecond() < 1) list = list.splice(list.indexOf("time"), 1)
+	if (!natural == true) list = list.splice(list.indexOf("awesome"), 1) 
 	return choose(list) as powerup
 }
 

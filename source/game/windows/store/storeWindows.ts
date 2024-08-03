@@ -39,6 +39,8 @@ export function storeWinContent(winParent) {
 
 	// determines store pitch
 	winParent.onUpdate(() => {
+		if (!winParent.is("window")) return
+		
 		if (storePitchJuice.timeSinceBought < 1) {
 			storePitchJuice.timeSinceBought += dt()
 
@@ -158,6 +160,13 @@ export function storeWinContent(winParent) {
 		winParent.get("*", { recursive: true }).forEach(element => {
 			if (element.endHover) element.endHover()
 		});
+		
+		// i am going insane
+		let tooltips = get("tooltip").filter(tooltip => tooltip.type != undefined)
+		tooltips = tooltips.filter(obj => obj.type.includes("tutorial") || obj.type.includes("price") || obj.type.includes("store"))
+		tooltips.forEach((tooltip) => {
+			tooltip.end()
+		})
 	})
 
 	// lol!

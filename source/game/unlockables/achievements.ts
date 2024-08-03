@@ -437,14 +437,11 @@ export function checkForUnlockable() {
 }
 
 export function unlockAchievement(id:string) {
-	if (get("toast").filter(toast => toast.type == "achievement" && toast.title == getAchievement(id).title).length > 0) {
-		return
-	}
-	
+	GameState.unlockedAchievements.push(id)
+
 	let achievement = getAchievement(id)
 	
 	wait(achievement.timeAfter || 0, () => {
-		GameState.unlockedAchievements.push(id)
 
 		addToast({
 			icon: achievement.icon,

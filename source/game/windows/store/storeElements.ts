@@ -22,7 +22,7 @@ export let storeElementsInfo = {
 	},
 	"powerupsElement": { 
 		gamestateKey: "stats.powerupsBought",
-		basePrice: 25200,
+		basePrice: 50500,
 		percentageIncrease: 200,
 		unlockPrice: 10500
 	},
@@ -317,7 +317,8 @@ export function addStoreElement(winParent:any, opts:storeElementOpt) {
 			direction: "down",
 			lerpValue: 1,
 			layer: winParent.layer,
-			z: winParent.z
+			z: winParent.z,
+			type: "store",
 		})
 
 		const greenPrice = GREEN.lighten(30)
@@ -375,20 +376,33 @@ export function addStoreElement(winParent:any, opts:storeElementOpt) {
 	let stacksText = btn.add([
 		text("Stacked upgrades: 0", {
 			size: 14,
+			align: "left",
 		}),
-		anchor("center"),
-		pos(-100, 24),
+		anchor("left"),
+		pos(-155, 24),
 		color(BLACK),
 		z(btn.z + 1),
 		"stacksText",
 		{
 			update() {
 				if (opts.type == "clickersElement") {
-					this.text = `Stacked upgrades: ${GameState.clicksUpgradesValue == 1 ? GameState.clicksUpgradesValue - 1: GameState.clicksUpgradesValue}`
+					let percentage = `(+${GameState.clickPercentage}%)`
+					let stuff = [
+						`Stacked upgrades: ${GameState.clicksUpgradesValue == 1 ? GameState.clicksUpgradesValue - 1: GameState.clicksUpgradesValue}`,
+						`${GameState.clickPercentage < 1 ? "" : percentage}`
+					]
+
+					this.text = stuff.join(" ")
 				}
 
 				else if (opts.type == "cursorsElement") {
-					this.text = `Stacked upgrades: ${GameState.cursorsUpgradesValue == 1 ? GameState.cursorsUpgradesValue - 1: GameState.cursorsUpgradesValue}`
+					let percentage = `(+${GameState.cursorsPercentage}%)`
+					let stuff = [
+						`Stacked upgrades: ${GameState.cursorsPercentage == 1 ? GameState.cursorsPercentage - 1: GameState.cursorsPercentage}`,
+						`${GameState.clickPercentage < 1 ? "" : percentage}`
+					]
+
+					this.text = stuff.join(" ")
 				}
 
 				else if (opts.type == "powerupsElement") this.destroy()
@@ -399,9 +413,10 @@ export function addStoreElement(winParent:any, opts:storeElementOpt) {
 	let priceText = btn.add([
 		text("$50", {
 			size: 18,
+			align: "center",
 		}),
 		anchor("center"),
-		pos(stacksText.pos.x - 5, stacksText.pos.y + 15),
+		pos(-100, stacksText.pos.y + 15),
 		color(BLACK),
 		z(btn.z + 1),
 		{

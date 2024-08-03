@@ -610,6 +610,7 @@ function loadSprites() {
 	loadSprite("backcard", "sprites/ascendscene/backcard.png")
 	loadSprite("confirmAscension", "sprites/ascendscene/confirmAscension.png")
 
+	loadSprite("winMage_body", "sprites/windows/ascendWin/winMage_body.png")
 	loadSprite("gnome", "sprites/gnome.png")
 	loadSprite("pinch", "sprites/pinch.png")
 	//#endregion

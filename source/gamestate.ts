@@ -100,9 +100,9 @@ class _GameState {
 	cheat() {
 		this.clickers = 100
 		this.cursors = 100
-		this.score = scoreManager.ascensionConstant * 0.95
-		this.scoreThisRun = scoreManager.ascensionConstant * 0.95
-		this.scoreAllTime = scoreManager.ascensionConstant * 0.95
+		this.score = scoreManager.ascensionConstant
+		this.scoreThisRun = scoreManager.ascensionConstant
+		this.scoreAllTime = scoreManager.ascensionConstant
 	}
 }
 

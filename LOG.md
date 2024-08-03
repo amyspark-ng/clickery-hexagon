@@ -18,7 +18,6 @@ this game MIGHT be getting done
 - increase the prices of click upgrades and cursor upgrades
 ^ just a little
 - make cursors more powerful so you don't have to click too much
-- unified format time function
 - make the start ascending at 50 millions
 - everything is too easy to get but at the same time it's too hard
 - you shouldn't be able to buy awesome powerup
@@ -30,12 +29,7 @@ this game MIGHT be getting done
 ^ that's where you got to ascend
 - balance powerups they are TOOOO FUCKING OP TOOK ME 5 MINUTES REACH 70 MILLIONS
 
-<!-- code -->
-- KILL the multiple tooltips system, i hate this shit so much
-- tooltip is re added every time you hover upgrade
-
 <!-- graphics -->
-- add a slight retsu sound for stroe
 - change color of upgrades
 - you can see hexagon in ascend substate even if scale is 0
 - make it so spamming the powerup unlock store element is nicer

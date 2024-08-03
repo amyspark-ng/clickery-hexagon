@@ -35,7 +35,7 @@ type powerupOpt = {
 }
 
 let timerSpacing = 65
-function getTimerXPos(index:number) {
+function getTimerXPos(index:number) : number {
 	let initialPos = vec2(width() + timerSpacing / 2)
 	return getPosInGrid(initialPos, 0, -index - 1, vec2(timerSpacing, 0)).x
 }

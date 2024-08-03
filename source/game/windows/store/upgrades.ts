@@ -3,23 +3,24 @@ import { ROOT } from "../../../main";
 import { playSfx, sfxHandlers } from "../../../sound";
 import { addTooltip } from "../../additives";
 import { insideWindowHover } from "../../hovers/insideWindowHover";
+import { positionSetter } from "../../plugins/positionSetter";
 import { blendColors, bop, formatNumber, getPositionOfSide, getRandomDirection, insertAtStart, parseAnimation } from "../../utils";
 
 export let upgradeInfo = {
 	"k_0": { value: 2, price: 500 },
-	"k_1": { value: 4, price: 2_500 }, // TODO: look into this, between first and second there's a 5x gap, i think that's good
-	"k_2": { value: 8, price: 12_500 },
+	"k_1": { value: 4, price: 1_000 }, // TODO: look into this, between first and second there's a 5x gap, i think that's good
+	"k_2": { value: 8, price: 5_000 },
 	// ending
-	"k_3": { value: 16, price: 65_500,},
-	"k_4": { value: 32, price: 340_000,},
+	"k_3": { value: 16, price: 10_000,},
+	"k_4": { value: 32, price: 600_000,},
 	"k_5": { value: 64, price: 850_000,},
 	// freq
 	"c_0": { freq: 10 }, // 10 seconds
 	"c_1": { freq: 5, price: 100_000 }, // 5 seconds
 	"c_2": { freq: 1, price: 650_000 }, // 1 second
 	// cursor values
-	"c_3": { value: 16, price: 12_500 }, 
-	"c_4": { value: 32, price: 45_000 },
+	"c_3": { value: 16, price: 1_500 }, 
+	"c_4": { value: 32, price: 10_500 },
 	"c_5": { value: 64, price: 100_400 },
 }
 
@@ -83,6 +84,7 @@ export function addUpgrades(elementParent) {
 							anchor(alignment),
 							layer("windows"),
 							opacity(),
+							positionSetter(),
 							"blinkText",
 							{
 								upgradeId: thisUpgrade.id,
@@ -94,7 +96,8 @@ export function addUpgrades(elementParent) {
 						])
 	
 						if (thisUpgrade.value != null) {
-							blinkingText.pos = vec2(stacksText.screenPos().x + stacksText.width / 2 + 2, stacksText.screenPos().y - 2)
+							blinkingText.pos.x = 225
+							blinkingText.pos.y = stacksText.screenPos().y - 2
 						}
 						
 						else if (thisUpgrade.freq != null) {
@@ -296,7 +299,7 @@ export function addUpgrades(elementParent) {
 						textSize: upgradeObj.height / 2,
 						direction: "down",
 						lerpValue: 0.65,
-						type: "buypreviousupgrade",
+						type: "store",
 						layer: winParent.layer,
 						z: winParent.z
 					})
@@ -320,7 +323,7 @@ export function addUpgrades(elementParent) {
 						if (isUpgradeBought(upgradeObj.id)) return
 						if (upgradeObj.boughtProgress >= 5) {
 							
-							if (upgradeObj.tooltip.type == "holddowntobuy") {
+							if (upgradeObj.tooltip.type == "storeholddowntobuy") {
 								upgradeObj.tooltip.end()
 								addPriceTooltip()
 								// there's a tutorial tooltip, get rid of it
@@ -363,7 +366,7 @@ export function addUpgrades(elementParent) {
 					let tutorialTooltip = addTooltip(upgradeObj, {
 						text: "Hold down to buy!",
 						lerpValue: 0.75,
-						type: "holddowntobuy",
+						type: "storeholddowntobuy",
 						direction: "down",
 					})
 				}
