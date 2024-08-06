@@ -21,6 +21,7 @@ this game MIGHT be getting done
 - make the start ascending at 50 millions
 - everything is too easy to get but at the same time it's too hard
 - you shouldn't be able to buy awesome powerup
+- make cursors almost as powerful as clicks but make them more expensive
 
 <!-- ascension -->
 - takes 10-15-20 mins to reach 75 million of total score, that's good
@@ -36,3 +37,7 @@ this game MIGHT be getting done
 - add the mute dialogue option
 - make the color window (rework it code and graphic)
 	^ make both windows different files and make a different file for buttons and sliders
+
+- blinking text is on the wrong position
+- upgrade tutorial tooltip doesn't work
+- stacked upgrades text doesn't work for cursors

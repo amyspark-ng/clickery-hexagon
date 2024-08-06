@@ -2,7 +2,7 @@ import { clickVars } from "./game/hexagon"
 import { powerupTypes } from "./game/powerups"
 import { percentage, saveAnim } from "./game/utils"
 import { ROOT } from "./main"
-import { musicHandler, sfxHandlers, stopAllSounds } from "./sound"
+import { musicHandler, stopAllSounds } from "./sound"
 
 class _GameState {	
 	score = 0
@@ -67,6 +67,7 @@ class _GameState {
 	}
 
 	save(anim = true) {
+		if (this.score < 25) return
 		setData("hexagon-save", this)
 		if (anim) saveAnim()
 	}
@@ -186,11 +187,11 @@ class _scoreManager {
 	/**
 	 * This is the number you start getting mana at
 	 */
-	ascensionConstant = 50_000_000
+	ascensionConstant = 5_000_000
 
 	// Is the actual formula that determines the amounts you get mana at
 	getScoreForManaAT = (manaAllTime:number) => {
-		return (manaAllTime ** 0.15) * this.ascensionConstant
+		return (manaAllTime ** 0.35) * this.ascensionConstant
 	}
 
 	// The score you get the next mana at

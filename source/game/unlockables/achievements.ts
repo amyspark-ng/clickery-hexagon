@@ -70,7 +70,7 @@ class Achievement {
 	}
 }
 
-let fullUpgradeValues = {
+export let fullUpgradeValues = {
 	clicks: () => {
 		let sum = 0
 		Object.keys(upgradeInfo).forEach(key => {
@@ -83,7 +83,8 @@ let fullUpgradeValues = {
 	cursors: () => {
 		let sum = 0
 		Object.keys(upgradeInfo).forEach(key => {
-			if (key.includes("c_") && upgradeInfo[key].freq != null) {
+			// if the key includes C_ (is a cursor) and the freq is null (is not a frequency upgrade)
+			if (key.includes("c_") && upgradeInfo[key].freq == null) {
 				sum += upgradeInfo[key].value
 			}
 		});
@@ -155,6 +156,14 @@ achievements = [
 		description: "Get 50.000 of score",
 		icon: "upgrades.k_1",
 		condition: () => GameState.scoreAllTime >= 50000,
+	}),
+
+	new Achievement({
+		id: "millionscore",
+		title: "That's crazy",
+		description: "Get 1 million of score",
+		icon: "upgrades.k_1",
+		condition: () => GameState.scoreAllTime >= 1_000_000,
 	}),
 
 	new Achievement({

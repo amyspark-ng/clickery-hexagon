@@ -18,6 +18,7 @@ export let unlockableWindows = {
 	"statsWin": {
 		condition: () => GameState.score >= 60
 	},
+	// they're unlocked at the same time lol!
 	"extraWin": {
 		condition: () => GameState.score >= 150
 	},

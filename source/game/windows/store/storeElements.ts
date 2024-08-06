@@ -4,7 +4,7 @@ import { playSfx } from "../../../sound"
 import { ROOT } from "../../../main"
 import { bop, formatNumber, getPrice, getRandomDirection, getVariable, percentage, randomPos, randomPowerup } from "../../utils"
 import { addTooltip } from "../../additives"
-import { powerupTypes, spawnPowerup } from "../../powerups"
+import { isHoveringAPowerup, powerupTypes, spawnPowerup } from "../../powerups"
 import { isHoveringUpgrade, storeElements, storePitchJuice } from "./storeWindows"
 import { positionSetter } from "../.././plugins/positionSetter"
 import { insideWindowHover } from "../../hovers/insideWindowHover"
@@ -59,6 +59,7 @@ function regularStoreElement(winParent) {
 			thisElement = this
 
 			thisElement.onMousePress("left", () => {
+				if (isHoveringAPowerup == true) return
 				if (thisElement.isBeingHovered == false) return
 				if (!winParent.active) return
 				
@@ -96,6 +97,7 @@ function regularStoreElement(winParent) {
 			})
 		
 			thisElement.onMouseRelease(() => {
+				if (isHoveringAPowerup == true) return
 				if (!winParent.active) return
 				
 				downEvent?.cancel()
@@ -157,6 +159,7 @@ function lockedPowerupStoreElement(winParent:GameObj) {
 	
 			let downEvent = null;
 			thisElement.onMousePress("left", () => {
+				if (isHoveringAPowerup == true) return
 				if (thisElement.isBeingHovered == false) return
 				if (!winParent.active) return
 			
@@ -188,6 +191,7 @@ function lockedPowerupStoreElement(winParent:GameObj) {
 			})
 	
 			thisElement.onMouseRelease("left", () => {
+				if (isHoveringAPowerup == true) return
 				if (!winParent.active) return
 			
 				if (!thisElement.isHovering()) return;
@@ -354,7 +358,7 @@ export function addStoreElement(winParent:any, opts:storeElementOpt) {
 				basePrice: elementInfo.basePrice + (percentage(elementInfo.basePrice, elementInfo.percentageIncrease) * GameState.stats.timesAscended),
 				percentageIncrease: elementInfo.percentageIncrease,
 				objectAmount: amountBought,
-				amountToBuy: amountToBuy,
+				amountToBuy: opts.type == "powerupsElement" ? 1 : amountToBuy,
 				gifted: opts.type == "clickersElement" ? 1 : 0
 			}) * powerupTypes.store.multiplier
 		}
@@ -398,7 +402,7 @@ export function addStoreElement(winParent:any, opts:storeElementOpt) {
 				else if (opts.type == "cursorsElement") {
 					let percentage = `(+${GameState.cursorsPercentage}%)`
 					let stuff = [
-						`Stacked upgrades: ${GameState.cursorsPercentage == 1 ? GameState.cursorsPercentage - 1: GameState.cursorsPercentage}`,
+						`Stacked upgrades: ${GameState.cursorsUpgradesValue == 1 ? GameState.cursorsUpgradesValue - 1: GameState.cursorsUpgradesValue}`,
 						`${GameState.clickPercentage < 1 ? "" : percentage}`
 					]
 

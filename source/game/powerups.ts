@@ -213,18 +213,13 @@ export function addPowerupLog(powerupType) {
 	})
 }
 
+export let isHoveringAPowerup = false
 export function spawnPowerup(opts?:powerupOpt) {
 	if (ascension.ascending == true) return
 	if (opts == undefined) opts = {} as powerupOpt 
 
 	opts.type = opts.type || randomPowerup()
 	opts.pos = opts.pos || randomPos()
-
-	if (opts.type == "time") {
-		opts.time = opts.time || 60
-	}
-
-	else opts.time = opts.time || 10
 
 	let powerupObj = add([
 		sprite("white_noise"),
@@ -239,6 +234,7 @@ export function spawnPowerup(opts?:powerupOpt) {
 		z(0),
 		waver({ wave_speed: 1.25, maxAmplitude: 5, minAmplitude: 0 }),
 		area(),
+		"powerup",
 		{
 			whiteness: 0,
 			type: opts.type,
@@ -303,22 +299,24 @@ export function spawnPowerup(opts?:powerupOpt) {
 
 				if (opts.multiplier == null) {
 					if (opts.type == "clicks" || opts.type == "cursors") {
-						multiplier = randi(2, 7) * power
+						time = opts.time ?? rand(0.5, 1.5) * power
+						multiplier = randi(2, 5) * power
 					}
 					
 					else if (opts.type == "awesome") {
-						multiplier = randi(15, 20) * power
+						time = opts.time = randi(2.5, 5)
+						multiplier = randi(5, 10) * power
 					}
 
 					else if (opts.type == "time") {
 						multiplier = 1
-						time = opts.time ?? 60 * power
-						scoreManager.addTweenScore(scoreManager.scorePerSecond() * opts.time)
+						time = opts.time ?? rand(30, 60) * power
+						scoreManager.addTweenScore(scoreManager.scorePerSecond() * time)
 					}
 
 					else if (opts.type == "store") {
+						time = opts.time = randi(2.5, 5)
 						multiplier = rand(0.05, 0.25) / power
-						// multiplied by 0.75 so it's not too op
 					}
 				}
 
@@ -330,7 +328,7 @@ export function spawnPowerup(opts?:powerupOpt) {
 				}
 
 				powerupTypes[opts.type].multiplier = multiplier
-				powerupTypes[opts.type].removalTime = opts.time
+				powerupTypes[opts.type].removalTime = time
 				
 				addPowerupLog(opts.type)
 			}
@@ -348,10 +346,28 @@ export function spawnPowerup(opts?:powerupOpt) {
 	// events
 	powerupObj.onHover(() => {
 		powerupObj.startHover()
+	
+		query({
+			include: ["insideHover", "outsideHover"],
+			includeOp: "or",
+		}).forEach((obj) => {
+			if (obj.isBeingHovered == true) {
+				obj.endHoverFunction()
+			}
+		})
 	})
 
 	powerupObj.onHoverEnd(() => {
 		powerupObj.endHover()
+
+		query({
+			include: ["insideHover", "outsideHover"],
+			includeOp: "or",
+		}).forEach((obj) => {
+			if (obj.isHovering() == true && obj.isBeingHovered == false) {
+				obj.startHoverFunction()
+			}
+		})
 	})
 
 	powerupObj.onClick(() => {
@@ -401,5 +417,11 @@ export function powerupManagement() {
 				powerupTypes[powerup].multiplier = 1
 			}
 		}
+	}
+
+	// this runs on update, it's fine putting isHoveringAPowerup behaviour here
+	if ((get("powerup").length > 0)) {
+		// use isHovering and not isBeingHovered because powerups are on top of everything
+		isHoveringAPowerup = get("powerup").some((powerup) => powerup.isHovering())
 	}
 }

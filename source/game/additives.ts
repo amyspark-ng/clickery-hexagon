@@ -5,7 +5,6 @@ import { hexagon } from "./hexagon"
 import { blendColors, parseAnimation } from "./utils"
 import { allObjWindows, manageWindow } from "./windows/windows-api/windowManaging"
 import { isWindowUnlocked } from "./unlockables/unlockablewindows"
-import { checkForUnlockable } from "./unlockables/achievements"
 
 export let gameBg;
 export function addBackground() {
@@ -129,7 +128,6 @@ export function addToast(opts:toastOpts) {
 						destroy(toastBg);
 						processQueue();
 					});
-					checkForUnlockable()
 				},
 			},
 		]);

@@ -2,6 +2,7 @@ import { GameState, scoreManager } from "../../gamestate"
 import { ROOT } from "../../main"
 import { positionSetter } from ".././plugins/positionSetter"
 import { triggerAscension } from "../ascension/ascension"
+import { isHoveringAPowerup } from "../powerups"
 import { formatNumber } from "../utils"
 
 export function ascendWinContent(winParent) {
@@ -104,6 +105,7 @@ export function ascendWinContent(winParent) {
 	])
 	
 	button.onClick(() => {
+		if (isHoveringAPowerup == true) return
 		if (GameState.ascension.mana >= 1) triggerAscension()
 	})
 
@@ -112,12 +114,12 @@ export function ascendWinContent(winParent) {
 	})
 
 	let masked = winParent.add([
-		// mask("intersect"),
+		mask("subtract"),
 		anchor("center"),
 		pos(),
 	])
 
-	winParent.add([
+	masked.add([
 		sprite("mage_body"),
 		anchor("center"),
 		pos(),

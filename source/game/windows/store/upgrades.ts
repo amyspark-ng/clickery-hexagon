@@ -8,20 +8,20 @@ import { blendColors, bop, formatNumber, getPositionOfSide, getRandomDirection, 
 
 export let upgradeInfo = {
 	"k_0": { value: 2, price: 500 },
-	"k_1": { value: 4, price: 1_000 }, // TODO: look into this, between first and second there's a 5x gap, i think that's good
-	"k_2": { value: 8, price: 5_000 },
+	"k_1": { value: 4, price: 5_000 }, // TODO: look into this, between first and second there's a 5x gap, i think that's good
+	"k_2": { value: 8, price: 10_000 },
 	// ending
-	"k_3": { value: 16, price: 10_000,},
+	"k_3": { value: 16, price: 150_000,},
 	"k_4": { value: 32, price: 600_000,},
-	"k_5": { value: 64, price: 850_000,},
+	"k_5": { value: 64, price: 750_000,},
 	// freq
 	"c_0": { freq: 10 }, // 10 seconds
-	"c_1": { freq: 5, price: 100_000 }, // 5 seconds
-	"c_2": { freq: 1, price: 650_000 }, // 1 second
+	"c_1": { freq: 5, price: 250_000 }, // 5 seconds
+	"c_2": { freq: 1, price: 500_000 }, // 1 second
 	// cursor values
-	"c_3": { value: 16, price: 1_500 }, 
-	"c_4": { value: 32, price: 10_500 },
-	"c_5": { value: 64, price: 100_400 },
+	"c_3": { value: 16, price: 50_000 }, 
+	"c_4": { value: 32, price: 100_000 },
+	"c_5": { value: 64, price: 500_000 },
 }
 
 export function isUpgradeBought(id:string):boolean {
@@ -202,7 +202,7 @@ export function addUpgrades(elementParent) {
 
 		const addPriceTooltip = () => {
 			let tooltip = addTooltip(upgradeObj, {
-				text: `${formatNumber(upgradeObj.price, { price: true })}`,
+				text: `${formatNumber(upgradeObj.price, { price: true, fixAmount: 0 })}`,
 				textSize: upgradeObj.height / 2,
 				direction: "down",
 				lerpValue: 0.95,
@@ -361,7 +361,7 @@ export function addUpgrades(elementParent) {
 				// you're confused!!!!!
 
 				if (upgradeObj.boughtProgress < 1) {
-					upgradeObj.tooltip.end()
+					upgradeObj.tooltip?.end()
 
 					let tutorialTooltip = addTooltip(upgradeObj, {
 						text: "Hold down to buy!",

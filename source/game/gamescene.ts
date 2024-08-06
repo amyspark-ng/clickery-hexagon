@@ -8,10 +8,11 @@ import { windowsDefinition } from "./windows/windows-api/windowManaging.ts"
 import { songs } from "./windows/musicWindow.ts"
 import { DEBUG, ROOT } from "../main.ts"
 import { powerupManagement, spawnPowerup } from "./powerups.ts"
-import { checkForUnlockable, isAchievementUnlocked, unlockAchievement } from "./unlockables/achievements.ts"
+import { checkForUnlockable, fullUpgradeValues, isAchievementUnlocked, unlockAchievement } from "./unlockables/achievements.ts"
 import { ascension } from "./ascension/ascension.ts"
 import { folderObj, folderObjManaging } from "./windows/windows-api/folderObj.ts"
 import { curDraggin } from "./plugins/drag.ts"
+import { unlockableWindows } from "./unlockables/unlockablewindows.ts"
 
 let panderitoLetters = "panderito".split("")
 export let panderitoIndex = 0
@@ -287,6 +288,10 @@ export function triggerGnome() {
 
 export let hexagonIntro;
 export let hasStartedGame:boolean;
+
+// export const gamescene = () => scene("gamescene", () => {
+// 	// gamescene
+// })
 export function gamescene() {
 	return scene("gamescene", () => {
 		GameState.load() // loadSave()
@@ -330,7 +335,7 @@ export function gamescene() {
 
 			if (!GameState.hasUnlockedPowerups) {
 				ROOT.on("powerupunlock", () => {
-					wait(30, () => {
+					wait(10, () => {
 						naturalPowerupSpawningManagement()
 						spawnPowerup()
 					})
@@ -393,7 +398,7 @@ export function gamescene() {
 			GameState.score = Math.round(GameState.score)
 
 			// INCREASES MANA
-			if (GameState.scoreAllTime >= scoreManager.scoreYouGetNextManaAt()) {
+			if (GameState.scoreAllTime >= scoreManager.scoreYouGetNextManaAt() && unlockableWindows.ascendWin.condition() == true) {
 				GameState.ascension.mana++
 				GameState.ascension.manaAllTime++
 				ROOT.trigger("manaGained")
