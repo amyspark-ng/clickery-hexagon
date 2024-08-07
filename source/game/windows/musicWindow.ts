@@ -2,7 +2,7 @@ import { GameState } from "../../gamestate";
 import { waver } from ".././plugins/wave";
 import { musicHandler, playMusic, playSfx, scratchSong } from "../../sound";
 import { isAchievementUnlocked } from "../unlockables/achievements";
-import { bop, formatMusicTime } from "../utils";
+import { bop, formatTime } from "../utils";
 
 export let songs = {
 	"clicker.wav": { name: "clicker.wav", idx: 0, speed: 2.5, cover: "wav", duration: 61},
@@ -114,7 +114,8 @@ export function musicWinContent(winParent) {
 		{
 			verPosition: 50,
 			update() {
-				this.text = `${formatMusicTime(musicHandler.currentTime === undefined ? 0 : musicHandler.currentTime)}/${formatMusicTime(musicHandler.totalTime === undefined ? musicHandler.duration() : musicHandler.totalTime)}`
+				let time = `${formatTime(musicHandler.currentTime, false)}/${formatTime(musicHandler.totalTime === undefined ? musicHandler.duration() : musicHandler.totalTime, false)}`
+				this.text = time;
 				if (!musicHandler.winding) musicHandler.currentTime = map(progressBar.width, 0, theOneBehind.width, 0, musicHandler.duration())
 				if (!musicHandler.winding) musicHandler.totalTime = songs[Object.keys(songs)[currentSongIdx]].duration
 			},

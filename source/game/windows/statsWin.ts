@@ -1,7 +1,7 @@
 import { GameState } from "../../gamestate";
 import { positionSetter } from ".././plugins/positionSetter";
 import { achievements } from "../unlockables/achievements";
-import { formatNumber, formatNumberSimple, toHHMMSS } from "../utils";
+import { formatNumber, formatNumberSimple, formatTime } from "../utils";
 
 export function statsWinContent(winParent) {
 	let stats = [];
@@ -13,7 +13,7 @@ export function statsWinContent(winParent) {
 			{ "Powerups clicked": formatNumberSimple(GameState.stats.powerupsClicked) },
 			{ "Powerups bought": formatNumberSimple(GameState.stats.powerupsBought) },
 			{ "Achievements unlocked": `${GameState.unlockedAchievements.length}/${achievements.length}` },
-			{ "Total time played": toHHMMSS(Math.round(GameState.stats.totalTimePlayed)) },
+			{ "Total time played": formatTime(Math.round(GameState.stats.totalTimePlayed), true) },
 		]
 
 		if (GameState.stats.timesAscended > 0) {

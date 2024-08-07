@@ -1,13 +1,13 @@
 import { GameState, scoreManager } from "../gamestate.ts"
 import { addHexagon, hexagon } from "./hexagon.ts"
 import { buildingsText, scoreText, spsText, uiCounters } from "./uicounters.ts"
-import { arrayToColor, debugFunctions, formatNumber, randomPos, randomPowerup, toHHMMSS } from "./utils.ts"
+import { arrayToColor, debugFunctions, formatNumber, formatTime } from "./utils.ts"
 import { addToast, gameBg, mouse } from "./additives.ts"
 import { musicHandler, playMusic, playSfx, stopAllSounds } from "../sound.ts"
 import { windowsDefinition } from "./windows/windows-api/windowManaging.ts"
 import { songs } from "./windows/musicWindow.ts"
 import { DEBUG, ROOT } from "../main.ts"
-import { powerupManagement, spawnPowerup } from "./powerups.ts"
+import { powerupTimeManagement, spawnPowerup } from "./powerups.ts"
 import { checkForUnlockable, fullUpgradeValues, isAchievementUnlocked, unlockAchievement } from "./unlockables/achievements.ts"
 import { ascension } from "./ascension/ascension.ts"
 import { folderObj, folderObjManaging } from "./windows/windows-api/folderObj.ts"
@@ -19,7 +19,7 @@ export let panderitoIndex = 0
 
 let isTabActive = true; // Variable to track if the tab is currently active
 let totalTimeOutsideTab = 0; // Variable to store the total time the user has been outside of the tab ; Miliseconds
-let startTimeOutsideTab; // Variable to store the start time when the tab becomes inactive
+let startTimeOutsideTab:DOMHighResTimeStamp; // Variable to store the start time when the tab becomes inactive
 export let excessTime = 0; // Time that has passed after autoLoopTime
 
 export let autoLoopTime = 0;
@@ -145,26 +145,7 @@ function welcomeBack(idle = false) {
 
 	function addWelcomeBackToast(score:any, timeInSeconds:number) {
 		
-		// an hour is 3600 seconds
-		let times = "";
-		if (timeInSeconds > 3600) {
-			if (timeInSeconds < 3600 * 2) times = "hour"
-			else times = "hours"
-		}
-		
-		// minutes
-		else if (timeInSeconds > 60) {
-			if (timeInSeconds < 120) times = "min"
-			else times = "mins"
-		}
-		
-		// seconds
-		else if (timeInSeconds > 0) {
-			if (timeInSeconds < 2) times = "sec"
-			else times = "secs"
-		}
-
-		let body = `You were out for: ${toHHMMSS(timeInSeconds)} ${times}`; 
+		let body = `You were out for: ${formatTime(timeInSeconds, true)}`; 
 		if (score != null) body += `\n+${formatNumber(score)}` 
 		
 		let hasCombo = scoreManager.combo > 1
@@ -286,7 +267,7 @@ export function triggerGnome() {
 	GameState.stats.timesGnomed++
 }
 
-export let hexagonIntro;
+export let hexagonIntro:() => void;
 export let hasStartedGame:boolean;
 
 // export const gamescene = () => scene("gamescene", () => {
@@ -315,9 +296,7 @@ export function gamescene() {
 			// wait 60 seconds
 			wait(60, () => {
 				loop(120, () => {
-					if (GameState.scoreAllTime > 25) if (DEBUG == false) {
-						GameState.save(true)
-					}
+					if (GameState.scoreAllTime > 25) GameState.save(true)
 				})
 			})
 
@@ -424,18 +403,22 @@ export function gamescene() {
 
 			if (sleeping) timeSlept += dt()
 
-			powerupManagement()
+			powerupTimeManagement()
 		})
 
 		// #region OUTSIDE OF TAB STUFF
 		// Function to handle tab visibility change
 		function handleVisibilityChange() {
 			if (!hasStartedGame) return;
+			
 			if (document.hidden) {
 				// Tab becomes inactive
 				totalTimeOutsideTab = 0
 				isTabActive = false;
 				startTimeOutsideTab = performance.now(); // Store the start time when the tab becomes inactive
+				
+				// save just in case
+				GameState.save(false)
 			}
 		
 			else {
@@ -606,10 +589,6 @@ export function gamescene() {
 
 		ROOT.on("buy", (info) => {
 			checkForUnlockable()
-		})
-
-		ROOT.on("scoreGained", (amount) => {
-			// kill myself
 		})
 
 		if (DEBUG) debugFunctions()

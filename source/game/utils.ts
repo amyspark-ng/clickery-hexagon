@@ -4,10 +4,8 @@ import { addToast, mouse } from "./additives";
 import { autoLoopTime, cam, triggerGnome } from "./gamescene";
 import { hexagon } from "./hexagon";
 import { unlockAchievement } from "./unlockables/achievements";
-import { allObjWindows, openWindow } from "./windows/windows-api/windowManaging";
+import { openWindow } from "./windows/windows-api/windowManaging";
 import { powerup, powerupTypes, spawnPowerup } from "./powerups";
-import { songsListened } from "./windows/musicWindow";
-import { playSfx, sfxHandlers } from "../sound";
 
 // definetely not stack overflow
 // dots are always for thousands, leave it like this
@@ -98,10 +96,6 @@ export function formatNumber(value:number, opts?:formatNumberOpts):string {
 	return returnValue
 }
 
-export function formatMusicTime(timeInSeconds) {
-	return `${Math.floor(timeInSeconds / 60)}:${Math.floor(timeInSeconds % 60) < 10 ? '0' + Math.floor(timeInSeconds % 60) : Math.floor(timeInSeconds % 60)}`
-}
-
 export function arrToVec(arr:Array<number>): Vec2 {
 	let vector = vec2(arr[0], arr[1])
 	return vector;
@@ -112,8 +106,6 @@ export function arrToVec(arr:Array<number>): Vec2 {
 //   ccc
 //  r...
 //  r...
-
-
 /**
  * Function to get the position of an object in a grid, it works like this:
  * Row 0 and Column 0 mean initialPos btw
@@ -127,16 +119,50 @@ export function getPosInGrid(initialpos:Vec2, row:number, column:number, spacing
 	return vec2(initialpos.x + spacing.x * (column), initialpos.y + spacing.y * (row));
 }
 
-export function toHHMMSS(timeInSeconds:number) {
-    const hours = Math.floor(timeInSeconds / 3600);
-    const minutes = Math.floor((timeInSeconds % 3600) / 60);
-    const seconds = Math.floor(timeInSeconds % 60);
+/**
+ * Formats time
+ * @param time Time in seconds
+ * @param opts Options for formatting
+ */
+export function formatTime(time:number, includeWords:boolean) {
+	function toHHMMSS(timeInSeconds:number) {
+		const hours = Math.floor(timeInSeconds / 3600);
+		const minutes = Math.floor((timeInSeconds % 3600) / 60);
+		const seconds = Math.floor(timeInSeconds % 60);
+	
+		const formattedHours = hours > 0 ? `${hours}:` : '';
+		const formattedMinutes = hours > 0 ? `${minutes < 10 ? '0' + minutes : minutes}` : minutes;
+		const formattedSeconds = seconds < 10 ? '0' + seconds : seconds;
+	
+		return `${formattedHours}${formattedMinutes}:${formattedSeconds}`;
+	}
+	
+	let returnValue = toHHMMSS(time);
 
-    const formattedHours = hours > 0 ? `${hours}:` : '';
-    const formattedMinutes = hours > 0 ? `${minutes < 10 ? '0' + minutes : minutes}` : minutes;
-    const formattedSeconds = seconds < 10 ? '0' + seconds : seconds;
+	if (includeWords == true) {
+		// an hour is 3600 seconds
+		let timeName = "";
+		if (time > 3600) {
+			if (time < 3600 * 2) timeName = "hour"
+			else timeName = "hours"
+		}
+		
+		// minutes
+		else if (time > 60) {
+			if (time < 120) timeName = "min"
+			else timeName = "mins"
+		}
+		
+		// seconds
+		else if (time > 0) {
+			if (time < 2) timeName = "sec"
+			else timeName = "secs"
+		}
+	
+		returnValue = `${returnValue} ${timeName}`
+	}
 
-    return `${formattedHours}${formattedMinutes}:${formattedSeconds}`;
+	return returnValue;
 }
 
 /**
@@ -290,14 +316,14 @@ export function setVariable(obj, path, value) {
 }
 
 export function saveAnim() {
-	let toast = addToast({ icon: "floppy", title: "Game saved!", body: `Time played: ${toHHMMSS(GameState.stats.totalTimePlayed)}`, type: "gamesaved" })
+	let toast = addToast({ icon: "floppy", title: "Game saved!", body: `Time played: ${formatTime(GameState.stats.totalTimePlayed, true)}`, type: "gamesaved" })
 }
 
 /**
  * @param natural Wheter the powerup is natural (if it's not it excludes the awesome powerup) 
  * @returns A powerup from the powerups types
  */
-export function randomPowerup(natural?:boolean) {
+export function getRandomPowerup(natural?:boolean) {
 	natural = natural || true
 	
 	let list = Object.keys(powerupTypes)
@@ -402,7 +428,7 @@ export function debugFunctions() {
 	
 		else if (isKeyPressed("f")) {
 			spawnPowerup({
-				type: randomPowerup(true),
+				type: getRandomPowerup(true),
 				pos: mousePos()
 			})
 		}

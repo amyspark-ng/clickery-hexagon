@@ -349,7 +349,16 @@ achievements = [
 		description: "Ascend for the fifth time",
 		icon: "icon_ascend",
 		condition: () => GameState.stats.timesAscended >= 5,
-		secretCondition: () => GameState.stats.timesAscended >= 5,
+		secretCondition: () => GameState.stats.timesAscended >= 1,
+	}),
+
+	new Achievement({
+		id: "ascend10time",
+		title: "I am the clickery...",
+		description: "Ascend for the tenth time",
+		icon: "icon_ascend",
+		condition: () => GameState.stats.timesAscended >= 10,
+		secretCondition: () => GameState.stats.timesAscended >= 1,
 	}),
 	// #endregion ASCENSION ACHIEVEMENTS =====================
 

@@ -2,7 +2,7 @@ import { GameObj, Vec2 } from "kaplay"
 import { GameState, scoreManager } from "../../../gamestate"
 import { playSfx } from "../../../sound"
 import { ROOT } from "../../../main"
-import { bop, formatNumber, getPrice, getRandomDirection, getVariable, percentage, randomPos, randomPowerup } from "../../utils"
+import { bop, formatNumber, getPrice, getRandomDirection, getVariable, percentage, randomPos, getRandomPowerup } from "../../utils"
 import { addTooltip } from "../../additives"
 import { isHoveringAPowerup, powerupTypes, spawnPowerup } from "../../powerups"
 import { isHoveringUpgrade, storeElements, storePitchJuice } from "./storeWindows"
@@ -23,7 +23,7 @@ export let storeElementsInfo = {
 	"powerupsElement": { 
 		gamestateKey: "stats.powerupsBought",
 		basePrice: 50500,
-		percentageIncrease: 200,
+		percentageIncrease: 160,
 		unlockPrice: 10500
 	},
 }
@@ -302,7 +302,7 @@ export function addStoreElement(winParent:any, opts:storeElementOpt) {
 				if (opts.type == "powerupsElement") {
 					spawnPowerup({
 						pos: randomPos(),
-						type: randomPowerup(false),
+						type: getRandomPowerup(false),
 					})
 					GameState.stats.powerupsBought++
 				}
@@ -352,15 +352,18 @@ export function addStoreElement(winParent:any, opts:storeElementOpt) {
 		else {
 			const amountBought = getVariable(GameState, storeElementsInfo[opts.type].gamestateKey) 
 	
+			let priceMultiplier = 1
+			if (opts.type != "powerupsElement") priceMultiplier = powerupTypes.store.multiplier
+			
 			// price
 			const elementInfo = storeElementsInfo[opts.type]
 			btn.price = getPrice({
-				basePrice: elementInfo.basePrice + (percentage(elementInfo.basePrice, elementInfo.percentageIncrease) * GameState.stats.timesAscended),
+				basePrice: elementInfo.basePrice,
 				percentageIncrease: elementInfo.percentageIncrease,
 				objectAmount: amountBought,
 				amountToBuy: opts.type == "powerupsElement" ? 1 : amountToBuy,
 				gifted: opts.type == "clickersElement" ? 1 : 0
-			}) * powerupTypes.store.multiplier
+			}) * priceMultiplier
 		}
 	})
 	

@@ -2,7 +2,7 @@ import { TextCompOpt, Vec2 } from "kaplay"
 import { waver } from "./plugins/wave";
 import { playSfx } from "../sound";
 import { GameState, scoreManager } from "../gamestate";
-import { bop, formatMusicTime, formatNumber, getPosInGrid, parseAnimation, randomPos, randomPowerup } from "./utils";
+import { bop, formatNumber, getPosInGrid, parseAnimation, randomPos, getRandomPowerup } from "./utils";
 import { positionSetter } from "./plugins/positionSetter";
 import { checkForUnlockable } from "./unlockables/achievements";
 import { ascension } from "./ascension/ascension";
@@ -187,7 +187,7 @@ export function addPowerupLog(powerupType) {
 				if (powerupType == "clicks") textInText = `Click production increased x${powerupMultiplier} for ${powerupTime} secs`
 				else if (powerupType == "cursors") textInText = `Cursors production increased x${powerupMultiplier} for ${powerupTime} secs`
 				else if (powerupType == "time") {
-					textInText = `+${formatNumber(scoreManager.autoScorePerSecond() * powerupTime)}, the score you would have gained in ${powerupTime} secs`
+					textInText = `+${formatNumber(Math.round(scoreManager.autoScorePerSecond()) * powerupTime)}, the score you would have gained in ${powerupTime} secs`
 				}
 				else if (powerupType == "awesome") textInText = `Score production increased by x${powerupMultiplier} for ${powerupTime}, AWESOME!!`
 				else if (powerupType == "store") textInText = `Store prices have a discount of ${Math.round(powerupMultiplier * 100)}% for ${powerupTime} secs, get em' now!`
@@ -218,7 +218,7 @@ export function spawnPowerup(opts?:powerupOpt) {
 	if (ascension.ascending == true) return
 	if (opts == undefined) opts = {} as powerupOpt 
 
-	opts.type = opts.type || randomPowerup()
+	opts.type = opts.type || getRandomPowerup()
 	opts.pos = opts.pos || randomPos()
 
 	let powerupObj = add([
@@ -299,24 +299,26 @@ export function spawnPowerup(opts?:powerupOpt) {
 
 				if (opts.multiplier == null) {
 					if (opts.type == "clicks" || opts.type == "cursors") {
-						time = opts.time ?? rand(0.5, 1.5) * power
+						time = opts.time ?? randi(5, 15)
 						multiplier = randi(2, 5) * power
 					}
 					
+					// op powerups
 					else if (opts.type == "awesome") {
-						time = opts.time = randi(2.5, 5)
+						time = opts.time ?? randi(2.5, 5)
 						multiplier = randi(5, 10) * power
 					}
 
+					else if (opts.type == "store") {
+						time = opts.time ?? randi(2.5, 5)
+						multiplier = rand(0.05, 0.25) / power
+					}
+
+					// patience
 					else if (opts.type == "time") {
 						multiplier = 1
 						time = opts.time ?? rand(30, 60) * power
 						scoreManager.addTweenScore(scoreManager.scorePerSecond() * time)
-					}
-
-					else if (opts.type == "store") {
-						time = opts.time = randi(2.5, 5)
-						multiplier = rand(0.05, 0.25) / power
 					}
 				}
 
@@ -406,7 +408,7 @@ export function spawnPowerup(opts?:powerupOpt) {
 
 }
 
-export function powerupManagement() {
+export function powerupTimeManagement() {
 	for (let powerup in powerupTypes) {
 		if (powerupTypes[powerup].removalTime != null) {
 			if (powerup != "time") powerupTypes[powerup].removalTime -= dt()
