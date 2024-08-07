@@ -5,7 +5,7 @@ import { autoLoopTime, cam, triggerGnome } from "./gamescene";
 import { hexagon } from "./hexagon";
 import { unlockAchievement } from "./unlockables/achievements";
 import { openWindow } from "./windows/windows-api/windowManaging";
-import { powerup, powerupTypes, spawnPowerup } from "./powerups";
+import { spawnPowerup } from "./powerups";
 
 // definetely not stack overflow
 // dots are always for thousands, leave it like this
@@ -142,6 +142,7 @@ export function formatTime(time:number, includeWords:boolean) {
 	if (includeWords == true) {
 		// an hour is 3600 seconds
 		let timeName = "";
+		
 		if (time > 3600) {
 			if (time < 3600 * 2) timeName = "hour"
 			else timeName = "hours"
@@ -316,20 +317,7 @@ export function setVariable(obj, path, value) {
 }
 
 export function saveAnim() {
-	let toast = addToast({ icon: "floppy", title: "Game saved!", body: `Time played: ${formatTime(GameState.stats.totalTimePlayed, true)}`, type: "gamesaved" })
-}
-
-/**
- * @param natural Wheter the powerup is natural (if it's not it excludes the awesome powerup) 
- * @returns A powerup from the powerups types
- */
-export function getRandomPowerup(natural?:boolean) {
-	natural = natural || true
-	
-	let list = Object.keys(powerupTypes)
-	if (scoreManager.autoScorePerSecond() < 1) list = list.splice(list.indexOf("time"), 1)
-	if (!natural == true) list = list.splice(list.indexOf("awesome"), 1) 
-	return choose(list) as powerup
+	addToast({ icon: "floppy", title: "Game saved!", body: `Time played: ${formatTime(GameState.stats.totalTimePlayed, true)}`, type: "gamesaved" })
 }
 
 export function randomPos() {
@@ -428,8 +416,8 @@ export function debugFunctions() {
 	
 		else if (isKeyPressed("f")) {
 			spawnPowerup({
-				type: getRandomPowerup(true),
-				pos: mousePos()
+				pos: mousePos(),
+				natural: true,
 			})
 		}
 

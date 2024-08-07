@@ -76,12 +76,11 @@ export function addUpgrades(elementParent) {
 						let stacksText = thisUpgrade.parent.get("stacksText")[0]
 					
 						// blinking
-						let alignment = thisUpgrade.value != null ? "left" : "right" as any;
-						let blinkingText = add([
-							text("+0", { align: alignment, size: stacksText.textSize + 4 }),
+						let blinkingText = elementParent.add([
+							text("+0", { align: "left", size: stacksText.textSize + 4 }),
 							pos(),
 							color(BLACK),
-							anchor(alignment),
+							anchor("left"),
 							layer("windows"),
 							opacity(),
 							positionSetter(),
@@ -95,18 +94,21 @@ export function addUpgrades(elementParent) {
 							}
 						])
 	
-						if (thisUpgrade.value != null) {
-							blinkingText.pos.x = 225
-							blinkingText.pos.y = stacksText.screenPos().y - 2
+						// is a regular upgraade
+						if (thisUpgrade.freq == null) {
+							blinkingText.pos.x = -56
+							blinkingText.pos.y = stacksText.pos.y - 15
 						}
-						
-						else if (thisUpgrade.freq != null) {
-							blinkingText.pos = vec2(thisUpgrade.screenPos().x, thisUpgrade.screenPos().y)
+
+						// frequency
+						else {
+							blinkingText.pos.x = -56
+							blinkingText.pos.y = 56
 						}
 					}
 
 					function end() {
-						get("blinkText").filter((t) => t.upgradeId == thisUpgrade.id).forEach((t) => t.destroy())
+						elementParent.get("blinkText", { recursive: true }).filter((t) => t.upgradeId == thisUpgrade.id).forEach((t) => t.destroy())
 					}
 
 					return { addT, end }
@@ -228,7 +230,7 @@ export function addUpgrades(elementParent) {
 			tween(upgradeObj.scale, vec2(1.1), 0.15, (p) => upgradeObj.scale = p, easings.easeOutQuad)
 		
 			// tooltips
-			let textInBlink = upgradeObj.value != null ? `+${upgradeObj.value}` : `Cursors now click every ${upgradeObj.freq} ${upgradeObj.freq > 1 ? "seconds" : "second"}`;
+			let textInBlink = upgradeObj.value != null ? `+${upgradeObj.value}` : `Clicks every ${upgradeObj.freq} ${upgradeObj.freq > 1 ? "seconds" : "second"}`;
 			
 			if (!isUpgradeBought(upgradeObj.id)) {
 				if (upgradeObj.tooltip == null) {

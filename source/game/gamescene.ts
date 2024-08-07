@@ -424,6 +424,7 @@ export function gamescene() {
 			else {
 				if (!isTabActive) {
 					isTabActive = true
+					GameState.save(false)
 					
 					// If the tab was previously inactive, calculate the time outside the tab and update the total time
 					const timeOutsideTab = performance.now() - startTimeOutsideTab;

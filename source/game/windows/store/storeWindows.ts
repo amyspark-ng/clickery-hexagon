@@ -1,8 +1,6 @@
 import { GameState } from "../../../gamestate";
 import { ROOT } from "../../../main";
-import { positionSetter } from "../.././plugins/positionSetter";
-import { addTooltip, mouse } from "../../additives";
-import { cam } from "../../gamescene";
+import { addTooltip } from "../../additives";
 import { addStoreElement, storeElementsInfo } from "./storeElements";
 import { addUpgrades, isUpgradeBought, upgradeInfo } from "./upgrades";
 

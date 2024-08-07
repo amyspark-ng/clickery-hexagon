@@ -305,6 +305,7 @@ export function maxComboAnim() {
 		spawnPowerup({
 			type: "awesome",
 			pos: randomPos(),
+			natural: true,
 		})
 	}
 }

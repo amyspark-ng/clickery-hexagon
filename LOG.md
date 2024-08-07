@@ -28,10 +28,8 @@ this game MIGHT be getting done
 - add the mute dialogue option
 - make the color window (rework it code and graphic)
 	^ make both windows different files and make a different file for buttons and sliders
-- blab powerup (you click it and it's random funny messages)
 
 - the fucking thing where powerup logs come again and again and again
-- blinking text is on the wrong position
 - upgrade tutorial tooltip doesn't work
 - figure out why does the game crash sometimes when coming back (probably related to kaplay CPU usage)
-- do tutorial for ascending (how i don't know)
+- do tutorial for ascending (how i don'gt know)

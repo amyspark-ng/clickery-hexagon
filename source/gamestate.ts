@@ -210,6 +210,8 @@ class _scoreManager {
 		tween(GameState.clicksUpgradesValue, 1, 0.5, (p) => GameState.clicksUpgradesValue = Math.round(p), easings.easeOutQuad)
 		tween(GameState.cursorsUpgradesValue, 1, 0.5, (p) => GameState.cursorsUpgradesValue = Math.round(p), easings.easeOutQuad)
 		
+		GameState.stats.powerupsBought = 0
+
 		GameState.upgradesBought = ["c_0"]
 		GameState.timeUntilAutoLoopEnds = 10
 	}

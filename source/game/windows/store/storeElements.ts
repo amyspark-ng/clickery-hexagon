@@ -2,7 +2,7 @@ import { GameObj, Vec2 } from "kaplay"
 import { GameState, scoreManager } from "../../../gamestate"
 import { playSfx } from "../../../sound"
 import { ROOT } from "../../../main"
-import { bop, formatNumber, getPrice, getRandomDirection, getVariable, percentage, randomPos, getRandomPowerup } from "../../utils"
+import { bop, formatNumber, getPrice, getRandomDirection, getVariable, percentage, randomPos } from "../../utils"
 import { addTooltip } from "../../additives"
 import { isHoveringAPowerup, powerupTypes, spawnPowerup } from "../../powerups"
 import { isHoveringUpgrade, storeElements, storePitchJuice } from "./storeWindows"
@@ -302,7 +302,7 @@ export function addStoreElement(winParent:any, opts:storeElementOpt) {
 				if (opts.type == "powerupsElement") {
 					spawnPowerup({
 						pos: randomPos(),
-						type: getRandomPowerup(false),
+						natural: false,
 					})
 					GameState.stats.powerupsBought++
 				}
@@ -359,7 +359,7 @@ export function addStoreElement(winParent:any, opts:storeElementOpt) {
 			const elementInfo = storeElementsInfo[opts.type]
 			btn.price = getPrice({
 				basePrice: elementInfo.basePrice,
-				percentageIncrease: elementInfo.percentageIncrease,
+				percentageIncrease: elementInfo.percentageIncrease + 1 * GameState.stats.timesAscended,
 				objectAmount: amountBought,
 				amountToBuy: opts.type == "powerupsElement" ? 1 : amountToBuy,
 				gifted: opts.type == "clickersElement" ? 1 : 0
@@ -472,7 +472,6 @@ export function addStoreElement(winParent:any, opts:storeElementOpt) {
 			color(BLACK),
 			opacity(0.45),
 			z(btn.z + 1),
-			positionSetter(),
 			{
 				update() {
 					if (GameState.hasUnlockedPowerups == false) this.destroy() 

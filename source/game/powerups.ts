@@ -2,36 +2,53 @@ import { TextCompOpt, Vec2 } from "kaplay"
 import { waver } from "./plugins/wave";
 import { playSfx } from "../sound";
 import { GameState, scoreManager } from "../gamestate";
-import { bop, formatNumber, getPosInGrid, parseAnimation, randomPos, getRandomPowerup } from "./utils";
+import { bop, formatNumber, getPosInGrid, parseAnimation, randomPos } from "./utils";
 import { positionSetter } from "./plugins/positionSetter";
 import { checkForUnlockable } from "./unlockables/achievements";
 import { ascension } from "./ascension/ascension";
 
-/*
-types of powerups
-	clicks: makes clicks more powerful
-	cursors: makes cursors more powerful
-	time: gives you the score you would have gotten in 1 minutes
-	awesome: increases production by a lot
-	store: makes everything cheaper
-	bad: could have the opposite of the effects before, or could increase them by A LOT
-*/
-
 export let powerupTypes = {
+	/**
+	 * Makes clicks more powerful
+	 */
 	"clicks": { sprite: "cursors.cursor", multiplier: 1, removalTime: null, color: [199, 228, 255] },
+	/**
+	 * Makes cursors more powerful
+	 */
 	"cursors": { sprite: "cursors.point", multiplier: 1, removalTime: null, color: [199, 252, 197] },
+	/**
+	 * Gives you the score you would have gotten in X amount of time
+	 */
 	"time": { sprite: "cursors.wait", multiplier: 1, removalTime: null, color: [247, 242, 193] },
+	/**
+	 * Increses production
+	 */
 	"awesome": { sprite: "cursors.check", multiplier: 1, removalTime: null, color: [227, 190, 247]} ,
+	/**
+	 * Gives discounts for clickers and cursors
+	 */
 	"store": { sprite: "icon_store", multiplier: 1, removalTime: null, color: [195, 250, 162] },
+	/**
+	 * Is just silly, very silly
+	 */
+	"blab": { sprite: "panderito", multiplier: 1, removalTime: null },
 }
+
+let blabPhrases = [
+	"lol!",
+	"Why did you click me?",
+	"IT HAD A FAMILY",
+	"Clicking since 1999",
+]
 
 export type powerup = keyof typeof powerupTypes
 
 type powerupOpt = {
-	type: powerup;
+	type?: powerup;
 	pos: Vec2,
 	multiplier?: number,
 	time?: number,
+	natural?: boolean,
 }
 
 let timerSpacing = 65
@@ -105,7 +122,7 @@ function addTimer(opts:{ sprite: string, type: string }) {
 	timerObj.onClick(() => {
 		if (get(`poweruplog_${opts.type}`).length == 0) {
 			bop(timerObj)
-			addPowerupLog(opts.type)
+			addPowerupLog(opts.type as powerup)
 		}
 	})
 
@@ -144,9 +161,11 @@ function addTimer(opts:{ sprite: string, type: string }) {
 	])
 }
 
-export function addPowerupLog(powerupType) {
+export function addPowerupLog(powerupType:powerup) {
 	let powerupTime = powerupTypes[powerupType].removalTime
 	let textInText = ""
+
+	if (powerupType == "blab") textInText = choose(blabPhrases)
 
 	let bgOpacity = 0.95
 	let bg = add([
@@ -191,6 +210,8 @@ export function addPowerupLog(powerupType) {
 				}
 				else if (powerupType == "awesome") textInText = `Score production increased by x${powerupMultiplier} for ${powerupTime}, AWESOME!!`
 				else if (powerupType == "store") textInText = `Store prices have a discount of ${Math.round(powerupMultiplier * 100)}% for ${powerupTime} secs, get em' now!`
+				else if (powerupType == "blab") textInText = textInText
+				
 				else throw new Error("powerup type doesn't exist");
 
 				this.text = textInText
@@ -206,7 +227,7 @@ export function addPowerupLog(powerupType) {
 	tween(0, bgOpacity, 0.5, (p) => bg.opacity = p, easings.easeOutQuad)
 	tween(height() + bg.height, height() - bg.height, 0.5, (p) => bg.pos.y = p, easings.easeOutQuad)
 
-	wait(2.5, () => {
+	wait(3.5, () => {
 		tween(bg.pos.y, bg.pos.y - bg.height, 0.5, (p) => bg.pos.y = p, easings.easeOutQuad)
 		bg.fadeOut(0.5).onEnd(() => destroy(bg))
 		tween(textInBg.opacity, 0, 0.5, (p) => textInBg.opacity = p, easings.easeOutQuad)
@@ -218,13 +239,25 @@ export function spawnPowerup(opts?:powerupOpt) {
 	if (ascension.ascending == true) return
 	if (opts == undefined) opts = {} as powerupOpt 
 
+	function getRandomPowerup() {
+		let list = Object.keys(powerupTypes)
+		
+		if (Math.round(scoreManager.autoScorePerSecond()) < 1) list.splice(list.indexOf("time"), 1)
+		if (opts.natural == false) list.splice(list.indexOf("awesome"), 1) 
+		
+		let element = choose(list) as powerup
+		if (chance(0.2) && opts.natural == false) element = "blab"
+		
+		return element;
+	}
+
 	opts.type = opts.type || getRandomPowerup()
 	opts.pos = opts.pos || randomPos()
 
 	let powerupObj = add([
 		sprite("white_noise"),
 		pos(opts.pos),
-		scale(3),
+		scale(1),
 		area(),
 		anchor("center"),
 		opacity(),
@@ -273,6 +306,9 @@ export function spawnPowerup(opts?:powerupOpt) {
 					}
 				])
 
+				blink.width = this.width
+				blink.height = this.height
+
 				parseAnimation(blink, powerupTypes[opts.type].sprite)
 
 				let timeToLeave = 0.75
@@ -320,6 +356,13 @@ export function spawnPowerup(opts?:powerupOpt) {
 						time = opts.time ?? rand(30, 60) * power
 						scoreManager.addTweenScore(scoreManager.scorePerSecond() * time)
 					}
+
+					// lol!
+					else if (opts.type == "blab") {
+						multiplier = 1
+						time = 1
+						scoreManager.addScore(1)
+					}
 				}
 
 				if (opts.type != "time") {
@@ -340,6 +383,9 @@ export function spawnPowerup(opts?:powerupOpt) {
 	// other stuff
 	parseAnimation(powerupObj, powerupTypes[opts.type].sprite)
 	powerupObj.startWave()
+
+	powerupObj.width = 60
+	powerupObj.height = 60
 
 	// spawn anim
 	tween(vec2(powerupObj.maxScale).sub(0.4), vec2(powerupObj.maxScale), 0.25, (p) => powerupObj.scale = p, easings.easeOutBack)
