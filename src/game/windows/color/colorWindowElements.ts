@@ -5,6 +5,8 @@ import { blendColors, bop, getPositionOfSide } from "../../utils"
 import { playSfx } from "../../../sound"
 import { saveColor } from "../../../gamestate"
 import { drawDamnShadow } from "../../plugins/drawDamnShadow"
+import { insideWindowHover } from "../../hovers/insideWindowHover"
+import { mouse } from "../../additives"
 
 const SLIDER_HANDLE_LERP = 0.2
 
@@ -53,6 +55,9 @@ export function addSlider(opts: sliderOpts) : sliderInterface {
 	let value = opts.value
 	let previousValue = value
 
+	let winParent = opts.parent;
+	opts.parent.onUpdate(() => winParent = opts.parent)
+
 	let fullColor = Color.fromArray(sliderColors[opts.color].full)
 	let dullColor = Color.fromArray(sliderColors[opts.color].dull)
 
@@ -63,11 +68,12 @@ export function addSlider(opts: sliderOpts) : sliderInterface {
 		}
 	}
 
-	let content = opts.parent.add([
-		rect(opts.parent.width - 40, 18, { radius: 10 }),
+	let content = winParent.add([
+		rect(winParent.width - 40, 18, { radius: 10 }),
 		color(),
 		pos(opts.pos),
 		anchor("left"),
+		drawDamnShadow(2, 2, 0.5),
 		{
 			update() {
 				let blendFactor = map(value, opts.range[0], opts.range[1], 0, 1)
@@ -81,13 +87,16 @@ export function addSlider(opts: sliderOpts) : sliderInterface {
 	let leftSideOfContent = content.pos.x
 	let rightSideOfContent = content.pos.x + content.width
 
-	let button = opts.parent.add([
+	let button = winParent.add([
 		sprite("hexColorHandle"),
 		anchor("center"),
 		rotate(0),
 		pos(0, content.pos.y),
 		area(),
+		scale(),
 		drag(true),
+		insideWindowHover(winParent),
+		drawDamnShadow(2, 2, 0.5),
 		{
 			update() {
 				this.pos.y = content.pos.y
@@ -115,19 +124,49 @@ export function addSlider(opts: sliderOpts) : sliderInterface {
 				this.color = mappedColor
 
 				triggerOnValueChange()
-			}
+			},
+
+			releaseDrop() {
+				curDraggin?.trigger("dragEnd")
+				setCurDraggin(null)
+			},
 		}
 	])
 
+	button.startingHover(() => {
+		tween(vec2(1), vec2(1.2), 0.15, (p) => button.scale = p)
+		mouse.play("point")
+	})
+
+	button.endingHover(() => {
+		tween(vec2(1.2), vec2(1), 0.15, (p) => button.scale = p)
+		mouse.play("cursor")
+	})
+
 	button.onClick(() => {
+		if (!winParent.active) return;
 		button.pick()
+		mouse.grab()
+
+		winParent.canClose = false
 	})
 
 	button.onMouseRelease(() => {
-		if (curDraggin && curDraggin === button) {
-			curDraggin?.trigger("dragEnd")
-			setCurDraggin(null)
+		if (!winParent.active) return;
+		if (button.isBeingHovered == false) return
+		button.releaseDrop()
+
+		if (button.isHovering() == true) {
+			button.startHoverFunction()
+			mouse.releaseAndPlay("point")
 		}
+
+		else {
+			mouse.releaseAndPlay("cursor")
+			button.endHoverFunction()
+		}
+
+		winParent.canClose = true
 	})
 
 	return {
@@ -159,7 +198,7 @@ export function addDefaultButton(position: Vec2, parent: GameObj, sliders: slide
 		color(),
 		scale(),
 		anchor("center"),
-		drawDamnShadow(0, 4, 0.5),
+		drawDamnShadow(2, 2, 0.5),
 	])
 
 	defaultButton.onClick(() => {
@@ -185,7 +224,7 @@ export function addRandomButton(position: Vec2, parent: GameObj, sliders: slider
 		anchor("center"),
 		color(),
 		scale(),
-		drawDamnShadow(0, 4, 0.5),
+		drawDamnShadow(2, 2, 0.5),
 	])
 
 	randomButton.onClick(() => {
@@ -228,6 +267,7 @@ export function addNumbers(position: Vec2, parent: GameObj, objSaveColor: saveCo
 		}),
 		pos(position),
 		anchor("left"),
+		drawDamnShadow(2, 2, 0.5),
 		{
 			update() {
 				let stuff = []

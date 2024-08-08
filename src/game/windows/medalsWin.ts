@@ -98,7 +98,7 @@ export function medalsWinContent(winParent) {
 				// is not secret
 				if (achievement.secretCondition == null) texting = achievement.description
 				// is secret
-				else texting = "This achievement is secret"
+				else texting = "This achievement is secret\nFor now..."
 			}
 
 			// is unlocked

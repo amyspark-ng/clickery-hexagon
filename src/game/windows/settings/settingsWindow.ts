@@ -1,6 +1,6 @@
 import { GameState } from "../../../gamestate"
 import { ROOT } from "../../../main";
-import { addCheckbox, addDeleteSaveButton, addVolumeControl } from "./uielements"
+import { addCheckbox, addDeleteSaveButton, addVolumeControl } from "./settingsWinElements"
 
 let otherCheckboxesBg:any;
 let otherButtonsBg:any;

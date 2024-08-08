@@ -1,10 +1,11 @@
 // =========================
 // INSIDE HOVER WINDOW COMPONENT
 
+import { AreaComp, GameObj } from "kaplay"
 import { curDraggin } from "../plugins/drag"
 
 // =========================
-export function insideWindowHover(winParent:any) {
+export function insideWindowHover(winParent:GameObj) {
 	
 	// doesn't take in account mouse animations, do it by yourself in the hover function!!
 	return {

@@ -67,7 +67,7 @@ export function addMouse() {
 				mouse.play("grab")
 			},
 
-			releaseAndPlay(newAnim = "cursor") {
+			releaseAndPlay(newAnim:string) {
 				this.grabbing = false
 				mouse.play(newAnim)
 			},

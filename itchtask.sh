@@ -4,11 +4,11 @@ OFF='\033[0m'
 
 echo -e "${YELLOW}### UPLOADING TO ITCH.IO ###${OFF}"
 pnpm build
-7z a -tzip ./build.zip ./www
+7z a -tzip ./build.zip ./dist
 butler push build.zip amyspark-ng/clickery-hexagon:html5 --userversion 1.0
 
 echo -e "${LIGHTBLUE}# Uploading source #${OFF}"
 
 # upload source
-7z a -tzip ./source.zip ./www ./source
+7z a -tzip ./source.zip ./public ./src
 butler push source.zip amyspark-ng/clickery-hexagon:source --userversion 1.0

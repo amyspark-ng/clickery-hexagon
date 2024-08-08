@@ -1,7 +1,6 @@
 import { GameState } from "../../../gamestate";
 import { hexagon } from "../../hexagon";
-import { positionSetter } from "../../plugins/positionSetter";
-import { addDefaultButton, addNumbers, addRandomButton, addSlider, playSliderSound, sliderColors } from "./colorWindowElements";
+import { addDefaultButton, addNumbers, addRandomButton, addSlider, playSliderSound } from "./colorWindowElements";
 
 export function hexColorWinContent(winParent) {
 	

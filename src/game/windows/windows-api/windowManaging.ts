@@ -20,6 +20,7 @@ import { statsWinContent } from "../statsWin.ts";
 import { medalsWinContent } from "../medalsWin.ts";
 import { hexColorWinContent } from "../color/hexColorWindow.ts";
 import { bgColorWinContent } from "../color/bgColorWindow.ts";
+import { windowComp } from "./windowComponent.ts";
 
 class Window {
 	key: string;
@@ -157,6 +158,7 @@ export function openWindow(windowKey:windowKey) {
 		z(0),
 		drag(),
 		area({ scale: vec2(1.05, 1) }),
+		windowComp(windowKey),
 		"window",
 		`${windowKey}`,
 		{
@@ -306,7 +308,7 @@ export function openWindow(windowKey:windowKey) {
 	windowObj.onKeyPress("escape", () => {
 		// if window is active and (window isn't an extra window and curDragging isn't gridMinibutton)
 		// can't close if is extra window and is dragging a button
-		if (windowObj.active && curDraggin != windowObj && !(windowObj.is("extraWin") && curDraggin?.is("gridMiniButton"))) windowObj.close()
+		if (windowObj.canClose == true && windowObj.active && curDraggin != windowObj && !(windowObj.is("extraWin") && curDraggin?.is("gridMiniButton"))) windowObj.close()
 	})
 
 	// activate
@@ -314,7 +316,7 @@ export function openWindow(windowKey:windowKey) {
 	windowObj.activate()
 
 	// add content
-	infoForWindows[windowKey].content(windowObj, windowKey)
+	windowObj.addContent(infoForWindows[windowKey].content(windowObj, windowKey))
 
 	// animate it
 	tween(0, 1, 0.32, (p) => windowObj.opacity = p, easings.easeOutQuint)
