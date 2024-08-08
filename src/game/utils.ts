@@ -329,7 +329,7 @@ export function bop(obj:any, howMuch = 0.1, bopEasing = easings.easeOutQuint) {
 	})
 }
 
-export function shrink(obj, howMuch) {
+export function shrink(obj) {
 	if (!obj.is("scale")) obj.use(scale(1))
 	if (!obj.shrinkDefScale) obj.shrinkDefScale = obj.scale
 	
@@ -344,7 +344,7 @@ export function debugTexts() {
 		return text
 	}
 
-	let debugText = add([
+	add([
 		text("DEBUG", { size: 18 }),
 		anchor("botleft"),
 		opacity(0.25),

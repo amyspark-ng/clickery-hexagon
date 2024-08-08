@@ -1,4 +1,4 @@
-import { GameState, saveColor, scoreManager } from "../gamestate.ts"
+import { GameState, scoreManager } from "../gamestate.ts"
 import { addHexagon, hexagon } from "./hexagon.ts"
 import { buildingsText, scoreText, spsText, uiCounters } from "./uicounters.ts"
 import { debugFunctions, formatNumber, formatTime, saveColorToColor } from "./utils.ts"
@@ -8,12 +8,11 @@ import { windowsDefinition } from "./windows/windows-api/windowManaging.ts"
 import { songs } from "./windows/musicWindow.ts"
 import { DEBUG, ROOT } from "../main.ts"
 import { powerupTimeManagement, spawnPowerup } from "./powerups.ts"
-import { checkForUnlockable, fullUpgradeValues, isAchievementUnlocked, unlockAchievement } from "./unlockables/achievements.ts"
+import { checkForUnlockable, isAchievementUnlocked, unlockAchievement } from "./unlockables/achievements.ts"
 import { ascension } from "./ascension/ascension.ts"
 import { folderObj, folderObjManaging } from "./windows/windows-api/folderObj.ts"
 import { curDraggin } from "./plugins/drag.ts"
 import { unlockableWindows } from "./unlockables/unlockablewindows.ts"
-import { Color } from "kaplay"
 
 let panderitoLetters = "panderito".split("")
 export let panderitoIndex = 0
@@ -276,6 +275,7 @@ export let hasStartedGame:boolean;
 // })
 export function gamescene() {
 	return scene("gamescene", () => {
+		GameState.load()
 		hasStartedGame = GameState.scoreAllTime > 1
 		ascension.ascending = false
 

@@ -68,7 +68,6 @@ onLoad(() => {
 	}
 	
 	ROOT.on("rungame", () => {
-		GameState.load() // loadSave()
 		addMouse()
 		if (!isFocused()) go("focuscene")
 		else go("gamescene")

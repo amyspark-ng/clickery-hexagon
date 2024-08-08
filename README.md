@@ -18,8 +18,8 @@ To build:
 - Khriz28 - Playtesting & Support
 
 ### Extra / Special Thanks:
+- niceEli - Desktop support/Port to Vite
+- Candy&Carmel - Number support
+- Oliver_is_here - Code/General support
 - [Lambda font](https://ggbot.itch.io/lambda-font)
 - Webadazzz <3
-- niceEli - Desktop support
-- Candy&Carmel - Number support
-- Oliver_is_here - Code, color windows, general support

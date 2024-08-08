@@ -128,7 +128,7 @@ export function addPlusScoreText(opts:plusScoreOpts) {
 					scale: vec2(0.8),
 					pos: vec2(0, 4)
 				},
-				"combo": (idx, ch) => ({
+				"combo": (idx) => ({
 					color: blendColors(
 						WHITE,
 						hsl2rgb((time() * 0.2 + idx * 0.1) % 1, 0.7, 0.8),

@@ -91,9 +91,10 @@ function drawDevkyLoadScreen(progress) {
 
 function loadSprites() {
 	loadBean()
-	loadSprite("hexagon", "./assets/sprites/hexagon.png")
-	loadSprite("devky", "./image.png")
-	loadRoot("./assets/")
+
+	// no use for loadRoot because public becomes ./
+	loadSprite("devky", "devky.png")
+	loadSprite("hexagon", "sprites/hexagon.png")
 	
 	if (!DEBUG) {load(new Promise<void>((res) => { setTimeout(() => { res() }, 5000) })) }
 
@@ -621,14 +622,6 @@ function loadSprites() {
 	//#endregion SPRITES
 }
 
-function loadSounds() {
-
-}
-
-function loadSongs() {
-
-}
-
 // Sprite atlas were made with this awesome website
 // https://www.finalparsec.com/tools/sprite_sheet_maker
 export function loadEverything() {
@@ -703,17 +696,17 @@ export function loadEverything() {
 	// #region OTHER STUFF
 	if (!DEBUG) {load(new Promise<void>((res) => { setTimeout(() => { res() }, 5000) })) }
 
-	loadFont("emulogic", "./assets/emulogic.ttf", {
+	loadFont("emulogic", "emulogic.ttf", {
 		outline: 10,
 		filter: "linear"
 	})
 
-	loadFont("lambdao", "./assets/Lambda-Regular.ttf", {
+	loadFont("lambdao", "Lambda-Regular.ttf", {
 		outline: 5,
 		filter: "linear"
 	})
 
-	loadFont("lambda", "./assets/Lambda-Regular.ttf", {
+	loadFont("lambda", "Lambda-Regular.ttf", {
 		filter: "linear"
 	})
 

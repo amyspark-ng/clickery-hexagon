@@ -1,5 +1,5 @@
 import { Color } from "kaplay";
-import { blendColors } from "../game/utils";
+import { blendColors } from "../utils";
 
 var sprIter = 0;
 type trailOpt =  {
@@ -7,7 +7,7 @@ type trailOpt =  {
 	amount?:number,
 	spreadBetweenClones?:number,
 	
-	startPointForColor?:"tail"|"origin", // tail, origin
+	startPointForColor?:"tail" | "origin", // tail, origin
 	color?: Color,
 	
 	startOpacity?:number,
