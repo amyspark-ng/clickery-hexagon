@@ -22,3 +22,4 @@ To build:
 - Webadazzz <3
 - niceEli - Desktop support
 - Candy&Carmel - Number support
+- Oliver_is_here - Code, color windows, general support

@@ -2,18 +2,18 @@ import { GameObj } from "kaplay"
 import { GameState } from "../gamestate"
 import { playSfx } from "../sound"
 import { hexagon } from "./hexagon"
-import { blendColors, parseAnimation } from "./utils"
+import { blendColors, parseAnimation, saveColorToColor } from "./utils"
 import { allObjWindows, manageWindow } from "./windows/windows-api/windowManaging"
 import { isWindowUnlocked } from "./unlockables/unlockablewindows"
 
-export let gameBg;
+export let gameBg:GameObj;
 export function addBackground() {
 	gameBg = add([
 		rect(width(), height()),
 		pos(center()),
 		anchor("center"),
 		scale(8),
-		color(Color.fromArray(GameState.settings.bgColor)),
+		color(saveColorToColor(GameState.settings.bgColor)),
 		layer("background"),
 		stay(),
 		{
@@ -23,8 +23,9 @@ export function addBackground() {
 			col1D: rgb(128, 128, 128),
 			col2D: rgb(190, 190, 190),
 			update() {
+				if (!isWindowUnlocked("bgColorWin")) return
+
 				if (isMousePressed("right")) {
-					if (!isWindowUnlocked("bgColorWin")) return
 					// doesn't check for hovering this because you will always be hovering it lol
 					if (!hexagon?.isHovering() && !get("folderObj")[0]?.isHovering() && !get("minibutton")[0]?.isHovering() && !get("window")[0]?.isHovering() && !allObjWindows.isDraggingAWindow) {
 						manageWindow("bgColorWin")
@@ -33,8 +34,8 @@ export function addBackground() {
 			}
 		}
 	])
+	gameBg.color.a = GameState.settings.bgColor.a
 
-	gameBg.color.a = GameState.settings.bgColor[3]
 	gameBg.use(shader("checkeredBg", () => ({
 		"u_time": time() / 10,
 		"u_color1": blendColors(gameBg.col1D, gameBg.color, gameBg.color.a),

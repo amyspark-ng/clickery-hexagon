@@ -373,7 +373,7 @@ achievements = [
 
 	new Achievement({
 		id: "allwindowsontaskbar",
-		title: "CPU Usage too highg!!",
+		title: "CPU Usage too high!!",
 		description: "Open all windows in your taskbar at the same time",
 		icon: "icon_extra.open_default",
 	}),

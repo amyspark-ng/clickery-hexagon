@@ -1,5 +1,5 @@
 import { Color, Vec2 } from "kaplay";
-import { GameState, scoreManager } from "../gamestate";
+import { GameState, saveColor, scoreManager } from "../gamestate";
 import { addToast, mouse } from "./additives";
 import { autoLoopTime, cam, triggerGnome } from "./gamescene";
 import { hexagon } from "./hexagon";
@@ -236,12 +236,8 @@ export function blendColors(color1:Color, color2:Color, blendFactor:number) {
     return color1.lerp(color2, blendFactor);
 }
 
-export function arrayToColor(arr) {
-	return rgb(arr[0], arr[1], arr[2])
-}
-
-export function colorToArray(color) {
-	return [color.r, color.g, color.b]
+export function saveColorToColor(color:saveColor) {
+	return rgb(color.r, color.g, color.b)
 }
 
 export function getPositionOfSide(obj) {

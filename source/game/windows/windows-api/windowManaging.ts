@@ -12,13 +12,14 @@ import { isAchievementUnlocked, unlockAchievement } from "../../unlockables/achi
 // window contents
 import { storeWinContent } from "../store/storeWindows.ts";
 import { musicWinContent } from "../musicWindow.ts";
-import { colorWinContent } from "../colorWindow.ts";
 import { settingsWinContent } from "../settings/settingsWindow.ts";
 import { ascendWinContent } from "../ascendWindow.ts";
 import { extraWinContent } from "../extraWindow.ts";
 import { creditsWinContent } from "../creditsWin.ts";
 import { statsWinContent } from "../statsWin.ts";
 import { medalsWinContent } from "../medalsWin.ts";
+import { hexColorWinContent } from "../color/hexColorWindow.ts";
+import { bgColorWinContent } from "../color/bgColorWindow.ts";
 
 class Window {
 	key: string;
@@ -81,8 +82,8 @@ export function windowsDefinition() {
 		"creditsWin": { idx: 5, content: creditsWinContent, lastPos: vec2(center().x, center().y) },
 		"settingsWin": { idx: 6, content: settingsWinContent, lastPos: vec2(center().x, center().y) },
 		"leaderboardsWin": { idx: 7, content: emptyWinContent, lastPos: vec2(center().x, center().y) },
-		"hexColorWin": { idx: 8, content: colorWinContent, lastPos: vec2(208, 160) },
-		"bgColorWin": { idx: 9, content: colorWinContent, lastPos: vec2(width() - 200, 200) },
+		"hexColorWin": { idx: 8, content: hexColorWinContent, lastPos: vec2(208, 160) },
+		"bgColorWin": { idx: 9, content: bgColorWinContent, lastPos: vec2(width() - 200, 200) },
 		"extraWin": { idx: 10, icon: "extra", content: extraWinContent, lastPos: center() },
 	}
 }

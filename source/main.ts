@@ -4,7 +4,7 @@ import "kaplay/global";
 import { drawSeriousLoadScreen, loadEverything } from "./loader.ts"
 import { addBackground, addMouse, gameBg } from "./game/additives.ts";
 import { volumeManager } from "./sound.ts";
-import { consoleManager } from "./console.ts";
+import { GameState } from "./gamestate.ts";
 
 export const DEBUG:boolean = true
 export const k = kaplay({
@@ -68,6 +68,7 @@ onLoad(() => {
 	}
 	
 	ROOT.on("rungame", () => {
+		GameState.load() // loadSave()
 		addMouse()
 		if (!isFocused()) go("focuscene")
 		else go("gamescene")

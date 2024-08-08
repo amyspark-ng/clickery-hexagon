@@ -31,6 +31,9 @@ export let unlockableWindows = {
 	"creditsWin": {
 		condition: () => GameState.score >= 200
 	},
+	"leaderboardsWin": {
+		condition: () => GameState.scoreAllTime >= 1_100_000
+	},
 	"ascendWin": {
 		condition: () => GameState.scoreAllTime >= scoreManager.ascensionConstant
 	},

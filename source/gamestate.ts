@@ -4,6 +4,20 @@ import { percentage, saveAnim } from "./game/utils"
 import { ROOT } from "./main"
 import { musicHandler, stopAllSounds } from "./sound"
 
+export class saveColor {
+    r: number = 255;
+    g: number = 255;
+    b: number = 255;
+	a: number;
+
+    constructor(r: number, g: number, b: number, a?: number) {
+        this.r = r;
+        this.g = g;
+        this.b = b;
+		this.a = a
+    }
+}
+
 class _GameState {	
 	score = 0
 	scoreThisRun = 0
@@ -40,7 +54,7 @@ class _GameState {
 
 	unlockedAchievements = []
 
-	unlockedWindows = []
+	unlockedWindows = ["bgColorWin", "hexColorWin"]
 	taskbar = []
 
 	stats = {
@@ -56,14 +70,13 @@ class _GameState {
 		sfx: { volume: 1, muted: false },
 		music: { volume: 1, muted: false, favoriteIdx: 0 },
 		volume: 1,
-		hexColor: [255, 255, 255],
-		bgColor: [0, 0, 0, 0.84],
+		hexColor: new saveColor(255, 255, 255),
+		bgColor: new saveColor(0, 0, 0, 0.84),
 		commaInsteadOfDot: false,
 		fullscreen: false,
 		spsTextMode: 1,
 
 		panderitoMode: false,
-		cursorTail: false,
 	}
 
 	save(anim = true) {

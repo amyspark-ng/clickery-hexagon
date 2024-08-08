@@ -26,8 +26,6 @@ this game MIGHT be getting done
 - change color of upgrades
 - fix hexagon scale when ascending
 - add the mute dialogue option
-- make the color window (rework it code and graphic)
-	^ make both windows different files and make a different file for buttons and sliders
 
 - the fucking thing where powerup logs come again and again and again
 - upgrade tutorial tooltip doesn't work

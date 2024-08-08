@@ -250,8 +250,6 @@ export function makeGridMinibutton(windowKey:windowKey, gridSlot:any, winParent:
 let amountOfElementsX = 5
 let amountOfElementsY = 2
 export function extraWinContent(winParent) {
-	winParent.width += 50
-	
 	// makes the grid
 	gridContainer = winParent.add([pos(-154, -192)])
 

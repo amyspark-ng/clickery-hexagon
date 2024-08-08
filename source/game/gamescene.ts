@@ -1,7 +1,7 @@
-import { GameState, scoreManager } from "../gamestate.ts"
+import { GameState, saveColor, scoreManager } from "../gamestate.ts"
 import { addHexagon, hexagon } from "./hexagon.ts"
 import { buildingsText, scoreText, spsText, uiCounters } from "./uicounters.ts"
-import { arrayToColor, debugFunctions, formatNumber, formatTime } from "./utils.ts"
+import { debugFunctions, formatNumber, formatTime, saveColorToColor } from "./utils.ts"
 import { addToast, gameBg, mouse } from "./additives.ts"
 import { musicHandler, playMusic, playSfx, stopAllSounds } from "../sound.ts"
 import { windowsDefinition } from "./windows/windows-api/windowManaging.ts"
@@ -13,6 +13,7 @@ import { ascension } from "./ascension/ascension.ts"
 import { folderObj, folderObjManaging } from "./windows/windows-api/folderObj.ts"
 import { curDraggin } from "./plugins/drag.ts"
 import { unlockableWindows } from "./unlockables/unlockablewindows.ts"
+import { Color } from "kaplay"
 
 let panderitoLetters = "panderito".split("")
 export let panderitoIndex = 0
@@ -275,7 +276,6 @@ export let hasStartedGame:boolean;
 // })
 export function gamescene() {
 	return scene("gamescene", () => {
-		GameState.load() // loadSave()
 		hasStartedGame = GameState.scoreAllTime > 1
 		ascension.ascending = false
 
@@ -495,9 +495,9 @@ export function gamescene() {
 				tween(0.25, 1, 1, (p) => hexagon.opacity = p, easings.easeOutQuad)
 			},
 			intro_gameBg() {
-				tween(BLACK, arrayToColor(GameState.settings.bgColor), 0.5, (p) => gameBg.color = p, easings.easeOutQuad)
+				tween(BLACK, saveColorToColor(GameState.settings.bgColor), 0.5, (p) => gameBg.color = p, easings.easeOutQuad)
+				tween(1, GameState.settings.bgColor.a, 0.5, (p) => gameBg.color.a = p, easings.easeOutQuad)
 				tween(-5, 5, 0.5, (p) => gameBg.movAngle = p, easings.easeOutQuad)
-				tween(1, GameState.settings.bgColor[3], 0.5, (p) => gameBg.color.a = p, easings.easeOutQuad)
 			},
 			intro_scoreCounter() {
 				// scoreCounter

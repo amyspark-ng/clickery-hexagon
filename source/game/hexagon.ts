@@ -1,7 +1,7 @@
 
 import { GameState, scoreManager } from "../gamestate.ts";
 import { scoreText, spsText } from "./uicounters.ts";
-import { arrayToColor, blendColors, getRandomDirection } from "./utils.ts";
+import { blendColors, getRandomDirection, saveColorToColor } from "./utils.ts";
 import { playSfx } from "../sound.ts";
 import { manageWindow } from "./windows/windows-api/windowManaging.ts";
 import { waver } from "./plugins/wave.js";
@@ -53,7 +53,7 @@ export function addHexagon() {
 		scale(),
 		opacity(1),
 		outsideWindowHover(),
-		color(arrayToColor(GameState.settings.hexColor)),
+		color(saveColorToColor(GameState.settings.hexColor)),
 		area({
 			shape: new Polygon([
 				vec2(406, 118),

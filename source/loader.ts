@@ -496,6 +496,10 @@ function loadSprites() {
 	//#region Other ones huh
 	loadSprite("hexColorWin", "sprites/windows/colorWin/hexColorWin.png")
 	loadSprite("bgColorWin", "sprites/windows/colorWin/bgColorWin.png")
+
+	loadSprite("hexColorHandle", "sprites/windows/colorWin/hexColorHandle.png")
+	loadSprite("defaultButton", "sprites/windows/colorWin/defaultButton.png")
+	loadSprite("randomButton", "sprites/windows/colorWin/randomButton.png")
 	//#endregion
 
 	//#endregion
