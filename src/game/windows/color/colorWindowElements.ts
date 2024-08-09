@@ -17,9 +17,9 @@ export let sliderColors = {
 	alpha: { full: [48, 48, 48], dull: [118, 118, 118] },
 }
 
-type rgba = "r" | "g" | "b" | "a"
+type rgbaKey = "r" | "g" | "b" | "a"
 
-function keyToName(key: rgba) {
+function keyToName(key: rgbaKey) {
 	switch (key) {
 		case "r": return "red"
 		case "g": return "green"
@@ -73,6 +73,7 @@ export function addSlider(opts: sliderOpts) : sliderInterface {
 		color(),
 		pos(opts.pos),
 		anchor("left"),
+		area(),
 		drawDamnShadow(2, 2, 0.5),
 		{
 			update() {
@@ -169,6 +170,14 @@ export function addSlider(opts: sliderOpts) : sliderInterface {
 		winParent.canClose = true
 	})
 
+	// oh god
+	content.onClick(() => {
+		if (button.isBeingHovered == true) return;
+		
+		let mappedValue = map(mousePos().x, content.screenPos().x, content.screenPos().x + content.width, opts.range[0], opts.range[1])
+		value = clamp(mappedValue, opts.range[0], opts.range[1])
+	})
+
 	return {
 		sliderContent: content,
 		sliderButton: button,
@@ -191,6 +200,8 @@ export function playSliderSound(value:number) {
 export function addDefaultButton(position: Vec2, parent: GameObj, sliders: sliderInterface[], defaultValues: number[]) {
 	parent = parent || ROOT
 	
+	let winParent = parent.parent;
+
 	let defaultButton = parent.add([
 		sprite("defaultButton"),
 		pos(position),
@@ -202,6 +213,8 @@ export function addDefaultButton(position: Vec2, parent: GameObj, sliders: slide
 	])
 
 	defaultButton.onClick(() => {
+		if (!winParent.active) return
+
 		bop(defaultButton)
 		playSfx("clickButton", { detune: rand(-50, 50) })
 
@@ -217,6 +230,8 @@ export function addDefaultButton(position: Vec2, parent: GameObj, sliders: slide
 export function addRandomButton(position: Vec2, parent: GameObj, sliders: sliderInterface[]) {
 	parent = parent || ROOT
 	
+	let winParent = parent.parent;
+
 	let randomButton = parent.add([
 		sprite("randomButton"),
 		pos(position),
@@ -228,6 +243,8 @@ export function addRandomButton(position: Vec2, parent: GameObj, sliders: slider
 	])
 
 	randomButton.onClick(() => {
+		if (!winParent.active) return
+
 		bop(randomButton)
 		playSfx("clickButton", { detune: rand(-50, 50) })
 		
@@ -245,7 +262,7 @@ export function addNumbers(position: Vec2, parent: GameObj, objSaveColor: saveCo
 
 	let numberStyles = {}
 	
-	let names = Object.keys(objSaveColor).map(color => keyToName(color as rgba))
+	let names = Object.keys(objSaveColor).map(color => keyToName(color as rgbaKey))
 	
 	names.forEach(colorName => {
 		numberStyles[`${colorName}`] = {

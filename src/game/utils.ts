@@ -404,7 +404,11 @@ export function debugFunctions() {
 		if (isKeyPressed("c") && GameState.scoreAllTime > 25) GameState.save(true)
 		else if (isKeyPressed("v")) GameState.delete()
 		else if (isKeyPressed("b")) GameState.cheat()
-		else if (isKeyPressed("w")) hexagon.autoClick()
+		
+			else if (isKeyPressed("w")) {
+			hexagon.autoClick()
+		}
+		
 		else if (isKeyDown("q")) {
 			hexagon.clickPress()
 			wait(0.1, () => hexagon.clickRelease())

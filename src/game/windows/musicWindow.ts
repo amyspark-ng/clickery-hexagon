@@ -38,6 +38,8 @@ let angleOfDisc = 0
 export function musicWinContent(winParent) {
 	currentSongIdx = GameState.settings.music.favoriteIdx == null ? 0 : GameState.settings.music.favoriteIdx
 	
+	let currentSong = songs[Object.keys(songs)[currentSongIdx]]
+
 	function checkForSongListen(songIdx) {
 		if (songsListened.includes(songIdx) == false) songsListened.push(songIdx)
 	}
@@ -122,27 +124,6 @@ export function musicWinContent(winParent) {
 		}
 	])
 
-	theOneBehind.onClick(() => {
-		// if (!winParent.is("active")) return
-		if (!skipping) {
-			if (theOneBehind.isHovering()) {
-				// calculation stuff
-				let objectRect = theOneBehind.screenArea().bbox();
-				let distanceFromCenter = mousePos().x - objectRect.pos.x - (objectRect.width / 2);
-				let relativePosition = distanceFromCenter / (objectRect.width / 2);
-				relativePosition = (relativePosition + 0.9) / 1.8;
-				let timeInSeconds = relativePosition * musicHandler.duration()
-				timeInSeconds = clamp(timeInSeconds, 0, musicHandler.duration())
-	
-				musicHandler.winding = true
-				musicHandler.seek(timeInSeconds)
-				tween(progressBar.width, relativePosition * theOneBehind.width, 0.2, p => progressBar.width = p, easings.easeOutQuint).onEnd(() => {
-					musicHandler.winding = false
-				})
-			}
-		}
-	})
-
 	progressBar = winParent.add([
 		rect(1, 10, { radius: 10 }),
 		pos(theOneBehind.pos.x - theOneBehind.width / 2, theOneBehind.pos.y),
@@ -223,6 +204,7 @@ export function musicWinContent(winParent) {
 		else {
 			currentSongIdx--
 			if (currentSongIdx < 0) currentSongIdx = Object.keys(songs).length - 1
+			currentSong = songs[Object.keys(songs)[currentSongIdx]]
 		}
 
 		playSfx("clickButton", {detune: rand(-150, 50)})
@@ -232,7 +214,8 @@ export function musicWinContent(winParent) {
 	function skipButtonAction() {
 		currentSongIdx++
 		if (currentSongIdx >= Object.keys(songs).length) currentSongIdx = 0
-		
+		currentSong = songs[Object.keys(songs)[currentSongIdx]]
+
 		playSfx("clickButton", {detune: rand(-50, 150)})
 		bop(skipButton)
 	}
@@ -321,7 +304,7 @@ export function musicWinContent(winParent) {
 	get("bpmChange", { recursive: true }).forEach(bpmChange => {
 		if (!bpmChange.is("wave")) bpmChange.use(waver({ 
 			maxAmplitude: 5,
-			wave_speed: songs[Object.keys(songs)[currentSongIdx]].speed,
+			wave_speed: currentSong.speed,
 			wave_tweenSpeed: 0.2
 		}))
 
@@ -329,7 +312,7 @@ export function musicWinContent(winParent) {
 	})
 
 	onUpdate("bpmChange", (bpmChangeObj) => {
-		bpmChangeObj.wave_speed = songs[Object.keys(songs)[currentSongIdx]].speed
+		bpmChangeObj.wave_speed = currentSong.speed
 	})
 	
 	// support for keys let's gooooo
@@ -344,6 +327,27 @@ export function musicWinContent(winParent) {
 
 	winParent.on("close", () => {
 		angleOfDisc = disc.angle
+	})
+
+	// fuck my small penis life
+	theOneBehind.onClick(() => {
+		if (!winParent.active) return
+		
+		let leftSideOfTheOneBehind = theOneBehind.screenPos().x - theOneBehind.width * 0.5
+		let rightSideOfTheOneBehind = theOneBehind.screenPos().x + theOneBehind.width * 0.5
+
+		let mappedSeconds = map(mousePos().x, leftSideOfTheOneBehind, rightSideOfTheOneBehind, 0, musicHandler.duration())
+		mappedSeconds = clamp(mappedSeconds, 0, musicHandler.duration())
+
+		if (!skipping) {
+			musicHandler.winding = true
+			musicHandler.seek(mappedSeconds)
+
+			let mappedWidth = map(mappedSeconds, 0, currentSong.duration, 0, theOneBehind.width)
+			tween(progressBar.width, mappedWidth, 0.2, p => progressBar.width = p, easings.easeOutQuint).onEnd(() => {
+				musicHandler.winding = false
+			})
+		}
 	})
 
 	return;

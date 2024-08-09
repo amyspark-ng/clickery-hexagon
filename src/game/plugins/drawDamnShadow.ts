@@ -4,10 +4,13 @@
 export function drawDamnShadow(xSpacing: number, ySpacing: number, theOpacity: number) {
 	let drawEvent = null
 
+	const theColor = BLACK
+
 	return {
 		id: "damnShadow",
 		require: ["anchor"],
 		disableShadow: false,
+		
 		add() {
 			let drawingShadow = () => {
 				if (this.disableShadow == true) return
@@ -17,7 +20,7 @@ export function drawDamnShadow(xSpacing: number, ySpacing: number, theOpacity: n
 
 						pos: vec2(this.pos.x + xSpacing, this.pos.y + ySpacing),
 						opacity: theOpacity,
-						color: BLACK,
+						color: theColor,
 						anchor: this.anchor,
 						scale: this.scale,
 						angle: this.angle,
@@ -33,7 +36,7 @@ export function drawDamnShadow(xSpacing: number, ySpacing: number, theOpacity: n
 
 						pos: vec2(this.pos.x + xSpacing, this.pos.y + ySpacing),
 						opacity: theOpacity,
-						color: BLACK,
+						color: theColor,
 						anchor: this.anchor,
 						scale: this.scale,
 						angle: this.angle,
@@ -48,7 +51,7 @@ export function drawDamnShadow(xSpacing: number, ySpacing: number, theOpacity: n
 
 						pos: vec2(this.pos.x + xSpacing, this.pos.y + ySpacing),
 						opacity: theOpacity,
-						color: BLACK,
+						color: theColor,
 						anchor: this.anchor,
 						scale: this.scale,
 						angle: this.angle,

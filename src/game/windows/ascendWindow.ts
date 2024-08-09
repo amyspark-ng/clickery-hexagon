@@ -17,7 +17,6 @@ export function ascendWinContent(winParent) {
 		color(WHITE),
 		pos(-182, -189),
 		area(),
-		positionSetter(),
 		{
 			update() {
 				let scoreTilNextMana = formatNumber(Math.round(scoreManager.scoreYouGetNextManaAt()) - Math.round(GameState.scoreAllTime))
@@ -114,9 +113,11 @@ export function ascendWinContent(winParent) {
 	})
 
 	let masked = winParent.add([
-		mask("subtract"),
+		mask("intersect"),
 		anchor("center"),
 		pos(),
+		rect(winParent.width, winParent.height),
+		positionSetter(),
 	])
 
 	masked.add([

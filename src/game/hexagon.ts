@@ -117,7 +117,9 @@ export function addHexagon() {
 				tween(this.scaleIncrease, this.maxScaleIncrease, 0.35, (p) => this.scaleIncrease = p, easings.easeOutQuint)
 				this.isBeingClicked = false
 				clickVars.clicksPerSecond++
-				mouse.releaseAndPlay("point")
+
+				if (hexagon.isBeingHovered) mouse.releaseAndPlay("point")
+				else mouse.releaseAndPlay("cursor")
 
 				// # combo stuff
 				clickVars.constantlyClicking = true
@@ -474,4 +476,6 @@ export function addHexagon() {
 
 	// COMBO STUFF
 	consecutiveClicksWaiting = wait(0, () => {});
+
+	return hexagon;
 }

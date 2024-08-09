@@ -6,6 +6,6 @@ export default defineConfig({
 	},
 	base: "./",
 	build: {
-		sourcemap: "hidden", // makes it so code is obstructed on release
+		sourcemap: "hidden", // hidden makes it so code is obstructed on release
 	},
 })

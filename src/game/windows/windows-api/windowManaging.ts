@@ -20,7 +20,6 @@ import { statsWinContent } from "../statsWin.ts";
 import { medalsWinContent } from "../medalsWin.ts";
 import { hexColorWinContent } from "../color/hexColorWindow.ts";
 import { bgColorWinContent } from "../color/bgColorWindow.ts";
-import { windowComp } from "./windowComponent.ts";
 
 class Window {
 	key: string;
@@ -158,7 +157,6 @@ export function openWindow(windowKey:windowKey) {
 		z(0),
 		drag(),
 		area({ scale: vec2(1.05, 1) }),
-		windowComp(windowKey),
 		"window",
 		`${windowKey}`,
 		{
@@ -166,6 +164,7 @@ export function openWindow(windowKey:windowKey) {
 			windowKey: windowKey,
 			active: true,
 			xButton: null,
+			canClose: true,
 			close() {
 				this.trigger("close")
 				this.removeAll()
@@ -316,7 +315,7 @@ export function openWindow(windowKey:windowKey) {
 	windowObj.activate()
 
 	// add content
-	windowObj.addContent(infoForWindows[windowKey].content(windowObj, windowKey))
+	infoForWindows[windowKey].content(windowObj, windowKey)
 
 	// animate it
 	tween(0, 1, 0.32, (p) => windowObj.opacity = p, easings.easeOutQuint)

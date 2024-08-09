@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       kaplay:
-        specifier: 3001.0.0-alpha.20
-        version: 3001.0.0-alpha.20
+        specifier: 4000.0.0-alpha.1
+        version: 4000.0.0-alpha.1
     devDependencies:
       typescript:
         specifier: ^5.5.3
@@ -299,8 +299,8 @@ packages:
     engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
     os: [darwin]
 
-  kaplay@3001.0.0-alpha.20:
-    resolution: {integrity: sha512-grBhXVS/tRB0q8L5TQF91Vf2m9CuQTvEfpGISG+mAboM5PU40Lm64pjNWipJ6KI5fltk/Ls32JI7BotpD0oIbQ==}
+  kaplay@4000.0.0-alpha.1:
+    resolution: {integrity: sha512-EDjKet/DwSr8VPMI25B1LNQVGig2DZGZ7f0M9DvM+n5rKETFeVG/PaQZyQ7SEEQ88W8MuRERISnFQWqgQAE07g==}
 
   nanoid@3.3.7:
     resolution: {integrity: sha512-eSRppjcPIatRIMC1U6UngP8XFcz8MQWGQdt1MTBQ7NaAmvXDfvNxbvWV3x2y6CdEUciCSsDHDQZbhYaB8QEo2g==}
@@ -548,7 +548,7 @@ snapshots:
   fsevents@2.3.3:
     optional: true
 
-  kaplay@3001.0.0-alpha.20:
+  kaplay@4000.0.0-alpha.1:
     dependencies:
       '@kaplayjs/dprint-config': 1.0.0
 

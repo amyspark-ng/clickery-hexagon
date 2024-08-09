@@ -1,14 +1,8 @@
 # Clickery Hexagon
 
-Simple clicker game made in Kaboom.js
+"Simple" clicker game
 
-(keys.js goes in src root)
-
-To build:
-- `pnpm i` - installs dependencies
-- `pnpm dev` - starts hosting locally
-- go to `localhost:8000`
-- change the files to work on it :thumbsup:
+Made in [KAPLAY](https://kaplayjs.com)
 
 ## CREDITS:
 - AmySpark - Code
@@ -23,3 +17,17 @@ To build:
 - Oliver_is_here - Code/General support
 - [Lambda font](https://ggbot.itch.io/lambda-font)
 - Webadazzz <3
+
+## RUNNING
+1. `pnpm i` - Installs all the dependencies
+2. `pnpm dev` - Starts hosting the game locally in localhost:8000
+3. You have to make a `env.json` file in `src`, holding this:
+```js
+{
+	"API_ID": "",
+	"ENCRIPTION_KEY": "",
+	"LEADERBOARD_ID": 0
+}
+```
+- The code disables newgrounds if no keys are present, but this is so imports don't nag you
+4. Edit the files to work on it :thumbsup:

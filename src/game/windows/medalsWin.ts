@@ -39,6 +39,11 @@ export function medalsWinContent(winParent) {
 		anchor("top"),
 	])
 
+	// TODO: you know what would be fun?????????????
+	
+	// make every medal a draw event that draws the sprite, map every row&column to an achievement
+	// everytime you scroll that achievements gets updated
+	// for hovers you can check the distance to the medalObj
 	function addMedal(gridPosition:{ row:number, column:number }, medalid:string) {
 		let achievementInfo = getAchievement(medalid)
 		

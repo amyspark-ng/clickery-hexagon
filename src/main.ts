@@ -4,7 +4,6 @@ import "kaplay/global";
 import { drawSeriousLoadScreen, loadEverything } from "./loader.ts"
 import { addBackground, addMouse, gameBg } from "./game/additives.ts";
 import { volumeManager } from "./sound.ts";
-import { GameState } from "./gamestate.ts";
 
 export const DEBUG:boolean = true
 export const k = kaplay({
@@ -18,9 +17,10 @@ export const k = kaplay({
 	loadingScreen: true,
 	crisp: false,
 	backgroundAudio: true,
-	// stretch: true,
-	// letterbox: true,
+	stretch: DEBUG == true ? false : true,
+	letterbox: DEBUG == true ? false : true,
 });
+
 export let ROOT = getTreeRoot()
 setBackground(BLACK)
 setCursor("none")

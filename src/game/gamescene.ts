@@ -13,6 +13,7 @@ import { ascension } from "./ascension/ascension.ts"
 import { folderObj, folderObjManaging } from "./windows/windows-api/folderObj.ts"
 import { curDraggin } from "./plugins/drag.ts"
 import { unlockableWindows } from "./unlockables/unlockablewindows.ts"
+import * as env from "../env.json"
 
 let panderitoLetters = "panderito".split("")
 export let panderitoIndex = 0

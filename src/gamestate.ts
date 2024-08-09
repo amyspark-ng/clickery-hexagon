@@ -204,7 +204,7 @@ class _scoreManager {
 
 	// Is the actual formula that determines the amounts you get mana at
 	getScoreForManaAT = (manaAllTime:number) => {
-		return (manaAllTime ** 2) * this.ascensionConstant
+		return (manaAllTime ** 3) * this.ascensionConstant
 	}
 
 	// The score you get the next mana at
