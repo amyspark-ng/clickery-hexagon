@@ -1,18 +1,14 @@
 {
   "name": "clickery-hexagon",
-  "private": true,
-  "version": "0.0.0",
+  "description": "A simple clicker game",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview"
-  },
-  "devDependencies": {
-    "typescript": "^5.5.3",
-    "vite": "^5.4.0"
+    "build": "esbuild --bundle source/main.ts --outfile=public/game.js",
+    "dev": "esbuild --bundle source/main.ts --outfile=public/game.js --servedir=./public"
   },
   "dependencies": {
-    "kaplay": "4000.0.0-alpha.1"
+    "esbuild": "^0.20.2",
+    "kaplay": "4000.0.0-alpha.1",
+    "newgrounds.js": "4.0.0-beta.1"
   }
 }

@@ -4,6 +4,7 @@ import "kaplay/global";
 import { drawSeriousLoadScreen, loadEverything } from "./loader.ts"
 import { addBackground, addMouse, gameBg } from "./game/additives.ts";
 import { volumeManager } from "./sound.ts";
+import { newgroundsManagement } from "./newgrounds.ts";
 
 export const DEBUG:boolean = true
 export const k = kaplay({
@@ -42,6 +43,7 @@ loadEverything()
 onLoad(() => {
 	volumeManager()
 	addBackground()
+	newgroundsManagement()
 
 	gameBg.movAngle = -5
 	gameBg.color = BLACK

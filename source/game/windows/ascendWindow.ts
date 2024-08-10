@@ -1,9 +1,48 @@
+import { GameObj, Vec2 } from "kaplay"
 import { GameState, scoreManager } from "../../gamestate"
 import { ROOT } from "../../main"
 import { positionSetter } from ".././plugins/positionSetter"
 import { triggerAscension } from "../ascension/ascension"
 import { isHoveringAPowerup } from "../powerups"
 import { formatNumber } from "../utils"
+import { waver } from "../plugins/wave"
+
+let objectsPositions = {
+	mage_hidden: 450,
+	mage_visible: 30,
+	cursors_hidden: 470,
+	cursors_visible: 26,
+}
+
+function addWinMage(position: Vec2, parent:GameObj) {
+	let winMage = parent.add([
+		pos(position),
+		anchor("center"),
+		waver({ maxAmplitude: 2 })
+	])
+
+	let body = winMage.add([
+		sprite("winMage_body"),
+		anchor("center"),
+	])
+
+	let eye = winMage.add([
+		sprite("winMage_eye"),
+		anchor("center"),
+	])
+
+	let cursors = parent.add([
+		sprite("winMage_cursors"),
+		anchor("center"),
+		pos(),
+		waver({ maxAmplitude: 3 })
+	])
+
+	return {
+		mage: winMage,
+		cursors: cursors,
+	};
+}
 
 export function ascendWinContent(winParent) {
 	// TODO: if mana is increased while the ascend window is open add a little spark and a sound
@@ -117,14 +156,24 @@ export function ascendWinContent(winParent) {
 		anchor("center"),
 		pos(),
 		rect(winParent.width, winParent.height),
-		positionSetter(),
 	])
 
-	masked.add([
-		sprite("mage_body"),
-		anchor("center"),
-		pos(),
-	])
+	let winMageFull = addWinMage(vec2(0, 450), masked)
+	let winMage = winMageFull.mage
+	let winMageCursors = winMageFull.cursors
+
+	winMageCursors.use(positionSetter()),
+
+	tween(objectsPositions.mage_hidden, objectsPositions.mage_visible, 0.6, (p) => winMage.pos.y = p, easings.easeOutQuint).onEnd(() => {
+		winMage.wave_verPosition = objectsPositions.mage_visible
+		// winMage.startWave()
+	})
+
+	wait(0.2, () => {
+		tween(objectsPositions.cursors_hidden, objectsPositions.cursors_visible, 0.5, (p) => winMageCursors.pos.y = p, easings.easeOutBack).onEnd(() => {
+			// winMageCursors.startWave()
+		})
+	})
 
 	winParent.on("close", () => {
 		manaGainedCheck.cancel()

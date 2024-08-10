@@ -593,6 +593,6 @@ export function gamescene() {
 			checkForUnlockable()
 		})
 
-		if (DEBUG) debugFunctions()
+		if (DEBUG == true) debugFunctions()
 	})
 }

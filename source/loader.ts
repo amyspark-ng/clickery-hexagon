@@ -89,10 +89,31 @@ function drawDevkyLoadScreen(progress) {
 	})
 }
 
+function loadFonts() {
+	if (!DEBUG) {load(new Promise<void>((res) => { setTimeout(() => { res() }, 5000) })) }
+
+	loadFont("emulogic", "assets/emulogic.ttf", {
+		outline: 10,
+		filter: "linear"
+	})
+
+	loadFont("lambdao", "assets/Lambda-Regular.ttf", {
+		outline: 5,
+		filter: "linear"
+	})
+
+	loadFont("lambda", "assets/Lambda-Regular.ttf", {
+		filter: "linear"
+	})
+}
+
 function loadSprites() {
 	loadBean()
 
-	// no use for loadRoot because public becomes ./
+	// fonts don't work with loadRoot, fuck
+	loadFonts()
+
+	loadRoot("assets/")
 	loadSprite("devky", "devky.png")
 	loadSprite("hexagon", "sprites/hexagon.png")
 	
@@ -615,7 +636,12 @@ function loadSprites() {
 	loadSprite("backcard", "sprites/ascendscene/backcard.png")
 	loadSprite("confirmAscension", "sprites/ascendscene/confirmAscension.png")
 
+	loadSprite("ascendWin", "sprites/windows/ascendWin/ascendWin.png")
 	loadSprite("winMage_body", "sprites/windows/ascendWin/winMage_body.png")
+	loadSprite("winMage_eye", "sprites/windows/ascendWin/winMage_eye.png")
+	loadSprite("winMage_cursors", "sprites/windows/ascendWin/winMage_cursors.png")
+	loadSprite("winMage_vignette", "sprites/windows/ascendWin/winMage_vignette.png")
+
 	loadSprite("gnome", "sprites/gnome.png")
 	loadSprite("pinch", "sprites/pinch.png")
 	//#endregion
@@ -694,22 +720,6 @@ export function loadEverything() {
 	//#endregion MUSIC
 
 	// #region OTHER STUFF
-	if (!DEBUG) {load(new Promise<void>((res) => { setTimeout(() => { res() }, 5000) })) }
-
-	loadFont("emulogic", "emulogic.ttf", {
-		outline: 10,
-		filter: "linear"
-	})
-
-	loadFont("lambdao", "Lambda-Regular.ttf", {
-		outline: 5,
-		filter: "linear"
-	})
-
-	loadFont("lambda", "Lambda-Regular.ttf", {
-		filter: "linear"
-	})
-
 	if (!DEBUG) {load(new Promise<void>((res) => { setTimeout(() => { res() }, 5000) })) }
 	
 	// made by MF

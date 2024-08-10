@@ -4,6 +4,7 @@ export function positionSetter() {
 	return {
 		id: "setterAnimation",
 		distance: 1,
+		require: ["pos"],
 		update() {
 			if (this.parent.is("setterAnimation")) return
 			

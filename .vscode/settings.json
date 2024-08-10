@@ -1,8 +1,5 @@
 {
 	"search.exclude": {
-		"**/price-tweaker": true,
-		"**/www/game.js": true,
+		"**/public/game.js": true,
 	},
-
-	"javascript.preferences.autoImportFileExcludePatterns": ["**/price-tweaker/**"],
 }

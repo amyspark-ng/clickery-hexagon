@@ -5,7 +5,7 @@
 			// Needs 7zip
 			"label": "— Build kaplay",
 			"type": "shell",
-			"command": "pnpm build ; 7z a -tzip ./build.zip ./dist",
+			"command": "pnpm build ; 7z a -tzip ./build.zip ./public",
 			// "group": {
 			// 	"kind": "build",
 			// }

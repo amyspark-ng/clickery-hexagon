@@ -17,5 +17,5 @@
     "strict": false,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"]
+  "include": ["source"]
 }

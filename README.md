@@ -12,7 +12,7 @@ Made in [KAPLAY](https://kaplayjs.com)
 - Khriz28 - Playtesting & Support
 
 ### Extra / Special Thanks:
-- niceEli - Desktop support/Port to Vite
+- niceEli - Desktop support/Help with packages
 - Candy&Carmel - Number support
 - Oliver_is_here - Code/General support
 - [Lambda font](https://ggbot.itch.io/lambda-font)

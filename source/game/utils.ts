@@ -398,7 +398,7 @@ export function debugFunctions() {
 	window.globalThis.spawnPowerup = spawnPowerup
 	window.globalThis.hexagon = hexagon
 	window.globalThis.openWindow = openWindow
-
+	
 	onUpdate(() => {
 		// if (isKeyDown("control")) {
 		if (isKeyPressed("c") && GameState.scoreAllTime > 25) GameState.save(true)
