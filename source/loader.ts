@@ -2,6 +2,7 @@ import { DEBUG } from "./main.js"
 import { introscene } from "./game/scenes/introScene.ts";
 import { gamescene } from "./game/gamescene.ts";
 import { focuscene } from "./game/scenes/focuscene.ts";
+import { ngScene } from "./game/scenes/ngScene.ts";
 
 export function drawSeriousLoadScreen(progress, op = 1) {
 	function drawHexagon(opts = {
@@ -771,6 +772,7 @@ export function loadEverything() {
 	
 	if (!DEBUG) {load(new Promise<void>((res) => { setTimeout(() => { res() }, 5000) })) }
 
+	ngScene()
 	focuscene()
 	introscene()
 	gamescene()

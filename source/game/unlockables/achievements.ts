@@ -7,12 +7,18 @@ import { songs, songsListened } from '../windows/musicWindow';
 import { isWindowUnlocked, unlockableWindows, unlockWindow } from './unlockablewindows';
 import { playSfx } from '../../sound';
 import { ROOT } from '../../main';
+import ng from 'newgrounds.js';
+import { newgroundsManagement, ngEnabled } from '../../newgrounds';
 
 type achievementOpt = {
 	/**
 	 * The id the achievement will have, (eg: 100score)
 	 */
 	id: string,
+	/**
+	 * The id the achievement has on newgrounds (remember to pass it as a number don't mess it up this time)
+	*/
+	ngId?: number, // IS OPTIONAL WHILE I ADD THEM
 	/**
 	 * The name/funny pun the achievement will have
 	 */
@@ -48,7 +54,8 @@ type achievementOpt = {
 }
 
 class Achievement {
-	id:string
+	id:string;
+	ngId?:number;
 	title: string;
 	description: string;
 	icon: string;
@@ -57,9 +64,11 @@ class Achievement {
 	duration: number;
 	condition: () => boolean;
 	secretCondition: () => boolean;
-	
+
 	constructor(public opts: achievementOpt) {
 		this.id = opts.id
+		this.ngId = opts.ngId
+
 		this.title = opts.title
 		this.description = opts.description
 		this.icon = opts.icon
@@ -455,6 +464,8 @@ export function checkForUnlockable() {
 }
 
 export function unlockAchievement(id:string) {
+	if (isAchievementUnlocked(id)) return
+	
 	GameState.unlockedAchievements.push(id)
 
 	let achievement = getAchievement(id)
@@ -475,4 +486,8 @@ export function unlockAchievement(id:string) {
 
 		ROOT.trigger("achivementUnlock", id)
 	})
+
+	if (ngEnabled == true) {
+		if (achievement.ngId) ng.unlockMedal(achievement.ngId)
+	}
 }

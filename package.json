@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "esbuild --bundle source/main.ts --outfile=public/game.js",
-    "dev": "esbuild --bundle source/main.ts --outfile=public/game.js --servedir=./public"
+    "dev": "esbuild --bundle source/main.ts --sourcemap --outfile=public/game.js --servedir=./public"
   },
   "dependencies": {
     "esbuild": "^0.20.2",

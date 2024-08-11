@@ -23,6 +23,7 @@ export function addBackground() {
 			col1D: rgb(128, 128, 128),
 			col2D: rgb(190, 190, 190),
 			update() {
+				if (getSceneName() != "gamescene") return
 				if (!isWindowUnlocked("bgColorWin")) return
 
 				if (isMousePressed("right")) {

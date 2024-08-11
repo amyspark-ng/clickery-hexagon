@@ -1,4 +1,6 @@
+import ng from "newgrounds.js"
 import { gameBg } from "../additives"
+import { enableNg } from "../../main"
 
 export function focuscene() {
 	return scene("focuscene", () => {
@@ -27,9 +29,16 @@ export function focuscene() {
 			})
 		})
 
-		onClick(() => {
+		onClick(async () => {
 			gameBg.color.a = 1
-			go("gamescene")
+			
+			if (enableNg == true) {
+				if (!await ng.getUsername()) go("ngScene")
+				else go("gamescene")
+			}
+
+			else go("gamescene")
+			
 		})
 	})	
 }

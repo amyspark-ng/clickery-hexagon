@@ -5,8 +5,10 @@ import { drawSeriousLoadScreen, loadEverything } from "./loader.ts"
 import { addBackground, addMouse, gameBg } from "./game/additives.ts";
 import { volumeManager } from "./sound.ts";
 import { newgroundsManagement } from "./newgrounds.ts";
+import ng from "newgrounds.js";
 
-export const DEBUG:boolean = true
+export let DEBUG:boolean = true
+export let enableNg:boolean = false
 export const k = kaplay({
 	width: 1024,
 	height: 576,
@@ -69,10 +71,18 @@ onLoad(() => {
 		})
 	}
 	
-	ROOT.on("rungame", () => {
+	ROOT.on("rungame", async () => {
 		addMouse()
+
 		if (!isFocused()) go("focuscene")
-		else go("gamescene")
+		else {
+			if (enableNg == true) {
+				if (!await ng.getUsername()) go("ngScene")
+				else go("gamescene")
+			}
+
+			else go("gamescene")
+		}
 	})
 })
 

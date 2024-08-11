@@ -10,14 +10,20 @@ this game MIGHT be getting done
 ## Current TODO (small stuff mostly)
 
 <!-- ================ -->
-	IMPORTANT!!!!!!
+	TO-DO!!!!!!
 <!-- ================ -->
-- start work on newgrounds api and leaderboards -->
 
 <!-- balancing -->
 - you shouldn't be able to buy awesome powerup
 - prices increase TOO MUCH after ascending (if clickers are 25 second time ascending they should be 29, or maybe instead of increasing base price increase percentageIncrease)
 - make powerups cheaper
+
+<!-- code -->
+- improve natural spawning methods of powerups
+- balance cursor prices (too expensive)
+- make powerups better and cheaper
+- fix the fullscreen checkbox working weird
+- music window
 
 <!-- ascension -->
 - takes 10-15-20 mins to reach 5 million of total score, that's good
