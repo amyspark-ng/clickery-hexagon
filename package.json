@@ -5,9 +5,12 @@
   "scripts": {
     "dev": "tauri dev",
     "build": "tauri build",
-    "nodemon:dev": "nodemon --exec esbuild --bundle source/main.ts --sourcemap --outfile=public/game.js --servedir=./public",
-    "old:build": "esbuild --bundle source/main.ts --outfile=public/game.js",
+
+    "web:dev": "nodemon --exec esbuild --bundle source/main.ts --sourcemap --outfile=public/game.js --servedir=./public",
+    "web:build": "esbuild --bundle source/main.ts --outfile=public/game.js",
+
     "old:dev": "esbuild --bundle source/main.ts --sourcemap --outfile=public/game.js --servedir=./public",
+    
     "tauri": "tauri"
   },
   "nodemonConfig": {
