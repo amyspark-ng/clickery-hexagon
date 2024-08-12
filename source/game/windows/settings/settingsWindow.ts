@@ -1,6 +1,7 @@
 import { GameState } from "../../../gamestate"
 import { ROOT } from "../../../main";
 import { addCheckbox, addDeleteSaveButton, addVolumeControl } from "./settingsWinElements"
+import { appWindow } from '@tauri-apps/api/window';
 
 let otherCheckboxesBg:any;
 let otherButtonsBg:any;
@@ -25,6 +26,10 @@ export function settingsWinContent(winParent) {
 		onCheck: function (): boolean {
 			GameState.settings.fullscreen = !GameState.settings.fullscreen
 			setFullscreen(GameState.settings.fullscreen)
+			if ("isTauri" in window)
+			{
+				appWindow.setFullscreen(GameState.settings.fullscreen)
+			}
 			return GameState.settings.fullscreen;
 		},
 		title: "Fullscreen"

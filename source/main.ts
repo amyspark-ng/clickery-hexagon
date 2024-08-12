@@ -20,8 +20,8 @@ export const k = kaplay({
 	loadingScreen: true,
 	crisp: false,
 	backgroundAudio: true,
-	stretch: DEBUG == true ? false : true,
-	letterbox: DEBUG == true ? false : true,
+	// stretch: DEBUG == true ? false : true,
+	letterbox: true // DEBUG == true ? false : true,
 });
 
 export let ROOT = getTreeRoot()
