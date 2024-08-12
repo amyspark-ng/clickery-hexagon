@@ -26,7 +26,7 @@ export function settingsWinContent(winParent) {
 		onCheck: function (): boolean {
 			GameState.settings.fullscreen = !GameState.settings.fullscreen
 			setFullscreen(GameState.settings.fullscreen)
-			if ("isTauri" in window)
+			if ("__TAURI__" in window)
 			{
 				appWindow.setFullscreen(GameState.settings.fullscreen)
 			}
