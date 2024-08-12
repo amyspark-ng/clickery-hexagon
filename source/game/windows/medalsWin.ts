@@ -45,10 +45,8 @@ export function medalsWinContent(winParent) {
 	// everytime you scroll that achievements gets updated
 	// for hovers you can check the distance to the medalObj
 	function addMedal(gridPosition:{ row:number, column:number }, medalid:string) {
-		let achievementInfo = getAchievement(medalid)
-		
 		let medalObj = medalsContainer.add([
-			sprite("white_noise"),
+			sprite(medalid),
 			pos(),
 			anchor("center"),
 			layer("windows"),
@@ -80,13 +78,13 @@ export function medalsWinContent(winParent) {
 		medalObj.achievementIdx = achievements.indexOf(getAchievement(medalid))
 
 		if (isAchievementUnlocked(medalid)) {
-			parseAnimation(medalObj, getAchievement(medalid).icon)
+			// parseAnimation(medalObj, getAchievement(medalid).icon)
 			medalObj.width = 60
 			medalObj.height = 60
 		}
 
 		else {
-			parseAnimation(medalObj, "medals.unknown")
+			// parseAnimation(medalObj, "medals.unknown")
 		}
 
 		medalObj.onClick(() => {

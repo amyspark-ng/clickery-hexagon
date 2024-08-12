@@ -10,9 +10,9 @@ Made in [KAPLAY](https://kaplayjs.com)
 - lajbel - Code & Design
 - MF - Code & Shaders
 - Khriz28 - Playtesting & Support
+- niceEli - Code & Desktop support
 
 ### Extra / Special Thanks:
-- niceEli - Desktop support/Help with packages
 - Candy&Carmel - Number support
 - Oliver_is_here - Code/General support
 - [Lambda font](https://ggbot.itch.io/lambda-font)

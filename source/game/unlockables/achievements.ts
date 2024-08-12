@@ -53,7 +53,7 @@ type achievementOpt = {
 	condition?: () => boolean,
 }
 
-class Achievement {
+export class Achievement {
 	id:string;
 	ngId?:number;
 	title: string;
@@ -101,9 +101,7 @@ export let fullUpgradeValues = {
 	}
 }
 
-export let achievements:Achievement[]
-
-achievements = [
+export let achievements = [
 	/* TODO: Missing types of achievements
 		- Score per second
 		- Score forfeited on ascending
@@ -168,7 +166,7 @@ achievements = [
 	}),
 
 	new Achievement({
-		id: "millionscore",
+		id: "1millionscore",
 		title: "That's crazy",
 		description: "Get 1 million of score",
 		icon: "upgrades.k_1",
@@ -176,12 +174,11 @@ achievements = [
 	}),
 
 	new Achievement({
-		id: "1sextillionscore",
-		title: "Getting scientific",
-		description: "Get 1 sextillion of score",
+		id: "15millionscore",
+		title: "That's crazy",
+		description: "Get 15 million of score",
 		icon: "upgrades.k_1",
-		duration: 4,
-		condition: () => GameState.scoreAllTime >= scoreManager.scientificENOT,
+		condition: () => GameState.scoreAllTime >= 15_000_000,
 	}),
 
 	new Achievement({
@@ -369,6 +366,15 @@ achievements = [
 		condition: () => GameState.stats.timesAscended >= 10,
 		secretCondition: () => GameState.stats.timesAscended >= 1,
 	}),
+
+	new Achievement({
+		id: "buy10cards",
+		title: "The trickster",
+		description: "Buy 10 cards",
+		icon: "icon_ascend",
+		condition: () => GameState.ascension.clickPercentagesBought + GameState.ascension.cursorsPercentagesBought + GameState.ascension.powerupPowersBought + GameState.ascension.critPowersBought >= 10,
+		secretCondition: () => GameState.stats.timesAscended >= 1,
+	}),
 	// #endregion ASCENSION ACHIEVEMENTS =====================
 
 	// #region EXTRA ACHIEVEMENTS =====================
@@ -426,7 +432,7 @@ achievements = [
 		icon: "osaka",
 		condition: () => GameState.unlockedAchievements.length == achievements.length - 1
 	}),
-]
+] as Achievement[]
 
 // TODO: Find a working api for the secret achievements
 // TODO: Find a way to make that achievementId type

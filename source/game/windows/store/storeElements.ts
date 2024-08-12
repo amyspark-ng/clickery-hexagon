@@ -305,6 +305,7 @@ export function addStoreElement(winParent:any, opts:storeElementOpt) {
 						natural: false,
 					})
 					GameState.stats.powerupsBought++
+					GameState.stats.powerupsBoughtThisRun++
 				}
 				
 				this.trigger("buy")

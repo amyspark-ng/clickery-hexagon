@@ -50,12 +50,14 @@ export function folderObjManaging() {
 							taskbarIndex: taskbarIndex,
 							initialPosition: folderObj.pos,
 						})
+						newminibutton.area.scale = vec2(0)
 					});
 					
 					movingMinibuttons = true
 					get("minibutton").forEach((miniButton) => {
 						tween(miniButton.pos, miniButton.destinedPosition, 0.32, (p) => miniButton.pos = p, easings.easeOutBack).then(() => {
 							movingMinibuttons = false;
+							miniButton.area.scale = vec2(0.75)
 						})
 					})
 				}
@@ -69,6 +71,7 @@ export function folderObjManaging() {
 				// return them to folderObj pos
 				movingMinibuttons = true
 				get("minibutton").forEach(minibutton => {
+					minibutton.area.scale = vec2(0)
 					tween(minibutton.opacity, 0, 0.32, (p) => minibutton.opacity = p, easings.easeOutQuint)
 					tween(minibutton.pos, folderObj.pos, 0.32, (p) => minibutton.pos = p, easings.easeOutQuint).then(() => {
 						destroy(minibutton)

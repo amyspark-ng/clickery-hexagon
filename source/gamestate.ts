@@ -54,13 +54,14 @@ class _GameState {
 
 	unlockedAchievements = []
 
-	unlockedWindows = ["bgColorWin", "hexColorWin"]
+	unlockedWindows = []
 	taskbar = []
 
 	stats = {
 		timesClicked: 0,
 		powerupsClicked: 0,
 		timesAscended: 0,
+		powerupsBoughtThisRun: 0,
 		powerupsBought: 0,
 		totalTimePlayed: 0,
 		timesGnomed: 0,
@@ -179,15 +180,19 @@ class _scoreManager {
 	// used usually when buying
 	subTweenScore(amount:number) {
 		// GameState.score -= amount
-		tween(GameState.score, GameState.score - amount, 0.32, (p) => GameState.score = p, easings.easeOutExpo)
 		ROOT.trigger("scoreDecreased", amount)
+		tween(GameState.score, GameState.score - amount, 0.32, (p) => GameState.score = p, easings.easeOutExpo).onEnd(() => {
+			ROOT.trigger("scoreDecreased", amount)
+		})
 	}
 
 	addTweenScore(amount:number) {
-		tween(GameState.score, GameState.score + amount, 0.32, (p) => GameState.score = p, easings.easeOutExpo)
+		ROOT.trigger("scoreIncreased", amount)
+		tween(GameState.score, GameState.score + amount, 0.32, (p) => GameState.score = p, easings.easeOutExpo).onEnd(() => {
+			ROOT.trigger("scoreIncreased", amount)
+		})
 		GameState.scoreThisRun += amount
 		GameState.scoreAllTime += amount
-		ROOT.trigger("scoreGained", amount)
 	}
 
 	// =====================
@@ -204,7 +209,7 @@ class _scoreManager {
 
 	// Is the actual formula that determines the amounts you get mana at
 	getScoreForManaAT = (manaAllTime:number) => {
-		return (manaAllTime ** 3) * this.ascensionConstant
+		return (manaAllTime ** 0.8) * this.ascensionConstant
 	}
 
 	// The score you get the next mana at
@@ -223,7 +228,7 @@ class _scoreManager {
 		tween(GameState.clicksUpgradesValue, 1, 0.5, (p) => GameState.clicksUpgradesValue = Math.round(p), easings.easeOutQuad)
 		tween(GameState.cursorsUpgradesValue, 1, 0.5, (p) => GameState.cursorsUpgradesValue = Math.round(p), easings.easeOutQuad)
 		
-		GameState.stats.powerupsBought = 0
+		GameState.stats.powerupsBoughtThisRun = 0
 
 		GameState.upgradesBought = ["c_0"]
 		GameState.timeUntilAutoLoopEnds = 10

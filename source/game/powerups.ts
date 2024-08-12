@@ -81,6 +81,7 @@ let blabPhrases = [
 	"Did you know?\nYou can hold your mouse when buying!",
 	"Did you know?\nYou can hold shift to bulk-buy 10x things!",
 	"Did you know?\nYou can click the big hexagon several times\nto start a combo!",
+	"Did you know?\nYou can click the score per second text to see how much\nyou'd make in different times!",
 ]
 
 export type powerupName = keyof typeof powerupTypes | "random";
@@ -310,10 +311,10 @@ export function spawnPowerup(opts?:powerupOpt) {
 		let list = Object.keys(powerupTypes)
 		
 		if (Math.round(scoreManager.autoScorePerSecond()) < 1) list.splice(list.indexOf("time"), 1)
-		if (opts.natural == false) list.splice(list.indexOf("awesome"), 1) 
+		if (opts.natural == false) list.splice(list.indexOf("awesome"), 1)
 		
 		let element = choose(list) as powerupName
-		if (chance(0.2) && opts.natural == false) element = "blab"
+		if (chance(0.2) && opts.natural == true) element = "blab"
 		
 		return element;
 	}
@@ -324,7 +325,7 @@ export function spawnPowerup(opts?:powerupOpt) {
 	opts.pos = opts.pos || randomPos()
 
 	let powerupObj = add([
-		sprite("white_noise"),
+		sprite("cursors"),
 		pos(opts.pos),
 		scale(1),
 		area(),
@@ -338,7 +339,6 @@ export function spawnPowerup(opts?:powerupOpt) {
 		area(),
 		"powerup",
 		{
-			whiteness: 0,
 			type: opts.type,
 			maxScale: 3,
 			update() {
@@ -375,11 +375,10 @@ export function spawnPowerup(opts?:powerupOpt) {
 					}
 				])
 
+				parseAnimation(blink, powerupTypes[opts.type].sprite)
 				blink.scale = this.scale
 				blink.width = this.width
 				blink.height = this.height
-
-				parseAnimation(blink, powerupTypes[opts.type].sprite)
 
 				let timeToLeave = 0.75
 				tween(0.5, 0, timeToLeave, (p) => blink.maxOpacity = p, easings.easeOutBack)
@@ -450,6 +449,7 @@ export function spawnPowerup(opts?:powerupOpt) {
 	parseAnimation(powerupObj, powerupTypes[opts.type].sprite)
 	powerupObj.startWave()
 
+	powerupObj.scale = vec2(1)
 	powerupObj.width = 60
 	powerupObj.height = 60
 

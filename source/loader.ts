@@ -3,6 +3,7 @@ import { introscene } from "./game/scenes/introScene.ts";
 import { gamescene } from "./game/gamescene.ts";
 import { focuscene } from "./game/scenes/focuscene.ts";
 import { ngScene } from "./game/scenes/ngScene.ts";
+import { Achievement, achievements } from "./game/unlockables/achievements.ts";
 
 export function drawSeriousLoadScreen(progress, op = 1) {
 	function drawHexagon(opts = {
@@ -508,6 +509,22 @@ function loadSprites() {
 	})
 	//#endregion Settings
 
+	let achievementIds = achievements.map(achievement => achievement.id)
+	let medalsSprites = {}
+
+	achievementIds.forEach((achievementId) => {
+		medalsSprites[achievementId] = {
+			"x": 0,
+			"y": 0,
+			"width": 60,
+			"height": 60,
+		}
+	})
+
+	loadSpriteAtlas("sprites/windows/medalsWin/medals.png", {
+		...medalsSprites
+	})
+
 	loadSprite("medals", "sprites/windows/medalsWin/medals.png", {
 		sliceX: 1,
 		sliceY: 1,
@@ -523,6 +540,8 @@ function loadSprites() {
 	loadSprite("hexColorHandle", "sprites/windows/colorWin/hexColorHandle.png")
 	loadSprite("defaultButton", "sprites/windows/colorWin/defaultButton.png")
 	loadSprite("randomButton", "sprites/windows/colorWin/randomButton.png")
+	
+	loadSprite("extraWin", "sprites/windows/extraWin/extraWin.png")
 	//#endregion
 
 	//#endregion

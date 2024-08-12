@@ -15,6 +15,7 @@ export function creditsWinContent(winParent) {
 		"MF": "Code & Shaders",
 		"lajbel": "Game Design",
 		"Khriz28": "Playtesting & Support",
+		"niceEli": "Code & Desktop support",
 	}
 
 	function createCredits() {

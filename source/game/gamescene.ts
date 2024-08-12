@@ -15,6 +15,9 @@ import { curDraggin } from "./plugins/drag.ts"
 import { unlockableWindows } from "./unlockables/unlockablewindows.ts"
 import * as env from "../env.json"
 
+import { runOnTauri } from "../tauriUtils.ts"
+import { appWindow } from '@tauri-apps/api/window';
+
 let panderitoLetters = "panderito".split("")
 export let panderitoIndex = 0
 
@@ -306,6 +309,8 @@ export const gamescene = () => scene("gamescene", () => {
 	setGravity(1600)
 	
 	ROOT.on("gamestart", () => {
+		runOnTauri(() => appWindow.setTitle("Clickery Hexagon"))
+		
 		// wait 60 seconds
 		wait(60, () => {
 			loop(120, () => {
@@ -596,6 +601,16 @@ export const gamescene = () => scene("gamescene", () => {
 	
 	ROOT.on("buy", (info) => {
 		checkForUnlockable()
+	})
+
+	runOnTauri(() => {
+		ROOT.on("scoreGained", () => {
+			appWindow.setTitle(`Clickery Hexagon - ${formatNumber(Math.round(GameState.score))} score`)
+		})
+
+		ROOT.on("scoreDecreased", () => {
+			appWindow.setTitle(`Clickery Hexagon - ${formatNumber(Math.round(GameState.score))} score`)
+		})
 	})
 	
 	if (DEBUG == true) debugFunctions()

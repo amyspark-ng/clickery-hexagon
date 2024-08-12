@@ -1,4 +1,4 @@
-import kaplay from "kaplay";
+import kaplay, { KAPLAYOpt } from "kaplay";
 import "kaplay/global";
 
 import { drawSeriousLoadScreen, loadEverything } from "./loader.ts"
@@ -6,10 +6,12 @@ import { addBackground, addMouse, gameBg } from "./game/additives.ts";
 import { volumeManager } from "./sound.ts";
 import { newgroundsManagement } from "./newgrounds.ts";
 import ng from "newgrounds.js";
+import { runOnTauri } from "./tauriUtils.ts";
 
 export let DEBUG:boolean = true
 export let enableNg:boolean = false
-export const k = kaplay({
+
+let kaplayOpts = {
 	width: 1024,
 	height: 576,
 	font: 'lambda',
@@ -20,9 +22,16 @@ export const k = kaplay({
 	loadingScreen: true,
 	crisp: false,
 	backgroundAudio: true,
-	// stretch: DEBUG == true ? false : true,
-	letterbox: true // DEBUG == true ? false : true,
-});
+	stretch: false,
+	letterbox: false,
+}
+
+runOnTauri(() => {
+	kaplayOpts.stretch = true;
+	kaplayOpts.letterbox = true
+})
+
+export const k = kaplay(kaplayOpts as KAPLAYOpt);
 
 export let ROOT = getTreeRoot()
 setBackground(BLACK)

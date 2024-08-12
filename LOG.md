@@ -19,12 +19,11 @@ this game MIGHT be getting done
 - make powerups cheaper
 
 <!-- code -->
-- balance cursor prices (too expensive)
-- make powerups better and cheaper
 - music window refactor and reworking, i hate that?'
-- something in the opacity of the blinks make the code crash
-- hasPoint in openWindowButton has makes the code crash
-^ maybe it's because when it opens lastPosClicked is null or undefined something like that
+- fix some powerup animations
+- change onmousepress to onclick
+- fix minibuttons area scale (when unlocked and that kinda stuff)
+- powerups don't seem to work after ascending
 
 <!-- ascension -->
 - takes 10-15-20 mins to reach 5 million of total score, that's good
@@ -34,7 +33,6 @@ this game MIGHT be getting done
 - fix hexagon scale when ascending
 - add the mute dialogue option
 
-- the fucking thing where powerup logs come again and again and again
+- the fucking thing where achievements logs come again and again and again
 - upgrade tutorial tooltip doesn't work
-- figure out why does the game crash sometimes when coming back (probably related to kaplay CPU usage)
 - do tutorial for ascending (how i don'gt know)

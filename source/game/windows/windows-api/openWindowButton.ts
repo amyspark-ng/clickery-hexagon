@@ -4,16 +4,13 @@ import { curDraggin } from "../../plugins/drag"
 const timeForHold = 0.18
 
 export function openWindowButton() {
-	let lastPosClicked:Vec2;
-
 	return {
 		id: "windowButton",
 		require: ["rotate", "drag", "dummyShadow", "area"],
 
 		add() {
 			let waitingHold = wait(0, () => {})
-			this.onMousePress("left", () => {
-				lastPosClicked = mousePos()
+			this.onClick(() => {
 				if (!this.isBeingHovered) return
 			
 				waitingHold.cancel()
@@ -36,7 +33,6 @@ export function openWindowButton() {
 				// was not being dragged
 				else {
 					waitingHold.cancel()
-					// if last posclicked is inside gridminibutton
 					if (!this.isBeingHovered) return
 					if (curDraggin) return
 	

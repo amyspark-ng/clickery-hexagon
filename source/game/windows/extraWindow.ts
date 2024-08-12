@@ -3,17 +3,18 @@ import { ROOT } from "../../main";
 import { curDraggin, drag, setCurDraggin } from ".././plugins/drag";
 import { dummyShadow } from ".././plugins/dummyShadow";
 import { playSfx } from "../../sound";
-import { bop } from "../utils";
+import { bop, getPosInGrid } from "../utils";
 import { mouse } from "../additives";
-import { buttonSpacing, infoForWindows, openWindow, windowKey } from "./windows-api/windowManaging";
+import { buttonSpacing, infoForWindows, manageWindow, openWindow, windowKey } from "./windows-api/windowManaging";
 import { addMinibutton } from "./windows-api/minibuttons";
 import { openWindowButton } from "./windows-api/openWindowButton";
 import { destroyExclamation } from "../unlockables/unlockablewindows";
 import { insideWindowHover } from "../hovers/insideWindowHover";
+import { GameObj } from "kaplay";
+import { positionSetter } from "../plugins/positionSetter";
 
-export let gridContainer;
-
-let currentClosest;
+export let gridContainer:GameObj;
+let currentClosest:GameObj;
 
 // Function to update the closest minibutton
 function updateClosestMinibuttonToDrag() {
@@ -209,13 +210,12 @@ export function makeGridMinibutton(windowKey:windowKey, gridSlot:any, winParent:
 
 	// press, hold and release hold functions
 	gridMiniButton.onPress(() => {
-		if (get(gridMiniButton.windowKey)[0]) winParent.close()
-		
-		else {
-			openWindow(gridMiniButton.windowKey as windowKey); 
-			winParent.close()
-		}
-		
+		let window = get(gridMiniButton.windowKey).filter((obj) => obj.is("window"))[0] 
+		// the window already exists, close it but not this one
+		if (window) window.close()
+		else winParent.close()
+
+		manageWindow(gridMiniButton.windowKey)
 		bop(gridMiniButton)
 	})
 
@@ -251,19 +251,31 @@ let amountOfElementsX = 5
 let amountOfElementsY = 2
 export function extraWinContent(winParent) {
 	// makes the grid
-	gridContainer = winParent.add([pos(-154, -192)])
+	gridContainer = winParent.add([pos(-164, -32)])
+
+	function getExtraBtnPos(index:number) {
+		let initialPos = vec2(18, 15)
+		let pos = vec2()
+
+		let column = 0;
+		let row = 0;
+
+		// column
+		if (index < amountOfElementsX) column = index
+		else column = index - amountOfElementsX
+
+		// row
+		if (index < amountOfElementsX) row = 0
+		else row = 1
+
+		pos = getPosInGrid(initialPos, row, column, vec2(buttonSpacing - 5))
+		return pos
+	}
 
 	for(let i = 0; i < Object.keys(infoForWindows).length - 1; i++) {
 		let windowKey = Object.keys(infoForWindows)[i]
-		let buttonPositionX = 0
-		let buttonPositionY = 0
-		
-		// 75 buttonSpacing
-		if (i < amountOfElementsX) buttonPositionX = 1 + i * 75;
-		else buttonPositionX = (1 + (i - amountOfElementsX) * 75) + 75 / amountOfElementsX
-
-		if (i < amountOfElementsX) buttonPositionY = 0;
-		else buttonPositionY = buttonSpacing + 10
+	
+		let thePos = getExtraBtnPos(i)
 
 		// add the shadow/empty-spot one
 		let shadowOne = gridContainer.add([
@@ -272,7 +284,7 @@ export function extraWinContent(winParent) {
 			}),
 			anchor("center"),
 			opacity(0.5),
-			pos(buttonPositionX, buttonPositionY),
+			pos(thePos),
 			color(BLACK),
 			area(),
 			`gridShadow_${i}`,
@@ -292,13 +304,14 @@ export function extraWinContent(winParent) {
 		}
 	}
 
+	gridContainer.get("gridMiniButton")[0].use(positionSetter())
+
 	winParent.onUpdate(() => {
 		if (curDraggin == null || !curDraggin.is("gridMiniButton")) return
 		updateClosestMinibuttonToDrag()
 	})
 
 	// # manages open closed animation
-	// winParent.on("open")
 	let extraMinibutton = get("extraMinibutton")[0]
 	if (extraMinibutton) {
 		extraMinibutton.shut = false

@@ -74,7 +74,7 @@ export function ascendWinContent(winParent) {
 		}
 	])
 
-	let button = winParent.add([
+	let ascendButton = winParent.add([
 		text("ASCEND!!!", {
 			size: 20,
 			align: "center",
@@ -82,7 +82,7 @@ export function ascendWinContent(winParent) {
 		}),
 		anchor("center"),
 		color(WHITE),
-		pos(0, -100),
+		pos(-230, -100),
 		area(),
 		opacity(),
 		{
@@ -142,7 +142,7 @@ export function ascendWinContent(winParent) {
 		}
 	])
 	
-	button.onClick(() => {
+	ascendButton.onClick(() => {
 		if (allPowerupsInfo.isHoveringAPowerup == true) return
 		if (GameState.ascension.mana >= 1) triggerAscension()
 	})
@@ -161,8 +161,6 @@ export function ascendWinContent(winParent) {
 	let winMageFull = addWinMage(vec2(0, 450), masked)
 	let winMage = winMageFull.mage
 	let winMageCursors = winMageFull.cursors
-
-	winMageCursors.use(positionSetter()),
 
 	tween(objectsPositions.mage_hidden, objectsPositions.mage_visible, 0.6, (p) => winMage.pos.y = p, easings.easeOutQuint).onEnd(() => {
 		winMage.wave_verPosition = objectsPositions.mage_visible

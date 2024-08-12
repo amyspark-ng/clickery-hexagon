@@ -12,10 +12,12 @@
     "isolatedModules": true,
     "moduleDetection": "force",
     "noEmit": true,
-
+    
     /* Linting */
     "strict": false,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+
+    "resolveJsonModule": true
   },
   "include": ["source", "node_modules"]
 }

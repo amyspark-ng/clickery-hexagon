@@ -84,7 +84,7 @@ export function windowsDefinition() {
 		"leaderboardsWin": { idx: 7, content: emptyWinContent, lastPos: vec2(center().x, center().y) },
 		"hexColorWin": { idx: 8, content: hexColorWinContent, lastPos: vec2(208, 160) },
 		"bgColorWin": { idx: 9, content: bgColorWinContent, lastPos: vec2(width() - 200, 200) },
-		"extraWin": { idx: 10, icon: "extra", content: extraWinContent, lastPos: center() },
+		"extraWin": { idx: 10, icon: "extra", content: extraWinContent, lastPos: vec2(750, 392) },
 	}
 }
 
