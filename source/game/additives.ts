@@ -105,7 +105,6 @@ export function addToast(opts:toastOpts) {
 			pos(-200, yOffset),
 			anchor("top"),
 			color(WHITE.darken(50)),
-			area(),
 			fixed(),
 			layer("logs"),
 			z(0),
@@ -148,10 +147,6 @@ export function addToast(opts:toastOpts) {
 		});
 
 		toastBg.height = opts.icon ? 80 : 100;
-
-		toastBg.onClick(() => {
-			toastBg.close();
-		})
 
 		let icon = add([
 			sprite("white_noise"),

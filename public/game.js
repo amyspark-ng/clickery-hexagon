@@ -7097,383 +7097,6 @@ type: ${this.typeIdx} - ${this.type}`,
     };
   }
 
-  // source/game/ascension/ascension.ts
-  var ascension = {
-    ascending: false,
-    canLeave: false
-  };
-  var activeLetterWaits = [];
-  var currentlySaying = "";
-  function addMage() {
-    let mage_color = rgb(0, 51, 102);
-    let mage;
-    mage = add([
-      pos(-17, 154),
-      waver({ wave_speed: 1, maxAmplitude: 2.5 }),
-      layer("ascension"),
-      z(1),
-      opacity(1),
-      anchor("center"),
-      "mage"
-    ]);
-    mage.startWave();
-    let mage_body = mage.add([
-      pos(),
-      sprite("mage_body"),
-      z(2),
-      "mage_body"
-    ]);
-    let mage_body_lightning = mage.add([
-      pos(),
-      sprite("mage_body_lightning"),
-      z(3),
-      opacity(0.25),
-      "mage_lightning"
-    ]);
-    let mage_cursors = mage.add([
-      pos(0, -7),
-      sprite("mage_cursors"),
-      z(0),
-      waver({ wave_speed: 1, maxAmplitude: 5 }),
-      opacity(1),
-      color(WHITE.darken(50))
-    ]);
-    mage_cursors.startWave();
-    let mage_eye = mage.add([
-      pos(117, 120),
-      sprite("mage_eye"),
-      area({ scale: 0.8 }),
-      z(2),
-      "ascensionHover",
-      {
-        timeToBlinkAgain: 8,
-        timeUntilBlink: 8,
-        update() {
-          if (this.isHovering() && isMousePressed("left")) {
-            this.play("blink");
-            talk("mage", "stop that");
-          }
-          this.timeToBlinkAgain -= dt();
-          if (this.timeToBlinkAgain < 0) {
-            this.timeToBlinkAgain = rand(5, 8);
-            this.timeToBlinkAgain = this.timeToBlinkAgain;
-            if (chance(0.75))
-              this.play("blink");
-          }
-        }
-      }
-    ]);
-    mage_eye.onAnimEnd((anim) => {
-    });
-    let mage_toparm = mage.add([
-      pos(0, 0),
-      sprite("mage_toparm"),
-      z(1),
-      {
-        update() {
-          this.angle = wave(-0.5, 0.5, time());
-        }
-      }
-    ]);
-    let mage_toparm_lightning = mage.add([
-      pos(0, 0),
-      sprite("mage_toparm_lightning"),
-      z(4),
-      opacity(0.25),
-      "mage_lightning",
-      {
-        update() {
-          this.angle = wave(-0.5, 0.5, time());
-        }
-      }
-    ]);
-    let mage_botarm = mage.add([
-      pos(5, 240),
-      sprite("mage_botarm"),
-      z(7),
-      anchor("left"),
-      {
-        update() {
-          this.angle = wave(-1, 1, time());
-        }
-      }
-    ]);
-    let mage_botarm_lightning = mage.add([
-      pos(5, 240),
-      sprite("mage_botarm_lightning"),
-      z(8),
-      anchor("left"),
-      opacity(0.25),
-      "mage_lightning",
-      {
-        update() {
-          this.angle = wave(-1, 1, time());
-        }
-      }
-    ]);
-    let mage_hexagon = mage.add([
-      pos(GameState.settings.panderitoMode ? vec2(231, 250) : vec2(231, 244)),
-      sprite(GameState.settings.panderitoMode ? "panderito" : "hexagon"),
-      scale(0.35),
-      waver({ wave_speed: 1, maxAmplitude: 10 }),
-      rotate(0),
-      anchor("center"),
-      color(WHITE),
-      z(5),
-      area({ scale: 0.8 }),
-      "hexagon",
-      "ascensionHover",
-      {
-        update() {
-          if (this.isHovering() && isMousePressed("left")) {
-            bop(this, 0.01);
-            talk("mage", "no backsies");
-          }
-          this.angle += 0.02;
-        }
-      }
-    ]);
-    mage.get("mage_lightning").forEach((o) => o.onUpdate(() => {
-      o.color = mage_hexagon.color;
-    }));
-    return mage;
-  }
-  var dialogue;
-  function addDialogueBox() {
-    let box = add([
-      sprite("dialogue"),
-      pos(623, 144),
-      anchor("center"),
-      scale(),
-      area({ scale: 0.8 }),
-      opacity(),
-      layer("ascension"),
-      z(1),
-      "textbox",
-      {
-        defaultPos: vec2(623, 144)
-      }
-    ]);
-    box.on("talk", (speaker2) => {
-      if (speaker2 == "card") {
-        box.use(sprite("hoverDialogue"));
-        tween(box.defaultPos.y + 10, box.defaultPos.y, 0.25, (p) => box.pos.y = p, easings.easeOutQuint);
-      } else if (speaker2 == "mage") {
-        box.use(sprite("dialogue"));
-        tween(box.defaultPos.x - 10, box.defaultPos.x, 0.25, (p) => box.pos.x = p, easings.easeOutQuint);
-      }
-      tween(0.75, 1, 0.25, (p) => box.scale.x = p, easings.easeOutQuint);
-    });
-    box.onClick(() => {
-      if (dialogue.textBox.text == currentlySaying)
-        return;
-      skipTalk();
-    });
-    tween(0.5, 1, 0.25, (p) => box.scale.x = p, easings.easeOutQuint);
-    tween(0, 1, 0.25, (p) => box.opacity = p, easings.easeOutQuint);
-    return box;
-  }
-  function addDialogueText() {
-    let textBox = add([
-      text("", {
-        styles: {
-          "wavy": (idx) => ({
-            pos: vec2(0, wave(-4, 4, time() * 6 + idx * 0.5))
-          })
-        },
-        width: 606,
-        // width without tail
-        align: "center",
-        size: 25
-      }),
-      pos(670, 127),
-      anchor("center"),
-      color(BLACK),
-      layer("ascension"),
-      opacity(),
-      z(dialogue.box.z + 1),
-      "textbox",
-      "boxText"
-    ]);
-    return textBox;
-  }
-  function talk(speaker2, thingToSay, speed) {
-    dialogue.box.trigger("talk", speaker2);
-    speaker2 = speaker2 || "card";
-    thingToSay = thingToSay || "No dialogue, missing a dialogue here";
-    speed = speed || 0.025;
-    if (currentlySaying == thingToSay)
-      speed /= 2;
-    currentlySaying = thingToSay;
-    activeLetterWaits.forEach((waitCall) => waitCall.cancel());
-    activeLetterWaits = [];
-    dialogue.textBox.text = "";
-    let currentDelay = 0;
-    Array.from(thingToSay).forEach((letter, index) => {
-      let delay = speed;
-      if (letter === "," || letter === "_") {
-        delay = speed * 5;
-      }
-      currentDelay += delay;
-      const waitCall = wait(currentDelay, () => {
-        if (letter !== "_")
-          dialogue.textBox.text += letter;
-      });
-      activeLetterWaits.push(waitCall);
-    });
-  }
-  function skipTalk() {
-    activeLetterWaits.forEach((waitCall) => waitCall.cancel());
-    dialogue.textBox.text = currentlySaying;
-    tween(dialogue.box.defaultPos.y + 10, dialogue.box.defaultPos.y, 0.25, (p) => dialogue.box.pos.y = p, easings.easeOutQuint);
-    tween(dialogue.box.defaultPos.x + 10, dialogue.box.defaultPos.x, 0.25, (p) => dialogue.box.pos.x = p, easings.easeOutQuint);
-  }
-  function triggerAscension() {
-    ascension.ascending = true;
-    GameState.ascension.magicLevel++;
-    ROOT.trigger("ascension", { score: GameState.score, scoreThisRun: GameState.scoreThisRun });
-    hexagon.interactable = false;
-    folderObj.interactable = false;
-    folderObj.fold();
-    get("window").forEach((window2) => {
-      window2.close();
-    });
-    tween(hexagon.scaleIncrease, 0, 0.35, (p) => hexagon.scaleIncrease = p, easings.easeOutCubic);
-    tween(hexagon.stretchScaleIncrease, 0, 0.35, (p) => hexagon.stretchScaleIncrease = p, easings.easeOutCubic);
-    tween(hexagon.maxScaleIncrease, 0, 0.35, (p) => hexagon.maxScaleIncrease = p, easings.easeOutCubic);
-    let blackBg = add([
-      rect(width(), height()),
-      color(BLACK),
-      fixed(),
-      opacity(0.5),
-      anchor("center"),
-      pos(center()),
-      z(0),
-      layer("ascension"),
-      "ascensionBg"
-    ]);
-    let mage = addMage();
-    mage.pos.x = -489;
-    blackBg.fadeIn(0.35).onEnd(() => {
-      tween(-489, -17, 0.5, (p) => mage.pos.x = p, easings.easeOutQuart);
-      tween(145, 154, 0.5, (p) => mage.pos.y = p, easings.easeOutQuart);
-      tween(0.5, 1, 0.5, (p) => mage.opacity = p, easings.easeOutQuart).onEnd(() => {
-        dialogue = add([]);
-        dialogue.box = addDialogueBox();
-        dialogue.textBox = addDialogueText();
-        talk("mage", "welcome to fortnite");
-        mage.trigger("endAnimating");
-      });
-    });
-    spawnCards();
-    wait(0.1, () => {
-      let manaText = add([
-        text("", { align: "left", font: "lambdao", size: 38 }),
-        pos(4, 19),
-        anchor("left"),
-        layer("ascension"),
-        opacity(1),
-        "manaText",
-        {
-          hiddenXPos: -72,
-          update() {
-            this.text = `\u2726${GameState.ascension.mana}`;
-          }
-        }
-      ]);
-      manaText.fadeIn(0.35);
-      tween(manaText.hiddenXPos, 4, 0.5, (p) => manaText.pos.x = p, easings.easeOutQuart);
-    });
-    let canLeaveAscensionCheck = ROOT.on("canLeaveAscension", () => {
-      let leaveButton = add([
-        sprite("confirmAscension"),
-        layer("ascension"),
-        z(6),
-        pos(960, 289),
-        layer("ascension"),
-        scale(),
-        area(),
-        anchor("center"),
-        positionSetter(),
-        opacity(),
-        "ascensionHover",
-        "leaveButton",
-        {
-          dscale: vec2(0.8),
-          update() {
-            if (ascension.canLeave == true) {
-              this.area.scale = vec2(1);
-            } else {
-              this.area.scale = vec2(0);
-            }
-          }
-        }
-      ]);
-      leaveButton.fadeIn(0.1, easings.easeOutQuad);
-      leaveButton.onHover(() => {
-        tween(leaveButton.scale, vec2(1.2), 0.35, (p) => leaveButton.scale = p, easings.easeOutQuint);
-      });
-      leaveButton.onHoverEnd(() => {
-        tween(leaveButton.scale, vec2(1), 0.35, (p) => leaveButton.scale = p, easings.easeOutQuint);
-      });
-      mage.on("endAnimating", () => {
-        leaveButton.onUpdate(() => {
-          if (ascension.canLeave == true)
-            leaveButton.opacity = 1;
-          else
-            leaveButton.opacity = 0.75;
-        });
-      });
-      leaveButton.onClick(() => {
-        leaveButton.area.scale = vec2(0);
-        bop(leaveButton);
-        playSfx("clickButton");
-        mouse.play("point");
-        endAscension();
-      });
-      canLeaveAscensionCheck.cancel();
-    });
-    let startHover = onHover("ascensionHover", () => {
-      mouse.play("point");
-    });
-    let endHover = onHoverEnd("ascensionHover", () => {
-      mouse.play("cursor");
-    });
-    blackBg.onDestroy(() => {
-      startHover.cancel();
-      endHover.cancel();
-    });
-  }
-  function endAscension() {
-    folderObj.interactable = true;
-    ROOT.trigger("endAscension");
-    get("*", { recursive: true }).filter((obj) => obj.layer == "ascension").forEach((obj) => {
-      if (obj.is("area"))
-        obj.area.scale = vec2(0);
-      if (obj.is("mage") || obj.is("manaText")) {
-        tween(obj.pos.x, obj.pos.x - obj.width, 0.5, (p) => obj.pos.x = p, easings.easeOutQuart).onEnd(() => destroy(obj));
-      } else if (obj.is("card")) {
-        tween(obj.pos.y, obj.pos.y + obj.height, 0.5, (p) => obj.pos.y = p, easings.easeOutQuart).onEnd(() => destroy(obj));
-      } else if (obj.is("textbox")) {
-        tween(obj.pos.y, -obj.height, 0.5, (p) => obj.pos.y = p, easings.easeOutQuart).onEnd(() => destroy(obj));
-      } else if (obj.is("ascensionBg") || obj.is("leaveButton")) {
-        obj.fadeOut(0.5).onEnd(() => destroy(obj));
-      }
-    });
-    scoreManager.resetRun();
-    wait(0.25, () => {
-      tween(hexagon.scaleIncrease, 1, 0.25, (p) => hexagon.scaleIncrease = p, easings.easeOutQuint);
-      tween(hexagon.maxScaleIncrease, 1, 0.25, (p) => hexagon.maxScaleIncrease = p, easings.easeOutQuint);
-      tween(hexagon.stretchScaleIncrease, 1, 0.25, (p) => hexagon.stretchScaleIncrease = p, easings.easeOutQuint).onEnd(() => {
-        hexagon.interactable = true;
-      });
-      hexagonIntro();
-    });
-    wait(0.5, () => {
-      ascension.canLeave = false;
-    });
-  }
-
   // source/game/plugins/confetti.ts
   var DEF_COUNT = 80;
   var DEF_GRAVITY = 800;
@@ -7908,6 +7531,326 @@ type: ${this.typeIdx} - ${this.type}`,
         });
       });
     }
+  }
+
+  // source/game/windows/musicWindow.ts
+  var songs = {
+    "clicker.wav": { name: "clicker.wav", idx: 0, speed: 2.5, cover: "wav", duration: 61 },
+    "menu.wav": { name: "menu.wav", idx: 1, speed: 1.6, cover: "wav", duration: 36 },
+    "whatttt.wav": { name: "whatttt.wav", idx: 2, speed: 2, cover: "wav", duration: 51 },
+    "simple.wav": { name: "simple.wav", idx: 3, speed: 1.3, cover: "wav", duration: 99 },
+    "jazz.wav": { name: "jazz.wav", idx: 4, speed: 2.1, cover: "wav", duration: 43 },
+    "sweet.wav": { name: "sweet.wav", idx: 5, speed: 2.5, cover: "wav", duration: 46 },
+    "ok_instrumental": { name: "ok (Inst)", idx: 6, speed: 2, cover: "ok", duration: 102 },
+    "magic": { name: "magic.", idx: 7, speed: 1, cover: "bb1", duration: 46 },
+    "watchout": { name: "Watch out!", idx: 8, speed: 2.4, cover: "bb2", duration: 49 },
+    "catnip": { name: "catnip", idx: 9, speed: 2.1, cover: "cat", duration: 67 },
+    "project_23": { name: "Project_23", idx: 10, speed: 2.1, cover: "bb3", duration: 45 }
+  };
+  var songsListened = [];
+  var currentSongIdx = 0;
+  var progressBar;
+  var timeText;
+  var timeSinceSkip = 0;
+  var skipping = false;
+  function setTimeSinceSkip(value = 0) {
+    timeSinceSkip = value;
+  }
+  var angleOfDisc = 0;
+  function musicWinContent(winParent) {
+    currentSongIdx = GameState.settings.music.favoriteIdx == null ? 0 : GameState.settings.music.favoriteIdx;
+    let currentSong = songs[Object.keys(songs)[currentSongIdx]];
+    function checkForSongListen(songIdx) {
+      if (songsListened.includes(songIdx) == false)
+        songsListened.push(songIdx);
+    }
+    if (!isAchievementUnlocked("allsongs")) {
+      checkForSongListen(currentSongIdx);
+    }
+    let disc = winParent.add([
+      sprite("discs", {
+        anim: `${songs[Object.keys(songs)[currentSongIdx]].cover}`
+      }),
+      pos(-150, -20),
+      rotate(angleOfDisc),
+      anchor("center"),
+      scale(1),
+      area(),
+      "bpmChange",
+      "pauseButton",
+      "musicButton",
+      "windowButton",
+      {
+        verPosition: -20,
+        spinSpeed: musicHandler.paused ? 0 : songs[Object.keys(songs)[currentSongIdx]].speed,
+        update() {
+          if (musicHandler.winding || skipping)
+            return;
+          this.angle += this.spinSpeed;
+          if (Math.floor(this.angle) % 360 == 0)
+            this.angle = 0;
+        }
+      }
+    ]);
+    let nowPlaying = winParent.add([
+      pos(-50, -25),
+      text(Object.keys(songs)[0], {
+        size: 20,
+        styles: {
+          "small": {
+            scale: vec2(0.8),
+            pos: vec2(0, 4)
+          }
+        }
+      }),
+      anchor("left"),
+      {
+        update() {
+          this.text = `${songs[Object.keys(songs)[currentSongIdx]].idx + 1}. ${songs[Object.keys(songs)[currentSongIdx]].name} ${musicHandler.paused && !musicHandler.winding ? "(PAUSED)" : ""}`;
+        }
+      }
+    ]);
+    let theOneBehind = winParent.add([
+      rect(winParent.width - 50, 10, { radius: 20 }),
+      pos(0, 25),
+      area(),
+      color(),
+      area({ scale: vec2(1, 1.25) }),
+      opacity(1),
+      anchor("center"),
+      {
+        update() {
+          this.color = progressBar.color.darken(150);
+        }
+      }
+    ]);
+    timeText = winParent.add([
+      text("0:00", {
+        size: 20
+      }),
+      pos(-120, 50),
+      anchor("center"),
+      "bpmChange",
+      {
+        verPosition: 50,
+        update() {
+          let time2 = `${formatTime(musicHandler.currentTime, false)}/${formatTime(musicHandler.totalTime === void 0 ? musicHandler.duration() : musicHandler.totalTime, false)}`;
+          this.text = time2;
+          if (!musicHandler.winding)
+            musicHandler.currentTime = map(progressBar.width, 0, theOneBehind.width, 0, musicHandler.duration());
+          if (!musicHandler.winding)
+            musicHandler.totalTime = songs[Object.keys(songs)[currentSongIdx]].duration;
+        }
+      }
+    ]);
+    progressBar = winParent.add([
+      rect(1, 10, { radius: 10 }),
+      pos(theOneBehind.pos.x - theOneBehind.width / 2, theOneBehind.pos.y),
+      color(WHITE),
+      anchor("left"),
+      {
+        update() {
+          if (musicHandler.winding)
+            return;
+          this.width = musicHandler.time() / musicHandler.duration() * theOneBehind.width;
+        },
+        draw() {
+          drawCircle({
+            pos: vec2(this.width, 0),
+            radius: 8,
+            color: this.color,
+            anchor: "center",
+            opacity: this.opacity
+          });
+        }
+      }
+    ]);
+    let backButton = winParent.add([
+      text("<", {
+        size: 40
+      }),
+      pos(-30, 60),
+      area(),
+      scale(),
+      anchor("center"),
+      "musicButton",
+      "windowButton",
+      "backButton"
+    ]);
+    let pauseButton = winParent.add([
+      text("", {
+        size: 40
+      }),
+      pos(15, 60),
+      area(),
+      scale(),
+      anchor("center"),
+      "musicButton",
+      "windowButton",
+      "pauseButton",
+      {
+        update() {
+          if (musicHandler.paused && !musicHandler.winding)
+            this.text = ">";
+          else
+            this.text = "||";
+        }
+      }
+    ]);
+    let skipButton = winParent.add([
+      text(">", {
+        size: 40
+      }),
+      pos(60, 60),
+      area(),
+      scale(),
+      anchor("center"),
+      "musicButton",
+      "windowButton",
+      "skipButton"
+    ]);
+    function backButtonAction() {
+      if (musicHandler.currentTime > 2) {
+        musicHandler.seek(0);
+        musicHandler.winding = true;
+      } else {
+        currentSongIdx--;
+        if (currentSongIdx < 0)
+          currentSongIdx = Object.keys(songs).length - 1;
+        currentSong = songs[Object.keys(songs)[currentSongIdx]];
+      }
+      playSfx("clickButton", { detune: rand(-150, 50) });
+      bop(backButton);
+    }
+    function skipButtonAction() {
+      currentSongIdx++;
+      if (currentSongIdx >= Object.keys(songs).length)
+        currentSongIdx = 0;
+      currentSong = songs[Object.keys(songs)[currentSongIdx]];
+      playSfx("clickButton", { detune: rand(-50, 150) });
+      bop(skipButton);
+    }
+    function pauseButtonAction() {
+      if (musicHandler.winding)
+        return;
+      musicHandler.paused = !musicHandler.paused;
+      pauseButton.text = musicHandler.paused ? ">" : "||";
+      get("bpmChange", { recursive: true }).forEach((bpmChange) => {
+        musicHandler.paused ? bpmChange.stopWave() : bpmChange.startWave();
+      });
+      tween(disc.spinSpeed, musicHandler.paused ? 0 : songs[Object.keys(songs)[currentSongIdx]].speed, 1, (p) => disc.spinSpeed = p, easings.easeOutQuint);
+      playSfx("clickButton", { detune: rand(-100, 100) });
+      bop(pauseButton);
+    }
+    function generalBackSkipButtonAction(action) {
+      if (skipping == false) {
+        skipping = true;
+        get("bpmChange", { recursive: true }).forEach((element) => {
+          element.stopWave();
+        });
+      }
+      scratchSong();
+      tween(progressBar.width, 0, 0.5, (p) => progressBar.width = p, easings.easeOutQuint);
+      musicHandler.currentTime = musicHandler.time();
+      musicHandler.totalTime = musicHandler.duration();
+      tween(musicHandler.currentTime, 0, 0.5, (p) => musicHandler.currentTime = p, easings.easeOutQuint);
+      tween(musicHandler.totalTime, songs[Object.keys(songs)[currentSongIdx]].duration, 0.5, (p) => musicHandler.totalTime = p, easings.easeOutQuint);
+      let idxOfNewSong = action == 0 ? currentSongIdx + 1 : currentSongIdx - 1;
+      if (idxOfNewSong < 0)
+        idxOfNewSong = Object.keys(songs).length - 1;
+      if (idxOfNewSong >= Object.keys(songs).length)
+        idxOfNewSong = 0;
+      if (songs[Object.keys(songs)[idxOfNewSong]].cover != songs[Object.keys(songs)[currentSongIdx]].cover) {
+        tween(disc.angle, 0, 0.5, (p) => disc.angle = p, easings.easeOutQuint);
+        if (action == 0)
+          tween(1, -1, 0.5, (p) => disc.scale.x = p, easings.easeOutQuint);
+        else if (action == 1)
+          tween(-1, 1, 0.5, (p) => disc.scale.x = p, easings.easeOutQuint);
+      } else {
+        if (action == 0)
+          tween(disc.angle, disc.angle - rand(75, 100), 0.5, (p) => disc.angle = p, easings.easeOutQuint);
+        else
+          tween(disc.angle, disc.angle + rand(75, 100), 0.5, (p) => disc.angle = p, easings.easeOutQuint);
+      }
+      disc.play(songs[Object.keys(songs)[currentSongIdx]].cover);
+      GameState.settings.music.favoriteIdx = currentSongIdx;
+      timeSinceSkip = 0;
+      if (!isAchievementUnlocked("allsongs")) {
+        checkForSongListen(currentSongIdx);
+      }
+      wait(1, () => {
+        if (timeSinceSkip > 1) {
+          playMusic(Object.keys(songs)[currentSongIdx]);
+          skipping = false;
+          musicHandler.winding = false;
+          get("bpmChange", { recursive: true }).forEach((element) => {
+            musicHandler.paused ? true : element.startWave();
+          });
+        }
+      });
+    }
+    get("musicButton", { recursive: true }).forEach((mBtn) => mBtn.onClick(() => {
+      if (mBtn.is("backButton") || mBtn.is("skipButton")) {
+        let action;
+        if (mBtn.is("backButton")) {
+          backButtonAction();
+          action = 0;
+        } else if (mBtn.is("skipButton")) {
+          skipButtonAction();
+          action = 1;
+        }
+        generalBackSkipButtonAction(action);
+      } else if (mBtn.is("pauseButton")) {
+        pauseButtonAction();
+      }
+    }));
+    get("bpmChange", { recursive: true }).forEach((bpmChange) => {
+      if (!bpmChange.is("wave"))
+        bpmChange.use(waver({
+          maxAmplitude: 5,
+          wave_speed: currentSong.speed,
+          wave_tweenSpeed: 0.2
+        }));
+      if (!musicHandler.paused)
+        bpmChange.startWave();
+    });
+    onUpdate("bpmChange", (bpmChangeObj) => {
+      bpmChangeObj.wave_speed = currentSong.speed;
+    });
+    winParent.onKeyPress((key) => {
+      let action;
+      if (key == "left") {
+        backButtonAction();
+        action = 0;
+      } else if (key == "right") {
+        skipButtonAction();
+        action = 1;
+      }
+      if (key == "left" || key == "right")
+        generalBackSkipButtonAction(action);
+      else if (key == "up")
+        pauseButtonAction();
+    });
+    winParent.on("close", () => {
+      angleOfDisc = disc.angle;
+    });
+    theOneBehind.onClick(() => {
+      if (!winParent.active)
+        return;
+      let leftSideOfTheOneBehind = theOneBehind.screenPos().x - theOneBehind.width * 0.5;
+      let rightSideOfTheOneBehind = theOneBehind.screenPos().x + theOneBehind.width * 0.5;
+      let mappedSeconds = map(mousePos().x, leftSideOfTheOneBehind, rightSideOfTheOneBehind, 0, musicHandler.duration());
+      mappedSeconds = clamp(mappedSeconds, 0, musicHandler.duration());
+      if (!skipping) {
+        musicHandler.winding = true;
+        musicHandler.seek(mappedSeconds);
+        let mappedWidth = map(mappedSeconds, 0, currentSong.duration, 0, theOneBehind.width);
+        tween(progressBar.width, mappedWidth, 0.2, (p) => progressBar.width = p, easings.easeOutQuint).onEnd(() => {
+          musicHandler.winding = false;
+        });
+      }
+    });
+    return;
   }
 
   // node_modules/.pnpm/newgrounds.js@4.0.0-beta.1/node_modules/newgrounds.js/dist/newgrounds.mjs
@@ -9754,324 +9697,828 @@ type: ${this.typeIdx} - ${this.type}`,
     }
   }
 
-  // source/game/windows/musicWindow.ts
-  var songs = {
-    "clicker.wav": { name: "clicker.wav", idx: 0, speed: 2.5, cover: "wav", duration: 61 },
-    "menu.wav": { name: "menu.wav", idx: 1, speed: 1.6, cover: "wav", duration: 36 },
-    "whatttt.wav": { name: "whatttt.wav", idx: 2, speed: 2, cover: "wav", duration: 51 },
-    "simple.wav": { name: "simple.wav", idx: 3, speed: 1.3, cover: "wav", duration: 99 },
-    "jazz.wav": { name: "jazz.wav", idx: 4, speed: 2.1, cover: "wav", duration: 43 },
-    "sweet.wav": { name: "sweet.wav", idx: 5, speed: 2.5, cover: "wav", duration: 46 },
-    "ok_instrumental": { name: "ok (Inst)", idx: 6, speed: 2, cover: "ok", duration: 102 },
-    "magic": { name: "magic.", idx: 7, speed: 1, cover: "bb1", duration: 46 },
-    "watchout": { name: "Watch out!", idx: 8, speed: 2.4, cover: "bb2", duration: 49 },
-    "catnip": { name: "catnip", idx: 9, speed: 2.1, cover: "cat", duration: 67 },
-    "project_23": { name: "Project_23", idx: 10, speed: 2.1, cover: "bb3", duration: 45 }
+  // source/game/powerups.ts
+  var Powerup = class {
+    sprite;
+    /**
+     * Time that its left for it to be removed, if it's null it means it's not active
+     */
+    removalTime;
+    /**
+     * Time it's running to check for max time and then chance
+     */
+    runningTime;
+    /**
+     * Time it takes to rethink chance
+     */
+    maxTime;
+    /**
+     * Chance it has of appearing when maxTime is ran (from 0 to 1)
+     */
+    chance;
+    /**
+     * The multiplier the powerup is currently running
+     */
+    multiplier;
+    constructor(sprite2, maxTime, chance2, runningTime, multiplier) {
+      this.sprite = sprite2;
+      this.maxTime = maxTime;
+      this.chance = chance2;
+      this.runningTime = runningTime || 0;
+      this.multiplier = multiplier || 1;
+    }
   };
-  var songsListened = [];
-  var currentSongIdx = 0;
-  var progressBar;
-  var timeText;
-  var timeSinceSkip = 0;
-  var skipping = false;
-  function setTimeSinceSkip(value = 0) {
-    timeSinceSkip = value;
+  var powerupTypes = {
+    /**
+     * Makes clicks more powerful
+     */
+    "clicks": new Powerup("cursors.cursor", 35, 0.15),
+    /**
+     * Makes cursors more powerful
+     */
+    "cursors": new Powerup("cursors.point", 30, 0.2),
+    /**
+     * Gives you the score you would have gotten in X amount of time
+     */
+    "time": new Powerup("cursors.wait", 45, 0.25),
+    /**
+     * Increses production
+     */
+    "awesome": new Powerup("cursors.time", 60, 0.3),
+    /**
+     * Gives discounts for clickers and cursors
+     */
+    "store": new Powerup("icon_store", 60, 0.5),
+    /**
+     * Is just silly, very silly
+     */
+    "blab": new Powerup("panderito", 10, 0.4)
+  };
+  var blabPhrases = [
+    "Test powerup",
+    "lol!",
+    "Why did you click me?",
+    "IT HAD A FAMILY!!!......",
+    "Clicking since 1999",
+    "Hexagoning since march 2024",
+    "Also try Cookie Clicker!",
+    "Orteil don't sue me",
+    "Area of an hexagon:\nA = (p * 2) / 2",
+    "Did you know?\nYou can drag the buttons in your taskbar around!",
+    "Did you know?\nYou can drag the buttons in the extra window\nto your taskbar!",
+    "Did you know?\nYou can hold your mouse when buying!",
+    "Did you know?\nYou can hold shift to bulk-buy 10x things!",
+    "Did you know?\nYou can click the big hexagon several times\nto start a combo!"
+  ];
+  var timerSpacing = 65;
+  function getTimerXPos(index) {
+    let initialPos2 = vec2(width() + timerSpacing / 2);
+    return getPosInGrid(initialPos2, 0, -index - 1, vec2(timerSpacing, 0)).x;
   }
-  var angleOfDisc = 0;
-  function musicWinContent(winParent) {
-    currentSongIdx = GameState.settings.music.favoriteIdx == null ? 0 : GameState.settings.music.favoriteIdx;
-    let currentSong = songs[Object.keys(songs)[currentSongIdx]];
-    function checkForSongListen(songIdx) {
-      if (songsListened.includes(songIdx) == false)
-        songsListened.push(songIdx);
-    }
-    if (!isAchievementUnlocked("allsongs")) {
-      checkForSongListen(currentSongIdx);
-    }
-    let disc = winParent.add([
-      sprite("discs", {
-        anim: `${songs[Object.keys(songs)[currentSongIdx]].cover}`
-      }),
-      pos(-150, -20),
-      rotate(angleOfDisc),
+  function addTimer(opts) {
+    let timerObj = add([
+      rect(60, 60),
+      color(WHITE),
+      outline(3, BLACK),
+      pos(0, 40),
       anchor("center"),
+      opacity(1),
+      scale(),
+      rotate(0),
+      layer("ui"),
+      area(),
+      "putimer",
+      `${opts.type}_putimer`,
+      {
+        index: get("putimer").length,
+        updateTime() {
+          tween(vec2(1), vec2(1.1), 0.32, (p) => this.scale = p, easings.easeOutQuint).onEnd(() => {
+            tween(this.scale, vec2(1), 0.32, (p) => this.scale = p, easings.easeOutElastic);
+          });
+        },
+        end() {
+          this.tags.forEach((tag) => this.unuse(tag));
+          tween(this.pos.y, this.pos.y - 40, 0.32, (p) => this.pos.y = p, easings.easeOutQuint);
+          tween(1, 0, 0.32, (p) => this.opacity = p, easings.easeOutQuint).onEnd(() => {
+            destroy(this);
+          });
+          get("putimer").filter((pt2) => pt2.index > this.index).forEach((element) => {
+            element.index--;
+            tween(element.pos.x, getTimerXPos(element.index), 0.32, (p) => element.pos.x = p, easings.easeOutQuint);
+          });
+        }
+      }
+    ]);
+    tween(30, 40, 0.32, (p) => timerObj.pos.y = p, easings.easeOutQuint);
+    tween(90, 0, 0.32, (p) => timerObj.angle = p, easings.easeOutQuint);
+    timerObj.pos.x = getTimerXPos(timerObj.index);
+    timerObj.add([
+      text("", { font: "lambdao", size: timerObj.height / 2 }),
+      pos(0, timerObj.height / 2 + 15),
+      anchor("center"),
+      opacity(),
+      z(3),
+      {
+        update() {
+          this.opacity = timerObj.opacity;
+          if (powerupTypes[opts.type].removalTime == null)
+            return;
+          this.text = `${powerupTypes[opts.type].removalTime.toFixed(0)}s
+`;
+        }
+      }
+    ]);
+    timerObj.onClick(() => {
+      if (get(`poweruplog_${opts.type}`).length == 0) {
+        bop(timerObj);
+        addPowerupLog(opts.type);
+      }
+    });
+    let icon = timerObj.add([
+      sprite("white_noise"),
+      anchor("center"),
+      z(1),
+      {
+        update() {
+          this.opacity = timerObj.opacity;
+        }
+      }
+    ]);
+    parseAnimation(icon, opts.sprite);
+    icon.width = 50;
+    icon.height = 50;
+    let maxTime = powerupTypes[opts.type].removalTime;
+    let round = timerObj.add([
+      z(2),
+      {
+        draw() {
+          drawRect({
+            width: timerObj.width - timerObj.outline.width,
+            height: map(powerupTypes[opts.type].removalTime, 0, maxTime, 0, timerObj.height - timerObj.outline.width),
+            color: YELLOW,
+            anchor: "bot",
+            pos: vec2(0, timerObj.height / 2),
+            opacity: 0.25
+          });
+        }
+      }
+    ]);
+  }
+  function addPowerupLog(powerupType) {
+    function getPosForPowerupLog(index2) {
+      return getPosInGrid(vec2(center().x, height() - 100), -index2, 0, vec2(300, 100));
+    }
+    let powerupTime = powerupTypes[powerupType].removalTime;
+    let textInText = "";
+    if (powerupType == "blab")
+      textInText = choose(blabPhrases);
+    const bgOpacity = 0.95;
+    let bg2 = add([
+      rect(0, 0, { radius: 0 }),
+      pos(center().x, height() - 100),
+      color(BLACK.lighten(2)),
+      positionSetter(),
+      anchor("center"),
+      layer("powerups"),
+      opacity(bgOpacity),
+      z(1),
+      "poweruplog",
+      `poweruplog_${powerupType}`
+    ]);
+    let textInBgOpts = { size: 25, align: "center", width: 300 };
+    let textInBg = bg2.add([
+      text("", textInBgOpts),
+      pos(0, 0),
+      anchor("center"),
+      area(),
+      opacity(),
+      {
+        update() {
+          if (powerupTypes[powerupType].removalTime == null) {
+            powerupTime = 0;
+            return;
+          }
+          powerupTime = Math.round(powerupTypes[powerupType].removalTime);
+          let powerupMultiplier = powerupTypes[powerupType].multiplier;
+          if (powerupType == "clicks")
+            textInText = `Click production increased x${powerupMultiplier} for ${powerupTime} secs`;
+          else if (powerupType == "cursors")
+            textInText = `Cursors production increased x${powerupMultiplier} for ${powerupTime} secs`;
+          else if (powerupType == "time") {
+            textInText = `+${formatNumber(Math.round(scoreManager.autoScorePerSecond()) * powerupTime)}, the score you would have gained in ${powerupTime} secs`;
+          } else if (powerupType == "awesome")
+            textInText = `Score production increased by x${powerupMultiplier} for ${powerupTime}, AWESOME!!`;
+          else if (powerupType == "store")
+            textInText = `Store prices have a discount of ${Math.round(powerupMultiplier * 100)}% for ${powerupTime} secs, get em' now!`;
+          else if (powerupType == "blab")
+            textInText = textInText;
+          else
+            throw new Error("powerup type doesn't exist");
+          this.text = textInText;
+        }
+      }
+    ]);
+    let icon = bg2.add([
+      sprite("white_noise"),
+      pos(-bg2.width / 2, -bg2.height / 2),
+      anchor("center"),
+      opacity(),
+      {
+        update() {
+          this.opacity = bg2.opacity;
+        }
+      }
+    ]);
+    parseAnimation(icon, powerupTypes[powerupType].sprite);
+    icon.width = 35;
+    icon.height = 35;
+    let index = get("poweruplog").length - 1;
+    let destinedPos = getPosForPowerupLog(index);
+    bg2.onUpdate(() => {
+      let radius = 5;
+      let width2 = 315;
+      let height2 = formatText({ text: textInText, ...textInBgOpts }).height + 15;
+      bg2.height = lerp(bg2.height, height2, 0.5);
+      bg2.width = lerp(bg2.width, width2, 0.5);
+      bg2.radius = lerp(bg2.radius, radius, 0.5);
+    });
+    tween(0, bgOpacity, 0.5, (p) => bg2.opacity = p, easings.easeOutQuad);
+    tween(height() + bg2.height, destinedPos.y, 0.5, (p) => bg2.pos.y = p, easings.easeOutQuad);
+    wait(3.5, () => {
+      tween(bg2.pos.y, bg2.pos.y - bg2.height, 0.5, (p) => bg2.pos.y = p, easings.easeOutQuad);
+      bg2.fadeOut(0.5).onEnd(() => destroy(bg2));
+      tween(textInBg.opacity, 0, 0.5, (p) => textInBg.opacity = p, easings.easeOutQuad);
+      bg2.unuse("poweruplog");
+    });
+  }
+  var allPowerupsInfo = {
+    isHoveringAPowerup: false,
+    canSpawnPowerups: false
+  };
+  function spawnPowerup(opts) {
+    if (allPowerupsInfo.canSpawnPowerups == false)
+      return;
+    if (opts == void 0)
+      opts = {};
+    function getRandomPowerup() {
+      let list = Object.keys(powerupTypes);
+      if (Math.round(scoreManager.autoScorePerSecond()) < 1)
+        list.splice(list.indexOf("time"), 1);
+      if (opts.natural == false)
+        list.splice(list.indexOf("awesome"), 1);
+      let element = choose(list);
+      if (chance(0.2) && opts.natural == false)
+        element = "blab";
+      return element;
+    }
+    opts.type = opts.type;
+    if (opts.type == "random")
+      opts.type = getRandomPowerup();
+    opts.pos = opts.pos || randomPos();
+    let powerupObj = add([
+      sprite("white_noise"),
+      pos(opts.pos),
       scale(1),
       area(),
-      "bpmChange",
-      "pauseButton",
-      "musicButton",
-      "windowButton",
-      {
-        verPosition: -20,
-        spinSpeed: musicHandler.paused ? 0 : songs[Object.keys(songs)[currentSongIdx]].speed,
-        update() {
-          if (musicHandler.winding || skipping)
-            return;
-          this.angle += this.spinSpeed;
-          if (Math.floor(this.angle) % 360 == 0)
-            this.angle = 0;
-        }
-      }
-    ]);
-    let nowPlaying = winParent.add([
-      pos(-50, -25),
-      text(Object.keys(songs)[0], {
-        size: 20,
-        styles: {
-          "small": {
-            scale: vec2(0.8),
-            pos: vec2(0, 4)
-          }
-        }
-      }),
-      anchor("left"),
-      {
-        update() {
-          this.text = `${songs[Object.keys(songs)[currentSongIdx]].idx + 1}. ${songs[Object.keys(songs)[currentSongIdx]].name} ${musicHandler.paused && !musicHandler.winding ? "(PAUSED)" : ""}`;
-        }
-      }
-    ]);
-    let theOneBehind = winParent.add([
-      rect(winParent.width - 50, 10, { radius: 20 }),
-      pos(0, 25),
+      anchor("center"),
+      opacity(),
+      layer("powerups"),
+      color(WHITE),
+      rotate(0),
+      z(0),
+      waver({ wave_speed: 1.25, maxAmplitude: 5, minAmplitude: 0 }),
       area(),
-      color(),
-      area({ scale: vec2(1, 1.25) }),
+      "powerup",
+      {
+        whiteness: 0,
+        type: opts.type,
+        maxScale: 3,
+        update() {
+          this.angle = wave(-1, 1, time() * 3);
+        },
+        startHover() {
+          tween(this.scale, vec2(this.maxScale).add(0.2), 0.15, (p) => this.scale = p, easings.easeOutBack);
+        },
+        endHover() {
+          tween(this.scale, vec2(this.maxScale).sub(0.2), 0.15, (p) => this.scale = p, easings.easeOutBack);
+        },
+        dieAnim() {
+          this.area.scale = vec2(0);
+          tween(this.scale, vec2(this.maxScale).add(0.4), 0.15, (p) => this.scale = p, easings.easeOutBack);
+          tween(this.opacity, 0, 0.15, (p) => this.opacity = p, easings.easeOutBack).onEnd(() => {
+            destroy(this);
+          });
+          let blink = add([
+            sprite("white_noise"),
+            pos(this.pos),
+            scale(this.scale),
+            anchor(this.anchor),
+            opacity(0.5),
+            layer("powerups"),
+            z(this.z - 1),
+            timer(),
+            {
+              maxOpacity: 0.5,
+              update() {
+                this.pos.y -= 0.5;
+              }
+            }
+          ]);
+          blink.width = this.width;
+          blink.height = this.height;
+          parseAnimation(blink, powerupTypes[opts.type].sprite);
+          let timeToLeave = 0.75;
+          loop(0.1, () => {
+            if (blink.opacity == blink.maxOpacity)
+              blink.opacity = 0;
+            else
+              blink.opacity = blink.maxOpacity;
+          });
+          tween(0.5, 0, timeToLeave, (p) => blink.maxOpacity = p, easings.easeOutBack);
+          blink.wait(timeToLeave, () => {
+            destroy(blink);
+          });
+        },
+        click() {
+          this.dieAnim();
+          playSfx("powerup");
+          checkForUnlockable();
+          GameState.stats.powerupsClicked++;
+          let multiplier = 0;
+          let time2 = 0;
+          const power = GameState.powerupPower;
+          if (opts.multiplier == null) {
+            if (opts.type == "clicks" || opts.type == "cursors") {
+              time2 = opts.time ?? randi(5, 15);
+              multiplier = randi(2, 5) * power;
+            } else if (opts.type == "awesome") {
+              time2 = opts.time ?? randi(2.5, 5);
+              multiplier = randi(5, 10) * power;
+            } else if (opts.type == "store") {
+              time2 = opts.time ?? randi(2.5, 5);
+              multiplier = rand(0.05, 0.25) / power;
+            } else if (opts.type == "time") {
+              multiplier = 1;
+              time2 = opts.time ?? rand(30, 60) * power;
+              scoreManager.addTweenScore(scoreManager.scorePerSecond() * time2);
+            } else if (opts.type == "blab") {
+              multiplier = 1;
+              time2 = 1;
+              scoreManager.addScore(1);
+            }
+          }
+          if (opts.type != "time") {
+            let checkTimer = get(`${opts.type}_putimer`)[0];
+            if (checkTimer)
+              checkTimer.updateTime();
+            else
+              addTimer({ sprite: powerupTypes[powerupObj.type].sprite, type: opts.type });
+          }
+          powerupTypes[opts.type].multiplier = multiplier;
+          powerupTypes[opts.type].removalTime = time2;
+          addPowerupLog(opts.type);
+        }
+      }
+    ]);
+    parseAnimation(powerupObj, powerupTypes[opts.type].sprite);
+    powerupObj.startWave();
+    powerupObj.width = 60;
+    powerupObj.height = 60;
+    tween(vec2(powerupObj.maxScale).sub(0.4), vec2(powerupObj.maxScale), 0.25, (p) => powerupObj.scale = p, easings.easeOutBack);
+    tween(0, 1, 0.2, (p) => powerupObj.opacity = p, easings.easeOutBack);
+    powerupObj.onHover(() => {
+      powerupObj.startHover();
+      query({
+        include: ["insideHover", "outsideHover"],
+        includeOp: "or"
+      }).forEach((obj) => {
+        if (obj.isBeingHovered == true) {
+          obj.endHoverFunction();
+        }
+      });
+    });
+    powerupObj.onHoverEnd(() => {
+      powerupObj.endHover();
+      query({
+        include: ["insideHover", "outsideHover"],
+        includeOp: "or"
+      }).forEach((obj) => {
+        if (obj.isHovering() == true && obj.isBeingHovered == false) {
+          obj.startHoverFunction();
+        }
+      });
+    });
+    powerupObj.onClick(() => {
+      powerupObj.click();
+    });
+  }
+  function Powerup_RemovalTimeManager() {
+    for (let powerup in powerupTypes) {
+      if (powerupTypes[powerup].removalTime != null) {
+        if (powerup != "time")
+          powerupTypes[powerup].removalTime -= dt();
+        if (powerupTypes[powerup].removalTime < 0) {
+          powerupTypes[powerup].removalTime = null;
+          get(`${powerup}_putimer`)?.forEach((timer2) => timer2.end());
+          powerupTypes[powerup].multiplier = 1;
+        }
+      }
+    }
+    if (get("powerup").length > 0) {
+      allPowerupsInfo.isHoveringAPowerup = get("powerup").some((powerup) => powerup.isHovering());
+    }
+  }
+  function Powerup_NaturalSpawnManager() {
+    for (let powerup in powerupTypes) {
+      powerupTypes[powerup].runningTime += dt();
+      if (powerupTypes[powerup].runningTime > powerupTypes[powerup].maxTime) {
+        powerupTypes[powerup].runningTime = 0;
+        if (chance(powerupTypes[powerup].chance)) {
+          spawnPowerup({
+            type: powerup
+          });
+        }
+      }
+    }
+  }
+
+  // source/game/ascension/ascension.ts
+  var ascension = {
+    ascending: false,
+    canLeave: false
+  };
+  var activeLetterWaits = [];
+  var currentlySaying = "";
+  function addMage() {
+    let mage_color = rgb(0, 51, 102);
+    let mage;
+    mage = add([
+      pos(-17, 154),
+      waver({ wave_speed: 1, maxAmplitude: 2.5 }),
+      layer("ascension"),
+      z(1),
       opacity(1),
       anchor("center"),
+      "mage"
+    ]);
+    mage.startWave();
+    let mage_body = mage.add([
+      pos(),
+      sprite("mage_body"),
+      z(2),
+      "mage_body"
+    ]);
+    let mage_body_lightning = mage.add([
+      pos(),
+      sprite("mage_body_lightning"),
+      z(3),
+      opacity(0.25),
+      "mage_lightning"
+    ]);
+    let mage_cursors = mage.add([
+      pos(0, -7),
+      sprite("mage_cursors"),
+      z(0),
+      waver({ wave_speed: 1, maxAmplitude: 5 }),
+      opacity(1),
+      color(WHITE.darken(50))
+    ]);
+    mage_cursors.startWave();
+    let mage_eye = mage.add([
+      pos(117, 120),
+      sprite("mage_eye"),
+      area({ scale: 0.8 }),
+      z(2),
+      "ascensionHover",
       {
+        timeToBlinkAgain: 8,
+        timeUntilBlink: 8,
         update() {
-          this.color = progressBar.color.darken(150);
+          if (this.isHovering() && isMousePressed("left")) {
+            this.play("blink");
+            talk("mage", "stop that");
+          }
+          this.timeToBlinkAgain -= dt();
+          if (this.timeToBlinkAgain < 0) {
+            this.timeToBlinkAgain = rand(5, 8);
+            this.timeToBlinkAgain = this.timeToBlinkAgain;
+            if (chance(0.75))
+              this.play("blink");
+          }
         }
       }
     ]);
-    timeText = winParent.add([
-      text("0:00", {
-        size: 20
-      }),
-      pos(-120, 50),
-      anchor("center"),
-      "bpmChange",
+    mage_eye.onAnimEnd((anim) => {
+    });
+    let mage_toparm = mage.add([
+      pos(0, 0),
+      sprite("mage_toparm"),
+      z(1),
       {
-        verPosition: 50,
         update() {
-          let time2 = `${formatTime(musicHandler.currentTime, false)}/${formatTime(musicHandler.totalTime === void 0 ? musicHandler.duration() : musicHandler.totalTime, false)}`;
-          this.text = time2;
-          if (!musicHandler.winding)
-            musicHandler.currentTime = map(progressBar.width, 0, theOneBehind.width, 0, musicHandler.duration());
-          if (!musicHandler.winding)
-            musicHandler.totalTime = songs[Object.keys(songs)[currentSongIdx]].duration;
+          this.angle = wave(-0.5, 0.5, time());
         }
       }
     ]);
-    progressBar = winParent.add([
-      rect(1, 10, { radius: 10 }),
-      pos(theOneBehind.pos.x - theOneBehind.width / 2, theOneBehind.pos.y),
-      color(WHITE),
+    let mage_toparm_lightning = mage.add([
+      pos(0, 0),
+      sprite("mage_toparm_lightning"),
+      z(4),
+      opacity(0.25),
+      "mage_lightning",
+      {
+        update() {
+          this.angle = wave(-0.5, 0.5, time());
+        }
+      }
+    ]);
+    let mage_botarm = mage.add([
+      pos(5, 240),
+      sprite("mage_botarm"),
+      z(7),
       anchor("left"),
       {
         update() {
-          if (musicHandler.winding)
-            return;
-          this.width = musicHandler.time() / musicHandler.duration() * theOneBehind.width;
-        },
-        draw() {
-          drawCircle({
-            pos: vec2(this.width, 0),
-            radius: 8,
-            color: this.color,
-            anchor: "center",
-            opacity: this.opacity
-          });
+          this.angle = wave(-1, 1, time());
         }
       }
     ]);
-    let backButton = winParent.add([
-      text("<", {
-        size: 40
-      }),
-      pos(-30, 60),
-      area(),
-      scale(),
-      anchor("center"),
-      "musicButton",
-      "windowButton",
-      "backButton"
-    ]);
-    let pauseButton = winParent.add([
-      text("", {
-        size: 40
-      }),
-      pos(15, 60),
-      area(),
-      scale(),
-      anchor("center"),
-      "musicButton",
-      "windowButton",
-      "pauseButton",
+    let mage_botarm_lightning = mage.add([
+      pos(5, 240),
+      sprite("mage_botarm_lightning"),
+      z(8),
+      anchor("left"),
+      opacity(0.25),
+      "mage_lightning",
       {
         update() {
-          if (musicHandler.paused && !musicHandler.winding)
-            this.text = ">";
-          else
-            this.text = "||";
+          this.angle = wave(-1, 1, time());
         }
       }
     ]);
-    let skipButton = winParent.add([
-      text(">", {
-        size: 40
-      }),
-      pos(60, 60),
-      area(),
-      scale(),
+    let mage_hexagon = mage.add([
+      pos(GameState.settings.panderitoMode ? vec2(231, 250) : vec2(231, 244)),
+      sprite(GameState.settings.panderitoMode ? "panderito" : "hexagon"),
+      scale(0.35),
+      waver({ wave_speed: 1, maxAmplitude: 10 }),
+      rotate(0),
       anchor("center"),
-      "musicButton",
-      "windowButton",
-      "skipButton"
+      color(WHITE),
+      z(5),
+      area({ scale: 0.8 }),
+      "hexagon",
+      "ascensionHover",
+      {
+        update() {
+          if (this.isHovering() && isMousePressed("left")) {
+            bop(this, 0.01);
+            talk("mage", "no backsies");
+          }
+          this.angle += 0.02;
+        }
+      }
     ]);
-    function backButtonAction() {
-      if (musicHandler.currentTime > 2) {
-        musicHandler.seek(0);
-        musicHandler.winding = true;
-      } else {
-        currentSongIdx--;
-        if (currentSongIdx < 0)
-          currentSongIdx = Object.keys(songs).length - 1;
-        currentSong = songs[Object.keys(songs)[currentSongIdx]];
-      }
-      playSfx("clickButton", { detune: rand(-150, 50) });
-      bop(backButton);
-    }
-    function skipButtonAction() {
-      currentSongIdx++;
-      if (currentSongIdx >= Object.keys(songs).length)
-        currentSongIdx = 0;
-      currentSong = songs[Object.keys(songs)[currentSongIdx]];
-      playSfx("clickButton", { detune: rand(-50, 150) });
-      bop(skipButton);
-    }
-    function pauseButtonAction() {
-      if (musicHandler.winding)
-        return;
-      musicHandler.paused = !musicHandler.paused;
-      pauseButton.text = musicHandler.paused ? ">" : "||";
-      get("bpmChange", { recursive: true }).forEach((bpmChange) => {
-        musicHandler.paused ? bpmChange.stopWave() : bpmChange.startWave();
-      });
-      tween(disc.spinSpeed, musicHandler.paused ? 0 : songs[Object.keys(songs)[currentSongIdx]].speed, 1, (p) => disc.spinSpeed = p, easings.easeOutQuint);
-      playSfx("clickButton", { detune: rand(-100, 100) });
-      bop(pauseButton);
-    }
-    function generalBackSkipButtonAction(action) {
-      if (skipping == false) {
-        skipping = true;
-        get("bpmChange", { recursive: true }).forEach((element) => {
-          element.stopWave();
-        });
-      }
-      scratchSong();
-      tween(progressBar.width, 0, 0.5, (p) => progressBar.width = p, easings.easeOutQuint);
-      musicHandler.currentTime = musicHandler.time();
-      musicHandler.totalTime = musicHandler.duration();
-      tween(musicHandler.currentTime, 0, 0.5, (p) => musicHandler.currentTime = p, easings.easeOutQuint);
-      tween(musicHandler.totalTime, songs[Object.keys(songs)[currentSongIdx]].duration, 0.5, (p) => musicHandler.totalTime = p, easings.easeOutQuint);
-      let idxOfNewSong = action == 0 ? currentSongIdx + 1 : currentSongIdx - 1;
-      if (idxOfNewSong < 0)
-        idxOfNewSong = Object.keys(songs).length - 1;
-      if (idxOfNewSong >= Object.keys(songs).length)
-        idxOfNewSong = 0;
-      if (songs[Object.keys(songs)[idxOfNewSong]].cover != songs[Object.keys(songs)[currentSongIdx]].cover) {
-        tween(disc.angle, 0, 0.5, (p) => disc.angle = p, easings.easeOutQuint);
-        if (action == 0)
-          tween(1, -1, 0.5, (p) => disc.scale.x = p, easings.easeOutQuint);
-        else if (action == 1)
-          tween(-1, 1, 0.5, (p) => disc.scale.x = p, easings.easeOutQuint);
-      } else {
-        if (action == 0)
-          tween(disc.angle, disc.angle - rand(75, 100), 0.5, (p) => disc.angle = p, easings.easeOutQuint);
-        else
-          tween(disc.angle, disc.angle + rand(75, 100), 0.5, (p) => disc.angle = p, easings.easeOutQuint);
-      }
-      disc.play(songs[Object.keys(songs)[currentSongIdx]].cover);
-      GameState.settings.music.favoriteIdx = currentSongIdx;
-      timeSinceSkip = 0;
-      if (!isAchievementUnlocked("allsongs")) {
-        checkForSongListen(currentSongIdx);
-      }
-      wait(1, () => {
-        if (timeSinceSkip > 1) {
-          playMusic(Object.keys(songs)[currentSongIdx]);
-          skipping = false;
-          musicHandler.winding = false;
-          get("bpmChange", { recursive: true }).forEach((element) => {
-            musicHandler.paused ? true : element.startWave();
-          });
-        }
-      });
-    }
-    get("musicButton", { recursive: true }).forEach((mBtn) => mBtn.onClick(() => {
-      if (mBtn.is("backButton") || mBtn.is("skipButton")) {
-        let action;
-        if (mBtn.is("backButton")) {
-          backButtonAction();
-          action = 0;
-        } else if (mBtn.is("skipButton")) {
-          skipButtonAction();
-          action = 1;
-        }
-        generalBackSkipButtonAction(action);
-      } else if (mBtn.is("pauseButton")) {
-        pauseButtonAction();
-      }
+    mage.get("mage_lightning").forEach((o) => o.onUpdate(() => {
+      o.color = mage_hexagon.color;
     }));
-    get("bpmChange", { recursive: true }).forEach((bpmChange) => {
-      if (!bpmChange.is("wave"))
-        bpmChange.use(waver({
-          maxAmplitude: 5,
-          wave_speed: currentSong.speed,
-          wave_tweenSpeed: 0.2
-        }));
-      if (!musicHandler.paused)
-        bpmChange.startWave();
-    });
-    onUpdate("bpmChange", (bpmChangeObj) => {
-      bpmChangeObj.wave_speed = currentSong.speed;
-    });
-    winParent.onKeyPress((key) => {
-      let action;
-      if (key == "left") {
-        backButtonAction();
-        action = 0;
-      } else if (key == "right") {
-        skipButtonAction();
-        action = 1;
+    return mage;
+  }
+  var dialogue;
+  function addDialogueBox() {
+    let box = add([
+      sprite("dialogue"),
+      pos(623, 144),
+      anchor("center"),
+      scale(),
+      area({ scale: 0.8 }),
+      opacity(),
+      layer("ascension"),
+      z(1),
+      "textbox",
+      {
+        defaultPos: vec2(623, 144)
       }
-      if (key == "left" || key == "right")
-        generalBackSkipButtonAction(action);
-      else if (key == "up")
-        pauseButtonAction();
+    ]);
+    box.on("talk", (speaker2) => {
+      if (speaker2 == "card") {
+        box.use(sprite("hoverDialogue"));
+        tween(box.defaultPos.y + 10, box.defaultPos.y, 0.25, (p) => box.pos.y = p, easings.easeOutQuint);
+      } else if (speaker2 == "mage") {
+        box.use(sprite("dialogue"));
+        tween(box.defaultPos.x - 10, box.defaultPos.x, 0.25, (p) => box.pos.x = p, easings.easeOutQuint);
+      }
+      tween(0.75, 1, 0.25, (p) => box.scale.x = p, easings.easeOutQuint);
     });
-    winParent.on("close", () => {
-      angleOfDisc = disc.angle;
-    });
-    theOneBehind.onClick(() => {
-      if (!winParent.active)
+    box.onClick(() => {
+      if (dialogue.textBox.text == currentlySaying)
         return;
-      let leftSideOfTheOneBehind = theOneBehind.screenPos().x - theOneBehind.width * 0.5;
-      let rightSideOfTheOneBehind = theOneBehind.screenPos().x + theOneBehind.width * 0.5;
-      let mappedSeconds = map(mousePos().x, leftSideOfTheOneBehind, rightSideOfTheOneBehind, 0, musicHandler.duration());
-      mappedSeconds = clamp(mappedSeconds, 0, musicHandler.duration());
-      if (!skipping) {
-        musicHandler.winding = true;
-        musicHandler.seek(mappedSeconds);
-        let mappedWidth = map(mappedSeconds, 0, currentSong.duration, 0, theOneBehind.width);
-        tween(progressBar.width, mappedWidth, 0.2, (p) => progressBar.width = p, easings.easeOutQuint).onEnd(() => {
-          musicHandler.winding = false;
+      skipTalk();
+    });
+    tween(0.5, 1, 0.25, (p) => box.scale.x = p, easings.easeOutQuint);
+    tween(0, 1, 0.25, (p) => box.opacity = p, easings.easeOutQuint);
+    return box;
+  }
+  function addDialogueText() {
+    let textBox = add([
+      text("", {
+        styles: {
+          "wavy": (idx) => ({
+            pos: vec2(0, wave(-4, 4, time() * 6 + idx * 0.5))
+          })
+        },
+        width: 606,
+        // width without tail
+        align: "center",
+        size: 25
+      }),
+      pos(670, 127),
+      anchor("center"),
+      color(BLACK),
+      layer("ascension"),
+      opacity(),
+      z(dialogue.box.z + 1),
+      "textbox",
+      "boxText"
+    ]);
+    return textBox;
+  }
+  function talk(speaker2, thingToSay, speed) {
+    dialogue.box.trigger("talk", speaker2);
+    speaker2 = speaker2 || "card";
+    thingToSay = thingToSay || "No dialogue, missing a dialogue here";
+    speed = speed || 0.025;
+    if (currentlySaying == thingToSay)
+      speed /= 2;
+    currentlySaying = thingToSay;
+    activeLetterWaits.forEach((waitCall) => waitCall.cancel());
+    activeLetterWaits = [];
+    dialogue.textBox.text = "";
+    let currentDelay = 0;
+    Array.from(thingToSay).forEach((letter, index) => {
+      let delay = speed;
+      if (letter === "," || letter === "_") {
+        delay = speed * 5;
+      }
+      currentDelay += delay;
+      const waitCall = wait(currentDelay, () => {
+        if (letter !== "_")
+          dialogue.textBox.text += letter;
+      });
+      activeLetterWaits.push(waitCall);
+    });
+  }
+  function skipTalk() {
+    activeLetterWaits.forEach((waitCall) => waitCall.cancel());
+    dialogue.textBox.text = currentlySaying;
+    tween(dialogue.box.defaultPos.y + 10, dialogue.box.defaultPos.y, 0.25, (p) => dialogue.box.pos.y = p, easings.easeOutQuint);
+    tween(dialogue.box.defaultPos.x + 10, dialogue.box.defaultPos.x, 0.25, (p) => dialogue.box.pos.x = p, easings.easeOutQuint);
+  }
+  function triggerAscension() {
+    ascension.ascending = true;
+    allPowerupsInfo.canSpawnPowerups = false;
+    GameState.ascension.magicLevel++;
+    ROOT.trigger("ascension", { score: GameState.score, scoreThisRun: GameState.scoreThisRun });
+    hexagon.interactable = false;
+    folderObj.interactable = false;
+    folderObj.fold();
+    get("window").forEach((window2) => {
+      window2.close();
+    });
+    tween(hexagon.scaleIncrease, 0, 0.35, (p) => hexagon.scaleIncrease = p, easings.easeOutCubic);
+    tween(hexagon.stretchScaleIncrease, 0, 0.35, (p) => hexagon.stretchScaleIncrease = p, easings.easeOutCubic);
+    tween(hexagon.maxScaleIncrease, 0, 0.35, (p) => hexagon.maxScaleIncrease = p, easings.easeOutCubic);
+    let blackBg = add([
+      rect(width(), height()),
+      color(BLACK),
+      fixed(),
+      opacity(0.5),
+      anchor("center"),
+      pos(center()),
+      z(0),
+      layer("ascension"),
+      "ascensionBg"
+    ]);
+    let mage = addMage();
+    mage.pos.x = -489;
+    blackBg.fadeIn(0.35).onEnd(() => {
+      tween(-489, -17, 0.5, (p) => mage.pos.x = p, easings.easeOutQuart);
+      tween(145, 154, 0.5, (p) => mage.pos.y = p, easings.easeOutQuart);
+      tween(0.5, 1, 0.5, (p) => mage.opacity = p, easings.easeOutQuart).onEnd(() => {
+        dialogue = add([]);
+        dialogue.box = addDialogueBox();
+        dialogue.textBox = addDialogueText();
+        talk("mage", "welcome to fortnite");
+        mage.trigger("endAnimating");
+      });
+    });
+    spawnCards();
+    wait(0.1, () => {
+      let manaText = add([
+        text("", { align: "left", font: "lambdao", size: 38 }),
+        pos(4, 19),
+        anchor("left"),
+        layer("ascension"),
+        opacity(1),
+        "manaText",
+        {
+          hiddenXPos: -72,
+          update() {
+            this.text = `\u2726${GameState.ascension.mana}`;
+          }
+        }
+      ]);
+      manaText.fadeIn(0.35);
+      tween(manaText.hiddenXPos, 4, 0.5, (p) => manaText.pos.x = p, easings.easeOutQuart);
+    });
+    let canLeaveAscensionCheck = ROOT.on("canLeaveAscension", () => {
+      let leaveButton = add([
+        sprite("confirmAscension"),
+        layer("ascension"),
+        z(6),
+        pos(960, 289),
+        layer("ascension"),
+        scale(),
+        area(),
+        anchor("center"),
+        positionSetter(),
+        opacity(),
+        "ascensionHover",
+        "leaveButton",
+        {
+          dscale: vec2(0.8),
+          update() {
+            if (ascension.canLeave == true) {
+              this.area.scale = vec2(1);
+            } else {
+              this.area.scale = vec2(0);
+            }
+          }
+        }
+      ]);
+      leaveButton.fadeIn(0.1, easings.easeOutQuad);
+      leaveButton.onHover(() => {
+        tween(leaveButton.scale, vec2(1.2), 0.35, (p) => leaveButton.scale = p, easings.easeOutQuint);
+      });
+      leaveButton.onHoverEnd(() => {
+        tween(leaveButton.scale, vec2(1), 0.35, (p) => leaveButton.scale = p, easings.easeOutQuint);
+      });
+      mage.on("endAnimating", () => {
+        leaveButton.onUpdate(() => {
+          if (ascension.canLeave == true)
+            leaveButton.opacity = 1;
+          else
+            leaveButton.opacity = 0.75;
         });
+      });
+      leaveButton.onClick(() => {
+        leaveButton.area.scale = vec2(0);
+        bop(leaveButton);
+        playSfx("clickButton");
+        mouse.play("point");
+        endAscension();
+      });
+      canLeaveAscensionCheck.cancel();
+    });
+    let startHover = onHover("ascensionHover", () => {
+      mouse.play("point");
+    });
+    let endHover = onHoverEnd("ascensionHover", () => {
+      mouse.play("cursor");
+    });
+    blackBg.onDestroy(() => {
+      startHover.cancel();
+      endHover.cancel();
+    });
+  }
+  function endAscension() {
+    folderObj.interactable = true;
+    ROOT.trigger("endAscension");
+    allPowerupsInfo.canSpawnPowerups = true;
+    get("*", { recursive: true }).filter((obj) => obj.layer == "ascension").forEach((obj) => {
+      if (obj.is("area"))
+        obj.area.scale = vec2(0);
+      if (obj.is("mage") || obj.is("manaText")) {
+        tween(obj.pos.x, obj.pos.x - obj.width, 0.5, (p) => obj.pos.x = p, easings.easeOutQuart).onEnd(() => destroy(obj));
+      } else if (obj.is("card")) {
+        tween(obj.pos.y, obj.pos.y + obj.height, 0.5, (p) => obj.pos.y = p, easings.easeOutQuart).onEnd(() => destroy(obj));
+      } else if (obj.is("textbox")) {
+        tween(obj.pos.y, -obj.height, 0.5, (p) => obj.pos.y = p, easings.easeOutQuart).onEnd(() => destroy(obj));
+      } else if (obj.is("ascensionBg") || obj.is("leaveButton")) {
+        obj.fadeOut(0.5).onEnd(() => destroy(obj));
       }
     });
-    return;
+    scoreManager.resetRun();
+    wait(0.25, () => {
+      tween(hexagon.scaleIncrease, 1, 0.25, (p) => hexagon.scaleIncrease = p, easings.easeOutQuint);
+      tween(hexagon.maxScaleIncrease, 1, 0.25, (p) => hexagon.maxScaleIncrease = p, easings.easeOutQuint);
+      tween(hexagon.stretchScaleIncrease, 1, 0.25, (p) => hexagon.stretchScaleIncrease = p, easings.easeOutQuint).onEnd(() => {
+        hexagon.interactable = true;
+      });
+      hexagonIntro();
+    });
+    wait(0.5, () => {
+      ascension.canLeave = false;
+    });
   }
 
   // source/game/windows/windows-api/folderObj.ts
@@ -10251,372 +10698,6 @@ type: ${this.typeIdx} - ${this.type}`,
     });
   }
 
-  // source/game/powerups.ts
-  var powerupTypes = {
-    /**
-     * Makes clicks more powerful
-     */
-    "clicks": { sprite: "cursors.cursor", multiplier: 1, removalTime: null, color: [199, 228, 255] },
-    /**
-     * Makes cursors more powerful
-     */
-    "cursors": { sprite: "cursors.point", multiplier: 1, removalTime: null, color: [199, 252, 197] },
-    /**
-     * Gives you the score you would have gotten in X amount of time
-     */
-    "time": { sprite: "cursors.wait", multiplier: 1, removalTime: null, color: [247, 242, 193] },
-    /**
-     * Increses production
-     */
-    "awesome": { sprite: "cursors.check", multiplier: 1, removalTime: null, color: [227, 190, 247] },
-    /**
-     * Gives discounts for clickers and cursors
-     */
-    "store": { sprite: "icon_store", multiplier: 1, removalTime: null, color: [195, 250, 162] },
-    /**
-     * Is just silly, very silly
-     */
-    "blab": { sprite: "panderito", multiplier: 1, removalTime: null }
-  };
-  var blabPhrases = [
-    "lol!",
-    "Why did you click me?",
-    "IT HAD A FAMILY",
-    "Clicking since 1999"
-  ];
-  var timerSpacing = 65;
-  function getTimerXPos(index) {
-    let initialPos2 = vec2(width() + timerSpacing / 2);
-    return getPosInGrid(initialPos2, 0, -index - 1, vec2(timerSpacing, 0)).x;
-  }
-  function addTimer(opts) {
-    let timerObj = add([
-      rect(60, 60),
-      color(WHITE),
-      outline(3, BLACK),
-      pos(0, 40),
-      anchor("center"),
-      opacity(1),
-      scale(),
-      rotate(0),
-      layer("ui"),
-      area(),
-      "putimer",
-      `${opts.type}_putimer`,
-      {
-        index: get("putimer").length,
-        updateTime() {
-          tween(vec2(1), vec2(1.1), 0.32, (p) => this.scale = p, easings.easeOutQuint).onEnd(() => {
-            tween(this.scale, vec2(1), 0.32, (p) => this.scale = p, easings.easeOutElastic);
-          });
-        },
-        end() {
-          this.tags.forEach((tag) => this.unuse(tag));
-          tween(this.pos.y, this.pos.y - 40, 0.32, (p) => this.pos.y = p, easings.easeOutQuint);
-          tween(1, 0, 0.32, (p) => this.opacity = p, easings.easeOutQuint).onEnd(() => {
-            destroy(this);
-          });
-          get("putimer").filter((pt2) => pt2.index > this.index).forEach((element) => {
-            element.index--;
-            tween(element.pos.x, getTimerXPos(element.index), 0.32, (p) => element.pos.x = p, easings.easeOutQuint);
-          });
-        }
-      }
-    ]);
-    tween(30, 40, 0.32, (p) => timerObj.pos.y = p, easings.easeOutQuint);
-    tween(90, 0, 0.32, (p) => timerObj.angle = p, easings.easeOutQuint);
-    timerObj.pos.x = getTimerXPos(timerObj.index);
-    timerObj.add([
-      text("", { font: "lambdao", size: timerObj.height / 2 }),
-      pos(0, timerObj.height / 2 + 15),
-      anchor("center"),
-      opacity(),
-      z(3),
-      {
-        update() {
-          this.opacity = timerObj.opacity;
-          if (powerupTypes[opts.type].removalTime == null)
-            return;
-          this.text = `${powerupTypes[opts.type].removalTime.toFixed(0)}s
-`;
-        }
-      }
-    ]);
-    timerObj.onClick(() => {
-      if (get(`poweruplog_${opts.type}`).length == 0) {
-        bop(timerObj);
-        addPowerupLog(opts.type);
-      }
-    });
-    let icon = timerObj.add([
-      sprite("white_noise"),
-      anchor("center"),
-      z(1),
-      {
-        update() {
-          this.opacity = timerObj.opacity;
-        }
-      }
-    ]);
-    parseAnimation(icon, opts.sprite);
-    icon.width = 50;
-    icon.height = 50;
-    let maxTime = powerupTypes[opts.type].removalTime;
-    let round = timerObj.add([
-      z(2),
-      {
-        draw() {
-          drawRect({
-            width: timerObj.width - timerObj.outline.width,
-            height: map(powerupTypes[opts.type].removalTime, 0, maxTime, 0, timerObj.height - timerObj.outline.width),
-            color: YELLOW,
-            anchor: "bot",
-            pos: vec2(0, timerObj.height / 2),
-            opacity: 0.25
-          });
-        }
-      }
-    ]);
-  }
-  function addPowerupLog(powerupType) {
-    let powerupTime = powerupTypes[powerupType].removalTime;
-    let textInText = "";
-    if (powerupType == "blab")
-      textInText = choose(blabPhrases);
-    let bgOpacity = 0.95;
-    let bg2 = add([
-      rect(300, 100, { radius: 5 }),
-      pos(center().x, height() - 100),
-      color(BLACK.lighten(2)),
-      positionSetter(),
-      anchor("center"),
-      layer("powerups"),
-      opacity(bgOpacity),
-      z(1),
-      `poweruplog_${powerupType}`,
-      {
-        draw() {
-        }
-      }
-    ]);
-    let textInBgOpts = { size: 25, align: "center", width: 300 };
-    let textInBg = bg2.add([
-      text("", textInBgOpts),
-      pos(0, 0),
-      anchor("center"),
-      area(),
-      opacity(),
-      {
-        update() {
-          if (powerupTypes[powerupType].removalTime == null) {
-            powerupTime = 0;
-            return;
-          }
-          powerupTime = Math.round(powerupTypes[powerupType].removalTime);
-          let powerupMultiplier = powerupTypes[powerupType].multiplier;
-          if (powerupType == "clicks")
-            textInText = `Click production increased x${powerupMultiplier} for ${powerupTime} secs`;
-          else if (powerupType == "cursors")
-            textInText = `Cursors production increased x${powerupMultiplier} for ${powerupTime} secs`;
-          else if (powerupType == "time") {
-            textInText = `+${formatNumber(Math.round(scoreManager.autoScorePerSecond()) * powerupTime)}, the score you would have gained in ${powerupTime} secs`;
-          } else if (powerupType == "awesome")
-            textInText = `Score production increased by x${powerupMultiplier} for ${powerupTime}, AWESOME!!`;
-          else if (powerupType == "store")
-            textInText = `Store prices have a discount of ${Math.round(powerupMultiplier * 100)}% for ${powerupTime} secs, get em' now!`;
-          else if (powerupType == "blab")
-            textInText = textInText;
-          else
-            throw new Error("powerup type doesn't exist");
-          this.text = textInText;
-        }
-      }
-    ]);
-    bg2.onUpdate(() => {
-      bg2.width = 315;
-      bg2.height = formatText({ text: textInText, ...textInBgOpts }).height + 15;
-    });
-    tween(0, bgOpacity, 0.5, (p) => bg2.opacity = p, easings.easeOutQuad);
-    tween(height() + bg2.height, height() - bg2.height, 0.5, (p) => bg2.pos.y = p, easings.easeOutQuad);
-    wait(3.5, () => {
-      tween(bg2.pos.y, bg2.pos.y - bg2.height, 0.5, (p) => bg2.pos.y = p, easings.easeOutQuad);
-      bg2.fadeOut(0.5).onEnd(() => destroy(bg2));
-      tween(textInBg.opacity, 0, 0.5, (p) => textInBg.opacity = p, easings.easeOutQuad);
-    });
-  }
-  var isHoveringAPowerup = false;
-  function spawnPowerup(opts) {
-    if (ascension.ascending == true)
-      return;
-    if (opts == void 0)
-      opts = {};
-    function getRandomPowerup() {
-      let list = Object.keys(powerupTypes);
-      if (Math.round(scoreManager.autoScorePerSecond()) < 1)
-        list.splice(list.indexOf("time"), 1);
-      if (opts.natural == false)
-        list.splice(list.indexOf("awesome"), 1);
-      let element = choose(list);
-      if (chance(0.2) && opts.natural == false)
-        element = "blab";
-      return element;
-    }
-    opts.type = opts.type || getRandomPowerup();
-    opts.pos = opts.pos || randomPos2();
-    let powerupObj = add([
-      sprite("white_noise"),
-      pos(opts.pos),
-      scale(1),
-      area(),
-      anchor("center"),
-      opacity(),
-      layer("powerups"),
-      color(WHITE),
-      rotate(0),
-      z(0),
-      waver({ wave_speed: 1.25, maxAmplitude: 5, minAmplitude: 0 }),
-      area(),
-      "powerup",
-      {
-        whiteness: 0,
-        type: opts.type,
-        maxScale: 3,
-        update() {
-          this.angle = wave(-1, 1, time() * 3);
-        },
-        startHover() {
-          tween(this.scale, vec2(this.maxScale).add(0.2), 0.15, (p) => this.scale = p, easings.easeOutBack);
-        },
-        endHover() {
-          tween(this.scale, vec2(this.maxScale).sub(0.2), 0.15, (p) => this.scale = p, easings.easeOutBack);
-        },
-        dieAnim() {
-          this.area.scale = vec2(0);
-          tween(this.scale, vec2(this.maxScale).add(0.4), 0.15, (p) => this.scale = p, easings.easeOutBack);
-          tween(this.opacity, 0, 0.15, (p) => this.opacity = p, easings.easeOutBack).onEnd(() => {
-            destroy(this);
-          });
-          let blink = add([
-            sprite("white_noise"),
-            pos(this.pos),
-            scale(this.scale),
-            anchor(this.anchor),
-            opacity(0.5),
-            layer("powerups"),
-            z(this.z - 1),
-            timer(),
-            {
-              maxOpacity: 0.5,
-              update() {
-                this.pos.y -= 0.5;
-              }
-            }
-          ]);
-          blink.width = this.width;
-          blink.height = this.height;
-          parseAnimation(blink, powerupTypes[opts.type].sprite);
-          let timeToLeave = 0.75;
-          loop(0.1, () => {
-            if (blink.opacity == blink.maxOpacity)
-              blink.opacity = 0;
-            else
-              blink.opacity = blink.maxOpacity;
-          });
-          tween(0.5, 0, timeToLeave, (p) => blink.maxOpacity = p, easings.easeOutBack);
-          blink.wait(timeToLeave, () => {
-            destroy(blink);
-          });
-        },
-        click() {
-          this.dieAnim();
-          playSfx("powerup");
-          checkForUnlockable();
-          GameState.stats.powerupsClicked++;
-          let multiplier = 0;
-          let time2 = 0;
-          const power = GameState.powerupPower;
-          if (opts.multiplier == null) {
-            if (opts.type == "clicks" || opts.type == "cursors") {
-              time2 = opts.time ?? randi(5, 15);
-              multiplier = randi(2, 5) * power;
-            } else if (opts.type == "awesome") {
-              time2 = opts.time ?? randi(2.5, 5);
-              multiplier = randi(5, 10) * power;
-            } else if (opts.type == "store") {
-              time2 = opts.time ?? randi(2.5, 5);
-              multiplier = rand(0.05, 0.25) / power;
-            } else if (opts.type == "time") {
-              multiplier = 1;
-              time2 = opts.time ?? rand(30, 60) * power;
-              scoreManager.addTweenScore(scoreManager.scorePerSecond() * time2);
-            } else if (opts.type == "blab") {
-              multiplier = 1;
-              time2 = 1;
-              scoreManager.addScore(1);
-            }
-          }
-          if (opts.type != "time") {
-            let checkTimer = get(`${opts.type}_putimer`)[0];
-            if (checkTimer)
-              checkTimer.updateTime();
-            else
-              addTimer({ sprite: powerupTypes[powerupObj.type].sprite, type: opts.type });
-          }
-          powerupTypes[opts.type].multiplier = multiplier;
-          powerupTypes[opts.type].removalTime = time2;
-          addPowerupLog(opts.type);
-        }
-      }
-    ]);
-    parseAnimation(powerupObj, powerupTypes[opts.type].sprite);
-    powerupObj.startWave();
-    powerupObj.width = 60;
-    powerupObj.height = 60;
-    tween(vec2(powerupObj.maxScale).sub(0.4), vec2(powerupObj.maxScale), 0.25, (p) => powerupObj.scale = p, easings.easeOutBack);
-    tween(0, 1, 0.2, (p) => powerupObj.opacity = p, easings.easeOutBack);
-    powerupObj.onHover(() => {
-      powerupObj.startHover();
-      query({
-        include: ["insideHover", "outsideHover"],
-        includeOp: "or"
-      }).forEach((obj) => {
-        if (obj.isBeingHovered == true) {
-          obj.endHoverFunction();
-        }
-      });
-    });
-    powerupObj.onHoverEnd(() => {
-      powerupObj.endHover();
-      query({
-        include: ["insideHover", "outsideHover"],
-        includeOp: "or"
-      }).forEach((obj) => {
-        if (obj.isHovering() == true && obj.isBeingHovered == false) {
-          obj.startHoverFunction();
-        }
-      });
-    });
-    powerupObj.onClick(() => {
-      powerupObj.click();
-    });
-  }
-  function powerupTimeManagement() {
-    for (let powerup in powerupTypes) {
-      if (powerupTypes[powerup].removalTime != null) {
-        if (powerup != "time")
-          powerupTypes[powerup].removalTime -= dt();
-        if (powerupTypes[powerup].removalTime < 0) {
-          powerupTypes[powerup].removalTime = null;
-          get(`${powerup}_putimer`)?.forEach((timer2) => timer2.end());
-          powerupTypes[powerup].multiplier = 1;
-        }
-      }
-    }
-    if (get("powerup").length > 0) {
-      isHoveringAPowerup = get("powerup").some((powerup) => powerup.isHovering());
-    }
-  }
-
   // source/game/windows/store/storeElements.ts
   var storeElementsInfo = {
     "clickersElement": {
@@ -10632,7 +10713,7 @@ type: ${this.typeIdx} - ${this.type}`,
     "powerupsElement": {
       gamestateKey: "stats.powerupsBought",
       basePrice: 50500,
-      percentageIncrease: 160,
+      percentageIncrease: 90,
       unlockPrice: 10500
     }
   };
@@ -10661,7 +10742,7 @@ type: ${this.typeIdx} - ${this.type}`,
       add() {
         thisElement = this;
         thisElement.onMousePress("left", () => {
-          if (isHoveringAPowerup == true)
+          if (allPowerupsInfo.isHoveringAPowerup == true)
             return;
           if (thisElement.isBeingHovered == false)
             return;
@@ -10697,7 +10778,7 @@ type: ${this.typeIdx} - ${this.type}`,
           });
         });
         thisElement.onMouseRelease(() => {
-          if (isHoveringAPowerup == true)
+          if (allPowerupsInfo.isHoveringAPowerup == true)
             return;
           if (!winParent.active)
             return;
@@ -10751,7 +10832,7 @@ type: ${this.typeIdx} - ${this.type}`,
         });
         let downEvent = null;
         thisElement.onMousePress("left", () => {
-          if (isHoveringAPowerup == true)
+          if (allPowerupsInfo.isHoveringAPowerup == true)
             return;
           if (thisElement.isBeingHovered == false)
             return;
@@ -10781,7 +10862,7 @@ type: ${this.typeIdx} - ${this.type}`,
           });
         });
         thisElement.onMouseRelease("left", () => {
-          if (isHoveringAPowerup == true)
+          if (allPowerupsInfo.isHoveringAPowerup == true)
             return;
           if (!winParent.active)
             return;
@@ -10872,7 +10953,8 @@ type: ${this.typeIdx} - ${this.type}`,
           ROOT.trigger("buy", { element: "storeElement", type: opts.type == "clickersElement" ? "clickers" : "cursors", price: this.price });
           if (opts.type == "powerupsElement") {
             spawnPowerup({
-              pos: randomPos2(),
+              type: "random",
+              pos: randomPos(),
               natural: false
             });
             GameState.stats.powerupsBought++;
@@ -11418,7 +11500,7 @@ type: ${this.typeIdx} - ${this.type}`,
       },
       title: "Fullscreen"
     }, otherCheckboxesBg);
-    let checkForFullscreen = ROOT.on("fullscreenchange", () => {
+    let checkForFullscreen = ROOT.on("checkFullscreen", () => {
       if (isFullscreen())
         fullscreenCheckbox.turnOn();
       else
@@ -11447,6 +11529,7 @@ type: ${this.typeIdx} - ${this.type}`,
     winParent.on("close", () => {
       checkForFullscreen.cancel();
     });
+    ROOT.trigger("checkFullscreen");
   }
 
   // source/game/windows/ascendWindow.ts
@@ -11568,7 +11651,7 @@ type: ${this.typeIdx} - ${this.type}`,
       }
     ]);
     button.onClick(() => {
-      if (isHoveringAPowerup == true)
+      if (allPowerupsInfo.isHoveringAPowerup == true)
         return;
       if (GameState.ascension.mana >= 1)
         triggerAscension();
@@ -12897,7 +12980,6 @@ This is the ${winParent.windowKey}`, {
         pos(-200, yOffset),
         anchor("top"),
         color(WHITE.darken(50)),
-        area(),
         fixed(),
         layer("logs"),
         z(0),
@@ -12935,9 +13017,6 @@ This is the ${winParent.windowKey}`, {
         });
       });
       toastBg.height = opts.icon ? 80 : 100;
-      toastBg.onClick(() => {
-        toastBg.close();
-      });
       let icon = add([
         sprite("white_noise"),
         anchor("center"),
@@ -13234,6 +13313,13 @@ This is the ${winParent.windowKey}`, {
       returnValue = returnValue.replaceAll(".", ",");
     return returnValue;
   }
+  function coolSetFullscreen(bool) {
+    let kanvas = document.querySelector("#kanva");
+    if (bool == true) {
+      kanvas.requestFullscreen();
+    } else if (bool == false)
+      kanvas;
+  }
   function getPosInGrid(initialpos, row, column, spacing2) {
     return vec2(initialpos.x + spacing2.x * column, initialpos.y + spacing2.y * row);
   }
@@ -13352,7 +13438,7 @@ This is the ${winParent.windowKey}`, {
   function saveAnim() {
     addToast({ icon: "floppy", title: "Game saved!", body: `Time played: ${formatTime(GameState.stats.totalTimePlayed, true)}`, type: "gamesaved" });
   }
-  function randomPos2() {
+  function randomPos() {
     return vec2(rand(0, width()), rand(0, height()));
   }
   function bop(obj, howMuch = 0.1, bopEasing = easings.easeOutQuint) {
@@ -13404,6 +13490,9 @@ This is the ${winParent.windowKey}`, {
             "Time until auto loop ends: ": GameState.timeUntilAutoLoopEnds,
             "Taskbar: ": GameState.taskbar
           };
+          for (let powerup in powerupTypes) {
+            keys[`${powerup} running time :`] = powerupTypes[powerup].runningTime.toFixed(1);
+          }
           this.text = createKeys();
         }
       }
@@ -13418,6 +13507,7 @@ This is the ${winParent.windowKey}`, {
     window.globalThis.spawnPowerup = spawnPowerup;
     window.globalThis.hexagon = hexagon;
     window.globalThis.openWindow = openWindow2;
+    window.globalThis.powerupsTypes = powerupTypes;
     onUpdate(() => {
       if (isKeyPressed("c") && GameState.scoreAllTime > 25)
         GameState.save(true);
@@ -13432,6 +13522,7 @@ This is the ${winParent.windowKey}`, {
         wait(0.1, () => hexagon.clickRelease());
       } else if (isKeyPressed("f")) {
         spawnPowerup({
+          type: "random",
           pos: mousePos(),
           natural: true
         });
@@ -13828,7 +13919,7 @@ ${formatNumberSimple(GameState.clickers)}`;
     if (GameState.hasUnlockedPowerups == true && chance(0.2)) {
       spawnPowerup({
         type: "awesome",
-        pos: randomPos2(),
+        pos: randomPos(),
         natural: true
       });
     }
@@ -14472,8 +14563,9 @@ ${formatNumberSimple(GameState.clickers)}`;
     }
     GameState.save(false);
   }
-  function triggerZZZ(idle = true) {
-    if (idle)
+  var TIME_FOR_SLEEP = 60;
+  function triggerZZZ(playerInactivity = true) {
+    if (playerInactivity)
       sleeping = true;
     let black = add([
       rect(width(), height()),
@@ -14484,7 +14576,7 @@ ${formatNumberSimple(GameState.clickers)}`;
       z(mouse.z - 2),
       opacity(1)
     ]);
-    if (idle)
+    if (playerInactivity)
       black.fadeIn(0.5);
     let sleepyText = add([
       text("Z Z Z . . . ", {
@@ -14502,7 +14594,7 @@ ${formatNumberSimple(GameState.clickers)}`;
       pos(center()),
       opacity(1)
     ]);
-    if (idle)
+    if (playerInactivity)
       sleepyText.fadeIn(0.5);
     let events;
     function wakeUp() {
@@ -14512,7 +14604,7 @@ ${formatNumberSimple(GameState.clickers)}`;
         sleepyText.fadeOut(0.5).onEnd(() => {
           black?.destroy();
           sleepyText?.destroy();
-          if (idle)
+          if (playerInactivity)
             welcomeBack(true);
         });
       });
@@ -14520,7 +14612,7 @@ ${formatNumberSimple(GameState.clickers)}`;
         event.cancel();
       });
     }
-    if (idle) {
+    if (playerInactivity) {
       let mouse2 = onMouseMove(() => wakeUp());
       let click = onClick(() => wakeUp());
       let key = onKeyPress(() => wakeUp());
@@ -14549,11 +14641,11 @@ ${formatNumberSimple(GameState.clickers)}`;
       body2 += applicationMessage;
       let toast = addToast({ icon: "cursors.cursor", title: "Welcome back!", body: body2, type: "welcome" });
       if (GameState.hasUnlockedPowerups == true) {
-        if (timeInSeconds > 60) {
+        if (timeInSeconds > TIME_FOR_SLEEP) {
           if (chance(0.1))
             spawnPowerup();
         }
-        if (timeInSeconds > 120) {
+        if (timeInSeconds > TIME_FOR_SLEEP * 2) {
           if (chance(0.25)) {
             if (chance(0.05)) {
               for (let i2 = 0; i2 < 2; i2++)
@@ -14561,6 +14653,14 @@ ${formatNumberSimple(GameState.clickers)}`;
             } else {
               spawnPowerup();
             }
+          }
+        }
+        if (timeInSeconds > TIME_FOR_SLEEP * 3) {
+          if (chance(0.5)) {
+            spawnPowerup({
+              type: "awesome",
+              pos: randomPos()
+            });
           }
         }
       }
@@ -14601,7 +14701,7 @@ ${formatNumberSimple(GameState.clickers)}`;
   }
   function resetIdleTime() {
     idleWaiter.cancel();
-    idleWaiter = wait(20, () => {
+    idleWaiter = wait(TIME_FOR_SLEEP, () => {
       triggerZZZ(true);
     });
   }
@@ -14630,268 +14730,259 @@ ${formatNumberSimple(GameState.clickers)}`;
   }
   var hexagonIntro;
   var hasStartedGame;
-  function gamescene() {
-    return scene("gamescene", () => {
-      GameState.load();
-      hasStartedGame = GameState.scoreAllTime > 1;
-      ascension.ascending = false;
-      cam = {
-        pos: center(),
-        zoom: 1,
-        rotation: 0
-      };
-      addHexagon();
-      uiCounters();
-      folderObjManaging();
-      windowsDefinition();
-      setGravity(1600);
-      debug.log(ngUser.name);
-      ROOT.on("gamestart", () => {
-        wait(60, () => {
-          loop(120, () => {
-            if (GameState.scoreAllTime > 25)
-              GameState.save(true);
-          });
+  var gamescene = () => scene("gamescene", () => {
+    GameState.load();
+    hasStartedGame = GameState.scoreAllTime > 1;
+    ascension.ascending = false;
+    cam = {
+      pos: center(),
+      zoom: 1,
+      rotation: 0
+    };
+    addHexagon();
+    uiCounters();
+    folderObjManaging();
+    windowsDefinition();
+    setGravity(1600);
+    ROOT.on("gamestart", () => {
+      wait(60, () => {
+        loop(120, () => {
+          if (GameState.scoreAllTime > 25)
+            GameState.save(true);
         });
-        function naturalPowerupSpawningManagement() {
-          wait(60, () => {
-            loop(60, () => {
-              if (chance(0.25)) {
-                if (GameState.hasUnlockedPowerups) {
-                  spawnPowerup();
-                }
-              }
-            });
-          });
-        }
-        if (!GameState.hasUnlockedPowerups) {
-          ROOT.on("powerupunlock", () => {
-            wait(10, () => {
-              naturalPowerupSpawningManagement();
-              spawnPowerup();
-            });
-          });
-        } else
-          naturalPowerupSpawningManagement();
-        idleWaiter = wait(0, () => {
-        });
-        onMouseMove(() => resetIdleTime());
-        onKeyPress(() => resetIdleTime());
-        onClick(() => resetIdleTime());
-        onCharInput((ch) => {
-          if (!hasStartedGame)
-            return;
-          if (ch == panderitoLetters[panderitoIndex]) {
-            panderitoIndex++;
-          } else {
-            panderitoIndex = 0;
-          }
-          if (panderitoIndex == panderitoLetters.length) {
-            togglePanderito();
-          }
-        });
-        if (!isAchievementUnlocked("gnome")) {
-          wait(60, () => {
-            loop(1, () => {
-              if (chance(25e-4)) {
-                if (ascension.ascending == true)
-                  return;
-                if (!isAchievementUnlocked("gnome"))
-                  triggerGnome();
-              }
-            });
-          });
-        }
       });
-      onUpdate(() => {
-        camRot(cam.rotation);
-        camScale(vec2(cam.zoom));
-        camPos(cam.pos);
-        if (isKeyDown("shift") && isKeyPressed("r") && panderitoIndex != 6) {
-          musicHandler.stop();
-          stopAllSounds();
-          go("gamescene");
-        }
-        if (isKeyDown("shift") && isKeyPressed("s") && GameState.scoreAllTime > 25)
-          GameState.save();
-        GameState.stats.totalTimePlayed += dt();
-        GameState.score = clamp(GameState.score, 0, Infinity);
-        GameState.score = Math.round(GameState.score);
-        if (GameState.scoreAllTime >= scoreManager.scoreYouGetNextManaAt() && unlockableWindows.ascendWin.condition() == true) {
-          GameState.ascension.mana++;
-          GameState.ascension.manaAllTime++;
-          ROOT.trigger("manaGained");
-        }
-        GameState.stats.timesAscended = GameState.ascension.magicLevel - 1;
-        if (GameState.cursors >= 1 && ascension.ascending == false) {
-          autoLoopTime += dt();
-          if (autoLoopTime >= GameState.timeUntilAutoLoopEnds) {
-            if (excessTime > 0)
-              autoLoopTime = excessTime;
-            else {
-              autoLoopTime = 0;
-              hexagon.autoClick();
-            }
-            excessTime = 0;
-          }
-        } else {
-          autoLoopTime = 0;
-        }
-        if (sleeping)
-          timeSlept += dt();
-        powerupTimeManagement();
-      });
-      function handleVisibilityChange() {
-        if (!hasStartedGame)
-          return;
-        if (document.hidden) {
-          totalTimeOutsideTab = 0;
-          isTabActive = false;
-          startTimeOutsideTab = performance.now();
-          GameState.save(false);
-        } else {
-          if (!isTabActive) {
-            isTabActive = true;
-            GameState.save(false);
-            const timeOutsideTab = performance.now() - startTimeOutsideTab;
-            totalTimeOutsideTab += timeOutsideTab;
-            GameState.stats.totalTimePlayed += totalTimeOutsideTab / 1e3;
-            if (!(GameState.scoreAllTime > 0))
-              return;
-            if (totalTimeOutsideTab / 1e3 > 30) {
-              triggerZZZ(false);
-              welcomeBack(false);
-            }
-          }
-        }
-      }
-      document.addEventListener("visibilitychange", handleVisibilityChange);
-      document.addEventListener("keydown", (event) => {
-        if (event.keyCode == 83 && (navigator.platform.match("Mac") ? event.metaKey : event.ctrlKey)) {
-          event.preventDefault();
-        }
-      }, false);
-      document.getElementById("kanva").addEventListener("mouseout", () => {
-        if (curDraggin && curDraggin.releaseDrop)
-          curDraggin.releaseDrop();
-      }, false);
-      document.getElementById("kanva").addEventListener("fullscreenchange", () => {
-        ROOT.trigger("fullscreenchange");
-      });
-      let introAnimations = {
-        intro_hopes() {
-          let reference = add([
-            text("\u266A ~ Clicker.wav", {
-              align: "right",
-              font: "lambdao"
-            }),
-            opacity(),
-            pos(width(), -2)
-          ]);
-          tween(reference.pos.x, 733, 0.32, (p) => reference.pos.x = p, easings.easeOutCubic);
-          tween(0, 1, 0.32, (p) => reference.opacity = p, easings.easeOutCubic);
-          wait(4, () => {
-            tween(reference.pos.x, width(), 0.32, (p) => reference.pos.x = p, easings.easeInCubic).onEnd(() => destroy(reference));
-            tween(1, 0, 0.32, (p) => reference.opacity = p, easings.easeOutCubic);
-          });
-        },
-        intro_playMusic() {
-          let song = GameState.settings.music.favoriteIdx == null ? "clicker.wav" : Object.keys(songs)[GameState.settings.music.favoriteIdx];
-          playMusic(song);
-        },
-        intro_hexagon() {
-          tween(vec2(center().x, center().y + 110), vec2(center().x, center().y + 55), 0.5, (p) => hexagon.pos = p, easings.easeOutQuad).onEnd(() => {
-            hexagon.trigger("startAnimEnd");
-          });
-          tween(0.25, 1, 1, (p) => hexagon.opacity = p, easings.easeOutQuad);
-        },
-        intro_gameBg() {
-          tween(BLACK, saveColorToColor(GameState.settings.bgColor), 0.5, (p) => gameBg.color = p, easings.easeOutQuad);
-          tween(1, GameState.settings.bgColor.a, 0.5, (p) => gameBg.color.a = p, easings.easeOutQuad);
-          tween(-5, 5, 0.5, (p) => gameBg.movAngle = p, easings.easeOutQuad);
-        },
-        intro_scoreCounter() {
-          tween(scoreText.scoreShown, GameState.score, 0.25, (p) => scoreText.scoreShown = p, easings.easeOutQuint);
-          tween(vec2(center().x, 80), vec2(center().x, 60), 0.5, (p) => scoreText.pos = p, easings.easeOutQuad).onEnd(() => {
-            scoreText.trigger("startAnimEnd");
-          });
-          tween(0.25, 1, 0.5, (p) => scoreText.opacity = p, easings.easeOutQuad);
-        },
-        intro_spsText() {
-          tween(0.25, 1, 0.5, (p) => spsText.opacity = p, easings.easeOutQuad);
-        },
-        intro_buildingsText() {
-          tween(5, 10, 0.5, (p) => buildingsText.pos.x = p, easings.easeOutQuad);
-          tween(0.25, 1, 0.5, (p) => buildingsText.opacity = p, easings.easeOutQuad);
-        },
-        intro_folderObj() {
-          tween(width() - 30, width() - 40, 0.5, (p) => folderObj.pos.x = p, easings.easeOutQuad);
-          tween(0.25, 1, 0.5, (p) => folderObj.opacity = p, easings.easeOutQuad);
-        }
-      };
-      hexagonIntro = introAnimations.intro_hexagon;
-      if (hasStartedGame) {
-        Object.values(introAnimations).filter((animation) => !animation.name.includes("hopes")).forEach((animation) => {
-          animation();
-        });
-        wait(0.5, () => {
-          hexagon.interactable = true;
-          ROOT.trigger("gamestart");
+      if (!GameState.hasUnlockedPowerups) {
+        ROOT.on("powerupunlock", () => {
+          allPowerupsInfo.canSpawnPowerups = true;
         });
       } else {
-        gameBg.color.a = 1;
-        hexagon.interactable = false;
-        let black = add([
-          rect(width(), height()),
-          pos(center()),
-          anchor("center"),
-          color(BLACK),
-          opacity(),
-          layer("mouse"),
-          z(mouse.z - 1)
-        ]);
-        wait(2, () => {
-          black.destroy();
-          let ominus = playSfx("ominus", { loop: true });
-          playSfx("biglight");
-          hexagon.interactable = true;
-          folderObj.interactable = false;
-          spsText.opacity = 0;
-          scoreText.opacity = 0;
-          buildingsText.opacity = 0;
-          folderObj.opacity = 0;
-          hexagon.on("clickrelease", () => {
-            switch (GameState.scoreAllTime) {
-              case 1:
-                ominus.stop();
-                gameBg.color.a = 0.84;
-                introAnimations.intro_scoreCounter();
-                break;
-              case 2:
-                introAnimations.intro_playMusic();
-                introAnimations.intro_hopes();
-                introAnimations.intro_spsText();
-                break;
-              case 3:
-                introAnimations.intro_buildingsText();
-                break;
-              case 25:
-                introAnimations.intro_folderObj();
-                hasStartedGame = true;
-                folderObj.interactable = true;
-                ROOT.trigger("gamestart");
-                break;
+        allPowerupsInfo.canSpawnPowerups = true;
+      }
+      idleWaiter = wait(0, () => {
+      });
+      onMouseMove(() => resetIdleTime());
+      onKeyPress(() => resetIdleTime());
+      onClick(() => resetIdleTime());
+      onCharInput((ch) => {
+        if (!hasStartedGame)
+          return;
+        if (ch == panderitoLetters[panderitoIndex]) {
+          panderitoIndex++;
+        } else {
+          panderitoIndex = 0;
+        }
+        if (panderitoIndex == panderitoLetters.length) {
+          togglePanderito();
+        }
+      });
+      if (!isAchievementUnlocked("gnome")) {
+        wait(60, () => {
+          loop(1, () => {
+            if (chance(25e-4)) {
+              if (ascension.ascending == true)
+                return;
+              if (!isAchievementUnlocked("gnome"))
+                triggerGnome();
             }
           });
         });
       }
-      ROOT.on("buy", (info) => {
-        checkForUnlockable();
-      });
-      if (DEBUG == true)
-        debugFunctions();
     });
-  }
+    onUpdate(() => {
+      camRot(cam.rotation);
+      camScale(vec2(cam.zoom));
+      camPos(cam.pos);
+      if (isKeyDown("shift") && isKeyPressed("r") && panderitoIndex != 6) {
+        musicHandler.stop();
+        stopAllSounds();
+        go("gamescene");
+      }
+      if (isKeyDown("shift") && isKeyPressed("s") && GameState.scoreAllTime > 25)
+        GameState.save();
+      GameState.stats.totalTimePlayed += dt();
+      GameState.score = clamp(GameState.score, 0, Infinity);
+      GameState.score = Math.round(GameState.score);
+      if (GameState.scoreAllTime >= scoreManager.scoreYouGetNextManaAt() && unlockableWindows.ascendWin.condition() == true) {
+        GameState.ascension.mana++;
+        GameState.ascension.manaAllTime++;
+        ROOT.trigger("manaGained");
+      }
+      GameState.stats.timesAscended = GameState.ascension.magicLevel - 1;
+      if (GameState.cursors >= 1 && ascension.ascending == false) {
+        autoLoopTime += dt();
+        if (autoLoopTime >= GameState.timeUntilAutoLoopEnds) {
+          if (excessTime > 0)
+            autoLoopTime = excessTime;
+          else {
+            autoLoopTime = 0;
+            hexagon.autoClick();
+          }
+          excessTime = 0;
+        }
+      } else {
+        autoLoopTime = 0;
+      }
+      if (sleeping)
+        timeSlept += dt();
+      if (GameState.hasUnlockedPowerups == true) {
+        Powerup_NaturalSpawnManager();
+        Powerup_RemovalTimeManager();
+      }
+    });
+    function handleVisibilityChange() {
+      if (!hasStartedGame)
+        return;
+      if (document.hidden) {
+        totalTimeOutsideTab = 0;
+        isTabActive = false;
+        startTimeOutsideTab = performance.now();
+        GameState.save(false);
+      } else {
+        if (!isTabActive) {
+          isTabActive = true;
+          GameState.save(false);
+          const timeOutsideTab = performance.now() - startTimeOutsideTab;
+          totalTimeOutsideTab += timeOutsideTab;
+          GameState.stats.totalTimePlayed += totalTimeOutsideTab / 1e3;
+          if (!(GameState.scoreAllTime > 0))
+            return;
+          if (totalTimeOutsideTab / 1e3 > 30) {
+            triggerZZZ(false);
+            welcomeBack(false);
+          }
+        }
+      }
+    }
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    document.addEventListener("keydown", (event) => {
+      if (event.keyCode == 83 && (navigator.platform.match("Mac") ? event.metaKey : event.ctrlKey)) {
+        event.preventDefault();
+      }
+    }, false);
+    document.getElementById("kanva").addEventListener("mouseout", () => {
+      if (curDraggin && curDraggin.releaseDrop)
+        curDraggin.releaseDrop();
+    }, false);
+    document.getElementById("kanva").addEventListener("fullscreenchange", () => {
+      ROOT.trigger("checkFullscreen");
+    });
+    let introAnimations = {
+      intro_hopes() {
+        let reference = add([
+          text("\u266A ~ Clicker.wav", {
+            align: "right",
+            font: "lambdao"
+          }),
+          opacity(),
+          pos(width(), -2)
+        ]);
+        tween(reference.pos.x, 733, 0.32, (p) => reference.pos.x = p, easings.easeOutCubic);
+        tween(0, 1, 0.32, (p) => reference.opacity = p, easings.easeOutCubic);
+        wait(4, () => {
+          tween(reference.pos.x, width(), 0.32, (p) => reference.pos.x = p, easings.easeInCubic).onEnd(() => destroy(reference));
+          tween(1, 0, 0.32, (p) => reference.opacity = p, easings.easeOutCubic);
+        });
+      },
+      intro_playMusic() {
+        let song = GameState.settings.music.favoriteIdx == null ? "clicker.wav" : Object.keys(songs)[GameState.settings.music.favoriteIdx];
+        playMusic(song);
+      },
+      intro_hexagon() {
+        tween(vec2(center().x, center().y + 110), vec2(center().x, center().y + 55), 0.5, (p) => hexagon.pos = p, easings.easeOutQuad).onEnd(() => {
+          hexagon.trigger("startAnimEnd");
+        });
+        tween(0.25, 1, 1, (p) => hexagon.opacity = p, easings.easeOutQuad);
+      },
+      intro_gameBg() {
+        tween(BLACK, saveColorToColor(GameState.settings.bgColor), 0.5, (p) => gameBg.color = p, easings.easeOutQuad);
+        tween(1, GameState.settings.bgColor.a, 0.5, (p) => gameBg.color.a = p, easings.easeOutQuad);
+        tween(-5, 5, 0.5, (p) => gameBg.movAngle = p, easings.easeOutQuad);
+      },
+      intro_scoreCounter() {
+        tween(scoreText.scoreShown, GameState.score, 0.25, (p) => scoreText.scoreShown = p, easings.easeOutQuint);
+        tween(vec2(center().x, 80), vec2(center().x, 60), 0.5, (p) => scoreText.pos = p, easings.easeOutQuad).onEnd(() => {
+          scoreText.trigger("startAnimEnd");
+        });
+        tween(0.25, 1, 0.5, (p) => scoreText.opacity = p, easings.easeOutQuad);
+      },
+      intro_spsText() {
+        tween(0.25, 1, 0.5, (p) => spsText.opacity = p, easings.easeOutQuad);
+      },
+      intro_buildingsText() {
+        tween(5, 10, 0.5, (p) => buildingsText.pos.x = p, easings.easeOutQuad);
+        tween(0.25, 1, 0.5, (p) => buildingsText.opacity = p, easings.easeOutQuad);
+      },
+      intro_folderObj() {
+        tween(width() - 30, width() - 40, 0.5, (p) => folderObj.pos.x = p, easings.easeOutQuad);
+        tween(0.25, 1, 0.5, (p) => folderObj.opacity = p, easings.easeOutQuad);
+      }
+    };
+    hexagonIntro = introAnimations.intro_hexagon;
+    if (GameState.settings.fullscreen == true)
+      coolSetFullscreen(true);
+    if (!isFullscreen())
+      GameState.settings.fullscreen = false;
+    if (hasStartedGame) {
+      Object.values(introAnimations).filter((animation) => !animation.name.includes("hopes")).forEach((animation) => {
+        animation();
+      });
+      wait(0.5, () => {
+        hexagon.interactable = true;
+        ROOT.trigger("gamestart");
+      });
+    } else {
+      gameBg.color.a = 1;
+      hexagon.interactable = false;
+      let black = add([
+        rect(width(), height()),
+        pos(center()),
+        anchor("center"),
+        color(BLACK),
+        opacity(),
+        layer("mouse"),
+        z(mouse.z - 1)
+      ]);
+      wait(2, () => {
+        black.destroy();
+        let ominus = playSfx("ominus", { loop: true });
+        playSfx("biglight");
+        hexagon.interactable = true;
+        folderObj.interactable = false;
+        spsText.opacity = 0;
+        scoreText.opacity = 0;
+        buildingsText.opacity = 0;
+        folderObj.opacity = 0;
+        hexagon.on("clickrelease", () => {
+          switch (GameState.scoreAllTime) {
+            case 1:
+              ominus.stop();
+              gameBg.color.a = 0.84;
+              introAnimations.intro_scoreCounter();
+              break;
+            case 2:
+              introAnimations.intro_playMusic();
+              introAnimations.intro_hopes();
+              introAnimations.intro_spsText();
+              break;
+            case 3:
+              introAnimations.intro_buildingsText();
+              break;
+            case 25:
+              introAnimations.intro_folderObj();
+              hasStartedGame = true;
+              folderObj.interactable = true;
+              ROOT.trigger("gamestart");
+              break;
+          }
+        });
+      });
+    }
+    ROOT.on("buy", (info) => {
+      checkForUnlockable();
+    });
+    if (DEBUG == true)
+      debugFunctions();
+  });
 
   // source/game/scenes/focuscene.ts
   function focuscene() {
@@ -14916,9 +15007,12 @@ ${formatNumberSimple(GameState.clickers)}`;
       });
       onClick(async () => {
         gameBg.color.a = 1;
-        if (!await Rx.getUsername())
-          go("ngScene");
-        else
+        if (enableNg == true) {
+          if (!await Rx.getUsername())
+            go("ngScene");
+          else
+            go("gamescene");
+        } else
           go("gamescene");
       });
     });
@@ -15661,6 +15755,7 @@ ${formatNumberSimple(GameState.clickers)}`;
 
   // source/main.ts
   var DEBUG = true;
+  var enableNg = false;
   var k = HC({
     width: 1024,
     height: 576,
@@ -15716,9 +15811,12 @@ ${formatNumberSimple(GameState.clickers)}`;
       if (!isFocused())
         go("focuscene");
       else {
-        if (!await Rx.getUsername())
-          go("ngScene");
-        else
+        if (enableNg == true) {
+          if (!await Rx.getUsername())
+            go("ngScene");
+          else
+            go("gamescene");
+        } else
           go("gamescene");
       }
     });
@@ -15747,3 +15845,4 @@ newgrounds.js/dist/newgrounds.mjs:
    * Jan Hruby jhruby.web@gmail.com
    *)
 */
+//# sourceMappingURL=game.js.map

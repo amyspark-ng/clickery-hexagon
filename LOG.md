@@ -19,11 +19,12 @@ this game MIGHT be getting done
 - make powerups cheaper
 
 <!-- code -->
-- improve natural spawning methods of powerups
 - balance cursor prices (too expensive)
 - make powerups better and cheaper
-- fix the fullscreen checkbox working weird
-- music window
+- music window refactor and reworking, i hate that?'
+- something in the opacity of the blinks make the code crash
+- hasPoint in openWindowButton has makes the code crash
+^ maybe it's because when it opens lastPosClicked is null or undefined something like that
 
 <!-- ascension -->
 - takes 10-15-20 mins to reach 5 million of total score, that's good

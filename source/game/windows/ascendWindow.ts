@@ -3,7 +3,7 @@ import { GameState, scoreManager } from "../../gamestate"
 import { ROOT } from "../../main"
 import { positionSetter } from ".././plugins/positionSetter"
 import { triggerAscension } from "../ascension/ascension"
-import { isHoveringAPowerup } from "../powerups"
+import { allPowerupsInfo} from "../powerups"
 import { formatNumber } from "../utils"
 import { waver } from "../plugins/wave"
 
@@ -143,7 +143,7 @@ export function ascendWinContent(winParent) {
 	])
 	
 	button.onClick(() => {
-		if (isHoveringAPowerup == true) return
+		if (allPowerupsInfo.isHoveringAPowerup == true) return
 		if (GameState.ascension.mana >= 1) triggerAscension()
 	})
 

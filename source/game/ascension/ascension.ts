@@ -11,6 +11,7 @@ import { spawnCards } from "./cards";
 import { folderObj } from "../windows/windows-api/folderObj";
 import { waver } from "../plugins/wave";
 import { positionSetter } from "../plugins/positionSetter";
+import { allPowerupsInfo } from "../powerups";
 
 export let ascension = {
 	ascending: false,
@@ -285,6 +286,7 @@ function skipTalk() {
 export function triggerAscension() {
 	// stuff
 	ascension.ascending = true
+	allPowerupsInfo.canSpawnPowerups = false
 
 	// the multiplier cool!!!
 	GameState.ascension.magicLevel++
@@ -427,8 +429,8 @@ export function triggerAscension() {
 
 export function endAscension() {
 	folderObj.interactable = true
-	
 	ROOT.trigger("endAscension")
+	allPowerupsInfo.canSpawnPowerups = true
 
 	get("*", { recursive: true }).filter(obj => obj.layer == "ascension").forEach((obj) => {
 		if (obj.is("area")) obj.area.scale = vec2(0)

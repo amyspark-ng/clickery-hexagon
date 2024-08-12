@@ -1,20 +1,19 @@
 import { GameState, scoreManager } from "../gamestate.ts"
 import { addHexagon, hexagon } from "./hexagon.ts"
 import { buildingsText, scoreText, spsText, uiCounters } from "./uicounters.ts"
-import { debugFunctions, formatNumber, formatTime, randomPos, saveColorToColor } from "./utils.ts"
+import { coolSetFullscreen, debugFunctions, formatNumber, formatTime, randomPos, saveColorToColor } from "./utils.ts"
 import { addToast, gameBg, mouse } from "./additives.ts"
 import { musicHandler, playMusic, playSfx, stopAllSounds } from "../sound.ts"
 import { windowsDefinition } from "./windows/windows-api/windowManaging.ts"
 import { songs } from "./windows/musicWindow.ts"
 import { DEBUG, ROOT } from "../main.ts"
-import { powerupTimeManagement, spawnPowerup } from "./powerups.ts"
+import { allPowerupsInfo, Powerup_NaturalSpawnManager, Powerup_RemovalTimeManager, spawnPowerup } from "./powerups.ts"
 import { checkForUnlockable, isAchievementUnlocked, unlockAchievement } from "./unlockables/achievements.ts"
 import { ascension } from "./ascension/ascension.ts"
 import { folderObj, folderObjManaging } from "./windows/windows-api/folderObj.ts"
 import { curDraggin } from "./plugins/drag.ts"
 import { unlockableWindows } from "./unlockables/unlockablewindows.ts"
 import * as env from "../env.json"
-import { ngUser } from "../newgrounds.ts"
 
 let panderitoLetters = "panderito".split("")
 export let panderitoIndex = 0
@@ -178,12 +177,14 @@ function welcomeBack(idle = false) {
 				if (chance(0.25)) {
 					// if an additional 5% chance also happens to be you get 2
 					if (chance(0.05)) {
-						for (let i = 0; i < 2; i++) spawnPowerup()
+						for (let i = 0; i < 2; i++) spawnPowerup({ type: "random" })
 					}
 
 					// else you get a single one
 					else {
-						spawnPowerup()
+						spawnPowerup({
+							type: "random",
+						})
 					}
 				}
 			}
@@ -312,28 +313,15 @@ export const gamescene = () => scene("gamescene", () => {
 			})
 		})
 	
-		function naturalPowerupSpawningManagement() {
-			wait(60, () => {
-				loop(60, () => {
-					if (chance(0.25)) {
-						if (GameState.hasUnlockedPowerups) {
-							spawnPowerup()
-						}
-					}
-				})
-			})
-		}
-	
 		if (!GameState.hasUnlockedPowerups) {
 			ROOT.on("powerupunlock", () => {
-				wait(10, () => {
-					naturalPowerupSpawningManagement()
-					spawnPowerup()
-				})
+				allPowerupsInfo.canSpawnPowerups = true
 			})
 		}
 	
-		else naturalPowerupSpawningManagement()
+		else {
+			allPowerupsInfo.canSpawnPowerups = true
+		}
 	
 		// check for idling
 		idleWaiter = wait(0, () => {})
@@ -415,7 +403,10 @@ export const gamescene = () => scene("gamescene", () => {
 	
 		if (sleeping) timeSlept += dt()
 	
-		powerupTimeManagement()
+		if (GameState.hasUnlockedPowerups == true) {
+			Powerup_NaturalSpawnManager()
+			Powerup_RemovalTimeManager()
+		}
 	})
 	
 	// #region OUTSIDE OF TAB STUFF
@@ -472,7 +463,7 @@ export const gamescene = () => scene("gamescene", () => {
 	}, false);
 	
 	document.getElementById("kanva").addEventListener("fullscreenchange", () => {
-		ROOT.trigger("fullscreenchange")
+		ROOT.trigger("checkFullscreen")
 	})
 	
 	let introAnimations = {
@@ -536,6 +527,9 @@ export const gamescene = () => scene("gamescene", () => {
 	
 	hexagonIntro = introAnimations.intro_hexagon
 	
+	if (GameState.settings.fullscreen == true) coolSetFullscreen(true)
+	if (!isFullscreen()) GameState.settings.fullscreen = false
+
 	if (hasStartedGame) {
 		Object.values(introAnimations).filter(animation => !animation.name.includes("hopes")).forEach((animation) => {
 			animation() // animations take 0.5 seconds

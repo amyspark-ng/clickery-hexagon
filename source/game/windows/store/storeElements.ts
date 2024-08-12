@@ -4,9 +4,8 @@ import { playSfx } from "../../../sound"
 import { ROOT } from "../../../main"
 import { bop, formatNumber, getPrice, getRandomDirection, getVariable, percentage, randomPos } from "../../utils"
 import { addTooltip } from "../../additives"
-import { isHoveringAPowerup, powerupTypes, spawnPowerup } from "../../powerups"
+import { allPowerupsInfo, powerupTypes, spawnPowerup } from "../../powerups"
 import { isHoveringUpgrade, storeElements, storePitchJuice } from "./storeWindows"
-import { positionSetter } from "../.././plugins/positionSetter"
 import { insideWindowHover } from "../../hovers/insideWindowHover"
 
 export let storeElementsInfo = {
@@ -18,12 +17,12 @@ export let storeElementsInfo = {
 	"cursorsElement": { 
 		gamestateKey: "cursors",
 		basePrice: 50,
-		percentageIncrease: 25
+		percentageIncrease: 15
 	},
 	"powerupsElement": { 
 		gamestateKey: "stats.powerupsBought",
 		basePrice: 50500,
-		percentageIncrease: 160,
+		percentageIncrease: 110,
 		unlockPrice: 10500
 	},
 }
@@ -59,7 +58,7 @@ function regularStoreElement(winParent) {
 			thisElement = this
 
 			thisElement.onMousePress("left", () => {
-				if (isHoveringAPowerup == true) return
+				if (allPowerupsInfo.isHoveringAPowerup == true) return
 				if (thisElement.isBeingHovered == false) return
 				if (!winParent.active) return
 				
@@ -97,7 +96,7 @@ function regularStoreElement(winParent) {
 			})
 		
 			thisElement.onMouseRelease(() => {
-				if (isHoveringAPowerup == true) return
+				if (allPowerupsInfo.isHoveringAPowerup == true) return
 				if (!winParent.active) return
 				
 				downEvent?.cancel()
@@ -159,7 +158,7 @@ function lockedPowerupStoreElement(winParent:GameObj) {
 	
 			let downEvent = null;
 			thisElement.onMousePress("left", () => {
-				if (isHoveringAPowerup == true) return
+				if (allPowerupsInfo.isHoveringAPowerup == true) return
 				if (thisElement.isBeingHovered == false) return
 				if (!winParent.active) return
 			
@@ -191,7 +190,7 @@ function lockedPowerupStoreElement(winParent:GameObj) {
 			})
 	
 			thisElement.onMouseRelease("left", () => {
-				if (isHoveringAPowerup == true) return
+				if (allPowerupsInfo.isHoveringAPowerup == true) return
 				if (!winParent.active) return
 			
 				if (!thisElement.isHovering()) return;
@@ -301,6 +300,7 @@ export function addStoreElement(winParent:any, opts:storeElementOpt) {
 			
 				if (opts.type == "powerupsElement") {
 					spawnPowerup({
+						type: "random",
 						pos: randomPos(),
 						natural: false,
 					})

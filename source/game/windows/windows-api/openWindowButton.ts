@@ -8,7 +8,7 @@ export function openWindowButton() {
 
 	return {
 		id: "windowButton",
-		require: ["rotate", "drag", "dummyShadow"],
+		require: ["rotate", "drag", "dummyShadow", "area"],
 
 		add() {
 			let waitingHold = wait(0, () => {})
@@ -38,7 +38,6 @@ export function openWindowButton() {
 					waitingHold.cancel()
 					// if last posclicked is inside gridminibutton
 					if (!this.isBeingHovered) return
-					if (!this.hasPoint(lastPosClicked)) return
 					if (curDraggin) return
 	
 					// click function

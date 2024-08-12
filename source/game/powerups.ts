@@ -2,50 +2,92 @@ import { TextCompOpt, Vec2 } from "kaplay"
 import { waver } from "./plugins/wave";
 import { playSfx } from "../sound";
 import { GameState, scoreManager } from "../gamestate";
-import { bop, formatNumber, getPosInGrid, parseAnimation, randomPos } from "./utils";
+import { bop, formatNumber, getPosInGrid, getPositionOfSide, parseAnimation, randomPos } from "./utils";
 import { positionSetter } from "./plugins/positionSetter";
 import { checkForUnlockable } from "./unlockables/achievements";
-import { ascension } from "./ascension/ascension";
+
+class Powerup {
+	sprite: string;
+	
+	/**
+	 * Time that its left for it to be removed, if it's null it means it's not active
+	 */
+	removalTime: null | number;
+	/**
+	 * Time it's running to check for max time and then chance
+	 */
+	runningTime: number;
+	/**
+	 * Time it takes to rethink chance
+	 */
+	maxTime: number;
+	/**
+	 * Chance it has of appearing when maxTime is ran (from 0 to 1)
+	 */
+	chance: number;
+	/**
+	 * The multiplier the powerup is currently running
+	 */
+	multiplier: number;
+
+	constructor(sprite:string, maxTime: number, chance: number, runningTime?:number, multiplier?:number) {
+		this.sprite = sprite;
+		this.maxTime = maxTime;
+		this.chance = chance;
+		this.runningTime = runningTime || 0
+		this.multiplier = multiplier || 1
+	}
+}
 
 export let powerupTypes = {
 	/**
 	 * Makes clicks more powerful
 	 */
-	"clicks": { sprite: "cursors.cursor", multiplier: 1, removalTime: null, color: [199, 228, 255] },
+	"clicks": new Powerup("cursors.cursor", 80, 0.15),
 	/**
 	 * Makes cursors more powerful
 	 */
-	"cursors": { sprite: "cursors.point", multiplier: 1, removalTime: null, color: [199, 252, 197] },
+	"cursors": new Powerup("cursors.point", 60, 0.2),
 	/**
 	 * Gives you the score you would have gotten in X amount of time
 	 */
-	"time": { sprite: "cursors.wait", multiplier: 1, removalTime: null, color: [247, 242, 193] },
+	"time": new Powerup("cursors.wait", 60, 0.45),
 	/**
 	 * Increses production
 	 */
-	"awesome": { sprite: "cursors.check", multiplier: 1, removalTime: null, color: [227, 190, 247]} ,
+	"awesome": new Powerup("cursors.check", 120, 0.30),
 	/**
 	 * Gives discounts for clickers and cursors
 	 */
-	"store": { sprite: "icon_store", multiplier: 1, removalTime: null, color: [195, 250, 162] },
+	"store": new Powerup("icon_store", 90, 0.45),
 	/**
 	 * Is just silly, very silly
 	 */
-	"blab": { sprite: "panderito", multiplier: 1, removalTime: null },
+	"blab": new Powerup("panderito", 20, 0.15),
 }
 
 let blabPhrases = [
+	"Test powerup",
 	"lol!",
 	"Why did you click me?",
-	"IT HAD A FAMILY",
+	"IT HAD A FAMILY!!!......",
 	"Clicking since 1999",
+	"Hexagoning since march 2024",
+	"Also try Cookie Clicker!",
+	"Orteil don't sue me",
+	"Area of an hexagon:\nA = (p * 2) / 2",
+	"Did you know?\nYou can drag the buttons in your taskbar around!",
+	"Did you know?\nYou can drag the buttons in the extra window\nto your taskbar!",
+	"Did you know?\nYou can hold your mouse when buying!",
+	"Did you know?\nYou can hold shift to bulk-buy 10x things!",
+	"Did you know?\nYou can click the big hexagon several times\nto start a combo!",
 ]
 
-export type powerup = keyof typeof powerupTypes
+export type powerupName = keyof typeof powerupTypes | "random";
 
 type powerupOpt = {
-	type?: powerup;
-	pos: Vec2,
+	type: powerupName;
+	pos?: Vec2,
 	multiplier?: number,
 	time?: number,
 	natural?: boolean,
@@ -122,7 +164,7 @@ function addTimer(opts:{ sprite: string, type: string }) {
 	timerObj.onClick(() => {
 		if (get(`poweruplog_${opts.type}`).length == 0) {
 			bop(timerObj)
-			addPowerupLog(opts.type as powerup)
+			addPowerupLog(opts.type as powerupName)
 		}
 	})
 
@@ -161,15 +203,19 @@ function addTimer(opts:{ sprite: string, type: string }) {
 	])
 }
 
-export function addPowerupLog(powerupType:powerup) {
+export function addPowerupLog(powerupType:powerupName) {
+	function getPosForPowerupLog(index:number) {
+		return getPosInGrid(vec2(center().x, height() - 100), -index, 0, vec2(300, 100))
+	}
+	
 	let powerupTime = powerupTypes[powerupType].removalTime
 	let textInText = ""
 
 	if (powerupType == "blab") textInText = choose(blabPhrases)
 
-	let bgOpacity = 0.95
+	const bgOpacity = 0.95
 	let bg = add([
-		rect(300, 100, { radius: 5 }),
+		rect(0, 0, { radius: 0 }),
 		pos(center().x, height() - 100),
 		color(BLACK.lighten(2)),
 		positionSetter(),
@@ -177,20 +223,11 @@ export function addPowerupLog(powerupType:powerup) {
 		layer("powerups"),
 		opacity(bgOpacity),
 		z(1),
+		"poweruplog",
 		`poweruplog_${powerupType}`,
-		{
-			draw() {
-				// drawSprite({
-				// 	sprite: "hexagon",
-				// 	scale: vec2(0.5),
-				// 	pos: vec2(-bg.width, -bg.height),
-				// 	color: Color.fromArray(powerups[powerupType].color),
-				// })
-			}
-		}
 	])
 
-	let textInBgOpts = { size: 25, align: "center", width: 300 } 
+	let textInBgOpts = { size: 25, align: "center", width: 300 }
 	let textInBg = bg.add([
 		text("", textInBgOpts as TextCompOpt),
 		pos(0, 0),
@@ -219,39 +256,71 @@ export function addPowerupLog(powerupType:powerup) {
 		}
 	])
 
+	let icon = bg.add([
+		sprite("white_noise"),
+		pos(-bg.width / 2, -bg.height / 2),
+		anchor("center"),
+		opacity(),
+		{
+			update() {
+				this.opacity = bg.opacity
+			}
+		}
+	])
+
+	parseAnimation(icon, powerupTypes[powerupType].sprite)
+	icon.width = 35
+	icon.height = 35
+
+	let index = get("poweruplog").length - 1
+	let destinedPos = getPosForPowerupLog(index)
+
 	bg.onUpdate(() => {
-		bg.width = 315
-		bg.height = formatText({ text: textInText, ...textInBgOpts as TextCompOpt }).height + 15
+		let radius = 5
+		let width = 315
+		let height = formatText({ text: textInText, ...textInBgOpts as TextCompOpt }).height + 15
+		
+		bg.height = lerp(bg.height, height, 0.5)
+		bg.width = lerp(bg.width, width, 0.5)
+		bg.radius = lerp(bg.radius, radius, 0.5)
 	})
 
 	tween(0, bgOpacity, 0.5, (p) => bg.opacity = p, easings.easeOutQuad)
-	tween(height() + bg.height, height() - bg.height, 0.5, (p) => bg.pos.y = p, easings.easeOutQuad)
+	tween(height() + bg.height, destinedPos.y, 0.5, (p) => bg.pos.y = p, easings.easeOutQuad)
 
 	wait(3.5, () => {
 		tween(bg.pos.y, bg.pos.y - bg.height, 0.5, (p) => bg.pos.y = p, easings.easeOutQuad)
 		bg.fadeOut(0.5).onEnd(() => destroy(bg))
 		tween(textInBg.opacity, 0, 0.5, (p) => textInBg.opacity = p, easings.easeOutQuad)
+		bg.unuse("poweruplog")
 	})
 }
 
-export let isHoveringAPowerup = false
+export let allPowerupsInfo = {
+	isHoveringAPowerup: false,
+	canSpawnPowerups: false,
+}
+
 export function spawnPowerup(opts?:powerupOpt) {
-	if (ascension.ascending == true) return
+	if (allPowerupsInfo.canSpawnPowerups == false) return
 	if (opts == undefined) opts = {} as powerupOpt 
 
 	function getRandomPowerup() {
+		// this doesn't include random of course
 		let list = Object.keys(powerupTypes)
 		
 		if (Math.round(scoreManager.autoScorePerSecond()) < 1) list.splice(list.indexOf("time"), 1)
 		if (opts.natural == false) list.splice(list.indexOf("awesome"), 1) 
 		
-		let element = choose(list) as powerup
+		let element = choose(list) as powerupName
 		if (chance(0.2) && opts.natural == false) element = "blab"
 		
 		return element;
 	}
 
-	opts.type = opts.type || getRandomPowerup()
+	opts.type = opts.type
+	if (opts.type == "random") opts.type = getRandomPowerup()
+
 	opts.pos = opts.pos || randomPos()
 
 	let powerupObj = add([
@@ -306,16 +375,13 @@ export function spawnPowerup(opts?:powerupOpt) {
 					}
 				])
 
+				blink.scale = this.scale
 				blink.width = this.width
 				blink.height = this.height
 
 				parseAnimation(blink, powerupTypes[opts.type].sprite)
 
 				let timeToLeave = 0.75
-				loop(0.1, () => {
-					if (blink.opacity == blink.maxOpacity) blink.opacity = 0
-					else blink.opacity = blink.maxOpacity 
-				})
 				tween(0.5, 0, timeToLeave, (p) => blink.maxOpacity = p, easings.easeOutBack)
 				blink.wait(timeToLeave, () => {
 					destroy(blink)
@@ -454,7 +520,10 @@ export function spawnPowerup(opts?:powerupOpt) {
 
 }
 
-export function powerupTimeManagement() {
+/**
+ * Manages the removal time of powerups, which is the amount of time they have after being activated
+ */
+export function Powerup_RemovalTimeManager() {
 	for (let powerup in powerupTypes) {
 		if (powerupTypes[powerup].removalTime != null) {
 			if (powerup != "time") powerupTypes[powerup].removalTime -= dt()
@@ -470,6 +539,25 @@ export function powerupTimeManagement() {
 	// this runs on update, it's fine putting isHoveringAPowerup behaviour here
 	if ((get("powerup").length > 0)) {
 		// use isHovering and not isBeingHovered because powerups are on top of everything
-		isHoveringAPowerup = get("powerup").some((powerup) => powerup.isHovering())
+		allPowerupsInfo.isHoveringAPowerup = get("powerup").some((powerup) => powerup.isHovering())
 	}
 }
+
+/**
+ * Manages the natural spawning of powerups
+ */
+export function Powerup_NaturalSpawnManager() {
+	for (let powerup in powerupTypes) {
+		powerupTypes[powerup].runningTime += dt()
+
+		if (powerupTypes[powerup].runningTime > powerupTypes[powerup].maxTime) {
+			powerupTypes[powerup].runningTime = 0
+
+			if (chance(powerupTypes[powerup].chance)) {
+				spawnPowerup({
+					type: powerup as powerupName,
+				})
+			}
+		}
+	}
+} 

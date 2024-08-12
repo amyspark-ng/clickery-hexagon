@@ -30,7 +30,7 @@ export function settingsWinContent(winParent) {
 		title: "Fullscreen"
 	}, otherCheckboxesBg)
 
-	let checkForFullscreen = ROOT.on("fullscreenchange", () => {
+	let checkForFullscreen = ROOT.on("checkFullscreen", () => {
 		if (isFullscreen()) fullscreenCheckbox.turnOn()
 		else fullscreenCheckbox.turnOff()
 		GameState.settings.fullscreen = isFullscreen()
@@ -63,4 +63,5 @@ export function settingsWinContent(winParent) {
 		checkForFullscreen.cancel()
 	})
 
+	ROOT.trigger("checkFullscreen")
 }

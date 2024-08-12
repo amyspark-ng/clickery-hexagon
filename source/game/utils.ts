@@ -1,11 +1,11 @@
-import { Color, Vec2 } from "kaplay";
+import { Color, GameObj, Vec2 } from "kaplay";
 import { GameState, saveColor, scoreManager } from "../gamestate";
 import { addToast, mouse } from "./additives";
 import { autoLoopTime, cam, triggerGnome } from "./gamescene";
 import { hexagon } from "./hexagon";
 import { unlockAchievement } from "./unlockables/achievements";
 import { openWindow } from "./windows/windows-api/windowManaging";
-import { spawnPowerup } from "./powerups";
+import { powerupTypes, spawnPowerup } from "./powerups";
 
 // definetely not stack overflow
 // dots are always for thousands, leave it like this
@@ -99,6 +99,16 @@ export function formatNumber(value:number, opts?:formatNumberOpts):string {
 export function arrToVec(arr:Array<number>): Vec2 {
 	let vector = vec2(arr[0], arr[1])
 	return vector;
+}
+
+export function coolSetFullscreen(bool:boolean) {
+	let kanvas = document.querySelector("#kanva")
+
+	if (bool == true) {
+		kanvas.requestFullscreen()
+	}
+
+	else if (bool == false) kanvas
 }
 
 // 3 columns means 3 objects laid horizontally, 3 rows is 3 objects laid vertically
@@ -292,7 +302,7 @@ export function getRandomDirection(initialPos:Vec2, onlyCardinal:boolean, mult:n
 	return newPos
 }
 
-export function parseAnimation(obj, anim) {
+export function parseAnimation(obj:GameObj, anim:string) {
 	let spriteName = !anim.includes(".") ? anim : [anim.split(".")[0], anim.split(".")[1]];
 	obj.unuse("sprite")
 	obj.use(sprite(typeof spriteName == "string" ? spriteName : spriteName[0]))
@@ -353,7 +363,8 @@ export function debugTexts() {
 		layer("mouse"),
 		{
 			update() {
-				this.text = "DEBUG" + ` ${debug.fps()}`
+				let fps = 1000 / dt()
+				this.text = "DEBUG" + ` ${fps.toFixed(0)}`
 			}
 		}
 	])
@@ -380,6 +391,10 @@ export function debugTexts() {
 					"Taskbar: ": GameState.taskbar,
 				}
 
+				for (let powerup in powerupTypes) {
+					keys[`${powerup} running time :`] = powerupTypes[powerup].runningTime.toFixed(1)
+				}
+
 				this.text = createKeys()
 			}
 		}
@@ -398,6 +413,7 @@ export function debugFunctions() {
 	window.globalThis.spawnPowerup = spawnPowerup
 	window.globalThis.hexagon = hexagon
 	window.globalThis.openWindow = openWindow
+	window.globalThis.powerupsTypes = powerupTypes
 	
 	onUpdate(() => {
 		// if (isKeyDown("control")) {
@@ -416,6 +432,7 @@ export function debugFunctions() {
 	
 		else if (isKeyPressed("f")) {
 			spawnPowerup({
+				type: "random",
 				pos: mousePos(),
 				natural: true,
 			})

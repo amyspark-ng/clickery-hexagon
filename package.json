@@ -3,7 +3,7 @@
   "description": "A simple clicker game",
   "type": "module",
   "scripts": {
-    "build": "esbuild --bundle source/main.ts --outfile=public/game.js",
+    "build": "esbuild --bundle source/main.ts --sourcemap --outfile=public/game.js",
     "dev": "esbuild --bundle source/main.ts --sourcemap --outfile=public/game.js --servedir=./public"
   },
   "dependencies": {
