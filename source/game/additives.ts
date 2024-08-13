@@ -90,6 +90,7 @@ export type toastOpts = {
 	icon: string,
 	duration?: number,
 	type?: string,
+	whenAdded?:(toastObj:GameObj) => void;
 }
 
 export function addToast(opts:toastOpts) {
@@ -113,15 +114,6 @@ export function addToast(opts:toastOpts) {
 			{
 				index: idx,
 				type: opts.type,
-				add() {
-					if (this.type == "achievement") {
-						playSfx("unlockachievement", { detune: this.index * 100 })
-					}
-
-					else if (this.type == "gamesaved") {
-						playSfx("gamesaved", { detune: rand(0, 30) })
-					}
-				},
 				close() {
 					wait(0.7).onEnd(() => this.trigger("closed"))
 					tween(toastBg.pos.x, -toastBg.width, 0.8, (p) => toastBg.pos.x = p, easings.easeOutQuint).onEnd(() => {
@@ -237,13 +229,11 @@ export function addToast(opts:toastOpts) {
 			bodyText.destroy();
 		});
 
-		if (toastBg.type == "save") playSfx("gamesaved")
-		else if (toastBg.type == "achievement" || toastBg.type == "window") playSfx("unlockachievement", { detune: toastBg.index * 100 })
-	
+		opts.whenAdded(toastBg);
 		return toastBg;
 	}
 
-	let toastObj:any;
+	let toastObj:GameObj;
 
 	function processQueue() {
 		let logs = get("toast", { recursive: true });
@@ -286,7 +276,7 @@ export function addToast(opts:toastOpts) {
 
 	processQueue(); // Ensure the queue is processed if there are available slots
 
-	return toastObj;
+	return toastObj
 }
 
 type tooltipOpts = {

@@ -1,7 +1,7 @@
 import { GameState, scoreManager } from "../gamestate.ts"
 import { addHexagon, hexagon } from "./hexagon.ts"
 import { buildingsText, scoreText, spsText, uiCounters } from "./uicounters.ts"
-import { coolSetFullscreen, debugFunctions, formatNumber, formatTime, randomPos, saveColorToColor } from "./utils.ts"
+import { coolSetFullscreen, debugFunctions, formatNumber, formatTime, randomPos, runInTauri, saveColorToColor } from "./utils.ts"
 import { addToast, gameBg, mouse } from "./additives.ts"
 import { musicHandler, playMusic, playSfx, stopAllSounds } from "../sound.ts"
 import { windowsDefinition } from "./windows/windows-api/windowManaging.ts"
@@ -13,10 +13,8 @@ import { ascension } from "./ascension/ascension.ts"
 import { folderObj, folderObjManaging } from "./windows/windows-api/folderObj.ts"
 import { curDraggin } from "./plugins/drag.ts"
 import { unlockableWindows } from "./unlockables/unlockablewindows.ts"
-import * as env from "../env.json"
-
-import { runOnTauri } from "../tauriUtils.ts"
 import { appWindow } from '@tauri-apps/api/window';
+import * as env from "../env.json"
 
 let panderitoLetters = "panderito".split("")
 export let panderitoIndex = 0
@@ -309,7 +307,7 @@ export const gamescene = () => scene("gamescene", () => {
 	setGravity(1600)
 	
 	ROOT.on("gamestart", () => {
-		runOnTauri(() => appWindow.setTitle("Clickery Hexagon"))
+		runInTauri(() => appWindow.setTitle("Clickery Hexagon"))
 		
 		// wait 60 seconds
 		wait(60, () => {
@@ -603,7 +601,7 @@ export const gamescene = () => scene("gamescene", () => {
 		checkForUnlockable()
 	})
 
-	runOnTauri(() => {
+	runInTauri(() => {
 		ROOT.on("scoreGained", () => {
 			appWindow.setTitle(`Clickery Hexagon - ${formatNumber(Math.round(GameState.score))} score`)
 		})

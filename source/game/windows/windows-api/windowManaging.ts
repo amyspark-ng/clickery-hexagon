@@ -20,6 +20,7 @@ import { statsWinContent } from "../statsWin.ts";
 import { medalsWinContent } from "../medalsWin.ts";
 import { hexColorWinContent } from "../color/hexColorWindow.ts";
 import { bgColorWinContent } from "../color/bgColorWindow.ts";
+import { leaderboardsWinContent } from "../leaderboardsWin.ts";
 
 class Window {
 	key: string;
@@ -81,7 +82,7 @@ export function windowsDefinition() {
 		"medalsWin": { idx: 4, content: medalsWinContent, lastPos: vec2(center().x, center().y) },
 		"creditsWin": { idx: 5, content: creditsWinContent, lastPos: vec2(center().x, center().y) },
 		"settingsWin": { idx: 6, content: settingsWinContent, lastPos: vec2(center().x, center().y) },
-		"leaderboardsWin": { idx: 7, content: emptyWinContent, lastPos: vec2(center().x, center().y) },
+		"leaderboardsWin": { idx: 7, content: leaderboardsWinContent, lastPos: vec2(center().x, center().y) },
 		"hexColorWin": { idx: 8, content: hexColorWinContent, lastPos: vec2(208, 160) },
 		"bgColorWin": { idx: 9, content: bgColorWinContent, lastPos: vec2(width() - 200, 200) },
 		"extraWin": { idx: 10, icon: "extra", content: extraWinContent, lastPos: vec2(750, 392) },
@@ -107,7 +108,7 @@ export function addXButton(windowParent:any) {
 		anchor("center"),
 		insideWindowHover(windowParent),
 		z(windowParent.z + 1),
-		area({ scale: vec2(1.8, 1.1), offset: vec2(-5, 0)}),
+		area({ scale: vec2(1.8, 1.1)}),
 		"xButton",
 		{
 			add() {
@@ -156,7 +157,7 @@ export function openWindow(windowKey:windowKey) {
 		layer("windows"),
 		z(0),
 		drag(),
-		area({ scale: vec2(1.05, 1) }),
+		area({ scale: vec2(1, 1) }),
 		"window",
 		`${windowKey}`,
 		{

@@ -45,8 +45,10 @@ export function medalsWinContent(winParent) {
 	// everytime you scroll that achievements gets updated
 	// for hovers you can check the distance to the medalObj
 	function addMedal(gridPosition:{ row:number, column:number }, medalid:string) {
+		let theSprite = getSprite("medal_" + medalid) || "unknown"
+		
 		let medalObj = medalsContainer.add([
-			sprite(medalid),
+			sprite(theSprite),
 			pos(),
 			anchor("center"),
 			layer("windows"),
@@ -99,8 +101,8 @@ export function medalsWinContent(winParent) {
 
 			if (!isAchievementUnlocked(achievement.id)) {
 				// is not secret
-				if (achievement.secretCondition == null) texting = achievement.description
-				// is secret
+				if (achievement.secretCondition == null || achievement.secretCondition() == true) texting = achievement.description
+				// is secret and is locked
 				else texting = "This achievement is secret\nFor now..."
 			}
 

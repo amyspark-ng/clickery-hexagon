@@ -2,7 +2,7 @@ import { GameObj, Vec2 } from "kaplay"
 import { GameState, scoreManager } from "../../gamestate"
 import { ROOT } from "../../main"
 import { positionSetter } from ".././plugins/positionSetter"
-import { triggerAscension } from "../ascension/ascension"
+import { startAscending } from "../ascension/ascension"
 import { allPowerupsInfo} from "../powerups"
 import { formatNumber } from "../utils"
 import { waver } from "../plugins/wave"
@@ -144,7 +144,7 @@ export function ascendWinContent(winParent) {
 	
 	ascendButton.onClick(() => {
 		if (allPowerupsInfo.isHoveringAPowerup == true) return
-		if (GameState.ascension.mana >= 1) triggerAscension()
+		if (GameState.ascension.mana >= 1) startAscending()
 	})
 
 	let manaGainedCheck = ROOT.on("manaGained", () => {

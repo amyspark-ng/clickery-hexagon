@@ -6,6 +6,7 @@ import { hexagon } from "./hexagon";
 import { unlockAchievement } from "./unlockables/achievements";
 import { openWindow } from "./windows/windows-api/windowManaging";
 import { powerupTypes, spawnPowerup } from "./powerups";
+import { playSfx } from "../sound";
 
 // definetely not stack overflow
 // dots are always for thousands, leave it like this
@@ -323,7 +324,15 @@ export function setVariable(obj, path, value) {
 }
 
 export function saveAnim() {
-	addToast({ icon: "floppy", title: "Game saved!", body: `Time played: ${formatTime(GameState.stats.totalTimePlayed, true)}`, type: "gamesaved" })
+	addToast({
+		icon: "floppy",
+		title: "Game saved!",
+		body: `Time played: ${formatTime(GameState.stats.totalTimePlayed, true)}`,
+		type: "gamesaved",
+		whenAdded(toastObj) {
+			playSfx("gamesaved", { detune: rand(0, 30) })
+		},
+	})
 }
 
 export function randomPos() {
@@ -451,4 +460,13 @@ export function debugFunctions() {
 	onMousePress("middle", () => {
 		if (isKeyDown("shift")) cam.zoom = 1
 	})
+}
+
+/**
+ * This function is used to run a function that will only run if you're on Tauri (desktop)
+ */
+export function runInTauri(func: () => void): void {
+	if ("__TAURI__" in window) {
+		func();
+	}
 }

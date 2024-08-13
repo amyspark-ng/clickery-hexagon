@@ -6,7 +6,7 @@ import { addBackground, addMouse, gameBg } from "./game/additives.ts";
 import { volumeManager } from "./sound.ts";
 import { newgroundsManagement } from "./newgrounds.ts";
 import ng from "newgrounds.js";
-import { runOnTauri } from "./tauriUtils.ts";
+import { runInTauri } from "./game/utils.ts";
 
 export let DEBUG:boolean = true
 export let enableNg:boolean = false
@@ -26,7 +26,7 @@ let kaplayOpts = {
 	letterbox: false,
 }
 
-runOnTauri(() => {
+runInTauri(() => {
 	kaplayOpts.stretch = true;
 	kaplayOpts.letterbox = true
 })

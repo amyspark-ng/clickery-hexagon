@@ -512,14 +512,21 @@ function loadSprites() {
 	let achievementIds = achievements.map(achievement => achievement.id)
 	let medalsSprites = {}
 
-	achievementIds.forEach((achievementId) => {
+	achievementIds.forEach((achievementId, index) => {
 		medalsSprites[achievementId] = {
-			"x": 0,
-			"y": 0,
+			"x": 60 * index + 1,
+			"y": 0 * index + 1,
 			"width": 60,
 			"height": 60,
 		}
 	})
+
+	medalsSprites["unknown"] = {
+		"x": 0,
+		"y": 0,
+		"width": 60,
+		"height": 60,
+	}
 
 	loadSpriteAtlas("sprites/windows/medalsWin/medals.png", {
 		...medalsSprites

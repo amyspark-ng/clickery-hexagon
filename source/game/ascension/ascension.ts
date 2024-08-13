@@ -12,6 +12,7 @@ import { folderObj } from "../windows/windows-api/folderObj";
 import { waver } from "../plugins/wave";
 import { positionSetter } from "../plugins/positionSetter";
 import { allPowerupsInfo } from "../powerups";
+import { addMage } from "./mage";
 
 export let ascension = {
 	ascending: false,
@@ -20,160 +21,6 @@ export let ascension = {
 
 let activeLetterWaits = []
 let currentlySaying = ""
-
-function addMage() {
-	let mage_color = rgb(0, 51, 102)
-	
-	let mage:any;
-
-	mage = add([
-		pos(-17, 154),
-		waver({ wave_speed: 1, maxAmplitude: 2.5 }),
-		layer("ascension"),
-		z(1),
-		opacity(1),
-		anchor("center"),
-		"mage",
-	]);
-	mage.startWave()
-
-	let mage_body = mage.add([
-		pos(),
-		sprite("mage_body"),
-		z(2),
-		"mage_body",
-	])
-
-	let mage_body_lightning = mage.add([
-		pos(),
-		sprite("mage_body_lightning"),
-		z(3),
-		opacity(0.25),
-		"mage_lightning",
-	])
-
-	let mage_cursors = mage.add([
-		pos(0, -7),
-		sprite("mage_cursors"),
-		z(0),
-		waver({ wave_speed: 1, maxAmplitude: 5 }),
-		opacity(1),
-		color(WHITE.darken(50)),
-	])
-	mage_cursors.startWave()
-
-	let mage_eye = mage.add([
-		pos(117, 120),
-		sprite("mage_eye"),
-		area({ scale: 0.8 }),
-		z(2),
-		"ascensionHover",
-		{
-			timeToBlinkAgain: 8,
-			timeUntilBlink: 8,
-			update() {
-				if (this.isHovering() && isMousePressed("left")) {
-					this.play("blink")
-					talk("mage", "stop that")
-					// currentDialogueIdx = getRandomElementDifferentFrom([1, 2, 3, 4], currentDialogueIdx)
-					// mage.say(dialogues[currentDialogueIdx][dialogueEye.woke ? "woke" : "dumb"], dialogues[currentDialogueIdx].speed)
-				}
-				
-				this.timeToBlinkAgain -= dt()
-				if (this.timeToBlinkAgain < 0) {
-					this.timeToBlinkAgain = rand(5, 8)
-					this.timeToBlinkAgain = this.timeToBlinkAgain
-					if (chance(0.75)) this.play("blink")
-				}
-			}
-		}
-	])
-	mage_eye.onAnimEnd((anim) => {
-		// if (anim != "blink") return
-		// if (chance(0.25)) mage_eye.play("blink") 
-	});
-
-	let mage_toparm = mage.add([
-		pos(0, 0),
-		sprite("mage_toparm"),
-		z(1),
-		{
-			update() {
-				this.angle = wave(-0.5, 0.5, time())
-			}
-		}			
-	])
-
-	let mage_toparm_lightning = mage.add([
-		pos(0, 0),
-		sprite("mage_toparm_lightning"),
-		z(4),
-		opacity(0.25),
-		"mage_lightning",
-		{
-			update() {
-				this.angle = wave(-0.5, 0.5, time())
-			}
-		}			
-	])
-
-	let mage_botarm = mage.add([
-		pos(5, 240),
-		sprite("mage_botarm"),
-		z(7),
-		anchor("left"),
-		{
-			update() {
-				this.angle = wave(-1, 1, time())
-			}
-		}			
-	])
-
-	let mage_botarm_lightning = mage.add([
-		pos(5, 240),
-		sprite("mage_botarm_lightning"),
-		z(8),
-		anchor("left"),
-		opacity(0.25),
-		"mage_lightning",
-		{
-			update() {
-				this.angle = wave(-1, 1, time())
-			}
-		}			
-	])
-
-	let mage_hexagon = mage.add([
-		pos(GameState.settings.panderitoMode ? vec2(231, 250): vec2(231, 244)),
-		sprite(GameState.settings.panderitoMode ? "panderito" : "hexagon"),
-		scale(0.35),
-		waver({ wave_speed: 1, maxAmplitude: 10 }),
-		rotate(0),
-		anchor("center"),
-		color(WHITE),
-		z(5),
-		area({ scale: 0.8 }),
-		"hexagon",
-		"ascensionHover",
-		{
-			update() {
-				if (this.isHovering() && isMousePressed("left")) {
-					bop(this, 0.01)
-					talk("mage", "no backsies")
-				}
-				this.angle += 0.02
-			}
-		}
-	])
-
-	// runs thorugh every object with mage_lightning object and attaches an 
-	// onupdate that does the color stuff
-	mage.get("mage_lightning").forEach(o => o.onUpdate(() => { 
-		o.color = mage_hexagon.color
-	}))
-
-	return mage;
-}
 
 let dialogue:any;
 
@@ -283,13 +130,10 @@ function skipTalk() {
 	tween(dialogue.box.defaultPos.x + 10, dialogue.box.defaultPos.x, 0.25, (p) => dialogue.box.pos.x = p, easings.easeOutQuint)
 }
 
-export function triggerAscension() {
+export function startAscending() {
 	// stuff
 	ascension.ascending = true
 	allPowerupsInfo.canSpawnPowerups = false
-
-	// the multiplier cool!!!
-	GameState.ascension.magicLevel++
 
 	ROOT.trigger("ascension", { score: GameState.score, scoreThisRun: GameState.scoreThisRun })
 	
@@ -412,25 +256,15 @@ export function triggerAscension() {
 
 		canLeaveAscensionCheck.cancel()
 	})
-
-	let startHover = onHover("ascensionHover", () => {
-		mouse.play("point")
-	})
-
-	let endHover = onHoverEnd("ascensionHover", () => {
-		mouse.play("cursor")
-	})
-
-	blackBg.onDestroy(() => {
-		startHover.cancel()
-		endHover.cancel()
-	})
 }
 
 export function endAscension() {
 	folderObj.interactable = true
 	ROOT.trigger("endAscension")
 	allPowerupsInfo.canSpawnPowerups = true
+
+	// the multiplier cool!!!
+	GameState.ascension.magicLevel++
 
 	get("*", { recursive: true }).filter(obj => obj.layer == "ascension").forEach((obj) => {
 		if (obj.is("area")) obj.area.scale = vec2(0)
@@ -447,7 +281,7 @@ export function endAscension() {
 			tween(obj.pos.y, -obj.height, 0.5, (p) => obj.pos.y = p, easings.easeOutQuart).onEnd(() => destroy(obj))
 		}
 
-		else if (obj.is("ascensionBg") || obj.is("leaveButton")) {
+		else if (obj.is("ascensionBg") || obj.is("leave}tton")) {
 			obj.fadeOut(0.5).onEnd(() => destroy(obj))
 		}
 	})

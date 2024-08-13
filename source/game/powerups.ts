@@ -2,7 +2,7 @@ import { TextCompOpt, Vec2 } from "kaplay"
 import { waver } from "./plugins/wave";
 import { playSfx } from "../sound";
 import { GameState, scoreManager } from "../gamestate";
-import { bop, formatNumber, getPosInGrid, getPositionOfSide, parseAnimation, randomPos } from "./utils";
+import { bop, formatNumber, formatTime, getPosInGrid, getPositionOfSide, parseAnimation, randomPos } from "./utils";
 import { positionSetter } from "./plugins/positionSetter";
 import { checkForUnlockable } from "./unlockables/achievements";
 
@@ -76,8 +76,8 @@ let blabPhrases = [
 	"Also try Cookie Clicker!",
 	"Orteil don't sue me",
 	"Area of an hexagon:\nA = (p * 2) / 2",
-	"Did you know?\nYou can drag the buttons in your taskbar around!",
-	"Did you know?\nYou can drag the buttons in the extra window\nto your taskbar!",
+	"Did you know?\nYou can hold to drag the buttons in your taskbar around!",
+	"Did you know?\nYou can hold and drag the buttons in the extra window\nto your taskbar!",
 	"Did you know?\nYou can hold your mouse when buying!",
 	"Did you know?\nYou can hold shift to bulk-buy 10x things!",
 	"Did you know?\nYou can click the big hexagon several times\nto start a combo!",
@@ -239,15 +239,16 @@ export function addPowerupLog(powerupType:powerupName) {
 			update() {
 				if (powerupTypes[powerupType].removalTime == null) {powerupTime = 0; return}
 				powerupTime = Math.round(powerupTypes[powerupType].removalTime)
+				let stringPowerupTime = formatTime(powerupTime, true)
 				let powerupMultiplier = powerupTypes[powerupType].multiplier
 
-				if (powerupType == "clicks") textInText = `Click production increased x${powerupMultiplier} for ${powerupTime} secs`
-				else if (powerupType == "cursors") textInText = `Cursors production increased x${powerupMultiplier} for ${powerupTime} secs`
+				if (powerupType == "clicks") textInText = `Click production increased x${powerupMultiplier} for ${stringPowerupTime}`
+				else if (powerupType == "cursors") textInText = `Cursors production increased x${powerupMultiplier} for ${stringPowerupTime}`
 				else if (powerupType == "time") {
-					textInText = `+${formatNumber(Math.round(scoreManager.autoScorePerSecond()) * powerupTime)}, the score you would have gained in ${powerupTime} secs`
+					textInText = `+${formatNumber(Math.round(scoreManager.autoScorePerSecond()) * powerupTime)}, the score you would have gained in ${stringPowerupTime}`
 				}
-				else if (powerupType == "awesome") textInText = `Score production increased by x${powerupMultiplier} for ${powerupTime}, AWESOME!!`
-				else if (powerupType == "store") textInText = `Store prices have a discount of ${Math.round(powerupMultiplier * 100)}% for ${powerupTime} secs, get em' now!`
+				else if (powerupType == "awesome") textInText = `Score production increased by x${powerupMultiplier} for ${stringPowerupTime}, AWESOME!!`
+				else if (powerupType == "store") textInText = `Store prices have a discount of ${Math.round(powerupMultiplier * 100)}% for ${stringPowerupTime}, get em' now!`
 				else if (powerupType == "blab") textInText = textInText
 				
 				else throw new Error("powerup type doesn't exist");
