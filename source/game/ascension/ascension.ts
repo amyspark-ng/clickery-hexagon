@@ -262,6 +262,7 @@ export function endAscension() {
 	folderObj.interactable = true
 	ROOT.trigger("endAscension")
 	allPowerupsInfo.canSpawnPowerups = true
+	ascension.ascending = false
 
 	// the multiplier cool!!!
 	GameState.ascension.magicLevel++

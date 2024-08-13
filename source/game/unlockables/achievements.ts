@@ -1,6 +1,6 @@
 import { GameState, scoreManager } from '../../gamestate';
 import { windowKey } from '../windows/windows-api/windowManaging';
-import { addToast, toastQueue } from '../additives';
+import { addToast } from '../additives';
 import { addConfetti } from '.././plugins/confetti';
 import { addUpgrades, upgradeInfo } from '../windows/store/upgrades';
 import { songs, songsListened } from '../windows/musicWindow';
@@ -434,7 +434,7 @@ export let achievements = [
 	new Achievement({
 		id: "allAchievements",
 		title: "CONGRATS!!!!",
-		description: "Complete all achievements, congratulations!!",
+		description: "Complete all achievements",
 		icon: "osaka",
 		unlockCondition: () => GameState.unlockedAchievements.length == achievements.length - 1
 	}),

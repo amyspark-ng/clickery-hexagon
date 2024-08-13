@@ -52,10 +52,10 @@ class _GameState {
 		critPowersBought: 0,
 	}
 
-	unlockedAchievements = []
+	unlockedAchievements:string[] = []
 
-	unlockedWindows = []
-	taskbar = []
+	unlockedWindows:string[] = []
+	taskbar:string[] = []
 
 	stats = {
 		timesClicked: 0,
@@ -110,6 +110,7 @@ class _GameState {
 		this.settings.volume = oldvolume
 		
 		go("gamescene")
+		return console.log("=== HEXAGON-SAVE DELETED ===")
 	}
 
 	cheat() {
@@ -118,6 +119,9 @@ class _GameState {
 		this.score = scoreManager.ascensionConstant
 		this.scoreThisRun = scoreManager.ascensionConstant
 		this.scoreAllTime = scoreManager.ascensionConstant
+		stopAllSounds()
+		go("gamescene")
+		this.settings.music.muted = true
 	}
 }
 

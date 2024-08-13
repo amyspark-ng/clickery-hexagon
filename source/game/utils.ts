@@ -7,6 +7,7 @@ import { unlockAchievement } from "./unlockables/achievements";
 import { openWindow } from "./windows/windows-api/windowManaging";
 import { powerupTypes, spawnPowerup } from "./powerups";
 import { playSfx } from "../sound";
+import { ascension } from "./ascension/ascension";
 
 // definetely not stack overflow
 // dots are always for thousands, leave it like this
@@ -398,7 +399,8 @@ export function debugTexts() {
 					"Auto loop time: ": autoLoopTime.toFixed(2),
 					"Time until auto loop ends: ": GameState.timeUntilAutoLoopEnds,
 					"Taskbar: ": GameState.taskbar,
-				}
+					"Ascending: ": ascension.ascending,
+				}	
 
 				for (let powerup in powerupTypes) {
 					keys[`${powerup} running time :`] = powerupTypes[powerup].runningTime.toFixed(1)
@@ -447,8 +449,12 @@ export function debugFunctions() {
 			})
 		}
 
-		else if (isKeyPressed("h")) {
-			triggerGnome()
+		else if (isKeyPressed("g")) {
+			addToast({
+				title: "Helo, i am testing",
+				body: "This is a test toast, i am just testing the animations, im on the verge of death and suicide",
+				icon: "cursors.point"
+			})
 		}
 	})
 

@@ -105,7 +105,6 @@ export function addMinibutton(opts:minibuttonOpt) {
 
 					// no curdragging
 					else if (curDraggin == null) {
-						// this.opacity = lerp(this.opacity, 1, 0.1)
 						if (this.isBeingHovered) {
 							this.angle = wave(-8, 8, time () * 3)
 						}
@@ -232,8 +231,12 @@ export function addMinibutton(opts:minibuttonOpt) {
 
 	// animate them
 	currentMinibutton.opacity = 0
+	currentMinibutton.area.scale = vec2(0)
     tween(currentMinibutton.opacity, 1, 0.32, (p) => currentMinibutton.opacity = p, easings.easeOutQuad)
-	tween(currentMinibutton.pos, currentMinibutton.destinedPosition, 0.32, (p) => currentMinibutton.pos = p, easings.easeOutBack)
+	tween(currentMinibutton.pos, currentMinibutton.destinedPosition, 0.32, (p) => currentMinibutton.pos = p, easings.easeOutBack).then(() => {
+		currentMinibutton.area.scale.x = 0.8
+		currentMinibutton.area.scale.y = 1.3
+	})
 	
 	// currentMinibutton is the one being swapped to met the curDragging wish
 	currentMinibutton.on("dragHasSurpassed", (left) => {

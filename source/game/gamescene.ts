@@ -299,12 +299,13 @@ export const gamescene = () => scene("gamescene", () => {
 		rotation: 0,
 	}
 	
+	setGravity(1600)
+
 	addHexagon()
 	uiCounters()
 	folderObjManaging()
 	windowsDefinition()
-	
-	setGravity(1600)
+	checkForUnlockable()
 	
 	ROOT.on("gamestart", () => {
 		runInTauri(() => appWindow.setTitle("Clickery Hexagon"))
@@ -610,6 +611,6 @@ export const gamescene = () => scene("gamescene", () => {
 			appWindow.setTitle(`Clickery Hexagon - ${formatNumber(Math.round(GameState.score))} score`)
 		})
 	})
-	
+
 	if (DEBUG == true) debugFunctions()
 })

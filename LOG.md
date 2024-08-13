@@ -13,6 +13,14 @@ this game MIGHT be getting done
 	TO-DO!!!!!!
 <!-- ================ -->
 
+<!-- ===== LEFT TO DO ====== -->
+- Music window re work (graphics and code, the play music function too)
+- Leaderboards window
+- Balancing mana getting
+- Ascension window graphics
+- Ascension substate re-work, it sucks really hard!
+- Powerup graphics and animations
+
 <!-- balancing -->
 - do the prices increasing after ascending
 
@@ -20,9 +28,7 @@ this game MIGHT be getting done
 - figure out api for secret achievements
 - leaderboards window
 - music window refactor and reworking, i hate that?'
-- fix minibuttons area scale (when unlocked and that kinda stuff)
 - find the actual discount the store powerup gives you
-- cursors don't seem to work after ascending
 - fix some powerup animations
 - change onmousepress to onclick
 - change color of upgrades

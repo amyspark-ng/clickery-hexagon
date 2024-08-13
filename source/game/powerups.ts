@@ -8,7 +8,6 @@ import { checkForUnlockable } from "./unlockables/achievements";
 
 class Powerup {
 	sprite: string;
-	
 	/**
 	 * Time that its left for it to be removed, if it's null it means it's not active
 	 */
@@ -82,6 +81,7 @@ let blabPhrases = [
 	"Did you know?\nYou can hold shift to bulk-buy 10x things!",
 	"Did you know?\nYou can click the big hexagon several times\nto start a combo!",
 	"Did you know?\nYou can click the score per second text to see how much\nyou'd make in different times!",
+	"Did you know?\nThe game has support for displaying numbers up until Vigintillions!",
 ]
 
 export type powerupName = keyof typeof powerupTypes | "random";

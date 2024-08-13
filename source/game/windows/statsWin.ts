@@ -3,11 +3,23 @@ import { positionSetter } from ".././plugins/positionSetter";
 import { achievements } from "../unlockables/achievements";
 import { formatNumber, formatNumberSimple, formatTime } from "../utils";
 
+class Stat {
+	key:string
+	value: number | string
+	icon: string
+	constructor(key:string, value: number | string, icon: string) {
+		this.key = key
+		this.value = value
+		this.icon = icon
+	}
+}
+
 export function statsWinContent(winParent) {
 	let stats = [];
 
 	winParent.onUpdate(() => {
 		stats = [
+			new Stat("Score all time", formatNumber(GameState.scoreAllTime), "coin"),
 			{ "Score all time": formatNumber(GameState.scoreAllTime) },
 			{ "Times clicked": formatNumberSimple(GameState.stats.timesClicked) },
 			{ "Powerups clicked": formatNumberSimple(GameState.stats.powerupsClicked) },

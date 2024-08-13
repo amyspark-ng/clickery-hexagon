@@ -85,17 +85,22 @@ export function unlockWindow(windowJustUnlocked:windowKey) {
 	GameState.unlockedWindows.push(windowJustUnlocked)
 	playSfx("windowUnlocked")
 	
-	if (GameState.taskbar.length < 4 || windowJustUnlocked == "extraWin") {
+	if (GameState.taskbar.filter(win => win != "extraWin").length < 4) {
 		GameState.taskbar.push(windowJustUnlocked)
 	}
-
-	else {
+	
+	if (GameState.taskbar.includes("extraWin")) {
+		// reorganize the taskbar array so extra win is always in the latest spot
+		GameState.taskbar.push(GameState.taskbar.splice(GameState.taskbar.indexOf("extraWin"), 1)[0]);
+	}
+	
+	// else {
 		// i got a 'Too much recursion!' crash here, got pretty scared :(
 		// if (GameState.unlockedWindows.includes("extraWin") == false) {
 		// 	unlockWindow("extraWin")
 		// 	GameState.taskbar.push("extraWin")
 		// }
-	}
+	// }
 
 	// if the folderObj is folded
 	if (folded == true) {
@@ -113,7 +118,7 @@ export function unlockWindow(windowJustUnlocked:windowKey) {
 			// it went to extraa win
 			else if (GameState.taskbar.includes(windowJustUnlocked) == false) {
 				let extraWinBtn = get("minibutton").filter(btn => btn.windowKey == "extraWin")[0]
-				addExclamation(extraWinBtn)
+				if (extraWinBtn) addExclamation(extraWinBtn)
 			}
 
 			unfoldCheckEvent.cancel()
