@@ -7,6 +7,7 @@ import { addTooltip } from "../../additives"
 import { allPowerupsInfo, powerupTypes, spawnPowerup } from "../../powerups"
 import { isHoveringUpgrade, storeElements, storePitchJuice } from "./storeWindows"
 import { insideWindowHover } from "../../hovers/insideWindowHover"
+import { isAchievementUnlocked, unlockAchievement } from "../../unlockables/achievements"
 
 export let storeElementsInfo = {
 	"clickersElement": { 
@@ -17,7 +18,7 @@ export let storeElementsInfo = {
 	"cursorsElement": { 
 		gamestateKey: "cursors",
 		basePrice: 50,
-		percentageIncrease: 15
+		percentageIncrease: 20
 	},
 	"powerupsElement": { 
 		gamestateKey: "stats.powerupsBought",
@@ -40,6 +41,10 @@ function addSmoke(winParent:any, btn:any) {
 	smoke.fadeIn(1)
 	smoke.play("smoking")
 	return smoke;
+}
+
+function isThereSmoke() {
+	return get("smoke", { recursive: true }) ?? true
 }
 
 function regularStoreElement(winParent) {
@@ -91,6 +96,7 @@ function regularStoreElement(winParent) {
 						timer = 0
 						hold_timesBought++	
 						thisElement.buy(amountToBuy)
+						this.timesBoughtConsecutively++
 					}
 				})
 			})
@@ -278,7 +284,7 @@ export function addStoreElement(winParent:any, opts:storeElementOpt) {
 					})
 				}
 
-				if (this.timesBoughtConsecutively < 6) this.timesBoughtConsecutively++ 
+				this.timesBoughtConsecutively++ 
 				buyTimer?.cancel()
 				buyTimer = wait(0.75, () => {
 					this.timesBoughtConsecutively = 0
@@ -292,10 +298,10 @@ export function addStoreElement(winParent:any, opts:storeElementOpt) {
 					}
 				})
 
-				if (this.timesBoughtConsecutively == 5) {
+				if (this.timesBoughtConsecutively >= 5 && !isThereSmoke()) {
 					addSmoke(winParent, this)
 				}
-				
+
 				ROOT.trigger("buy", { element: "storeElement", type: opts.type == "clickersElement" ? "clickers" : "cursors", price: this.price })
 			
 				if (opts.type == "powerupsElement") {
@@ -307,6 +313,8 @@ export function addStoreElement(winParent:any, opts:storeElementOpt) {
 					GameState.stats.powerupsBought++
 					GameState.stats.powerupsBoughtThisRun++
 				}
+
+				if (this.timesBoughtConsecutively >= 10 && !isAchievementUnlocked("buy10stuff")) unlockAchievement("buy10stuff") 
 				
 				this.trigger("buy")
 			},

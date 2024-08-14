@@ -13,6 +13,7 @@ import { waver } from "../plugins/wave";
 import { positionSetter } from "../plugins/positionSetter";
 import { allPowerupsInfo } from "../powerups";
 import { addMage } from "./mage";
+import { isAchievementUnlocked, unlockAchievement } from "../unlockables/achievements";
 
 export let ascension = {
 	ascending: false,
@@ -301,5 +302,6 @@ export function endAscension() {
 
 	wait(0.5, () => {
 		ascension.canLeave = false
+		if (!isAchievementUnlocked("ascend1time")) unlockAchievement("ascend1time")
 	})
 }

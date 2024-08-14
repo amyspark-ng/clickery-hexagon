@@ -10,26 +10,26 @@ import { ROOT } from "../../main";
 
 export let unlockableWindows = {
 	"storeWin": {
-		condition: () => GameState.score >= 25
+		condition: () => GameState.scoreAllTime >= 25
 	},
 	"settingsWin": {
-		condition: () => GameState.score >= 50
+		condition: () => GameState.scoreAllTime >= 50
 	},
 	"statsWin": {
-		condition: () => GameState.score >= 60
+		condition: () => GameState.scoreAllTime >= 60
 	},
 	// they're unlocked at the same time lol!
 	"extraWin": {
-		condition: () => GameState.score >= 150
+		condition: () => GameState.scoreAllTime >= 150
 	},
 	"musicWin": {
-		condition: () => GameState.score >= 150
+		condition: () => GameState.scoreAllTime >= 150
 	},
 	"medalsWin": {
-		condition: () => GameState.score >= 105
+		condition: () => GameState.scoreAllTime >= 105
 	},
 	"creditsWin": {
-		condition: () => GameState.score >= 200
+		condition: () => GameState.scoreAllTime >= 200
 	},
 	"leaderboardsWin": {
 		condition: () => GameState.scoreAllTime >= 1_100_000
@@ -85,7 +85,7 @@ export function unlockWindow(windowJustUnlocked:windowKey) {
 	GameState.unlockedWindows.push(windowJustUnlocked)
 	playSfx("windowUnlocked")
 	
-	if (GameState.taskbar.filter(win => win != "extraWin").length < 4) {
+	if (GameState.taskbar.length < 4 || windowJustUnlocked == "extraWin") {
 		GameState.taskbar.push(windowJustUnlocked)
 	}
 	

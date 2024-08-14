@@ -81,7 +81,7 @@ class _GameState {
 	}
 
 	save(anim = true) {
-		if (this.score < 25) return
+		if (this.scoreAllTime < 25) return
 		setData("hexagon-save", this)
 		if (anim) saveAnim()
 	}

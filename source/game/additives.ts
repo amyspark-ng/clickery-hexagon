@@ -94,6 +94,7 @@ export type toastOpts = {
 	whenAdded?:(toastObj:GameObj) => void;
 }
 
+let allToasts:GameObj[] = []
 export function addToast(opts:toastOpts) {
 	opts = opts || {} as toastOpts
 
@@ -125,7 +126,7 @@ export function addToast(opts:toastOpts) {
 		pos(-200, yOffset),
 		anchor("top"),
 		color(WHITE.darken(50)),
-		// fixed(),
+		fixed(),
 		layer("logs"),
 		z(0),
 		timer(),
@@ -174,7 +175,7 @@ export function addToast(opts:toastOpts) {
 		sprite("white_noise"),
 		anchor("center"),
 		pos(toastBg.pos.x - toastBg.width / 2 + 50, toastBg.pos.y),
-		toastBg.is("fixed") ?? fixed(),
+		fixed(),
 		layer("logs"),
 		z(toastBg.z + 1),
 		{
@@ -198,7 +199,7 @@ export function addToast(opts:toastOpts) {
 			width: 500,
 		}),
 		pos(icon.pos.x + icon.width / 2 + 10, toastBg.pos.y - toastBg.height / 2),
-		toastBg.is("fixed") ?? fixed(),
+		fixed(),
 		color(BLACK),
 		layer("logs"),
 		z(toastBg.z + 1),
@@ -218,7 +219,7 @@ export function addToast(opts:toastOpts) {
 			width: 500,
 		}),
 		pos(titleText.pos.x, titleText.pos.y + titleText.height),
-		toastBg.is("fixed") ?? fixed(),
+		fixed(),
 		color(BLACK),
 		layer("logs"),
 		z(toastBg.z + 1),
@@ -241,12 +242,16 @@ export function addToast(opts:toastOpts) {
 
 	if (titleTextWidth > bodyTextWidth) toastBg.width += titleTextWidth + 25;
 	else if (bodyTextWidth > titleTextWidth) toastBg.width += bodyTextWidth + 25;
+	else if (bodyTextWidth == titleTextWidth) toastBg.width += titleTextWidth + 25;
 
 	// height
 	if (titleText.height > bodyText.height) toastBg.height = titleText.height + bodyText.height + 15;
-	else toastBg.height += bodyText.height - titleText.height + 15;
+	else if (bodyText.height > titleText.height) toastBg.height += bodyText.height - titleText.height + 15;
+	else if (bodyText.height == titleText.height) toastBg.height = titleText.height + bodyText.height + 15;
 
 	toastPosition.x = toastBg.width / 2
+	
+	if (opts.whenAdded) opts.whenAdded(toastBg)
 
 	toastBg.wait(opts.duration ?? 3, () => {
 		toastBg.close();
@@ -259,16 +264,12 @@ export function addToast(opts:toastOpts) {
 		bodyText.destroy();
 	});
 
-	if (opts.whenAdded) opts.whenAdded(toastBg);
-
 	if (toastBg.pos.y + toastBg.height + 10 >= height()) {
 		let allTosts = get("toast")
 		allTosts.forEach((toast, index) => {
 			toast.setPosition(vec2(toast.getPosition().x, toast.getPosition().y - toast.height - 10))
 		})
 	}
-
-	debug.log(idx)
 
 	return toastBg;
 }

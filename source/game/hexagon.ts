@@ -108,6 +108,8 @@ export function addHexagon() {
 				this.isBeingClicked = true
 				mouse.grab()
 				playSfx("clickPress", {detune: rand(-50, 50)})
+				
+				GameState.stats.timesClicked++
 			},
 
 			clickRelease() {
@@ -440,7 +442,6 @@ export function addHexagon() {
 	hexagon.onClick(() => {
 		if (hexagon.isBeingHovered) {
 			hexagon.clickPress()
-			GameState.stats.timesClicked++
 		}
 	})
 	

@@ -19,7 +19,6 @@ export function statsWinContent(winParent) {
 
 	winParent.onUpdate(() => {
 		stats = [
-			new Stat("Score all time", formatNumber(GameState.scoreAllTime), "coin"),
 			{ "Score all time": formatNumber(GameState.scoreAllTime) },
 			{ "Times clicked": formatNumberSimple(GameState.stats.timesClicked) },
 			{ "Powerups clicked": formatNumberSimple(GameState.stats.powerupsClicked) },

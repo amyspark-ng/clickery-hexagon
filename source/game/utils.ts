@@ -3,7 +3,7 @@ import { GameState, saveColor, scoreManager } from "../gamestate";
 import { addToast, mouse } from "./additives";
 import { autoLoopTime, cam, triggerGnome } from "./gamescene";
 import { hexagon } from "./hexagon";
-import { unlockAchievement } from "./unlockables/achievements";
+import { Achievement, achievements, getAchievement, unlockAchievement } from "./unlockables/achievements";
 import { openWindow } from "./windows/windows-api/windowManaging";
 import { powerupTypes, spawnPowerup } from "./powerups";
 import { playSfx } from "../sound";

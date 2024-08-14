@@ -107,13 +107,22 @@ export let fullUpgradeValues = {
 	}
 }
 
+const hamiltonSong = `Here's hamilton!\nHow does a bastard, orphan, son of a whore
+And a Scotsman, dropped in the middle of a forgotten spot
+In the Caribbean by providence impoverished
+In squalor, grow up to be a hero and a scholar?
+The ten-dollar founding father without a father
+Got a lot farther by working a lot harder
+By being a lot smarter
+By being a self-starter
+By fourteen, they placed him in charge of a trading charter
+And every day while slaves were being slaughtered and carted away
+Across the waves, he struggled and kept his guard up
+Inside, he was longing for something to be a part of
+The brother was ready to beg, steal, borrow, or bar-
+Wait, i got lazy.`
+
 export let achievements = [
-	/* TODO: Missing types of achievements
-		- Score per second
-		- Score forfeited on ascending
-		- Score gained by tapping
-		- Score gained by cursors
-	*/
 	// #region SCORE ACHIEVEMENTS =====================
 	new Achievement({
 		id: "100score",
@@ -136,15 +145,15 @@ export let achievements = [
 		title: "Wake and click",
 		description: "Get 1.000 of score",
 		icon: "upgrades.k_1",
-		unlockCondition: () => GameState.scoreAllTime >= 1000,
+		unlockCondition: () => GameState.scoreAllTime >= 1_000,
 	}),
 
 	new Achievement({
 		id: "5000score",
-		title: "Wake and click",
-		description: "Get 5.000 of score",
+		title: "Testing Testing",
+		description: "Ok these seem to be working",
 		icon: "upgrades.k_1",
-		unlockCondition: () => GameState.scoreAllTime >= 5000,
+		unlockCondition: () => GameState.scoreAllTime >= 5_000,
 	}),
 
 	new Achievement({
@@ -152,7 +161,7 @@ export let achievements = [
 		title: "Wake and click",
 		description: "Get 10.000 of score",
 		icon: "upgrades.k_1",
-		unlockCondition: () => GameState.scoreAllTime >= 10000,
+		unlockCondition: () => GameState.scoreAllTime >= 10_000,
 	}),
 
 	new Achievement({
@@ -160,7 +169,7 @@ export let achievements = [
 		title: "Wake and click",
 		description: "Get 25.000 of score",
 		icon: "upgrades.k_1",
-		unlockCondition: () => GameState.scoreAllTime >= 25000,
+		unlockCondition: () => GameState.scoreAllTime >= 25_000,
 	}),
 
 	new Achievement({
@@ -168,7 +177,40 @@ export let achievements = [
 		title: "Wake and click",
 		description: "Get 50.000 of score",
 		icon: "upgrades.k_1",
-		unlockCondition: () => GameState.scoreAllTime >= 50000,
+		unlockCondition: () => GameState.scoreAllTime >= 50_000,
+	}),
+
+	new Achievement({
+		id: "100000score",
+		title: "Wake and click",
+		description: "Get 100.000 of score",
+		icon: "upgrades.k_1",
+		unlockCondition: () => GameState.scoreAllTime >= 100_000,
+	}),
+
+	new Achievement({
+		id: "250000score",
+		title: "Wake and click",
+		description: "Get 250.000 of score",
+		icon: "upgrades.k_1",
+		unlockCondition: () => GameState.scoreAllTime >= 250_000,
+	}),
+
+	new Achievement({
+		id: "500000score",
+		title: "Wake and click",
+		description: "Get 500.000 of score",
+		icon: "upgrades.k_1",
+		unlockCondition: () => GameState.scoreAllTime >= 500_000,
+	}),
+
+	new Achievement({
+		id: "750000score",
+		title: "Did you know there's no actual limit to how long these names can be? I specifically spent a lot of time working on them so they can be as LONG as i want them to be and they will do their best to look good",
+		description: `I'm not too sure how well it supports long descriptions, i can't really be bothered to test it, i'm pretty close to the deadline of this game coming out so i'd like not to dwell in those dark functions...`,
+		icon: "upgrades.k_1",
+		readingTime: 20,
+		unlockCondition: () => GameState.scoreAllTime >= 750_000,
 	}),
 
 	new Achievement({
@@ -188,11 +230,67 @@ export let achievements = [
 	}),
 
 	new Achievement({
-		id: "1000clicks",
-		title: "One hell of a clicker",
-		description: "Click 1.000 times",
-		icon: "cursors.cursor",
-		unlockCondition: () => GameState.stats.timesClicked >= 1000,
+		id: "50millionscore",
+		title: "That's crazy",
+		description: "Get 50 million of score",
+		icon: "upgrades.k_1",
+		unlockCondition: () => GameState.scoreAllTime >= 50_000_000,
+	}),
+
+	new Achievement({
+		id: "100millionscore",
+		title: "That's crazy",
+		description: "Get 100 million of score",
+		icon: "upgrades.k_1",
+		unlockCondition: () => GameState.scoreAllTime >= 100_000_000,
+	}),
+
+	new Achievement({
+		id: "250millionscore",
+		title: "That's crazy",
+		description: "Get 250 million of score",
+		icon: "upgrades.k_1",
+		unlockCondition: () => GameState.scoreAllTime >= 250_000_000,
+	}),
+
+	new Achievement({
+		id: "500millionscore",
+		title: "That's crazy",
+		description: "Get 500 million of score",
+		icon: "upgrades.k_1",
+		unlockCondition: () => GameState.scoreAllTime >= 500_000_000,
+	}),
+
+	new Achievement({
+		id: "600millionscore",
+		title: "That's crazy",
+		description: "Get 600 million of score",
+		icon: "upgrades.k_1",
+		unlockCondition: () => GameState.scoreAllTime >= 600_000_000,
+	}),
+
+	new Achievement({
+		id: "750millionscore",
+		title: "That's crazy",
+		description: "Get 750 million of score",
+		icon: "upgrades.k_1",
+		unlockCondition: () => GameState.scoreAllTime >= 750_000_000,
+	}),
+
+	new Achievement({
+		id: "950millionscore",
+		title: "That's crazy",
+		description: "Get 950 million of score",
+		icon: "upgrades.k_1",
+		unlockCondition: () => GameState.scoreAllTime >= 950_000_000,
+	}),
+
+	new Achievement({
+		id: "1billionscore",
+		title: "That's crazy",
+		description: "Get 1 billion of score, you're crazy for this...",
+		icon: "upgrades.k_1",
+		unlockCondition: () => GameState.scoreAllTime >= 1_000_000_000,
 	}),
 	// #endregion SCORE ACHIEVEMENTS ====================
 
@@ -280,25 +378,6 @@ export let achievements = [
 	}),
 	//#endregion CLICKERS/CURSORS ACHIEVEMENTS =================
 
-	// #region SCORE PER SECOND ACHIEVEMENTS ==================
-	new Achievement({
-		id: "10scorepersecond",
-		title: "Very fast score",
-		description: "Get to 10 score per second",
-		icon: "cursors.cursor",
-		unlockCondition: () => scoreManager.autoScorePerSecond() >= 10,
-	}),
-	//#endregion SCORE PER SECOND ACHIEVEMENTS =================
-
-	new Achievement({
-		id: "allclickupgrades",
-		title: "Very clickery score",
-		description: "Buy all the click upgrades",
-		icon: "icon_store",
-		timeAfter: 1,
-		unlockCondition: () => GameState.clicksUpgradesValue >= fullUpgradeValues.clicks(),
-	}),
-
 	new Achievement({
 		id: "allupgrades",
 		title: "Very very score",
@@ -337,8 +416,17 @@ export let achievements = [
 	}),
 
 	new Achievement({
+		id: "click20powerup",
+		title: "What?! Help me!",
+		description: "Click 20 powerup",
+		icon: "cursors.cursor",
+		timeAfter: 0.5,
+		unlockCondition: () => GameState.stats.powerupsClicked >= 20,
+	}),
+
+	new Achievement({
 		id: "buy10powerup",
-		title: "Scrooge McDuck",
+		title: "Pay to win",
 		description: "Buy 10 powerup",
 		icon: "icon_store",
 		timeAfter: 1,
@@ -350,7 +438,7 @@ export let achievements = [
 	new Achievement({
 		id: "ascend1time",
 		title: "Oh. So you've met him?",
-		description: "Ascend for the first time",
+		description: "Ascend for the first time, it seems that you've met him",
 		icon: "icon_ascend",
 		secretCondition: () => GameState.stats.timesAscended >= 1
 	}),
@@ -385,18 +473,19 @@ export let achievements = [
 
 	// #region EXTRA ACHIEVEMENTS =====================
 	new Achievement({
+		id: "click1000times",
+		title: "One hell of a clicker",
+		description: "Click 1000 times",
+		icon: "hexagon",
+		unlockCondition: () => GameState.stats.timesClicked >= 1000
+	}),
+
+	new Achievement({
 		id: "maxedcombo",
 		title: "OVERDRIVE!!!",
 		description: "Max your combo for the first time, FULL COMBO!!",
 		icon: "hexagon",
 		timeAfter: 2,
-	}),
-
-	new Achievement({
-		id: "allwindowsontaskbar",
-		title: "CPU Usage too high!!",
-		description: "Open all windows in your taskbar at the same time",
-		icon: "icon_extra.open_default",
 	}),
 
 	new Achievement({
@@ -430,6 +519,22 @@ export let achievements = [
 		icon: "icon_music",
 		unlockCondition: () => songsListened.length == Object.keys(songs).length
 	}),
+
+	new Achievement({
+		id: "buy10stuff",
+		title: "Inflation",
+		description: "Buy 10 things consecutively",
+		icon: "icon_store",
+	}),
+
+	new Achievement({
+		id: "play15minutes",
+		title: "Thank you for playing!",
+		description: "Play for 15 minutes",
+		icon: "cursors.wait",
+		unlockCondition: () => GameState.stats.totalTimePlayed >= 60 * 15
+	}),
+
 	// #endregion EXTRA ACHIEVEMENTS =====================
 	new Achievement({
 		id: "allAchievements",

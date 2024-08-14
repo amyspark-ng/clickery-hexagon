@@ -452,7 +452,7 @@ export const gamescene = () => scene("gamescene", () => {
 	
 	// Listen for visibility change events
 	document.addEventListener("visibilitychange", handleVisibilityChange);
-	 // #endregion
+	// #endregion
 	
 	// prevent dumb ctrl + s
 	document.addEventListener("keydown", (event) => {

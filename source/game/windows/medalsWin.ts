@@ -10,12 +10,6 @@ let totalRows = 7;
 let initialPos = { x: -137, y: 46 }; 
 let spacing = { x: 65, y: 65 };
 
-// 3 columns means 3 objects laid horizontally, 3 rows is 3 objects laid vertically
-// from top to bottom
-//   ccc
-//  r...
-//  r...
-// this means 3 columns and 2 rows
 function getPositionInWindow(row:number, column:number) {
 	return vec2(initialPos.x + spacing.x * (column), initialPos.y + spacing.y * (row));
 }
@@ -43,7 +37,7 @@ export function medalsWinContent(winParent) {
 	
 	// make every medal a draw event that draws the sprite, map every row&column to an achievement
 	// everytime you scroll that achievements gets updated
-	// for hovers you can check the distance to the medalObj
+	// for hovers you can check the distance to the position the medal will be in
 	function addMedal(gridPosition:{ row:number, column:number }, medalid:string) {
 		let theSprite = getSprite("medal_" + medalid) || "unknown"
 		
@@ -80,13 +74,13 @@ export function medalsWinContent(winParent) {
 		medalObj.achievementIdx = achievements.indexOf(getAchievement(medalid))
 
 		if (isAchievementUnlocked(medalid)) {
-			// parseAnimation(medalObj, getAchievement(medalid).icon)
+			parseAnimation(medalObj, getAchievement(medalid).icon)
 			medalObj.width = 60
 			medalObj.height = 60
 		}
 
 		else {
-			// parseAnimation(medalObj, "medals.unknown")
+			parseAnimation(medalObj, "medals.unknown")
 		}
 
 		medalObj.onClick(() => {
