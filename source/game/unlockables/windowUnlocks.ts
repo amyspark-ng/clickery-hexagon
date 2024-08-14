@@ -1,12 +1,13 @@
 import { GameObj } from "kaplay";
 import { GameState, scoreManager } from "../../gamestate";
-import { windowKey } from "../windows/windows-api/windowManaging";
-import { waver } from ".././plugins/wave";
+import { isWindowOpen, windowKey } from "../windows/windows-api/windowManaging";
+import { waver } from "../plugins/wave";
 import { bop } from "../utils";
 import { playSfx } from "../../sound";
 import { folded, folderObj } from "../windows/windows-api/folderObj";
 import { addMinibutton } from "../windows/windows-api/minibuttons";
 import { ROOT } from "../../main";
+import { addGridButton } from "../windows/extraWin";
 
 export let unlockableWindows = {
 	"storeWin": {
@@ -152,15 +153,21 @@ export function unlockWindow(windowJustUnlocked:windowKey) {
 	// if the window is on extra win i have to check if the extra win is opened to add the extra minibutton
 	// if is not open i have to wait until then
 	if (GameState.taskbar.includes(windowJustUnlocked) == false) {
-		let extraWinOpenCheck = ROOT.on("winOpen", (windowOpened) => {
-			if (windowOpened == "extraWin") {
-				let gridMinibtn = get("gridMiniButton", { recursive: true }).filter((btn) => btn.windowKey == windowJustUnlocked)[0]
-				addExclamation(gridMinibtn)
-	
-				extraWinOpenCheck.cancel()
-			}
-		})
-	}
+		if (isWindowOpen("extraWin")) {
+			let gridBtn = addGridButton(windowJustUnlocked)
+			addExclamation(gridBtn)
+		}
 
-	ROOT.trigger("winUnlock", windowJustUnlocked)
-}
+		else {
+			let extraWinOpenCheck = ROOT.on("winOpen", (windowOpened) => {
+				if (windowOpened == "extraWin") {
+					let gridMinibtn = get("gridMiniButton", { recursive: true }).filter((btn) => btn.windowKey == windowJustUnlocked)[0]
+					addExclamation(gridMinibtn)
+	
+					extraWinOpenCheck.cancel()
+				}
+			})
+		}
+		
+	}
+}	

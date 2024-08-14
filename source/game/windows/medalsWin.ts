@@ -1,4 +1,4 @@
-import { ROOT } from "../../main";
+import { DEBUG, ROOT } from "../../main";
 import { addTooltip } from "../additives";
 import { achievements, achievementsInfo, getAchievement, isAchievementUnlocked, unlockAchievement } from "../unlockables/achievements";
 import { parseAnimation } from "../utils";
@@ -91,19 +91,22 @@ export function medalsWinContent(winParent) {
 
 		medalObj.onHover(() => {
 			let achievement = getAchievement(medalObj.achievementId)
-			let texting:string;
+			
+			let description:string; // the actual description
+			let texting:string; // text displayed
+
+			if (achievement.id == "750000score") description = "Get 750.000 score"
+			else description = achievement.description
 
 			if (!isAchievementUnlocked(achievement.id)) {
 				// is not secret
-				if (achievement.secretCondition == null || achievement.secretCondition() == true) texting = achievement.description
+				if (achievement.secretCondition == null || achievement.secretCondition() == true) texting = description
 				// is secret and is locked
 				else texting = "This achievement is secret\nFor now..."
 			}
 
 			// is unlocked
-			else {
-				texting = achievement.description
-			}
+			else texting = description
 			
 			let tooltip = addTooltip(medalObj, { 
 				text: texting,
@@ -206,6 +209,7 @@ export function medalsWinContent(winParent) {
 	})
 
 	winParent.onScroll((delta) => {
+		if (DEBUG == true && isKeyDown("shift")) return
 		if (delta.y > 0) scrollDown()
 		else if (delta.y < 0) scrollUp()	
 	})

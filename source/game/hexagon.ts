@@ -12,7 +12,7 @@ import { checkForUnlockable, isAchievementUnlocked, unlockAchievement } from "./
 import { ROOT } from "../main.ts";
 import { outsideWindowHover } from "./hovers/outsideWindowHover.ts";
 import { mouse } from "./additives.ts";
-import { isWindowUnlocked } from "./unlockables/unlockablewindows.ts";
+import { isWindowUnlocked } from "./unlockables/windowUnlocks.ts";
 
 export let clickVars = {
 	clicksPerSecond: 0, // to properly calculate sps

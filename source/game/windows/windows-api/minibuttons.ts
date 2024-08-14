@@ -8,7 +8,7 @@ import { GameState } from "../../../gamestate";
 import { Vec2 } from "kaplay";
 import { openWindowButton } from "./openWindowButton";
 import { folded, folderObj } from "./folderObj";
-import { destroyExclamation } from "../../unlockables/unlockablewindows";
+import { destroyExclamation } from "../../unlockables/windowUnlocks";
 import { outsideWindowHover } from "../../hovers/outsideWindowHover";
 
 type minibuttonOpt = {

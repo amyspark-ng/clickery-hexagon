@@ -12,7 +12,7 @@ import { checkForUnlockable, isAchievementUnlocked, unlockAchievement } from "./
 import { ascension } from "./ascension/ascension.ts"
 import { folderObj, folderObjManaging } from "./windows/windows-api/folderObj.ts"
 import { curDraggin } from "./plugins/drag.ts"
-import { unlockableWindows } from "./unlockables/unlockablewindows.ts"
+import { unlockableWindows } from "./unlockables/windowUnlocks.ts"
 import { appWindow } from '@tauri-apps/api/window';
 import * as env from "../env.json"
 

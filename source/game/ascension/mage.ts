@@ -1,7 +1,7 @@
 import { GameState } from "../../gamestate";
 import { waver } from "../plugins/wave";
 import { bop } from "../utils";
-import { talk } from "./ascension";
+import { getRandomDialogue, mageDialogues, talk } from "./dialogues";
 
 export function addMage() {
 	let mageClothColor = rgb(0, 51, 102)
@@ -53,13 +53,6 @@ export function addMage() {
 			timeToBlinkAgain: 8,
 			timeUntilBlink: 8,
 			update() {
-				if (this.isHovering() && isMousePressed("left")) {
-					this.play("blink")
-					talk("mage", "stop that")
-					// currentDialogueIdx = getRandomElementDifferentFrom([1, 2, 3, 4], currentDialogueIdx)
-					// mage.say(dialogues[currentDialogueIdx][dialogueEye.woke ? "woke" : "dumb"], dialogues[currentDialogueIdx].speed)
-				}
-				
 				this.timeToBlinkAgain -= dt()
 				if (this.timeToBlinkAgain < 0) {
 					this.timeToBlinkAgain = rand(5, 8)
@@ -69,10 +62,13 @@ export function addMage() {
 			}
 		}
 	])
-	mage_eye.onAnimEnd((anim) => {
-		// if (anim != "blink") return
-		// if (chance(0.25)) mage_eye.play("blink") 
-	});
+
+	mage_eye.onClick(() => {
+		let randomDialogue = getRandomDialogue("eye") 
+		talk("mage", randomDialogue.text, randomDialogue.speed)
+		
+		mage_eye.play("blink")
+	})
 
 	let mage_toparm = mage.add([
 		pos(0, 0),
@@ -137,14 +133,17 @@ export function addMage() {
 		"hexagon",
 		{
 			update() {
-				if (this.isHovering() && isMousePressed("left")) {
-					bop(this, 0.01)
-					talk("mage", "no backsies")
-				}
 				this.angle += 0.02
 			}
 		}
 	])
+
+	mage_hexagon.onClick(() => {
+		let randomDialogue = getRandomDialogue("hex") 
+		talk("mage", randomDialogue.text, randomDialogue.speed)
+		
+		bop(mage_hexagon, 0.01)
+	})
 
 	// runs thorugh every object with mage_lightning object and attaches an 
 	// onupdate that does the color stuff

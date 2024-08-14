@@ -4,7 +4,7 @@ import { playSfx } from "../sound"
 import { hexagon } from "./hexagon"
 import { blendColors, getPosInGrid, parseAnimation, saveColorToColor } from "./utils"
 import { allObjWindows, manageWindow } from "./windows/windows-api/windowManaging"
-import { isWindowUnlocked } from "./unlockables/unlockablewindows"
+import { isWindowUnlocked } from "./unlockables/windowUnlocks"
 
 export let gameBg:GameObj;
 export function addBackground() {

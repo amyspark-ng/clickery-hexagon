@@ -1,11 +1,12 @@
 import { GameObj, Vec2 } from "kaplay"
 import { getPrice, getVariable, setVariable } from "../utils"
 import { GameState } from "../../gamestate"
-import { ascension, talk } from "./ascension"
+import { ascension } from "./ascension"
 import { ROOT } from "../../main"
 import { playSfx } from "../../sound"
 import { windowKey } from "../windows/windows-api/windowManaging"
-import { isWindowUnlocked, unlockWindow } from "../unlockables/unlockablewindows"
+import { isWindowUnlocked, unlockWindow } from "../unlockables/windowUnlocks"
+import { talk } from "./dialogues"
 
 let cardsInfo = {
 	"clickersCard": { 

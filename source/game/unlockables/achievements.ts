@@ -4,7 +4,7 @@ import { addToast } from '../additives';
 import { addConfetti } from '.././plugins/confetti';
 import { addUpgrades, upgradeInfo } from '../windows/store/upgrades';
 import { songs, songsListened } from '../windows/musicWindow';
-import { isWindowUnlocked, unlockableWindows, unlockWindow } from './unlockablewindows';
+import { isWindowUnlocked, unlockableWindows, unlockWindow } from './windowUnlocks';
 import { ROOT } from '../../main';
 import ng from 'newgrounds.js';
 import { ngEnabled } from '../../newgrounds';
@@ -207,7 +207,7 @@ export let achievements = [
 	new Achievement({
 		id: "750000score",
 		title: "Did you know there's no actual limit to how long these names can be? I specifically spent a lot of time working on them so they can be as LONG as i want them to be and they will do their best to look good",
-		description: `I'm not too sure how well it supports long descriptions, i can't really be bothered to test it, i'm pretty close to the deadline of this game coming out so i'd like not to dwell in those dark functions...`,
+		description: `Get 750.000 score\nI'm not too sure how well it supports long descriptions, i can't really be bothered to test it, i'm pretty close to the deadline of this game coming out so i'd like not to dwell in those dark functions...`,
 		icon: "upgrades.k_1",
 		readingTime: 20,
 		unlockCondition: () => GameState.scoreAllTime >= 750_000,

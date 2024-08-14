@@ -8,6 +8,8 @@ import { openWindow } from "./windows/windows-api/windowManaging";
 import { powerupTypes, spawnPowerup } from "./powerups";
 import { playSfx } from "../sound";
 import { ascension } from "./ascension/ascension";
+import { unlockWindow } from "./unlockables/windowUnlocks";
+import { mageDialogues } from "./ascension/dialogues";
 
 // definetely not stack overflow
 // dots are always for thousands, leave it like this
@@ -218,6 +220,10 @@ export function getCompletedAchievementPercentage(unlockeds, total) {
 	return Math.round((unlockeds * 100) / total)
 }
 
+export function removeNumbersOfString(str:string) {
+	return str.replace(/\d+/g, '');
+}
+
 export function getRandomElementDifferentFrom(arr, element) {
     // Step 1: Filter the array to exclude the specified element
     const filteredArray = arr.filter(item => item !== element);
@@ -425,6 +431,8 @@ export function debugFunctions() {
 	window.globalThis.hexagon = hexagon
 	window.globalThis.openWindow = openWindow
 	window.globalThis.powerupsTypes = powerupTypes
+	window.globalThis.unlockWindow = unlockWindow
+	window.globalThis.mageDialogues = mageDialogues
 	
 	onUpdate(() => {
 		// if (isKeyDown("control")) {

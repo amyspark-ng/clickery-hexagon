@@ -14,7 +14,7 @@ import { storeWinContent } from "../store/storeWindows.ts";
 import { musicWinContent } from "../musicWindow.ts";
 import { settingsWinContent } from "../settings/settingsWindow.ts";
 import { ascendWinContent } from "../ascendWindow.ts";
-import { extraWinContent } from "../extraWindow.ts";
+import { extraWinContent } from "../extraWin.ts";
 import { creditsWinContent } from "../creditsWin.ts";
 import { statsWinContent } from "../statsWin.ts";
 import { medalsWinContent } from "../medalsWin.ts";
@@ -87,6 +87,8 @@ export function windowsDefinition() {
 		"bgColorWin": { idx: 9, content: bgColorWinContent, lastPos: vec2(width() - 200, 200) },
 		"extraWin": { idx: 10, icon: "extra", content: extraWinContent, lastPos: vec2(750, 392) },
 	}
+
+	return infoForWindows;
 }
 
 export type windowKey = "storeWin" | "musicWin" | "ascendWin" | "statsWin" | "medalsWin" | "aboutWin" | "creditsWin" | "settingsWin" | "leaderboardsWin" | "hexColorWin" | "bgColorWin" | "extraWin"
