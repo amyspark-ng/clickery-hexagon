@@ -391,8 +391,8 @@ export const gamescene = () => scene("gamescene", () => {
 			GameState.ascension.manaAllTime++
 			ROOT.trigger("manaGained")
 		}
-		
-		GameState.stats.timesAscended = GameState.ascension.magicLevel - 1
+
+		GameState.ascension.magicLevel = GameState.stats.timesAscended + 1
 	
 		// auto loop stuff
 		if (GameState.cursors >= 1 && ascension.ascending == false) {

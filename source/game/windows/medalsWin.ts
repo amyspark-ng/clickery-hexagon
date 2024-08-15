@@ -7,7 +7,7 @@ let totalColumns = 5;
 let totalRows = 7;
 
 // initialPos of the first element, relative to the medalsContainer that is relative to the window position
-let initialPos = { x: -137, y: 46 }; 
+let initialPos = { x: -137, y: 46 };
 let spacing = { x: 65, y: 65 };
 
 function getPositionInWindow(row:number, column:number) {

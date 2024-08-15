@@ -205,6 +205,7 @@ export let achievements = [
 		unlockCondition: () => GameState.scoreAllTime >= 500_000,
 	}),
 
+	// this is the gimmiko achievement
 	new Achievement({
 		id: "750000score",
 		title: "Did you know there's no actual limit to how long these names can be? I specifically spent a lot of time working on them so they can be as LONG as i want them to be and they will do their best to look good",
@@ -264,7 +265,7 @@ export let achievements = [
 
 	new Achievement({
 		id: "600millionscore",
-		title: "That's crazy",
+		title: "C L I C K  M Y  H E X A G O N S",
 		description: "Get 600 million of score",
 		icon: "upgrades.k_1",
 		unlockCondition: () => GameState.scoreAllTime >= 600_000_000,
@@ -288,7 +289,7 @@ export let achievements = [
 
 	new Achievement({
 		id: "1billionscore",
-		title: "That's crazy",
+		title: "YOU'RE crazy",
 		description: "Get 1 billion of score, you're crazy for this...",
 		icon: "upgrades.k_1",
 		unlockCondition: () => GameState.scoreAllTime >= 1_000_000_000,

@@ -546,6 +546,8 @@ function loadSprites() {
 	loadSprite("randomButton", "sprites/windows/colorWin/randomButton.png")
 	
 	loadSprite("extraWin", "sprites/windows/extraWin/extraWin.png")
+
+	loadSprite("statsWin", "sprites/windows/statsWin/statsWin.png")
 	//#endregion
 
 	//#endregion

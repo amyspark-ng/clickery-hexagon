@@ -256,17 +256,17 @@ export function blendColors(color1:Color, color2:Color, blendFactor:number) {
 
 export function sortedTaskbar() {
 	// i have to sort the taskbar considering that if there's enough windows (4) then the taskbar should always have 4, and if the extra win is unlocked then add it at the end of the taskbar array
+	
+	let unlockedWindowsWithoutExtraAndTaskbar = GameState.unlockedWindows.filter(key => key != "extraWin" && !GameState.taskbar.includes(key))
 
 	let taskbarCopy = GameState.taskbar
-	
-	// if the taskbar doesn't have enough windows
-	if (taskbarCopy.filter(key => key != "extraWin").length < 4) {
+	while(taskbarCopy.filter(key => key != "extraWin").length < 4 && unlockedWindowsWithoutExtraAndTaskbar.length > 0) {
 		// if there's a window you have unlocked but is not on the taskbar
 		if (GameState.unlockedWindows.filter(key => GameState.taskbar.includes(key)).length > 0) {
 			let randomNewOne = choose(GameState.unlockedWindows.filter(key => !GameState.taskbar.includes(key)))
 			taskbarCopy.push(randomNewOne)
 		}
-	}
+	} 
 
 	if (taskbarCopy.includes("extraWin")) {
 		// reorganize the taskbar array so extra win is always in the latest spot

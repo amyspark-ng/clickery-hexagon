@@ -221,6 +221,18 @@ class _scoreManager {
 		let nextManaAt = this.getScoreForManaAT(GameState.ascension.manaAllTime + 1);
 		return nextManaAt;
 	}
+
+	manaPerSecond = () => {
+		const scoreNeededForNextMana = GameState.ascension.manaAllTime ** 0.8 * this.ascensionConstant;
+
+		// Calculate time to reach the next mana
+		const timeToNextMana = scoreNeededForNextMana / GameState.scoreAllTime;
+	
+		// Calculate mana per second
+		const manaPerSecond = timeToNextMana > 0 ? 1 / timeToNextMana : 0;
+
+		return manaPerSecond;
+	}
 	
 	resetRun() {
 		tween(GameState.score, 0, 0.32, (p) => GameState.score = p, easings.easeOutCirc)

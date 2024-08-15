@@ -19,23 +19,29 @@ export function statsWinContent(winParent) {
 
 	winParent.onUpdate(() => {
 		stats = [
-			{ "Score all time": formatNumber(GameState.scoreAllTime) },
-			{ "Times clicked": formatNumberSimple(GameState.stats.timesClicked) },
-			{ "Powerups clicked": formatNumberSimple(GameState.stats.powerupsClicked) },
-			{ "Powerups bought": formatNumberSimple(GameState.stats.powerupsBought) },
-			{ "Achievements unlocked": `${GameState.unlockedAchievements.length}/${achievements.length}` },
-			{ "Total time played": formatTime(Math.round(GameState.stats.totalTimePlayed), true) },
+			new Stat("Score all time", formatNumber(GameState.scoreAllTime), "cursors"),
+			new Stat("Times clicked", formatNumberSimple(GameState.stats.timesClicked), "cursors"),
+			new Stat("Power-ups clicked", formatNumberSimple(GameState.stats.powerupsClicked), "cursors"),
+			new Stat("Power-ups bought", formatNumberSimple(GameState.stats.powerupsBought), "cursors"),
+			new Stat("Achievements unlocked", `${GameState.unlockedAchievements.length}/${achievements.length}`, "cursors"),
+			new Stat("Total time played", formatTime(Math.round(GameState.stats.totalTimePlayed), true), "cursors"),
 		]
 
 		if (GameState.stats.timesAscended > 0) {
-			stats[0] = { "Score all time": formatNumber(GameState.scoreAllTime) }
-			stats[1] = { "Score this run": formatNumber(GameState.scoreThisRun) }
-			stats.splice(2, 0, { "Times clicked": `${formatNumberSimple(GameState.stats.timesClicked)}` });
+			stats[0] = new Stat("Score all time", formatNumber(GameState.scoreAllTime), "cursors")
+			stats[1] = new Stat("Score this run", formatNumber(GameState.scoreThisRun), "cursors")
 
-			let ascendStatObject = { "Times ascended": `${GameState.stats.timesAscended}` }
+			stats.splice(2, 0, new Stat("Times clicked", formatNumberSimple(GameState.stats.timesClicked), "cursors"));
+
+			let ascendStatObject = new Stat("Times ascended", `${GameState.stats.timesAscended}`, "cursors")
 			if (stats.indexOf(ascendStatObject) == -1) stats.push(ascendStatObject)
 		}
 	})
+
+	function createStats() {
+		let text = stats.map(stat => `${stat.key}: ${stat.value}`).join("\n")
+		return text
+	}
 
 	let icons = winParent.add([
 		pos(),
@@ -43,51 +49,9 @@ export function statsWinContent(winParent) {
 		anchor("top"),
 	])
 
-	icons.onDraw(() => {
-		drawSprite({
-			sprite: "cursors",
-			frame: 2,
-			anchor: "center",
-			width: 50,
-			height: 45,
-		})
-
-		drawSprite({
-			sprite: "cursors",
-			frame: 0,
-			anchor: "center",
-			pos: vec2(0, 40),
-			width: 45,
-			height: 45,
-		})
-
-		drawSprite({
-			sprite: "hexagon",
-			anchor: "center",
-			pos: vec2(0, 80),
-			width: 45,
-			scale: vec2(0.9),
-			height: 45,
-		})
-
-		drawSprite({
-			sprite: "icon_medals",
-			frame: 0,
-			anchor: "center",
-			pos: vec2(0, 160),
-			width: 45,
-			height: 45,
-		})
-	})
-
-	function createStats() {
-		let text = stats.map((stat) => `${Object.keys(stat)[0]}: ${Object.values(stat)[0]}`).join("\n")
-		return text
-	}
-
 	let statsText = winParent.add([
 		text(createStats()),
-		pos(70, -230),
+		pos(14, -122),
 		anchor("top"),
 		positionSetter(),
 		{
@@ -98,4 +62,32 @@ export function statsWinContent(winParent) {
 			}
 		}
 	])
+
+	let statLineHeight = formatText({ text: "Score all time: 0" }).height / 2
+
+	debug.log(statLineHeight)
+
+	let ffff = winParent.add([
+		rect(10, 0),
+		anchor("top"),
+		pos(icons.pos.x, icons.pos.y),
+		{
+			update() {
+				if (isKeyPressed("up")) this.height--
+				if (isKeyPressed("down")) this.height++
+			}
+		}
+	])
+
+	icons.onDraw(() => {
+		for (let i = 0; i < stats.length; i++) {
+			let stat = stats[i]
+
+			// drawSprite({
+			// 	pos: vec2(icons.pos.x, icons.pos.y + (i * statLineHeight)),
+			// 	sprite: "statIcon",
+			// 	frame: i,
+			// })
+		}
+	})
 }

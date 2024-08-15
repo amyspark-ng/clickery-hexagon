@@ -4,8 +4,9 @@ import { ROOT } from "../../main"
 import { positionSetter } from "../plugins/positionSetter"
 import { startAscending } from "../ascension/ascension"
 import { allPowerupsInfo} from "../powerups"
-import { formatNumber } from "../utils"
+import { formatNumber, formatNumberSimple } from "../utils"
 import { waver } from "../plugins/wave"
+import { scoreText } from "../uicounters"
 
 let objectsPositions = {
 	mage_hidden: 450,
@@ -47,6 +48,8 @@ function addWinMage(position: Vec2, parent:GameObj) {
 export function ascendWinContent(winParent) {
 	// TODO: if mana is increased while the ascend window is open add a little spark and a sound
 
+	let manaTimeCounter = 0;
+
 	let manaText = winParent.add([
 		text("", {
 			size: 40,
@@ -58,16 +61,23 @@ export function ascendWinContent(winParent) {
 		area(),
 		{
 			update() {
-				let scoreTilNextMana = formatNumber(Math.round(scoreManager.scoreYouGetNextManaAt()) - Math.round(GameState.scoreAllTime))
+				let scoreTextOrManaPerSecond = `Score 'til next mana: `
+				
+				let scoreTilNextMana = Math.round(scoreManager.scoreYouGetNextManaAt() - Math.round(GameState.scoreAllTime))
+				let formattedNumber = formatNumber(Math.round(scoreManager.scoreYouGetNextManaAt()) - Math.round(GameState.scoreAllTime))
+
+				// getting scrumptious amounts of mana
+				if (scoreTilNextMana < -1) {
+					formattedNumber = formatNumber(Math.round(scoreManager.manaPerSecond()))
+					scoreTextOrManaPerSecond = "Mana per second: "
+				}
 
 				let text = [
 					// TODO: make it so it shows how much mana you've  gotten since the run started
 					`${GameState.ascension.mana}✦`,
-					`Score 'til next mana: ${scoreTilNextMana}`,
+					`${scoreTextOrManaPerSecond}${formattedNumber}`,
 					`+${GameState.ascension.magicLevel}MG`
 				].join("\n")
-
-				// let manaSinceRunStart = formatNumber(GameState.ascension.mana - GameState.ascension.manaAtStartOfRun)
 
 				this.text = text
 			}
@@ -128,11 +138,13 @@ export function ascendWinContent(winParent) {
 		z(barFrame.z - 1),
 		{
 			update() {
-				let scoreTilNextMana = Math.round(scoreManager.scoreYouGetNextManaAt() - GameState.scoreAllTime)
-	
-				let mappedWidth = map(scoreTilNextMana, 0, GameState.scoreAllTime + scoreManager.scoreYouGetNextManaAt(), barFrame.width, 0)
+				let currentScore = scoreManager.getScoreForManaAT(GameState.ascension.manaAllTime)
+				let nextScore = scoreManager.getScoreForManaAT(GameState.ascension.manaAllTime + 1)
+
+				let mappedWidth = map(GameState.scoreAllTime, currentScore, nextScore, 0, barFrame.width)
 				this.width = lerp(this.width, mappedWidth, 0.5)
-			
+				this.width = clamp(this.width, 0, barFrame.width)
+
 				const lighter = rgb(178, 208, 247)
 				const darker = rgb(100, 157, 232)
 				this.color.r = wave(lighter.r, darker.r, time() * 2)
