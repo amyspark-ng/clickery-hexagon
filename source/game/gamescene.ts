@@ -14,7 +14,9 @@ import { folderObj, folderObjManaging } from "./windows/windows-api/folderObj.ts
 import { curDraggin } from "./plugins/drag.ts"
 import { unlockableWindows } from "./unlockables/windowUnlocks.ts"
 import { appWindow } from '@tauri-apps/api/window';
+import { ngEnabled } from "../newgrounds.ts"
 import * as env from "../env.json"
+import ng from "newgrounds.js"
 
 let panderitoLetters = "panderito".split("")
 export let panderitoIndex = 0
@@ -313,7 +315,10 @@ export const gamescene = () => scene("gamescene", () => {
 		// wait 60 seconds
 		wait(60, () => {
 			loop(120, () => {
-				if (GameState.scoreAllTime > 25) GameState.save(true)
+				if (GameState.scoreAllTime > 25) {
+					if (ngEnabled == true) ng.postScore(env.LEADERBOARD_ID, GameState.scoreAllTime)	
+					GameState.save(true)
+				}
 			})
 		})
 	
@@ -494,6 +499,7 @@ export const gamescene = () => scene("gamescene", () => {
 			// don't check anything for muted, it will play but no sound, that's good
 			let song = GameState.settings.music.favoriteIdx == null ? "clicker.wav" : Object.keys(songs)[GameState.settings.music.favoriteIdx]
 			playMusic(song)
+			musicHandler.paused = GameState.settings.music.paused
 		},
 		intro_hexagon() {
 			tween(vec2(center().x, center().y + 110), vec2(center().x, center().y + 55), 0.5, (p) => hexagon.pos = p, easings.easeOutQuad).onEnd(() => {

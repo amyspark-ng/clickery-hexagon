@@ -39,10 +39,8 @@ export function medalsWinContent(winParent) {
 	// everytime you scroll that achievements gets updated
 	// for hovers you can check the distance to the position the medal will be in
 	function addMedal(gridPosition:{ row:number, column:number }, medalid:string) {
-		let theSprite = getSprite("medal_" + medalid) || "unknown"
-		
 		let medalObj = medalsContainer.add([
-			sprite(theSprite),
+			sprite("medals"),
 			pos(),
 			anchor("center"),
 			layer("windows"),

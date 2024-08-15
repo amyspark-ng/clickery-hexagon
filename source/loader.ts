@@ -3,7 +3,7 @@ import { introscene } from "./game/scenes/introScene.ts";
 import { gamescene } from "./game/gamescene.ts";
 import { focuscene } from "./game/scenes/focuscene.ts";
 import { ngScene } from "./game/scenes/ngScene.ts";
-import { Achievement, achievements } from "./game/unlockables/achievements.ts";
+import { achievements } from "./game/unlockables/achievements.ts";
 
 export function drawSeriousLoadScreen(progress, op = 1) {
 	function drawHexagon(opts = {
@@ -459,6 +459,18 @@ function loadSprites() {
 			}
 		}
 	})
+	loadSprite("musicWinButtons", "sprites/windows/musicWin/musicWinButtons.png", {
+		sliceX: 4,
+		sliceY: 1,
+		anims: {
+			"back": 0,
+			"skip": 1,
+			"pause": 2,
+			"play": 3,
+		}
+	})
+	loadSprite("mutedButton", "sprites/windows/musicWin/mutedButton.png")
+	
 	//#endregion
 
 	// #region Settings
@@ -509,35 +521,20 @@ function loadSprites() {
 	})
 	//#endregion Settings
 
-	let achievementIds = achievements.map(achievement => achievement.id)
-	let medalsSprites = {}
+	loadSprite("unknown", "sprites/windows/medalsWin/unknown.png")
+	
+	const medalsX = 20
+	const medalsY = 1
 
-	achievementIds.forEach((achievementId, index) => {
-		medalsSprites[achievementId] = {
-			"x": 60 * index + 1,
-			"y": 0 * index + 1,
-			"width": 60,
-			"height": 60,
-		}
+	let medalAnims = {}
+	achievements.map(achievement => achievement.id).forEach((achievementId, index) => {
+		medalAnims[`${achievementId}`] = index
 	})
-
-	medalsSprites["unknown"] = {
-		"x": 0,
-		"y": 0,
-		"width": 60,
-		"height": 60,
-	}
-
-	loadSpriteAtlas("sprites/windows/medalsWin/medals.png", {
-		...medalsSprites
-	})
-
+	
 	loadSprite("medals", "sprites/windows/medalsWin/medals.png", {
-		sliceX: 1,
-		sliceY: 1,
-		anims: {
-			"unknown": 0,
-		}
+		sliceX: medalsX,
+		sliceY: medalsY,
+		anims: medalAnims
 	})
 
 	//#region Other ones huh

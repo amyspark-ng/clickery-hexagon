@@ -69,7 +69,7 @@ class _GameState {
 
 	settings = {
 		sfx: { volume: 1, muted: false },
-		music: { volume: 1, muted: false, favoriteIdx: 0 },
+		music: { volume: 1, muted: false, paused: false, favoriteIdx: 0 },
 		volume: 1,
 		hexColor: new saveColor(255, 255, 255),
 		bgColor: new saveColor(0, 0, 0, 0.84),

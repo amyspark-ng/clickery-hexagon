@@ -160,6 +160,7 @@ export function openWindow(windowKey:windowKey) {
 		z(0),
 		drag(),
 		area({ scale: vec2(1, 1) }),
+		timer(),
 		"window",
 		`${windowKey}`,
 		{

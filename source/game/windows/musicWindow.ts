@@ -1,9 +1,10 @@
 import { GameState } from "../../gamestate";
 import { waver } from ".././plugins/wave";
-import { musicHandler, playMusic, playSfx, scratchSong } from "../../sound";
+import { manageMute, musicHandler, playMusic, playSfx, scratchSong } from "../../sound";
 import { isAchievementUnlocked } from "../unlockables/achievements";
-import { bop, formatTime } from "../utils";
+import { bop, formatTime, getPositionOfSide } from "../utils";
 import { GameObj } from "kaplay";
+import { positionSetter } from "../plugins/positionSetter";
 
 export let songs = {
 	"clicker.wav": { name: "clicker.wav", idx: 0, speed: 2.5, cover: "wav", duration: 61},
@@ -53,12 +54,11 @@ export function musicWinContent(winParent) {
 		sprite("discs", {
 			anim: `${songs[Object.keys(songs)[currentSongIdx]].cover}`
 		}),
-		pos(-150, -20),
+		pos(-152, -17),
 		rotate(angleOfDisc),
 		anchor("center"),
 		scale(1),
 		area(),
-		"bpmChange",
 		"pauseButton",
 		"musicButton",
 		"windowButton",
@@ -73,27 +73,50 @@ export function musicWinContent(winParent) {
 		}
 	])
 
-	let nowPlaying = winParent.add([
-		pos(-50, -25),
+	let titleText = winParent.add([
+		pos(-114, -14),
 		text(Object.keys(songs)[0], {
-			size: 20,
-			styles: {
-				"small": {
-					scale: vec2(0.8),
-					pos: vec2(0, 4)
-				}
-			}
+			size: 28,
 		}),
 		anchor("left"),
+		positionSetter(),
 		{
 			update() {
-				this.text = `${songs[Object.keys(songs)[currentSongIdx]].idx + 1}. ${songs[Object.keys(songs)[currentSongIdx]].name} ${musicHandler.paused && !musicHandler.winding? "(PAUSED)" : ""}`
+				let theText = `${songs[Object.keys(songs)[currentSongIdx]].idx + 1}. ${songs[Object.keys(songs)[currentSongIdx]].name}`
+				this.text = theText
+			}
+		}
+	])
+
+	let mutedButton = winParent.add([
+		sprite("mutedButton"),
+		pos(),
+		area(),
+		anchor("center"),
+		scale(),
+		{
+			update() {
+				if (GameState.settings.music.muted) {
+					this.hidden = false
+				
+					if (isMousePressed("left") && this.isHovering()) {
+						bop(this)
+						manageMute("music", false)
+					}
+				}
+
+				else {
+					this.hidden = true
+				}
+
+				this.pos.y = titleText.pos.y
+				this.pos.x = lerp(this.pos.x, titleText.pos.x + titleText.width + this.width / 2 + 5, 0.5)
 			}
 		}
 	])
 
 	let theOneBehind = winParent.add([
-		rect(winParent.width - 50, 10, { radius: 20 }),
+		rect(winParent.width - 50, 10, { radius: 2.5 }),
 		pos(0, 25),
 		area(),
 		color(),
@@ -109,11 +132,10 @@ export function musicWinContent(winParent) {
 
 	timeText = winParent.add([
 		text("0:00", {
-			size: 20,
+			size: 25,
 		}),
 		pos(-120, 50),
 		anchor("center"),
-		"bpmChange",
 		{
 			verPosition: 50,
 			update() {
@@ -126,20 +148,23 @@ export function musicWinContent(winParent) {
 	])
 
 	progressBar = winParent.add([
-		rect(1, 10, { radius: 10 }),
+		rect(1, 10, { radius: theOneBehind.radius }),
 		pos(theOneBehind.pos.x - theOneBehind.width / 2, theOneBehind.pos.y),
 		color(WHITE),
 		anchor("left"),
 		{
 			update() {
 				if (musicHandler.winding) return
-				this.width = musicHandler.time() / musicHandler.duration() * theOneBehind.width
+				
+				let intendedWidth = musicHandler.time() / musicHandler.duration() * theOneBehind.width 
+				this.width = lerp(this.width, intendedWidth, 0.6)
 			},
 
 			draw() {
-				drawCircle({
+				drawSprite({
 					pos: vec2(this.width, 0),
-					radius: 8,
+					sprite: "hexColorHandle", // recycling is good for the planet
+					scale: vec2(0.5),
 					color: this.color,
 					anchor: "center",
 					opacity: this.opacity
@@ -151,9 +176,7 @@ export function musicWinContent(winParent) {
 	// theOneBehind.color = progressBar.color
 
 	let backButton = winParent.add([
-		text("<", {
-			size: 40
-		}),
+		sprite("musicWinButtons", { anim: "back", }),
 		pos(-30, 60),
 		area(),
 		scale(),
@@ -164,9 +187,7 @@ export function musicWinContent(winParent) {
 	])
 
 	let pauseButton = winParent.add([
-		text("", {
-			size: 40
-		}),
+		sprite("musicWinButtons", { anim: "pause", }),
 		pos(15, 60),
 		area(),
 		scale(),
@@ -174,18 +195,10 @@ export function musicWinContent(winParent) {
 		"musicButton",
 		"windowButton",
 		"pauseButton",
-		{
-			update() {
-				if (musicHandler.paused && !musicHandler.winding) this.text = ">"
-				else this.text = "||"
-			}
-		}
 	])
 
 	let skipButton = winParent.add([
-		text(">", {
-			size: 40
-		}),
+		sprite("musicWinButtons", { anim: "skip", }),
 		pos(60, 60),
 		area(),
 		scale(),
@@ -221,12 +234,17 @@ export function musicWinContent(winParent) {
 		bop(skipButton)
 	}
 
-	function pauseButtonAction() {
+	function pauseButtonAction(pause?:boolean) {
 		if (musicHandler.winding) return
-		musicHandler.paused = !musicHandler.paused
+
+		pause = pause || !musicHandler.paused
+		musicHandler.paused = pause
+		GameState.settings.music.paused = musicHandler.paused
 
 		// ^ only manages pause, do the other stuff below
-		pauseButton.text = musicHandler.paused ? ">" : "||"
+		if (musicHandler.paused == true) pauseButton.play("play")
+		else pauseButton.play("pause") 
+
 		get("bpmChange", { recursive: true }).forEach(bpmChange => {
 			musicHandler.paused ? bpmChange.stopWave() : bpmChange.startWave()
 		})
@@ -350,4 +368,6 @@ export function musicWinContent(winParent) {
 			})
 		}
 	})
+
+	pauseButtonAction(GameState.settings.music.paused)
 }

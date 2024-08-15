@@ -129,6 +129,7 @@ export let achievements = [
 		title: "It starts...",
 		description: "Get 100 of score",
 		icon: "upgrades.k_0",
+		ngId: 80187,
 		unlockCondition: () => GameState.scoreAllTime >= 100,
 	}),
 

@@ -3,10 +3,10 @@ import { curDraggin } from "../.././plugins/drag";
 import { playSfx } from "../../../sound";
 import { mouse } from "../../additives";
 import { ascension } from "../../ascension/ascension";
-import { blendColors, bop } from "../../utils";
+import { blendColors, bop, sortedTaskbar } from "../../utils";
 import { setTimeSinceSkip, timeSinceSkip } from "../musicWindow";
 import { addMinibutton, getMinibuttonPos,  } from "./minibuttons";
-import { manageWindow, allObjWindows } from "./windowManaging";
+import { manageWindow, allObjWindows, windowKey } from "./windowManaging";
 import { outsideWindowHover } from "../../hovers/outsideWindowHover";
 
 export let folderObj;
@@ -42,11 +42,13 @@ export function folderObjManaging() {
 				timeSinceFold = 0
 				playSfx("fold")
 
+				GameState.taskbar = sortedTaskbar()
+
 				// if there's no minibutton
 				if (get("minibutton").length == 0) {
 					GameState.taskbar.forEach((key, taskbarIndex) => {
 						let newminibutton = addMinibutton({
-							windowKey: key,
+							windowKey: key as windowKey,
 							taskbarIndex: taskbarIndex,
 							initialPosition: folderObj.pos,
 						})

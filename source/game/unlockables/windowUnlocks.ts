@@ -2,7 +2,7 @@ import { GameObj } from "kaplay";
 import { GameState, scoreManager } from "../../gamestate";
 import { isWindowOpen, windowKey } from "../windows/windows-api/windowManaging";
 import { waver } from "../plugins/wave";
-import { bop } from "../utils";
+import { bop, sortedTaskbar } from "../utils";
 import { playSfx } from "../../sound";
 import { folded, folderObj } from "../windows/windows-api/folderObj";
 import { addMinibutton } from "../windows/windows-api/minibuttons";
@@ -89,12 +89,9 @@ export function unlockWindow(windowJustUnlocked:windowKey) {
 	if (GameState.taskbar.length < 4 || windowJustUnlocked == "extraWin") {
 		GameState.taskbar.push(windowJustUnlocked)
 	}
-	
-	if (GameState.taskbar.includes("extraWin")) {
-		// reorganize the taskbar array so extra win is always in the latest spot
-		GameState.taskbar.push(GameState.taskbar.splice(GameState.taskbar.indexOf("extraWin"), 1)[0]);
-	}
-	
+
+	GameState.taskbar = sortedTaskbar()
+
 	// else {
 		// i got a 'Too much recursion!' crash here, got pretty scared :(
 		// if (GameState.unlockedWindows.includes("extraWin") == false) {

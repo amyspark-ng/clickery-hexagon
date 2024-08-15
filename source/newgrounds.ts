@@ -1,12 +1,12 @@
 import ng, { User } from "newgrounds.js";
 import * as env from "./env.json"
-import { ngScene } from "./game/scenes/ngScene";
+import { gameBg } from "./game/additives";
 
 export let ngEnabled:boolean;
 export let ngUser:User | void;
 
-export async function newgroundsManagement() {
-	let connectionToNg = ng.connect(env.API_ID, env.ENCRIPTION_KEY);
+export function newgroundsManagement() {
+	return ng.connect(env.API_ID, env.ENCRIPTION_KEY);
 }
 
 export async function newgroundsSceneContent() {
