@@ -7,7 +7,7 @@
     "distDir": "../public"
   },
   "package": {
-    "productName": "clickery-hexagon-dev",
+    "productName": "clickery-hexagon",
     "version": "0.1.0"
   },
   "tauri": {
@@ -20,7 +20,7 @@
     },
     "bundle": {
       "active": true,
-      "category": "DeveloperTool",
+      "category": "Game",
       "copyright": "",
       "deb": {
         "depends": []
@@ -33,7 +33,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.amysparkng.clickery-hexagon-dev",
+      "identifier": "com.amysparkng.clickery-hexagon",
       "longDescription": "",
       "macOS": {
         "entitlements": null,
