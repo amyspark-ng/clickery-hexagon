@@ -5,7 +5,7 @@ import { ROOT } from "../../../main"
 import { bop, formatNumber, getPrice, getRandomDirection, getVariable, percentage, randomPos } from "../../utils"
 import { addTooltip } from "../../additives"
 import { allPowerupsInfo, powerupTypes, spawnPowerup } from "../../powerups"
-import { isHoveringUpgrade, storeElements, storePitchJuice } from "./storeWindows"
+import { isHoveringUpgrade, storeElements, storePitchJuice } from "./storeWin"
 import { insideWindowHover } from "../../hovers/insideWindowHover"
 import { isAchievementUnlocked, unlockAchievement } from "../../unlockables/achievements"
 

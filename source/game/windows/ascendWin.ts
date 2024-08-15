@@ -1,7 +1,7 @@
 import { GameObj, Vec2 } from "kaplay"
 import { GameState, scoreManager } from "../../gamestate"
 import { ROOT } from "../../main"
-import { positionSetter } from ".././plugins/positionSetter"
+import { positionSetter } from "../plugins/positionSetter"
 import { startAscending } from "../ascension/ascension"
 import { allPowerupsInfo} from "../powerups"
 import { formatNumber } from "../utils"

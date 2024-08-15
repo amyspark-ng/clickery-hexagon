@@ -1,4 +1,4 @@
-import { positionSetter } from ".././plugins/positionSetter"
+import { positionSetter } from "../plugins/positionSetter"
 
 export function creditsWinContent(winParent) {
 	winParent.add([

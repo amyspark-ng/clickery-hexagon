@@ -3,6 +3,7 @@ import { waver } from ".././plugins/wave";
 import { musicHandler, playMusic, playSfx, scratchSong } from "../../sound";
 import { isAchievementUnlocked } from "../unlockables/achievements";
 import { bop, formatTime } from "../utils";
+import { GameObj } from "kaplay";
 
 export let songs = {
 	"clicker.wav": { name: "clicker.wav", idx: 0, speed: 2.5, cover: "wav", duration: 61},
@@ -21,8 +22,8 @@ export let songs = {
 export let songsListened = [];
 export let currentSongIdx = 0
 
-export let progressBar;
-export let timeText;
+export let progressBar:GameObj;
+export let timeText:GameObj;
 
 // don't mess up with timeSinceSkip, don't reset when window enter
 export let timeSinceSkip = 0;
@@ -349,6 +350,4 @@ export function musicWinContent(winParent) {
 			})
 		}
 	})
-
-	return;
 }

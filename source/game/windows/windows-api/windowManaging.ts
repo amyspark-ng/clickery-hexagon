@@ -10,16 +10,16 @@ import { insideWindowHover } from "../../hovers/insideWindowHover.ts";
 import { isAchievementUnlocked, unlockAchievement } from "../../unlockables/achievements.ts";
 
 // window contents
-import { storeWinContent } from "../store/storeWindows.ts";
+import { storeWinContent } from "../store/storeWin.ts";
 import { musicWinContent } from "../musicWindow.ts";
-import { settingsWinContent } from "../settings/settingsWindow.ts";
-import { ascendWinContent } from "../ascendWindow.ts";
+import { settingsWinContent } from "../settings/settingsWin.ts";
+import { ascendWinContent } from "../ascendWin.ts";
 import { extraWinContent } from "../extraWin.ts";
 import { creditsWinContent } from "../creditsWin.ts";
 import { statsWinContent } from "../statsWin.ts";
 import { medalsWinContent } from "../medalsWin.ts";
-import { hexColorWinContent } from "../color/hexColorWindow.ts";
-import { bgColorWinContent } from "../color/bgColorWindow.ts";
+import { hexColorWinContent } from "../color/hexColorWin.ts";
+import { bgColorWinContent } from "../color/bgColorWin.ts";
 import { leaderboardsWinContent } from "../leaderboardsWin.ts";
 
 class Window {
