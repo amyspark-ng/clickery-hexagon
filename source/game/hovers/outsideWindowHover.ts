@@ -4,6 +4,7 @@
 
 import { mouse } from "../additives"
 import { curDraggin } from "../plugins/drag"
+import { allPowerupsInfo } from "../powerups"
 import { allObjWindows } from "../windows/windows-api/windowManaging"
 
 // =========================
@@ -41,7 +42,7 @@ export function outsideWindowHover() {
 
 			this.onHover(() => {
 				// only check for these conditions here
-				if (allObjWindows.isHoveringAWindow == false && allObjWindows.isDraggingAWindow == false) {
+				if (allObjWindows.isHoveringAWindow == false && allPowerupsInfo.isHoveringAPowerup == false && allObjWindows.isDraggingAWindow == false) {
 					this.startHoverFunction()
 				}
 			})

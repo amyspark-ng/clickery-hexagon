@@ -548,6 +548,12 @@ function loadSprites() {
 	loadSprite("extraWin", "sprites/windows/extraWin/extraWin.png")
 
 	loadSprite("statsWin", "sprites/windows/statsWin/statsWin.png")
+	loadSprite("statIcons1", "sprites/windows/statsWin/statIcons1.png")
+	loadSprite("statIcons2", "sprites/windows/statsWin/statIcons2.png")
+	
+	loadSprite("leaderboardsWin", "sprites/windows/leaderboardsWin/leaderboardsWin.png")
+	loadSprite("leaderboardsHeader", "sprites/windows/leaderboardsWin/leaderboardsHeader.png")
+	loadSprite("leaderboardsTheLine", "sprites/windows/leaderboardsWin/leaderboardsTheLine.png")
 	//#endregion
 
 	//#endregion

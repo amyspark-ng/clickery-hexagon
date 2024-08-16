@@ -9,7 +9,7 @@ import ng from "newgrounds.js";
 import { runInTauri } from "./game/utils.ts";
 
 export let DEBUG:boolean = true
-export let enableNg:boolean = false
+export let enableNg = false
 
 let kaplayOpts = {
 	width: 1024,

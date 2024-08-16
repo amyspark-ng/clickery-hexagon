@@ -14,7 +14,7 @@ import { folderObj, folderObjManaging } from "./windows/windows-api/folderObj.ts
 import { curDraggin } from "./plugins/drag.ts"
 import { unlockableWindows } from "./unlockables/windowUnlocks.ts"
 import { appWindow } from '@tauri-apps/api/window';
-import { ngEnabled } from "../newgrounds.ts"
+import { ngEnabled, postTheScores } from "../newgrounds.ts"
 import * as env from "../env.json"
 import ng from "newgrounds.js"
 
@@ -316,7 +316,9 @@ export const gamescene = () => scene("gamescene", () => {
 		wait(60, () => {
 			loop(120, () => {
 				if (GameState.scoreAllTime > 25) {
-					if (ngEnabled == true) ng.postScore(env.LEADERBOARD_ID, GameState.scoreAllTime)	
+					if (ngEnabled == true) {
+						postTheScores()
+					}
 					GameState.save(true)
 				}
 			})

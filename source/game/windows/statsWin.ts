@@ -7,7 +7,7 @@ class Stat {
 	key:string
 	value: number | string
 	icon: string
-	constructor(key:string, value: number | string, icon: string) {
+	constructor(key:string, value: number | string, icon?: string) {
 		this.key = key
 		this.value = value
 		this.icon = icon
@@ -18,23 +18,22 @@ export function statsWinContent(winParent) {
 	let stats = [];
 
 	winParent.onUpdate(() => {
+		let scoreAllTime = new Stat("Score all time", formatNumber(GameState.scoreAllTime))
+		let scoreThisRun = new Stat("Score this run", formatNumber(GameState.scoreThisRun))
+		let timesClicked = new Stat("Times clicked", formatNumberSimple(GameState.stats.timesClicked))
+		let powerupsClicked = new Stat("Power-ups clicked", formatNumberSimple(GameState.stats.powerupsClicked))
+		let powerupsBought = new Stat("Power-ups bought", formatNumberSimple(GameState.stats.powerupsBought))
+		let timesAscended = new Stat("Times ascended", formatNumberSimple(GameState.stats.timesAscended))
+		let achievementsUnlocked = new Stat("Achievements unlocked", `${GameState.unlockedAchievements.length}/${achievements.length}`)
+		let timePlayed = new Stat("Total time played", formatTime(Math.round(GameState.stats.totalTimePlayed), true))
+
 		stats = [
-			new Stat("Score all time", formatNumber(GameState.scoreAllTime), "cursors"),
-			new Stat("Times clicked", formatNumberSimple(GameState.stats.timesClicked), "cursors"),
-			new Stat("Power-ups clicked", formatNumberSimple(GameState.stats.powerupsClicked), "cursors"),
-			new Stat("Power-ups bought", formatNumberSimple(GameState.stats.powerupsBought), "cursors"),
-			new Stat("Achievements unlocked", `${GameState.unlockedAchievements.length}/${achievements.length}`, "cursors"),
-			new Stat("Total time played", formatTime(Math.round(GameState.stats.totalTimePlayed), true), "cursors"),
+			scoreAllTime, timesClicked, powerupsClicked, powerupsBought, achievementsUnlocked, timePlayed
 		]
 
 		if (GameState.stats.timesAscended > 0) {
-			stats[0] = new Stat("Score all time", formatNumber(GameState.scoreAllTime), "cursors")
-			stats[1] = new Stat("Score this run", formatNumber(GameState.scoreThisRun), "cursors")
-
-			stats.splice(2, 0, new Stat("Times clicked", formatNumberSimple(GameState.stats.timesClicked), "cursors"));
-
-			let ascendStatObject = new Stat("Times ascended", `${GameState.stats.timesAscended}`, "cursors")
-			if (stats.indexOf(ascendStatObject) == -1) stats.push(ascendStatObject)
+			stats.splice(stats.indexOf(achievementsUnlocked), 0, timesAscended);
+			stats.splice(stats.indexOf(timesClicked), 0, scoreThisRun);
 		}
 	})
 
@@ -44,50 +43,27 @@ export function statsWinContent(winParent) {
 	}
 
 	let icons = winParent.add([
-		pos(),
-		// positionSetter(),
+		sprite("statIcons1"),
+		pos(-221, -127),
+		positionSetter(),
 		anchor("top"),
+		{
+			update() {
+				if (GameState.stats.timesAscended > 0 && this.sprite != "statIcons2") this.sprite = "statIcons2"
+				else if (GameState.stats.timesAscended == 0 && this.sprite != "statIcons1") this.sprite = "statIcons1"
+			}
+		}
 	])
 
 	let statsText = winParent.add([
 		text(createStats()),
 		pos(14, -122),
 		anchor("top"),
-		positionSetter(),
+		// positionSetter(),
 		{
 			update() {
 				this.text = createStats()
-				icons.pos.y = this.pos.y + 20
-				icons.pos.x = (this.pos.x - this.width / 2) - 25
 			}
 		}
 	])
-
-	let statLineHeight = formatText({ text: "Score all time: 0" }).height / 2
-
-	debug.log(statLineHeight)
-
-	let ffff = winParent.add([
-		rect(10, 0),
-		anchor("top"),
-		pos(icons.pos.x, icons.pos.y),
-		{
-			update() {
-				if (isKeyPressed("up")) this.height--
-				if (isKeyPressed("down")) this.height++
-			}
-		}
-	])
-
-	icons.onDraw(() => {
-		for (let i = 0; i < stats.length; i++) {
-			let stat = stats[i]
-
-			// drawSprite({
-			// 	pos: vec2(icons.pos.x, icons.pos.y + (i * statLineHeight)),
-			// 	sprite: "statIcon",
-			// 	frame: i,
-			// })
-		}
-	})
 }

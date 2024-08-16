@@ -1,6 +1,7 @@
 import ng, { User } from "newgrounds.js";
 import * as env from "./env.json"
 import { gameBg } from "./game/additives";
+import { GameState } from "./gamestate";
 
 export let ngEnabled:boolean;
 export let ngUser:User | void;
@@ -9,13 +10,20 @@ export function newgroundsManagement() {
 	return ng.connect(env.API_ID, env.ENCRIPTION_KEY);
 }
 
+export function postTheScores() {
+	if (ngEnabled) {
+		ng.postScore(env.SCORE_LEADERBOARD_ID, GameState.scoreAllTime)
+		ng.postScore(env.TIME_LEADERBOARD_ID, GameState.stats.totalTimePlayed)
+	}
+}
+
 export async function newgroundsSceneContent() {
 	debug.log("you don't seem to be signed in, would you like to?")
 
 	onKeyPress("enter", async () => {
 		ngUser = await ng.login().then(null)
 		
-		if (await ng.getUsername() != null) {
+		if (ng.getUsername() != null) {
 			ngEnabled = true
 			debug.log("You logged in! Youhoo!!!")
 			wait(1, () => {
