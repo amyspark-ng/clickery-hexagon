@@ -78,7 +78,7 @@ export function medalsWinContent(winParent) {
 		}
 
 		else {
-			parseAnimation(medalObj, "medals.unknown")
+			parseAnimation(medalObj, "unknown")
 		}
 
 		medalObj.onClick(() => {

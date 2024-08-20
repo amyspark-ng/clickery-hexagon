@@ -343,7 +343,7 @@ export let achievements = [
 		id: "10cursors",
 		title: "Getting cursory",
 		description: "Have 10 cursors",
-		icon: "cursors.cursor",
+		icon: "cursors.point",
 		unlockCondition: () => GameState.cursors >= 10,
 	}),
 
@@ -351,7 +351,7 @@ export let achievements = [
 		id: "20cursors",
 		title: "Getting cursory",
 		description: "Have 20 cursors",
-		icon: "cursors.cursor",
+		icon: "cursors.point",
 		unlockCondition: () => GameState.cursors >= 20,
 	}),
 
@@ -359,7 +359,7 @@ export let achievements = [
 		id: "30cursors",
 		title: "Getting cursory",
 		description: "Have 30 cursors",
-		icon: "cursors.cursor",
+		icon: "cursors.point",
 		unlockCondition: () => GameState.cursors >= 30,
 	}),
 
@@ -367,7 +367,7 @@ export let achievements = [
 		id: "40cursors",
 		title: "Getting cursory",
 		description: "Have 40 cursors",
-		icon: "cursors.cursor",
+		icon: "cursors.point",
 		unlockCondition: () => GameState.cursors >= 40,
 	}),
 
@@ -375,7 +375,7 @@ export let achievements = [
 		id: "50cursors",
 		title: "Getting cursory",
 		description: "Have 50 cursors",
-		icon: "cursors.cursor",
+		icon: "cursors.point",
 		unlockCondition: () => GameState.cursors >= 50,
 	}),
 	//#endregion CLICKERS/CURSORS ACHIEVEMENTS =================

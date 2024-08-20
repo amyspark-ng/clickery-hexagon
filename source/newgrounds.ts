@@ -10,10 +10,11 @@ export function newgroundsManagement() {
 	return ng.connect(env.API_ID, env.ENCRIPTION_KEY);
 }
 
-export function postTheScores() {
+export function postEverything() {
 	if (ngEnabled) {
 		ng.postScore(env.SCORE_LEADERBOARD_ID, GameState.scoreAllTime)
-		ng.postScore(env.TIME_LEADERBOARD_ID, GameState.stats.totalTimePlayed)
+		// have to send the time in miliseconds
+		ng.postScore(env.TIME_LEADERBOARD_ID, GameState.stats.totalTimePlayed * 1000)
 	}
 }
 

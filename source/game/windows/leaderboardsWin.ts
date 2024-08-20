@@ -4,7 +4,6 @@ import { ScoreBoardGetScoresParams } from "newgrounds.js/dist/first";
 import { GameObj, TextCompOpt } from 'kaplay';
 import { Score } from 'newgrounds.js/dist/first';
 import { formatNumber } from '../utils';
-import { positionSetter } from '../plugins/positionSetter';
 
 async function updateScores(winParent:GameObj) {
 	const paramsForGettingScores = { period: "A", limit: 5 } as ScoreBoardGetScoresParams 
@@ -37,8 +36,6 @@ async function updateScores(winParent:GameObj) {
 		let timeValues = timeLeaderboards.map((score) => score.value + "h")
 		times.text = timeValues.join("\n")
 	}
-
-	debug.log("updated scores")
 }
 
 export async function leaderboardsWinContent(winParent:GameObj) {
@@ -102,18 +99,6 @@ export async function leaderboardsWinContent(winParent:GameObj) {
 		"times"
 	])
 	
-	let line1 = winParent.add([
-		sprite("leaderboardsTheLine"),
-		pos(-26, 21),
-		anchor("center"),
-	])
-
-	let line2 = winParent.add([
-		sprite("leaderboardsTheLine"),
-		pos(114, 21),
-		anchor("center"),
-	])
-
 	// now after being added update them all
 	await updateScores(winParent)
 

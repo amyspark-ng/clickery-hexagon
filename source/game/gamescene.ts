@@ -14,7 +14,7 @@ import { folderObj, folderObjManaging } from "./windows/windows-api/folderObj.ts
 import { curDraggin } from "./plugins/drag.ts"
 import { unlockableWindows } from "./unlockables/windowUnlocks.ts"
 import { appWindow } from '@tauri-apps/api/window';
-import { ngEnabled, postTheScores } from "../newgrounds.ts"
+import { ngEnabled, postEverything } from "../newgrounds.ts"
 import * as env from "../env.json"
 import ng from "newgrounds.js"
 
@@ -291,7 +291,6 @@ export let hexagonIntro:() => void;
 export let hasStartedGame:boolean;
 
 export const gamescene = () => scene("gamescene", () => {
-	GameState.load()
 	hasStartedGame = GameState.scoreAllTime > 1
 	ascension.ascending = false
 	
@@ -317,7 +316,7 @@ export const gamescene = () => scene("gamescene", () => {
 			loop(120, () => {
 				if (GameState.scoreAllTime > 25) {
 					if (ngEnabled == true) {
-						postTheScores()
+						postEverything()
 					}
 					GameState.save(true)
 				}
@@ -501,7 +500,6 @@ export const gamescene = () => scene("gamescene", () => {
 			// don't check anything for muted, it will play but no sound, that's good
 			let song = GameState.settings.music.favoriteIdx == null ? "clicker.wav" : Object.keys(songs)[GameState.settings.music.favoriteIdx]
 			playMusic(song)
-			musicHandler.paused = GameState.settings.music.paused
 		},
 		intro_hexagon() {
 			tween(vec2(center().x, center().y + 110), vec2(center().x, center().y + 55), 0.5, (p) => hexagon.pos = p, easings.easeOutQuad).onEnd(() => {

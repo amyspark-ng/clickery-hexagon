@@ -7,6 +7,7 @@ import { volumeManager } from "./sound.ts";
 import { newgroundsManagement } from "./newgrounds.ts";
 import ng from "newgrounds.js";
 import { runInTauri } from "./game/utils.ts";
+import { GameState } from "./gamestate.ts";
 
 export let DEBUG:boolean = true
 export let enableNg = false
@@ -81,6 +82,7 @@ onLoad(() => {
 	}
 	
 	ROOT.on("rungame", async () => {
+		GameState.load()
 		addMouse()
 
 		if (!isFocused()) go("focuscene")
