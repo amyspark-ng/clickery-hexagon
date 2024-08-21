@@ -51,7 +51,6 @@ export function uiCounters() {
 		}),
 		scale(),
 		anchor("center"),
-		area(),
 		layer("ui"),
 		opacity(1),
 		pos(0, scoreText.pos.y - 14),
@@ -91,22 +90,8 @@ export function uiCounters() {
 			update() {
 				this.text = this.formatSpsText(this.value, GameState.settings.spsTextMode)
 			},
-
-			click() {
-				if (allObjWindows.isHoveringAWindow == false) {
-					// 1 second, 2 minute, 3 hour
-					GameState.settings.spsTextMode++
-					if (GameState.settings.spsTextMode > 3) GameState.settings.spsTextMode = 1
-					this.updateValue()
-					bop(this, 0.05)
-				}
-			}
 		}
 	])
-
-	spsText.onClick(() => {
-		spsText.click()
-	})
 
 	let buildingTextTextOpts = { size: 40, lineSpacing: 1.5, font: "lambdao" }
 	buildingsText = add([

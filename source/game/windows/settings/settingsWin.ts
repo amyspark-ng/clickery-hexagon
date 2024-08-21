@@ -1,27 +1,37 @@
+import { GameObj } from "kaplay";
 import { GameState } from "../../../gamestate"
 import { ROOT } from "../../../main";
 import { runInTauri } from "../../utils";
-import { addCheckbox, addDeleteSaveButton, addVolumeControl } from "./settingsWinElements"
+import { addCheckbox, addDeleteSaveButton, addMinigame, addSaveButton, addScorePerTimeCounter, addVolumeControl } from "./settingsWinElements"
 import { appWindow } from '@tauri-apps/api/window';
 
-let otherCheckboxesBg:any;
-let otherButtonsBg:any;
+let volumeControlBG:GameObj;
+let generalOptionsBG:GameObj;
+let buttonsBG:GameObj;
 
-export function settingsWinContent(winParent) {
-	// volume control
-	let volumeControl = addVolumeControl({ pos: vec2(-winParent.width / 2 + 40, -winParent.height / 2 + 75)}, winParent)
+export function settingsWinContent(winParent:GameObj) {
+	// ======= VOLUME CONTROl =======
+	volumeControlBG = winParent.add([
+		rect(winParent.width - 25, 150, { radius: 10 }),
+		pos(0, -132),
+		color(BLACK),
+		opacity(0.25),
+		anchor("center"),
+	])
+	
+	let volumeControl = addVolumeControl(vec2(-winParent.width / 2 + 40, -winParent.height / 2 + 75), volumeControlBG)
 
 	// ======= OTHER CHECKBOXES =======
-	otherCheckboxesBg = winParent.add([
-		rect(winParent.width - 25, 255, { radius: 10 }),
-		pos(0, -60),
+	generalOptionsBG = winParent.add([
+		rect(winParent.width - 25, 218, { radius: 10 }),
+		pos(0, -44),
 		color(BLACK),
 		opacity(0.25),
 		anchor("top"),
 	])
 
 	let fullscreenCheckbox = addCheckbox({
-		pos: vec2(-144, 38),
+		pos: vec2(-144, 110),
 		name: "fullscreenCheckbox",
 		checked: GameState.settings.fullscreen,
 		onCheck: function (): boolean {
@@ -31,7 +41,7 @@ export function settingsWinContent(winParent) {
 			return GameState.settings.fullscreen;
 		},
 		title: "Fullscreen"
-	}, otherCheckboxesBg)
+	}, generalOptionsBG)
 
 	let checkForFullscreen = ROOT.on("checkFullscreen", () => {
 		if (isFullscreen()) fullscreenCheckbox.turnOn()
@@ -40,27 +50,30 @@ export function settingsWinContent(winParent) {
 	})
 
 	let commaCheckbox = addCheckbox({
-		pos: vec2(-144, fullscreenCheckbox.pos.y + 60),
+		pos: vec2(-144, fullscreenCheckbox.pos.y + 65),
 		name: "commaCheckbox",
 		checked: GameState.settings.commaInsteadOfDot,
 		onCheck: function (): boolean {
 			GameState.settings.commaInsteadOfDot = !GameState.settings.commaInsteadOfDot
 			return GameState.settings.commaInsteadOfDot;
 		},
-		title: "Use commas for\ndecimals",
-		titleSize: 40,
-	}, otherCheckboxesBg)
+		title: "Use commas",
+	}, generalOptionsBG)
+
+	let counter = addScorePerTimeCounter(vec2(0, 0), generalOptionsBG)
 
 	// ======= BUTTONS TRAY =======
-	otherButtonsBg = winParent.add([
-		rect(winParent.width - 25, 55, { radius: 10 }),
-		pos(0, 203),
+	buttonsBG = winParent.add([
+		rect(winParent.width - 80, 70, { radius: 10 }),
+		pos(-27, 182),
 		color(BLACK),
 		opacity(0.25),
 		anchor("top"),
 	])
 
-	addDeleteSaveButton(otherButtonsBg, winParent)
+	addSaveButton(buttonsBG, winParent)
+	addDeleteSaveButton(buttonsBG, winParent)
+	addMinigame(buttonsBG)
 
 	winParent.on("close", () => {
 		checkForFullscreen.cancel()

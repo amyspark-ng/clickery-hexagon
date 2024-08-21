@@ -519,6 +519,15 @@ function loadSprites() {
 			"height": 54,
 		},
 	})
+
+	loadSprite("settingsWin", "sprites/windows/settingsWin/settingsWin.png")
+
+	loadSprite("settingsArrow", "sprites/windows/settingsWin/settingsArrow.png")
+	loadSprite("settingsDottedHex", "sprites/windows/settingsWin/settingsDottedHex.png")
+	loadSprite("settingsHex", "sprites/windows/settingsWin/settingsHex.png")
+	loadSprite("settingsFloppy", "sprites/windows/settingsWin/settingsFloppy.png")
+	loadSprite("settingsTrashcan", "sprites/windows/settingsWin/settingsTrashcan.png")
+
 	//#endregion Settings
 
 	loadSprite("unknown", "sprites/windows/medalsWin/unknown.png")

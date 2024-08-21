@@ -1,10 +1,15 @@
-import { Vec2 } from "kaplay"
+import { GameObj, Vec2 } from "kaplay"
 import { ROOT } from "../../../main"
 import { blendColors, bop } from "../../utils"
 import { manageMute, playSfx, volChangeTune } from "../../../sound"
-import { GameState } from "../../../gamestate"
-import { addTooltip } from "../../additives"
+import { GameState, scoreManager } from "../../../gamestate"
+import { addTooltip, mouse } from "../../additives"
+import { spsText } from "../../uicounters"
+import { positionSetter } from "../../plugins/positionSetter"
 import { insideWindowHover } from "../../hovers/insideWindowHover"
+import { addPlusScoreText } from "../../combo-utils"
+
+const defaultTextSize = 36
 
 type checkBoxOpt = {
 	pos: Vec2,
@@ -45,12 +50,12 @@ export function addCheckbox(opts:checkBoxOpt, parent?:any) {
 
 			turnOn() {
 				this.play("on")
-				this.tick.appear();
+				this.tick.hidden = false
 			},
 			
 			turnOff() {
 				this.play("off")
-				this.tick.dissapear();
+				this.tick.hidden = true
 			},
 		}
 	])
@@ -61,15 +66,6 @@ export function addCheckbox(opts:checkBoxOpt, parent?:any) {
 		pos(),
 		scale(1),
 		"tick",
-		{
-			appear() {
-				this.hidden = false
-			},
-
-			dissapear() {
-				this.hidden = true
-			}
-		}
 	])
 
 	checkBox.tick = tick
@@ -100,7 +96,9 @@ export function addCheckbox(opts:checkBoxOpt, parent?:any) {
 	})
 
 	if (opts.title) {
-		(parent || ROOT).add([
+		opts.titleSize = opts.titleSize | defaultTextSize
+		
+		let title = (parent || ROOT).add([
 			text(opts.title, {
 				size: opts.titleSize
 			}),
@@ -118,25 +116,14 @@ export function addCheckbox(opts:checkBoxOpt, parent?:any) {
 	return checkBox
 }
 
-type volumeControlOpt = {
-	pos?: Vec2,
-	variable?: string
-}
-export function addVolumeControl(opts:volumeControlOpt, parent:any) {
-	let volumeControlBg = (parent || ROOT).add([
-		rect(parent.width - 25, 150, { radius: 10 }),
-		pos(0, -218),
-		color(BLACK),
-		opacity(0.25),
-		anchor("top"),
-	])
-	
-	let barscontainer = volumeControlBg.add([pos(27, 236)])
+export function addVolumeControl(position:Vec2, parent:GameObj) {
+	let barsContainer = parent.add([anchor("center"), pos(-128, -30)])
+	let checkboxesContainer = parent.add([anchor("center"), pos(0, -70)])
 
 	for (let i = 0; i < 10; i++) {
-		let volbar = barscontainer.add([
+		let volbar = barsContainer.add([
 			sprite("volbarbutton"),
-			pos(opts.pos),
+			pos(0, 0),
 			anchor("center"),
 			scale(),
 			area(),
@@ -154,6 +141,7 @@ export function addVolumeControl(opts:volumeControlOpt, parent:any) {
 
 		volbar.pos.x = volbar.pos.x + (i * 28)
 
+		// progresionally turn the bars to the right off so it has a cool animation
 		volbar.onClick(() => {
 			tween(GameState.settings.volume, volbar.volume, 0.1, (p) => {
 				const lastVolume = GameState.settings.volume
@@ -161,16 +149,15 @@ export function addVolumeControl(opts:volumeControlOpt, parent:any) {
 				if (lastVolume != GameState.settings.volume) play("volumeChange", { detune: volChangeTune })
 			})
 			bop(volbar)
-			// progresionally turn the bars to the right off so it has a cool animation
 		})
 	};
 
 	let volbars = get("volbar", { recursive: true });
 
 	// buttons
-	let minus = barscontainer.add([
+	let minus = barsContainer.add([
 		sprite("minusbutton"),
-		pos(-180, -194),
+		pos(-180, 0),
 		area(),
 		scale(),
 		anchor("center"),
@@ -183,17 +170,14 @@ export function addVolumeControl(opts:volumeControlOpt, parent:any) {
 			GameState.settings.volume -= 0.1
 		}
 
-		else if ((GameState.settings.volume -= 0.1) == 0) {
-		}
-
 		bop(volbars[clamp(Math.floor(GameState.settings.volume * 10 - 1), 0, 10)])
 		play("volumeChange", { detune: volChangeTune })
 		bop(minus)
 	});
 
-	let plus = barscontainer.add([
+	let plus = barsContainer.add([
 		sprite("plusbutton"),
-		pos(142, -194),
+		pos(142, 0),
 		area(),
 		scale(),
 		anchor("center"),
@@ -204,11 +188,10 @@ export function addVolumeControl(opts:volumeControlOpt, parent:any) {
 	plus.onClick(() => {
 		if (GameState.settings.volume <= 0.9) {
 			GameState.settings.volume += 0.1
-			play("volumeChange", { detune: volChangeTune })
 		}
-
-		else play("volumeChange", { detune: volChangeTune, volume: 5 })
+		
 		bop(volbars[clamp(Math.floor(GameState.settings.volume * 10 - 1), 0, 10)])
+		play("volumeChange", { detune: volChangeTune })
 		bop(plus)
 	});
 
@@ -222,7 +205,7 @@ export function addVolumeControl(opts:volumeControlOpt, parent:any) {
 			return !GameState.settings.sfx.muted;
 		},
 		name: "sfxCheckbox",
-	}, volumeControlBg)
+	}, checkboxesContainer)
 
 	let music = addCheckbox({
 		pos: vec2(42, 104),
@@ -233,21 +216,131 @@ export function addVolumeControl(opts:volumeControlOpt, parent:any) {
 			return !GameState.settings.music.muted
 		},
 		name: "musicCheckbox"
-	}, volumeControlBg)
+	}, checkboxesContainer)
 
-	return volumeControlBg;
+	return {
+		barsContainer,
+		checkboxesContainer,
+	};
+}
+
+export function addScorePerTimeCounter(position:Vec2, parent:GameObj) {
+	parent = parent || ROOT
+	
+	let values = ["", "Seconds", "Minutes", "Hours"]
+
+	let title = parent.add([
+		text("Score per time", { size: 45 }),
+		pos(0, 22),
+		anchor("center"),
+	])
+	
+	let counter = parent.add([
+		text("", { size: 28 }),
+		pos(0, title.pos.y + 45),
+		anchor("center"),
+		{
+			update() {
+				this.text = values[clamp(Math.floor(GameState.settings.spsTextMode), 1, 3)]
+			}
+		}
+	])
+
+	let leftArrow = parent.add([
+		sprite("settingsArrow"),
+		pos(0, 80),
+		anchor("center"),
+		area({ scale: 1.5 }),
+		{
+			update() {
+				this.pos.x = lerp(this.pos.x, counter.pos.x - (counter.width / 2) - 20, 0.5)
+				this.pos.y = counter.pos.y
+			}
+		}
+	])
+	leftArrow.flipX = true
+
+	leftArrow.onClick(() => {
+		if (GameState.settings.spsTextMode - 1 < 1) GameState.settings.spsTextMode = 3
+		else GameState.settings.spsTextMode -= 1
+		spsText.updateValue()
+		bop(spsText, 0.05)
+	})
+
+	let rightArrow = parent.add([
+		sprite("settingsArrow"),
+		pos(0, 80),
+		anchor("center"),
+		area({ scale: 1.5 }),
+		{
+			update() {
+				this.pos.x = lerp(this.pos.x, counter.pos.x + (counter.width / 2) + 20, 0.5)
+				this.pos.y = counter.pos.y
+			}
+		}
+	])
+
+	rightArrow.onClick(() => {
+		if (GameState.settings.spsTextMode + 1 > 3) GameState.settings.spsTextMode = 1
+		else GameState.settings.spsTextMode += 1
+		spsText.updateValue()
+		bop(spsText, 0.05)
+	})
+
+	return {
+		title: title,
+	};
+}
+
+export function addSaveButton(otherButtonsBg, winParent) {
+	let saveButton = otherButtonsBg.add([
+		sprite("settingsFloppy"),
+		pos(-124, 36),
+		anchor("center"),
+		area(),
+		{
+			count: 3
+		}
+	])
+
+	saveButton.onClick(() => {
+		GameState.save()
+	})
+
+	let texty = otherButtonsBg.add([
+		text("Save", { size: 40 }),
+		anchor("center"),
+		pos(),
+		{
+			update() {
+				this.pos.x = saveButton.pos.x + saveButton.width + 30
+				this.pos.y = saveButton.pos.y
+			}
+		}
+	])
 }
 
 export function addDeleteSaveButton(otherButtonsBg, winParent) {
 	let deleteSaveButton = otherButtonsBg.add([
-		text("X", { size: 50 }),
-		pos(-140, 24),
+		sprite("settingsTrashcan"),
+		pos(20, 36),
 		anchor("center"),
-		color(blendColors(WHITE, RED, 0.5)),
 		area(),
 		insideWindowHover(winParent),
 		{
 			count: 3
+		}
+	])
+
+	let texty = otherButtonsBg.add([
+		text("Delete", { size: 40 }),
+		anchor("center"),
+		pos(),
+		{
+			update() {
+				this.pos.x = deleteSaveButton.pos.x + deleteSaveButton.width + 40
+				this.pos.y = deleteSaveButton.pos.y
+			}
 		}
 	])
 	
@@ -264,7 +357,6 @@ export function addDeleteSaveButton(otherButtonsBg, winParent) {
 	deleteSaveButton.endingHover(() => {
 		deleteSaveButton.count = 3
 		deleteSaveButtonTooltip.end()
-		deleteSaveButton.color = blendColors(WHITE, RED, 0.5)
 	})
 
 	deleteSaveButton.onClick(() => {
@@ -272,7 +364,6 @@ export function addDeleteSaveButton(otherButtonsBg, winParent) {
 	
 		deleteSaveButton.count--
 		playSfx("clickButton", { detune: 25 * deleteSaveButton.count })
-		deleteSaveButton.color = blendColors(WHITE, RED, map(deleteSaveButton.count, 3, 0, 0.5, 1))
 
 		deleteSaveButtonTooltip.end()
 		deleteSaveButtonTooltip = addTooltip(deleteSaveButton, {
@@ -287,4 +378,34 @@ export function addDeleteSaveButton(otherButtonsBg, winParent) {
 	})
 
 	return deleteSaveButton
+}
+
+export function addMinigame(otherButtonsBg) {
+	let miniHex = otherButtonsBg.add([
+		sprite("settingsDottedHex"),
+		pos(190, 34),
+		area(),
+		positionSetter(),
+		anchor("center"),
+		scale(),
+	])
+
+	let miniGameActive = scoreManager.autoScorePerSecond() >= 10
+
+	if (miniGameActive) {
+		miniHex.sprite = "settingsHex"
+
+		miniHex.onClick(() => {
+			scoreManager.addScore(1)
+			bop(miniHex, 0.05)
+			let thing = addPlusScoreText({
+				pos: mouse.pos,
+				value: 1,
+				cursorRelated: false
+			})
+			thing.scale = vec2(0.4)
+			thing.layer = otherButtonsBg.parent.layer
+			GameState.stats.timesClicked += 1
+		})
+	}
 }
