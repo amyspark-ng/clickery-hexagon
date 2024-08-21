@@ -102,9 +102,7 @@ export function isWindowOpen(windowKey:windowKey) {
  */
 export function addXButton(windowParent:any) {
 	let xButton = windowParent.add([
-		text("X", {
-			font: "lambda",
-		}),
+		sprite("xButton"),
 		color(WHITE),
 		pos(),
 		anchor("center"),

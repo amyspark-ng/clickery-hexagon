@@ -1,6 +1,6 @@
 import { GameObj, Vec2 } from "kaplay"
 import { ROOT } from "../../../main"
-import { blendColors, bop } from "../../utils"
+import { blendColors, bop, getRandomDirection } from "../../utils"
 import { manageMute, playSfx, volChangeTune } from "../../../sound"
 import { GameState, scoreManager } from "../../../gamestate"
 import { addTooltip, mouse } from "../../additives"
@@ -298,13 +298,18 @@ export function addSaveButton(otherButtonsBg, winParent) {
 		pos(-124, 36),
 		anchor("center"),
 		area(),
+		scale(),
 		{
 			count: 3
 		}
 	])
 
 	saveButton.onClick(() => {
-		GameState.save()
+		bop(saveButton)
+		if (get("toast").filter(toast => toast.type == "gamesaved").length < 1) {
+			playSfx("clickButton", { detune: rand(0, 25) })
+			GameState.save()
+		}
 	})
 
 	let texty = otherButtonsBg.add([
@@ -359,6 +364,8 @@ export function addDeleteSaveButton(otherButtonsBg, winParent) {
 		deleteSaveButtonTooltip.end()
 	})
 
+	let initialTrashPosition = deleteSaveButton.pos
+
 	deleteSaveButton.onClick(() => {
 		if (!winParent.active) return
 	
@@ -375,6 +382,12 @@ export function addDeleteSaveButton(otherButtonsBg, winParent) {
 			deleteSaveButtonTooltip.tooltipText.text = "GOODBYE SAVE :)"
 			GameState.delete()
 		}
+
+		let fromZeroToThree = map(deleteSaveButton.count, 0, 3, 3, 0) 
+		deleteSaveButtonTooltip.tooltipText.color = blendColors(WHITE, RED, map(fromZeroToThree, 0, 3, 0, 1))
+
+		let randPos = getRandomDirection(initialTrashPosition, false, 1.5 * fromZeroToThree)
+		tween(randPos, deleteSaveButton.pos, 0.5, (p) => deleteSaveButton.pos = p, easings.easeOutQuint)
 	})
 
 	return deleteSaveButton

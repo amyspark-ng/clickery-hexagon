@@ -163,7 +163,7 @@ function welcomeBack(idle = false) {
 		else if (hasCombo && hasPowerup) applicationMessage += "\n(Combo nor Power-ups are applicable)"
 		body += applicationMessage
 
-		let toast = addToast({ icon: "cursors.cursor", title: "Welcome back!", body: body, type: "welcome" })
+		let toast = addToast({ icon: "welcomeBackIcon", title: "Welcome back!", body: body, type: "welcome" })
 	
 		if (GameState.hasUnlockedPowerups == true) {
 			// if you left for this seconds there's a 10% chance you get a powerup

@@ -109,7 +109,7 @@ function loadFonts() {
 	})
 }
 
-function loadSprites() {
+function loadAllSprites() {
 	loadBean()
 
 	// fonts don't work with loadRoot, fuck
@@ -135,9 +135,11 @@ function loadSprites() {
 		},
 	});
 	
+	loadSprite("saveIcon", "sprites/saveIcon.png")
+	loadSprite("welcomeBackIcon", "sprites/welcomeBackIcon.png")
+
 	loadSprite("part_star", "sprites/part_star.png")
 	loadSprite("osaka", "sprites/osaka.png")
-	loadSprite("floppy", "sprites/floppy.png")
 	loadSprite("panderito", "sprites/panderito.png")
 	loadSprite("smallpanderito", "sprites/smallpanderito.png")
 	loadSprite("folderObj", "sprites/folderObj.png")
@@ -152,7 +154,8 @@ function loadSprites() {
 
 	//#region Windows
 	loadSprite("dumbTestWin", "sprites/windows/dumbTestWin.png")
-	loadSpriteAtlas("sprites/windows/folderIcons.png", {
+	loadSprite("xButton", "sprites/windows/xButton.png")
+	loadSpriteAtlas("sprites/windows/winMinibuttons.png", {
 		"icon_about": {
 			width: 140,
 			height: 70,
@@ -689,12 +692,7 @@ function loadSprites() {
 	//#endregion SPRITES
 }
 
-// Sprite atlas were made with this awesome website
-// https://www.finalparsec.com/tools/sprite_sheet_maker
-export function loadEverything() {
-
-	loadSprites()
-
+function loadAllSounds() {
 	// #region SOUNDS
 	if (!DEBUG) {load(new Promise<void>((res) => { setTimeout(() => { res() }, 5000) })) }
 
@@ -759,7 +757,9 @@ export function loadEverything() {
 	loadSound("project_23", "sounds/music/project_23.wav")
 
 	//#endregion MUSIC
+}
 
+function loadAllStuff() {
 	// #region OTHER STUFF
 	if (!DEBUG) {load(new Promise<void>((res) => { setTimeout(() => { res() }, 5000) })) }
 	
@@ -809,7 +809,16 @@ export function loadEverything() {
 			return vec4(vec3(dot(c.rgb, vec3(0.2125, 0.7154, 0.0721))), c.a);
 		}
 	`)
-	
+}
+
+// Sprite atlas were made with this awesome website
+// https://www.finalparsec.com/tools/sprite_sheet_maker
+export function loadEverything() {
+
+	loadAllSprites()
+	loadAllSounds()
+	loadAllStuff()
+
 	if (!DEBUG) {load(new Promise<void>((res) => { setTimeout(() => { res() }, 5000) })) }
 
 	ngScene()

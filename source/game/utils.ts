@@ -354,7 +354,7 @@ export function setVariable(obj, path, value) {
 
 export function saveAnim() {
 	addToast({
-		icon: "floppy",
+		icon: "saveIcon",
 		title: "Game saved!",
 		body: `Time played: ${formatTime(GameState.stats.totalTimePlayed, true)}`,
 		type: "gamesaved",
