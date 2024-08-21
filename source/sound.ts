@@ -85,7 +85,7 @@ export function scratchSong() {
 		tween(musicHandler.detune, rand(100, 150), 0.25, (p) => musicHandler.detune = p, easings.easeInQuint)
 	})
 	tween(musicHandler.speed, rand(0.25, 0.5), 0.25, (p) => musicHandler.speed = p, easings.easeInQuint)
-	tween(musicHandler.volume, rand(0.1, 0.5), 0.5, (p) => musicHandler.volume = p, easings.easeInQuint).then(() => {
+	tween(musicHandler.volume, musicHandler.volume * rand(0.1, 0.5), 0.5, (p) => musicHandler.volume = p, easings.easeInQuint).then(() => {
 		musicHandler.stop()
 	})
 }

@@ -2,6 +2,7 @@ import ng, { User } from "newgrounds.js";
 import * as env from "./env.json"
 import { gameBg } from "./game/additives";
 import { GameState } from "./gamestate";
+import { openWindow, windowsDefinition } from "./game/windows/windows-api/windowManaging";
 
 export let ngEnabled:boolean;
 export let ngUser:User | void;

@@ -79,7 +79,6 @@ export function musicWinContent(winParent) {
 			size: 28,
 		}),
 		anchor("left"),
-		positionSetter(),
 		{
 			update() {
 				let theText = `${songs[Object.keys(songs)[currentSongIdx]].idx + 1}. ${songs[Object.keys(songs)[currentSongIdx]].name}`
@@ -90,7 +89,8 @@ export function musicWinContent(winParent) {
 
 	let mutedButton = winParent.add([
 		sprite("mutedButton"),
-		pos(),
+		pos(172, -30),
+		positionSetter(),
 		area(),
 		anchor("center"),
 		scale(),
@@ -108,9 +108,6 @@ export function musicWinContent(winParent) {
 				else {
 					this.hidden = true
 				}
-
-				this.pos.y = titleText.pos.y
-				this.pos.x = lerp(this.pos.x, titleText.pos.x + titleText.width + this.width / 2 + 5, 0.5)
 			}
 		}
 	])
@@ -139,10 +136,11 @@ export function musicWinContent(winParent) {
 		{
 			verPosition: 50,
 			update() {
-				let time = `${formatTime(musicHandler.currentTime, false)}/${formatTime(musicHandler.totalTime === undefined ? musicHandler.duration() : musicHandler.totalTime, false)}`
-				this.text = time;
 				if (!musicHandler.winding) musicHandler.currentTime = map(progressBar.width, 0, theOneBehind.width, 0, musicHandler.duration())
 				if (!musicHandler.winding) musicHandler.totalTime = songs[Object.keys(songs)[currentSongIdx]].duration
+
+				let theText = `${formatTime(musicHandler.currentTime, false)}/${formatTime(musicHandler.totalTime === undefined ? musicHandler.duration() : musicHandler.totalTime, false)}`
+				this.text = theText;
 			},
 		}
 	])
@@ -272,6 +270,7 @@ export function musicWinContent(winParent) {
 		if (idxOfNewSong < 0) idxOfNewSong = Object.keys(songs).length - 1
 		if (idxOfNewSong >= Object.keys(songs).length) idxOfNewSong = 0
 
+		// if it's a different cover
 		if (songs[Object.keys(songs)[idxOfNewSong]].cover != songs[Object.keys(songs)[currentSongIdx]].cover) {
 			tween(disc.angle, 0, 0.5, (p) => disc.angle = p, easings.easeOutQuint)
 			// goes back
@@ -280,6 +279,7 @@ export function musicWinContent(winParent) {
 			else if (action == 1) tween(-1, 1, 0.5, (p) => disc.scale.x = p, easings.easeOutQuint)
 		}
 	
+		// is the same cover
 		else {
 			if (action == 0) tween(disc.angle, disc.angle - rand(75, 100), 0.5, (p) => disc.angle = p, easings.easeOutQuint)
 			else tween(disc.angle, disc.angle + rand(75, 100), 0.5, (p) => disc.angle = p, easings.easeOutQuint)
@@ -362,6 +362,11 @@ export function musicWinContent(winParent) {
 			musicHandler.winding = true
 			musicHandler.seek(mappedSeconds)
 
+			// don't touch this it works
+			let differenceInSeconds = currentSong.duration - mappedSeconds
+			let mappedAngle = map(differenceInSeconds, 0, currentSong.duration, 360, 0)
+			tween(disc.angle, disc.angle + mappedAngle, 0.5, (p) => disc.angle = p, easings.easeOutQuint)
+
 			let mappedWidth = map(mappedSeconds, 0, currentSong.duration, 0, theOneBehind.width)
 			tween(progressBar.width, mappedWidth, 0.2, p => progressBar.width = p, easings.easeOutQuint).onEnd(() => {
 				musicHandler.winding = false
@@ -369,5 +374,6 @@ export function musicWinContent(winParent) {
 		}
 	})
 
-	pauseButtonAction(GameState.settings.music.paused)
+	if (musicHandler.paused == true) pauseButton.play("play")
+	else pauseButton.play("pause") 
 }

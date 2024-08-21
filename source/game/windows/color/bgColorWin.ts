@@ -26,10 +26,7 @@ export function bgColorWinContent(winParent) {
 		onValueChange: (value) => {
 			gameBg.color.g = value
 			GameState.settings.bgColor.g = value
-
-			let mappedValue = map(value, 0, 1, 0, 255)
-
-			playSliderSound(mappedValue)
+			playSliderSound(value)
 		}
 	})
 

@@ -8,6 +8,7 @@ import { newgroundsManagement } from "./newgrounds.ts";
 import ng from "newgrounds.js";
 import { runInTauri } from "./game/utils.ts";
 import { GameState } from "./gamestate.ts";
+import { windowsDefinition } from "./game/windows/windows-api/windowManaging.ts";
 
 export let DEBUG:boolean = true
 export let enableNg = false
@@ -56,6 +57,7 @@ onLoad(() => {
 	volumeManager()
 	addBackground()
 	newgroundsManagement()
+	windowsDefinition()
 
 	gameBg.movAngle = -5
 	gameBg.color = BLACK

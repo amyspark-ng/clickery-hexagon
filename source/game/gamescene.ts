@@ -4,7 +4,6 @@ import { buildingsText, scoreText, spsText, uiCounters } from "./uicounters.ts"
 import { coolSetFullscreen, debugFunctions, formatNumber, formatTime, randomPos, runInTauri, saveColorToColor } from "./utils.ts"
 import { addToast, gameBg, mouse } from "./additives.ts"
 import { musicHandler, playMusic, playSfx, stopAllSounds } from "../sound.ts"
-import { windowsDefinition } from "./windows/windows-api/windowManaging.ts"
 import { songs } from "./windows/musicWindow.ts"
 import { DEBUG, ROOT } from "../main.ts"
 import { allPowerupsInfo, Powerup_NaturalSpawnManager, Powerup_RemovalTimeManager, spawnPowerup } from "./powerups.ts"
@@ -15,8 +14,6 @@ import { curDraggin } from "./plugins/drag.ts"
 import { unlockableWindows } from "./unlockables/windowUnlocks.ts"
 import { appWindow } from '@tauri-apps/api/window';
 import { ngEnabled, postEverything } from "../newgrounds.ts"
-import * as env from "../env.json"
-import ng from "newgrounds.js"
 
 let panderitoLetters = "panderito".split("")
 export let panderitoIndex = 0
@@ -305,7 +302,6 @@ export const gamescene = () => scene("gamescene", () => {
 	addHexagon()
 	uiCounters()
 	folderObjManaging()
-	windowsDefinition()
 	checkForUnlockable()
 	
 	ROOT.on("gamestart", () => {
@@ -500,6 +496,7 @@ export const gamescene = () => scene("gamescene", () => {
 			// don't check anything for muted, it will play but no sound, that's good
 			let song = GameState.settings.music.favoriteIdx == null ? "clicker.wav" : Object.keys(songs)[GameState.settings.music.favoriteIdx]
 			playMusic(song)
+			musicHandler.paused = GameState.settings.music.paused
 		},
 		intro_hexagon() {
 			tween(vec2(center().x, center().y + 110), vec2(center().x, center().y + 55), 0.5, (p) => hexagon.pos = p, easings.easeOutQuad).onEnd(() => {

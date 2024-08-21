@@ -463,10 +463,10 @@ function loadSprites() {
 		sliceX: 4,
 		sliceY: 1,
 		anims: {
-			"back": 0,
-			"skip": 1,
-			"pause": 2,
-			"play": 3,
+			"pause": 0,
+			"play": 1,
+			"back": 2,
+			"skip": 3,
 		}
 	})
 	loadSprite("mutedButton", "sprites/windows/musicWin/mutedButton.png")
