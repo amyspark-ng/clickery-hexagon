@@ -4,6 +4,7 @@ import { gamescene } from "./game/gamescene.ts";
 import { focuscene } from "./game/scenes/focuscene.ts";
 import { ngScene } from "./game/scenes/ngScene.ts";
 import { achievements } from "./game/unlockables/achievements.ts";
+import { getPosInGrid } from "./game/utils.ts";
 
 export function drawSeriousLoadScreen(progress, op = 1) {
 	function drawHexagon(opts = {
@@ -534,21 +535,40 @@ function loadAllSprites() {
 	//#endregion Settings
 
 	loadSprite("unknown", "sprites/windows/medalsWin/unknown.png")
+	loadSprite("tapper", "sprites/windows/medalsWin/tapper.png")
 	
 	const medalsX = 20
 	const medalsY = 1
+	let medalSprites = {}
 
-	let medalAnims = {}
-	achievements.map(achievement => achievement.id).forEach((achievementId, index) => {
-		medalAnims[`${achievementId}`] = index
+	let availableAchievements = achievements.slice(0, 21)
+
+	let row = 0
+	let column = -1
+	let spacing = vec2(60)
+
+	availableAchievements.map(achievement => achievement.id).forEach((achievementId, index) => {
+		if (row >= medalsX) {
+			row = 0
+			column++
+		}
+
+		else {
+			column++
+		}
+
+		let position = getPosInGrid(vec2(0, 0), row, column, spacing)
+
+		medalSprites[`${achievementId}`] = {
+			"x": position.x,
+			"y": position.y,
+			"width": spacing.x,
+			"height": spacing.y,
+		}
 	})
+
+	loadSpriteAtlas("sprites/windows/medalsWin/medals.png", medalSprites)
 	
-	loadSprite("medals", "sprites/windows/medalsWin/medals.png", {
-		sliceX: medalsX,
-		sliceY: medalsY,
-		anims: medalAnims
-	})
-
 	//#region Other ones huh
 	loadSprite("hexColorWin", "sprites/windows/colorWin/hexColorWin.png")
 	loadSprite("bgColorWin", "sprites/windows/colorWin/bgColorWin.png")

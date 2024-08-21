@@ -232,6 +232,10 @@ export function musicWinContent(winParent) {
 		bop(skipButton)
 	}
 
+	/**
+	 * Handles pause and unpause
+	 * @param pause Wheter to pause or unpause
+	 */
 	function pauseButtonAction(pause?:boolean) {
 		if (musicHandler.winding) return
 
@@ -253,7 +257,9 @@ export function musicWinContent(winParent) {
 	}
 
 	function generalBackSkipButtonAction(action) {
-		if (skipping == false) {
+		if (musicHandler.paused) pauseButtonAction(false)
+		
+			if (skipping == false) {
 			skipping = true
 			get("bpmChange", { recursive: true }).forEach(element => { element.stopWave() });
 		}

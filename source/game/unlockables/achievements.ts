@@ -126,7 +126,7 @@ export let achievements = [
 	// #region SCORE ACHIEVEMENTS =====================
 	new Achievement({
 		id: "100score",
-		title: "It starts...",
+		title: "CAMBIAR",
 		description: "Get 100 of score",
 		icon: "upgrades.k_0",
 		ngId: 80187,
@@ -134,16 +134,8 @@ export let achievements = [
 	}),
 
 	new Achievement({
-		id: "500score",
-		title: "Wake and click",
-		description: "Get 500 of score",
-		icon: "upgrades.k_1",
-		unlockCondition: () => GameState.scoreAllTime >= 500,
-	}),
-
-	new Achievement({
 		id: "1000score",
-		title: "Wake and click",
+		title: "CAMBIAR",
 		description: "Get 1.000 of score",
 		icon: "upgrades.k_1",
 		unlockCondition: () => GameState.scoreAllTime >= 1_000,
@@ -151,7 +143,7 @@ export let achievements = [
 
 	new Achievement({
 		id: "5000score",
-		title: "Testing Testing",
+		title: "CAMBIAR",
 		description: "Ok these seem to be working",
 		icon: "upgrades.k_1",
 		unlockCondition: () => GameState.scoreAllTime >= 5_000,
@@ -159,7 +151,7 @@ export let achievements = [
 
 	new Achievement({
 		id: "10000score",
-		title: "Wake and click",
+		title: "CAMBIAR",
 		description: "Get 10.000 of score",
 		icon: "upgrades.k_1",
 		unlockCondition: () => GameState.scoreAllTime >= 10_000,
@@ -167,7 +159,7 @@ export let achievements = [
 
 	new Achievement({
 		id: "25000score",
-		title: "Wake and click",
+		title: "CAMBIAR",
 		description: "Get 25.000 of score",
 		icon: "upgrades.k_1",
 		unlockCondition: () => GameState.scoreAllTime >= 25_000,
@@ -175,7 +167,7 @@ export let achievements = [
 
 	new Achievement({
 		id: "50000score",
-		title: "Wake and click",
+		title: "CAMBIAR",
 		description: "Get 50.000 of score",
 		icon: "upgrades.k_1",
 		unlockCondition: () => GameState.scoreAllTime >= 50_000,
@@ -183,7 +175,7 @@ export let achievements = [
 
 	new Achievement({
 		id: "100000score",
-		title: "Wake and click",
+		title: "CAMBIAR",
 		description: "Get 100.000 of score",
 		icon: "upgrades.k_1",
 		unlockCondition: () => GameState.scoreAllTime >= 100_000,
@@ -191,7 +183,7 @@ export let achievements = [
 
 	new Achievement({
 		id: "250000score",
-		title: "Wake and click",
+		title: "CAMBIAR",
 		description: "Get 250.000 of score",
 		icon: "upgrades.k_1",
 		unlockCondition: () => GameState.scoreAllTime >= 250_000,
@@ -199,13 +191,12 @@ export let achievements = [
 
 	new Achievement({
 		id: "500000score",
-		title: "Wake and click",
+		title: "CAMBIAR",
 		description: "Get 500.000 of score",
 		icon: "upgrades.k_1",
 		unlockCondition: () => GameState.scoreAllTime >= 500_000,
 	}),
 
-	// this is the gimmiko achievement
 	new Achievement({
 		id: "750000score",
 		title: "Did you know there's no actual limit to how long these names can be? I specifically spent a lot of time working on them so they can be as LONG as i want them to be and they will do their best to look good",
@@ -217,7 +208,7 @@ export let achievements = [
 
 	new Achievement({
 		id: "1millionscore",
-		title: "That's crazy",
+		title: "CAMBIAR",
 		description: "Get 1 million of score",
 		icon: "upgrades.k_1",
 		unlockCondition: () => GameState.scoreAllTime >= 1_000_000,
@@ -225,7 +216,7 @@ export let achievements = [
 
 	new Achievement({
 		id: "15millionscore",
-		title: "That's crazy",
+		title: "CAMBIAR",
 		description: "Get 15 million of score",
 		icon: "upgrades.k_1",
 		unlockCondition: () => GameState.scoreAllTime >= 15_000_000,
@@ -233,7 +224,7 @@ export let achievements = [
 
 	new Achievement({
 		id: "50millionscore",
-		title: "That's crazy",
+		title: "CAMBIAR",
 		description: "Get 50 million of score",
 		icon: "upgrades.k_1",
 		unlockCondition: () => GameState.scoreAllTime >= 50_000_000,
@@ -241,7 +232,7 @@ export let achievements = [
 
 	new Achievement({
 		id: "100millionscore",
-		title: "That's crazy",
+		title: "CAMBIAR",
 		description: "Get 100 million of score",
 		icon: "upgrades.k_1",
 		unlockCondition: () => GameState.scoreAllTime >= 100_000_000,
@@ -249,15 +240,16 @@ export let achievements = [
 
 	new Achievement({
 		id: "250millionscore",
-		title: "That's crazy",
+		title: "CAMBIAR",
 		description: "Get 250 million of score",
 		icon: "upgrades.k_1",
 		unlockCondition: () => GameState.scoreAllTime >= 250_000_000,
 	}),
 
+	// cambialo
 	new Achievement({
 		id: "500millionscore",
-		title: "That's crazy",
+		title: "CAMBIAR",
 		description: "Get 500 million of score",
 		icon: "upgrades.k_1",
 		unlockCondition: () => GameState.scoreAllTime >= 500_000_000,
@@ -271,17 +263,19 @@ export let achievements = [
 		unlockCondition: () => GameState.scoreAllTime >= 600_000_000,
 	}),
 
+	// this is the gimmiko achievement
 	new Achievement({
 		id: "750millionscore",
-		title: "That's crazy",
+		title: "Who else is gimmicking their dice right now?",
 		description: "Get 750 million of score",
 		icon: "upgrades.k_1",
 		unlockCondition: () => GameState.scoreAllTime >= 750_000_000,
 	}),
 
+	// cambialo
 	new Achievement({
 		id: "950millionscore",
-		title: "That's crazy",
+		title: "CAMBIAR",
 		description: "Get 950 million of score",
 		icon: "upgrades.k_1",
 		unlockCondition: () => GameState.scoreAllTime >= 950_000_000,
@@ -289,7 +283,7 @@ export let achievements = [
 
 	new Achievement({
 		id: "1billionscore",
-		title: "YOU'RE crazy",
+		title: "CAMBIAR",
 		description: "Get 1 billion of score, you're crazy for this...",
 		icon: "upgrades.k_1",
 		unlockCondition: () => GameState.scoreAllTime >= 1_000_000_000,
@@ -300,7 +294,7 @@ export let achievements = [
 	// ### CLICKERS
 	new Achievement({
 		id: "10clickers",
-		title: "Getting clickery",
+		title: "CAMBIAR",
 		description: "Have 10 clickers",
 		icon: "cursors.cursor",
 		unlockCondition: () => GameState.clickers >= 10,
@@ -308,7 +302,7 @@ export let achievements = [
 
 	new Achievement({
 		id: "20clickers",
-		title: "Getting clickery",
+		title: "CAMBIAR",
 		description: "Have 20 clickers",
 		icon: "cursors.cursor",
 		unlockCondition: () => GameState.clickers >= 20,
@@ -316,7 +310,7 @@ export let achievements = [
 
 	new Achievement({
 		id: "30clickers",
-		title: "Getting clickery",
+		title: "CAMBIAR",
 		description: "Have 30 clickers",
 		icon: "cursors.cursor",
 		unlockCondition: () => GameState.clickers >= 30,
@@ -324,7 +318,7 @@ export let achievements = [
 
 	new Achievement({
 		id: "40clickers",
-		title: "Getting clickery",
+		title: "CAMBIAR",
 		description: "Have 40 clickers",
 		icon: "cursors.cursor",
 		unlockCondition: () => GameState.clickers >= 40,
@@ -332,7 +326,7 @@ export let achievements = [
 
 	new Achievement({
 		id: "50clickers",
-		title: "Getting clickery",
+		title: "CAMBIAR",
 		description: "Have 50 clickers",
 		icon: "cursors.cursor",
 		unlockCondition: () => GameState.clickers >= 50,
@@ -341,7 +335,7 @@ export let achievements = [
 	// ### CURSORS
 	new Achievement({
 		id: "10cursors",
-		title: "Getting cursory",
+		title: "CAMBIAR",
 		description: "Have 10 cursors",
 		icon: "cursors.point",
 		unlockCondition: () => GameState.cursors >= 10,
@@ -349,7 +343,7 @@ export let achievements = [
 
 	new Achievement({
 		id: "20cursors",
-		title: "Getting cursory",
+		title: "CAMBIAR",
 		description: "Have 20 cursors",
 		icon: "cursors.point",
 		unlockCondition: () => GameState.cursors >= 20,
@@ -357,7 +351,7 @@ export let achievements = [
 
 	new Achievement({
 		id: "30cursors",
-		title: "Getting cursory",
+		title: "CAMBIAR",
 		description: "Have 30 cursors",
 		icon: "cursors.point",
 		unlockCondition: () => GameState.cursors >= 30,
@@ -365,7 +359,7 @@ export let achievements = [
 
 	new Achievement({
 		id: "40cursors",
-		title: "Getting cursory",
+		title: "CAMBIAR",
 		description: "Have 40 cursors",
 		icon: "cursors.point",
 		unlockCondition: () => GameState.cursors >= 40,
@@ -373,7 +367,7 @@ export let achievements = [
 
 	new Achievement({
 		id: "50cursors",
-		title: "Getting cursory",
+		title: "CAMBIAR",
 		description: "Have 50 cursors",
 		icon: "cursors.point",
 		unlockCondition: () => GameState.cursors >= 50,
@@ -382,7 +376,7 @@ export let achievements = [
 
 	new Achievement({
 		id: "allupgrades",
-		title: "Very very score",
+		title: "CAMBIAR",
 		description: "Buy all the available upgrades",
 		icon: "icon_store",
 		timeAfter: 1,

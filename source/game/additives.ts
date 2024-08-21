@@ -188,8 +188,8 @@ export function addToast(opts:toastOpts) {
 
 	parseAnimation(icon, opts.icon)
 
-	icon.width = 60;
-	icon.height = 60;
+	if (icon.width >= 70) icon.width = 60
+	if (icon.height >= 70) icon.height = 60
 
 	let titleText = add([
 		text(opts.title, {

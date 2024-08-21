@@ -1,7 +1,7 @@
 import { DEBUG, ROOT } from "../../main";
 import { addTooltip } from "../additives";
 import { achievements, achievementsInfo, getAchievement, isAchievementUnlocked, unlockAchievement } from "../unlockables/achievements";
-import { parseAnimation } from "../utils";
+import { blendColors, parseAnimation } from "../utils";
 
 let totalColumns = 5;
 let totalRows = 7;
@@ -40,7 +40,7 @@ export function medalsWinContent(winParent) {
 	// for hovers you can check the distance to the position the medal will be in
 	function addMedal(gridPosition:{ row:number, column:number }, medalid:string) {
 		let medalObj = medalsContainer.add([
-			sprite("medals"),
+			sprite("unknown"),
 			pos(),
 			anchor("center"),
 			layer("windows"),
@@ -70,6 +70,7 @@ export function medalsWinContent(winParent) {
 		// one less, i don't know why!!
 		medalObj.pos = getPositionInWindow(gridPosition.row - 1, gridPosition.column - 1)
 		medalObj.achievementIdx = achievements.indexOf(getAchievement(medalid))
+		let theAchievement = getAchievement(medalid)
 
 		if (isAchievementUnlocked(medalid)) {
 			parseAnimation(medalObj, getAchievement(medalid).icon)
@@ -78,14 +79,25 @@ export function medalsWinContent(winParent) {
 		}
 
 		else {
-			parseAnimation(medalObj, "unknown")
+			if (theAchievement.id == "tapachievementslot") parseAnimation(medalObj, "tapper")
+			else parseAnimation(medalObj, "unknown")
+			if (getAchievement(medalid).secretCondition != null) medalObj.color = blendColors(RED, BLUE, 0.5)
+			else medalObj.color = RED.darken(50)
 		}
 
 		medalObj.onClick(() => {
 			if (medalObj.achievementId == "tapachievementslot") {
-				if (!isAchievementUnlocked(medalObj.achievementId)) unlockAchievement(medalObj.achievementId)
+				if (!isAchievementUnlocked(medalObj.achievementId)) {
+					medalObj.color = WHITE
+					unlockAchievement(medalObj.achievementId)
+				}
 			}
 		})
+
+		if (achievements.indexOf(theAchievement) < 20) {
+			medalObj.unuse("sprite")
+			medalObj.use(sprite(medalid))
+		}
 
 		medalObj.onHover(() => {
 			let achievement = getAchievement(medalObj.achievementId)
@@ -111,6 +123,7 @@ export function medalsWinContent(winParent) {
 				direction: "down",
 				lerpValue: 1, // TODO: make this just appear, it looks ugly 
 			})
+			tooltip.tooltipText.align = "center"
 		})
 
 		medalObj.onHoverEnd(() => {
