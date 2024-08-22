@@ -99,6 +99,7 @@ export async function creditsWinContent(winParent:GameObj) {
 	dummyHoverAnims(specialCredits)
 	specialCredits.onPressClick(() => {
 		openURL("https://github.com/amyspark-ng/clickery-hexagon-dev?tab=readme-ov-file#extra--special-thanks")
+		playSfx("clickButton", { detune: rand(0, 50) })
 	})
 
 	let playerCredit = winParent.add([

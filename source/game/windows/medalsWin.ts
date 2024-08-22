@@ -1,5 +1,6 @@
 import { DEBUG, ROOT } from "../../main";
 import { addTooltip } from "../additives";
+import { insideWindowHover } from "../hovers/insideWindowHover";
 import { achievements, achievementsInfo, getAchievement, isAchievementUnlocked, unlockAchievement } from "../unlockables/achievements";
 import { blendColors, parseAnimation } from "../utils";
 
@@ -45,7 +46,7 @@ export function medalsWinContent(winParent) {
 			anchor("center"),
 			layer("windows"),
 			z(winParent.z + 1),
-			// positionSetter(),
+			insideWindowHover(winParent),
 			area(),
 			"medal",
 			{
@@ -85,7 +86,7 @@ export function medalsWinContent(winParent) {
 			else medalObj.color = RED.darken(50)
 		}
 
-		medalObj.onClick(() => {
+		medalObj.onPressClick(() => {
 			if (medalObj.achievementId == "tapachievementslot") {
 				if (!isAchievementUnlocked(medalObj.achievementId)) {
 					medalObj.color = WHITE
@@ -99,7 +100,7 @@ export function medalsWinContent(winParent) {
 			medalObj.use(sprite(medalid))
 		}
 
-		medalObj.onHover(() => {
+		medalObj.startingHover(() => {
 			let achievement = getAchievement(medalObj.achievementId)
 			
 			let description:string; // the actual description
@@ -126,7 +127,7 @@ export function medalsWinContent(winParent) {
 			tooltip.tooltipText.align = "center"
 		})
 
-		medalObj.onHoverEnd(() => {
+		medalObj.endingHover(() => {
 			medalObj.tooltip.end()
 		})
 
@@ -212,14 +213,17 @@ export function medalsWinContent(winParent) {
 	}
 
 	winParent.onKeyPress("down", () => {
+		if (winParent.active == false) return
 		scrollDown()
 	})
 
 	winParent.onKeyPress("up", () => {
+		if (winParent.active == false) return
 		scrollUp()
 	})
 
 	winParent.onScroll((delta) => {
+		if (winParent.active == false) return
 		if (DEBUG == true && isKeyDown("shift")) return
 		if (delta.y > 0) scrollDown()
 		else if (delta.y < 0) scrollUp()	

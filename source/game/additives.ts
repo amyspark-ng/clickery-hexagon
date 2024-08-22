@@ -2,7 +2,7 @@ import { GameObj, Vec2 } from "kaplay"
 import { GameState } from "../gamestate"
 import { playSfx } from "../sound"
 import { hexagon } from "./hexagon"
-import { blendColors, getPosInGrid, parseAnimation, saveColorToColor } from "./utils"
+import { blendColors, getPosInGrid, getPositionOfSide, parseAnimation, saveColorToColor } from "./utils"
 import { allObjWindows, manageWindow } from "./windows/windows-api/windowManaging"
 import { isWindowUnlocked } from "./unlockables/windowUnlocks"
 
@@ -264,10 +264,13 @@ export function addToast(opts:toastOpts) {
 		bodyText.destroy();
 	});
 
-	if (toastBg.pos.y + toastBg.height + 10 >= height()) {
+	if (toastBg.pos.y + toastBg.height >= height()) {
+		// find the bottomest position and set tit to it
+		let bottomestPosition;
+		
 		let allTosts = get("toast")
 		allTosts.forEach((toast, index) => {
-			toast.setPosition(vec2(toast.getPosition().x, toast.getPosition().y - toast.height - 10))
+			toast.setPosition(vec2(toast.getPosition().x, toast.getPosition().y - toastBg.height - 10))
 		})
 	}
 

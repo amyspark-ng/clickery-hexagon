@@ -483,13 +483,13 @@ export function debugFunctions() {
 			let longAchievement = getAchievement("750000score")
 			
 			addToast({
-				// title: "Helo, i am testing",
+				title: "Helo, i am testing",
 				// title: "clickery Hexagon forever and forever a hundred years clickery Hexagon, all day long forever, forever a hundred times, over and over clickery Hexagon adventures dot com",
-				// body: "This is a test toast, i am just testing the animations very very very descriptioner",
-				// icon: "cursors.point"
-				title: longAchievement.title,
-				body: longAchievement.description,
+				body: "This is a test toast, i am just testing the animations very very very descriptioner",
 				icon: "cursors.point"
+				// title: longAchievement.title,
+				// body: longAchievement.description,
+				// icon: "cursors.point"
 			})
 		}
 	})

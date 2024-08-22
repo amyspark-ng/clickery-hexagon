@@ -71,8 +71,8 @@ export function settingsWinContent(winParent:GameObj) {
 		anchor("top"),
 	])
 
-	addSaveButton(buttonsBG, winParent)
-	addDeleteSaveButton(buttonsBG, winParent)
+	addSaveButton(buttonsBG)
+	addDeleteSaveButton(buttonsBG)
 	addMinigame(buttonsBG)
 
 	winParent.on("close", () => {

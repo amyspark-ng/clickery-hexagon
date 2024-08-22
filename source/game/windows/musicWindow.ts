@@ -5,6 +5,7 @@ import { isAchievementUnlocked } from "../unlockables/achievements";
 import { bop, formatTime, getPositionOfSide } from "../utils";
 import { GameObj } from "kaplay";
 import { positionSetter } from "../plugins/positionSetter";
+import { insideWindowHover } from "../hovers/insideWindowHover";
 
 export let songs = {
 	"clicker.wav": { name: "clicker.wav", idx: 0, speed: 2.5, cover: "wav", duration: 61},
@@ -59,6 +60,7 @@ export function musicWinContent(winParent) {
 		anchor("center"),
 		scale(1),
 		area(),
+		insideWindowHover(winParent),
 		"pauseButton",
 		"musicButton",
 		"windowButton",
@@ -92,6 +94,7 @@ export function musicWinContent(winParent) {
 		pos(172, -30),
 		positionSetter(),
 		area(),
+		insideWindowHover(winParent),
 		anchor("center"),
 		scale(),
 		{
@@ -119,6 +122,7 @@ export function musicWinContent(winParent) {
 		color(),
 		area({ scale: vec2(1, 1.25) }),
 		opacity(1),
+		insideWindowHover(winParent),
 		anchor("center"),
 		{
 			update() {
@@ -178,6 +182,7 @@ export function musicWinContent(winParent) {
 		pos(-30, 60),
 		area(),
 		scale(),
+		insideWindowHover(winParent),
 		anchor("center"),
 		"musicButton",
 		"windowButton",
@@ -189,6 +194,7 @@ export function musicWinContent(winParent) {
 		pos(15, 60),
 		area(),
 		scale(),
+		insideWindowHover(winParent),
 		anchor("center"),
 		"musicButton",
 		"windowButton",
@@ -199,6 +205,7 @@ export function musicWinContent(winParent) {
 		sprite("musicWinButtons", { anim: "skip", }),
 		pos(60, 60),
 		area(),
+		insideWindowHover(winParent),
 		scale(),
 		anchor("center"),
 		"musicButton",
@@ -342,7 +349,9 @@ export function musicWinContent(winParent) {
 	
 	// support for keys let's gooooo
 	winParent.onKeyPress((key) => {
-		let action;
+		if (winParent.active == false) return
+		
+		let action:number;
 		if (key == "left") {backButtonAction(); action = 0}
 		else if (key == "right") {skipButtonAction(); action = 1}
 		if (key == "left" || key == "right") generalBackSkipButtonAction(action)
@@ -355,8 +364,8 @@ export function musicWinContent(winParent) {
 	})
 
 	// fuck my small penis life
-	theOneBehind.onClick(() => {
-		if (!winParent.active) return
+	theOneBehind.onPressClick(() => {
+		if (winParent.active == false) return
 		
 		let leftSideOfTheOneBehind = theOneBehind.screenPos().x - theOneBehind.width * 0.5
 		let rightSideOfTheOneBehind = theOneBehind.screenPos().x + theOneBehind.width * 0.5
