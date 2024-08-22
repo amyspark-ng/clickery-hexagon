@@ -9,14 +9,16 @@ Made in [KAPLAY](https://kaplayjs.com)
 - DevkyRD - Art & Design
 - lajbel - Code & Design
 - MF - Code & Shaders
-- Khriz28 - Playtesting & Support
+- Khriz28 - Playtesting & Support & Achievement titles
 - niceEli - Code & Desktop support
 
 ### Extra / Special Thanks:
 - Candy&Carmel - Number support
 - Oliver_is_here - Code/General support
-- [Lambda font](https://ggbot.itch.io/lambda-font)
+- [Lambda font] (https://ggbot.itch.io/lambda-font)
 - Webadazzz <3
+
+There's also in-game credits
 
 ## RUNNING
 1. `pnpm i` - Installs all the dependencies

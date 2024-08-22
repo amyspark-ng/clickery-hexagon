@@ -586,6 +586,16 @@ function loadAllSprites() {
 	loadSprite("leaderboardsWin", "sprites/windows/leaderboardsWin/leaderboardsWin.png")
 	loadSprite("leaderboardsHeader", "sprites/windows/leaderboardsWin/leaderboardsHeader.png")
 	loadSprite("leaderboardsTheLine", "sprites/windows/leaderboardsWin/leaderboardsTheLine.png")
+	
+	loadSprite("creditsWin", "sprites/windows/creditsWin/creditsWin.png")
+	loadSprite("creditsHeart", "sprites/windows/creditsWin/creditsHeart.png")
+	
+	loadSprite("creditsCode", "sprites/windows/creditsWin/creditsCode.png")
+	loadSprite("creditsArt", "sprites/windows/creditsWin/creditsArt.png")
+	loadSprite("creditsDesign", "sprites/windows/creditsWin/creditsDesign.png")
+	loadSprite("creditsShader", "sprites/windows/creditsWin/creditsShader.png")
+	loadSprite("creditsPlaytest", "sprites/windows/creditsWin/creditsPlaytest.png")
+	loadSprite("creditsDesktop", "sprites/windows/creditsWin/creditsDesktop.png")
 	//#endregion
 
 	//#endregion

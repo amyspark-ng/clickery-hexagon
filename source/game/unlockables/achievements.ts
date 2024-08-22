@@ -126,7 +126,7 @@ export let achievements = [
 	// #region SCORE ACHIEVEMENTS =====================
 	new Achievement({
 		id: "100score",
-		title: "CAMBIAR",
+		title: "Clicktastic",
 		description: "Get 100 of score",
 		icon: "upgrades.k_0",
 		ngId: 80187,
@@ -257,7 +257,7 @@ export let achievements = [
 
 	new Achievement({
 		id: "600millionscore",
-		title: "C L I C K  M Y  H E X A G O N S",
+		title: "Click my hexagons...",
 		description: "Get 600 million of score",
 		icon: "upgrades.k_1",
 		unlockCondition: () => GameState.scoreAllTime >= 600_000_000,

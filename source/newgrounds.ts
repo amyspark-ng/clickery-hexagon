@@ -5,7 +5,7 @@ import { GameState } from "./gamestate";
 import { openWindow, windowsDefinition } from "./game/windows/windows-api/windowManaging";
 
 export let ngEnabled:boolean;
-export let ngUser:User | void;
+export let ngUser:User;
 
 export function newgroundsManagement() {
 	return ng.connect(env.API_ID, env.ENCRIPTION_KEY);

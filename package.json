@@ -8,7 +8,7 @@
     "build": "esbuild --bundle source/main.ts --outfile=public/game.js",
 
     "desktop:dev": "tauri dev",
-    "destkop:build": "tauri build",
+    "desktop:build": "tauri build",
     "tauri": "tauri",
 
     "old:dev": "esbuild --bundle source/main.ts --sourcemap --outfile=public/game.js --servedir=./public"

@@ -11,6 +11,16 @@
 			// }
 		},
 		{
+			// so slow
+			// Needs 7zip
+			"label": "— Build kaplay (desktop)",
+			"type": "shell",
+			"command": "pnpm desktop:build ; 7z a -tzip ./build.zip ./public",
+			// "group": {
+			// 	"kind": "build",
+			// }
+		},
+		{
 			// This runs the pnpm build and then runs the butler to send it to itch.io
 			// Needs 7zip
 			"label": "— Deliver kaplay to Itch.io",
