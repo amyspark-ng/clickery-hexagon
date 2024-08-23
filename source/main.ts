@@ -11,7 +11,7 @@ import { GameState } from "./gamestate.ts";
 import { windowsDefinition } from "./game/windows/windows-api/windowManaging.ts";
 
 export let DEBUG:boolean = true
-export let enableNg = false
+export let enableNg = true
 
 let kaplayOpts = {
 	width: 1024,
@@ -26,7 +26,7 @@ let kaplayOpts = {
 	backgroundAudio: true,
 	stretch: false,
 	letterbox: false,
-}
+} as KAPLAYOpt
 
 runInTauri(() => {
 	kaplayOpts.stretch = true;
@@ -57,6 +57,7 @@ onLoad(() => {
 	volumeManager()
 	addBackground()
 	newgroundsManagement()
+	
 	windowsDefinition()
 
 	gameBg.movAngle = -5
@@ -90,6 +91,7 @@ onLoad(() => {
 		if (!isFocused()) go("focuscene")
 		else {
 			if (enableNg == true) {
+				debug.log("loading")
 				if (!await ng.getUsername()) go("ngScene")
 				else go("gamescene")
 			}

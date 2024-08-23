@@ -338,27 +338,6 @@ export function openWindow(windowKey:windowKey) {
 		}
 	})
 
-	// check for achievement
-	if (GameState.taskbar.length > 3) {
-		if (!isAchievementUnlocked("allwindowsontaskbar")) {
-			if (get("window").length == GameState.taskbar.length) {
-				let windows = []
-				get("window").forEach((window) => {
-					windows.push(window.windowKey)
-				})
-				
-				let gamestateTaskbarClone = GameState.taskbar.slice()
-
-				// @ts-ignore
-				const isEqual = (a, b) => new Set(a).symmetricDifference(new Set(b)).size == 0
-
-				if (isEqual(gamestateTaskbarClone, windows)) {
-					unlockAchievement("allwindowsontaskbar")
-				}
-			}
-		}
-	}
-
 	// drawShadow() 
 	let drawShadowEvent = onDraw(() => {
 		drawSprite({

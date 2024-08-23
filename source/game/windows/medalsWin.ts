@@ -79,9 +79,9 @@ export function medalsWinContent(winParent:GameObj) {
 						if (medal_ID == "extra.theSlot" && this.sprite != "medalsUnknown_tap") this.sprite = "medalsUnknown_tap"
 						
 						// has a secret condition
-						if (theAchievement.secretCondition != null) {
+						if (theAchievement.visibleCondition != null) {
 							// is not secret anymore
-							if (theAchievement.secretCondition() == true) {
+							if (theAchievement.visibleCondition() == true) {
 								// its raare
 								if (theAchievement.rare == true) this.color = YELLOW
 								// its not
@@ -130,7 +130,7 @@ export function medalsWinContent(winParent:GameObj) {
 
 			if (!isAchievementUnlocked(theAchievement.id)) {
 				// is secret and is locked
-				if (theAchievement.secretCondition != null && theAchievement.secretCondition() == false) {
+				if (theAchievement.visibleCondition != null && theAchievement.visibleCondition() == false) {
 					title = "???"
 					flavorText = ""
 					description = "This achievement is secret\nFor now..."

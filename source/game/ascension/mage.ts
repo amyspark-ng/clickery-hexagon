@@ -64,6 +64,7 @@ export function addMage() {
 	])
 
 	mage_eye.onClick(() => {
+		if (GameState.stats.timesAscended < 1) return
 		let randomDialogue = getRandomDialogue("eye") 
 		talk("mage", randomDialogue.text, randomDialogue.speed)
 		
@@ -139,6 +140,7 @@ export function addMage() {
 	])
 
 	mage_hexagon.onClick(() => {
+		if (GameState.stats.timesAscended < 1) return
 		let randomDialogue = getRandomDialogue("hex") 
 		talk("mage", randomDialogue.text, randomDialogue.speed)
 		

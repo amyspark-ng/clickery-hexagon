@@ -36,7 +36,7 @@ export function togglePanderito() {
 	panderitoIndex = 0
 
 	if (!isAchievementUnlocked("panderitomode")) {
-		unlockAchievement("panderitomode")
+		unlockAchievement("extra.panderito")
 	}
 
 	let block = add([
@@ -280,7 +280,7 @@ export function triggerGnome() {
 		destroy(gnome)
 	})
 
-	if (!isAchievementUnlocked("gnome")) unlockAchievement("gnome")
+	if (!isAchievementUnlocked("extra.gnome")) unlockAchievement("extra.gnome")
 	GameState.stats.timesGnomed++
 }
 
@@ -375,8 +375,13 @@ export const gamescene = () => scene("gamescene", () => {
 			
 			go("gamescene")
 		}
+		
 		if (isKeyDown("shift") && isKeyPressed("s") && GameState.scoreAllTime > 25) GameState.save()
 		
+		if (isKeyPressed("f2")) {
+			get("toast").forEach(toast => toast.close())
+		}
+
 		GameState.stats.totalTimePlayed += dt()
 		
 		GameState.score = clamp(GameState.score, 0, Infinity)

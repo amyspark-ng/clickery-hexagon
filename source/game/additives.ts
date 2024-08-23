@@ -1,10 +1,11 @@
-import { GameObj, Vec2 } from "kaplay"
+import { GameObj, KAPLAYCtx, Vec2 } from "kaplay"
 import { GameState } from "../gamestate"
 import { playSfx } from "../sound"
 import { hexagon } from "./hexagon"
 import { blendColors, getPosInGrid, getPositionOfSide, parseAnimation, saveColorToColor } from "./utils"
 import { allObjWindows, manageWindow } from "./windows/windows-api/windowManaging"
 import { isWindowUnlocked } from "./unlockables/windowUnlocks"
+import { k } from "../main"
 
 export let gameBg:GameObj;
 export function addBackground() {
@@ -134,6 +135,11 @@ export function addToast(opts:toastOpts) {
 		{
 			index: idx,
 			type: opts.type,
+
+			icon: null,
+			title: null,
+			body: null,
+
 			getPosition() {
 				return toastPosition
 			},
@@ -186,12 +192,13 @@ export function addToast(opts:toastOpts) {
 		}
 	]);
 
-	if (!opts.icon.includes("medals_")) {
-		parseAnimation(icon, opts.icon)
+	// the medal exists
+	if (opts.icon.includes("medals_")) {
+		icon.sprite = opts.icon
 	}
-
+	
 	else {
-		icon.use(outline(5, BLACK))
+		parseAnimation(icon, opts.icon)
 	}
 
 	if (icon.width >= 70) icon.width = 60
@@ -286,6 +293,10 @@ export function addToast(opts:toastOpts) {
 	}
 
 	if (Ycenter < -10) toastBg.close()
+
+	toastBg.icon = icon
+	toastBg.title = titleText
+	toastBg.body = bodyText
 
 	return toastBg;
 }

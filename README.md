@@ -13,6 +13,7 @@ Made in [KAPLAY](https://kaplayjs.com)
 - niceEli - Code & Desktop support
 
 ### Extra / Special Thanks:
+- Enysmo - Music & SFX
 - Candy&Carmel - Number support
 - Oliver_is_here - Code/General support
 - [Lambda font] (https://ggbot.itch.io/lambda-font)
@@ -31,5 +32,5 @@ There's also in-game credits
 	"LEADERBOARD_ID": 0
 }
 ```
-- The code disables newgrounds if no keys are present, but this is so imports don't nag you
+- The newgrounds code should not work if no keys are present, but this is so imports don't nag you
 4. Edit the files to work on it :thumbsup:

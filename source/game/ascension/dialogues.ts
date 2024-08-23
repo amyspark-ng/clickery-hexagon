@@ -6,6 +6,10 @@ import { playSfx } from "../../sound";
 
 class Dialogue {
 	/**
+	 * The key of the dialogue (back1, back2, etc) 
+	 */
+	key:string;
+	/**
 	 * The text of the dialogue
 	 */
 	text:string;
@@ -18,37 +22,48 @@ class Dialogue {
 	 */
 	extra?: boolean;
 
-	constructor(text:string, extra?:boolean, speed?:number) {
+	constructor(key:string, text:string, extra?:boolean, speed?:number) {
+		this.key = key
 		this.text = text
 		this.extra = extra || false
 		this.speed = speed || 0.025 // 1 is extremly slow remember that
 	}
 }
 
-export const mageDialogues = {
-	"tutorial1": new Dialogue("Welcome..."),
-	"tutorial2": new Dialogue("Im glad you're here..."),
-	"tutorial3": new Dialogue("You're ascending, which means you have a lot of stuff to learn..."),
-	"tutorial4": new Dialogue("These are cards, when they're clicked you get an additive percentage"),
-	"tutorial5": new Dialogue("You buy them with mana, which you get after gaining large amounts of score"),
-	"tutorial6": new Dialogue("When returning with your new cards, all your score will be lost"),
-	"tutorial7": new Dialogue("Good luck traveller (so corny)"),
+export const mageDialogues = [
+	new Dialogue("tutorial1", "Welcome..."),
+	new Dialogue("tutorial2", "Im glad you're here..."),
+	new Dialogue("tutorial3", "You're ascending, which means you have a lot of stuff to learn..."),
+	new Dialogue("tutorial4", "These are cards, when they're clicked you get an additive percentage"),
+	new Dialogue("tutorial5", "You buy them with mana, which you get after gaining large amounts of score"),
+	new Dialogue("tutorial6", "When returning with your new cards, all your score will be lost"),
+	new Dialogue("tutorial7", "Good luck traveller (so corny)"),
 	
-	"eye1": new Dialogue("Stop that", true),
-	"eye2": new Dialogue("Don't do that", true),
-	"eye3":new Dialogue("STOP", true),
-	"hex1": new Dialogue("No backsies", true),
-	"hex2": new Dialogue("Mine now", true),
-	"hex3": new Dialogue("I want to play with it :(", true),
-	"back1": new Dialogue("Welcome back...", true),
-	"fun1": new Dialogue("Here's a fun text", true),
-	"fun2": new Dialogue("Here's another one", true),
-	"fun3": new Dialogue("Devky please write these", true),
-	"fun4": new Dialogue("I beg of you", true),
-	"fun5": new Dialogue("Welcome to fortnite", true),
+	// extra ones
+	new Dialogue("eye1", "Stop that", true),
+	new Dialogue("eye2", "Don't do that", true),
+	new Dialogue("eye3", "STOP", true),
+	
+	new Dialogue("hex1", "No backsies", true),
+	new Dialogue("hex2", "Mine now", true),
+	new Dialogue("hex3", "I want to play with it :(", true),
+	
+	new Dialogue("back1", "Welcome back...", true),
+	new Dialogue("back2", "Here again?", true),
+	new Dialogue("back2", "Not busy it seems", true),
+	
+	new Dialogue("fun1", "Here's a fun text", true),
+	new Dialogue("fun2", "Here's another one", true),
+	new Dialogue("fun3", "Devky please write these", true),
+	new Dialogue("fun4", "I beg of you", true),
+	new Dialogue("fun5", "Welcome to fortnite", true),
+]
+
+export function getDialogue(key:string) : Dialogue {
+	return mageDialogues[mageDialogues.indexOf(mageDialogues.filter(dialogue => dialogue.key === key)[0])]
 }
 
-type dialogueType = "tutorial" | "eye" | "hex"
+type dialogueType = "tutorial" | "eye" | "hex" | "back" | "fun"
 
 /**
  * Gets a random
@@ -56,8 +71,8 @@ type dialogueType = "tutorial" | "eye" | "hex"
  * @returns A random dialogue corresponding to the key 
  */
 export function getRandomDialogue(generalType:dialogueType) : Dialogue {
-	let thing = Object.keys(mageDialogues).filter(key => key.includes(generalType)).map((key) => mageDialogues[key])
-	return choose(thing)
+	let arrayOfDialoguesWithThatType = mageDialogues.filter(dialogue => dialogue.key.includes(generalType))
+	return choose(arrayOfDialoguesWithThatType)
 }
 
 export function startDialoguing() {
@@ -173,9 +188,18 @@ export function talk(speaker:"mage" | "card", thingToSay:string, speed?:number, 
 			dialogue.textBox.text += letter;
 
 			// playSfx(`${speaker}_e`, { detune: rand(-150, 150) }); 
-			playSfx(`mage_e`, { detune: rand(-150, 150) }); 
+			// playSfx(`mage_e`, { detune: rand(-150, 150) }); 
 			
 			if (index == thingToSay.length - 1) {
+				// i have to search in magedialogues for thingToSay and get its key
+
+				let dialogueKey:string = undefined
+				mageDialogues.forEach(dialogue => {
+					if (dialogue.text == thingToSay) dialogueKey = dialogue.key
+				})
+				if (dialogueKey == undefined) dialogueKey = null
+
+				dialogue.box.trigger("dialogueEnd", dialogueKey)
 				currentOnEnd()
 			}
 		});
@@ -190,52 +214,50 @@ export function talk(speaker:"mage" | "card", thingToSay:string, speed?:number, 
  */
 function continueDialogue(dialogueKey:string) {
 	// this is the original dialogue, the one it's coming from
-	let currentDialogue = mageDialogues[dialogueKey]
-	// this wil be the new dialogue
-	let newDialogue = null;
-	let newDialogueKey = null;
+	let currentDialogue = getDialogue(dialogueKey);
+
+	/**
+	 * Is the new dialogue, the one that will be played, the continued one
+	 */
+	let thePlayedNewDialogue:Dialogue = null;
 
 	if (currentDialogue.extra == true) {
 		let dialogueType = removeNumbersOfString(dialogueKey)
 		let newRandDialogue = getRandomDialogue(dialogueType as dialogueType)
-		let keyOfNewRandDialogue = Object.keys(mageDialogues).filter(key => mageDialogues[key].text == newRandDialogue.text)[0]
+
+		if (currentDialogue.key.includes("back")) {
+			// you already welcomed, move on
+			dialogueType = "fun"
+			newRandDialogue = getRandomDialogue(dialogueType as dialogueType)
+		}
 		
-		ascension.currentDialoguekey = keyOfNewRandDialogue
-		newDialogue = newRandDialogue
-		newDialogueKey = keyOfNewRandDialogue
+		thePlayedNewDialogue = newRandDialogue
+		ascension.currentDialoguekey = thePlayedNewDialogue.key
 	}
 
 	// serious dialogue
 	else {
-		// they're supposedly ordered so good!
-		let tutorialDialogues = Object.keys(mageDialogues).filter(dialogue => dialogue.includes("tutorial"))
-		let index = tutorialDialogues.findIndex(key => key == dialogueKey)
-		let nextDialogueKey = tutorialDialogues[index + 1]
+		let tutorialDialoguesKeys = mageDialogues.map(dialogue => dialogue.key).filter(key => key.includes("tutorial"))
+		let index = tutorialDialoguesKeys.findIndex(key => key == dialogueKey)
+		let nextDialogueKey = tutorialDialoguesKeys[index + 1]
 
 		if (nextDialogueKey != undefined) {
-			ascension.currentDialoguekey = nextDialogueKey
-			let nextDialogue = mageDialogues[nextDialogueKey]
-			newDialogue = nextDialogue
-			newDialogueKey = nextDialogueKey
+			thePlayedNewDialogue = getDialogue(nextDialogueKey)
+			ascension.currentDialoguekey = thePlayedNewDialogue.key
 		}
 
+		// the continuated dialogue is over, play a random one
 		else {
-			// are extra but no specific ones like the eye, hex or back 
-			let extraDialogueKeys = Object.keys(mageDialogues).filter(dialogue => dialogue.includes("fun"))
+			// are extra but no specific ones like the eye, hex or back
+			let extraDialogueKeys = mageDialogues.map(dialogue => dialogue.key).filter(key => key.includes("fun"))
 			let nextDialogueKey = choose(extraDialogueKeys)
 			
-			ascension.currentDialoguekey = nextDialogueKey
-			newDialogue = mageDialogues[nextDialogueKey]
-			nextDialogueKey = nextDialogueKey
+			thePlayedNewDialogue = getDialogue(nextDialogueKey)
+			ascension.currentDialoguekey = thePlayedNewDialogue.key
 		}
 	}
 
-	// can't be bothered to soft code it
-	if (newDialogueKey == "tutorial4") {
-		spawnCards()
-	}
-
-	talk("mage", newDialogue.text, newDialogue.speed)
+	talk("mage", thePlayedNewDialogue.text, thePlayedNewDialogue.speed)
 }
 
 function skipTalk() {
@@ -245,4 +267,5 @@ function skipTalk() {
 	tween(dialogue.box.defaultPos.x + 10, dialogue.box.defaultPos.x, 0.25, (p) => dialogue.box.pos.x = p, easings.easeOutQuint)
 	
 	currentOnEnd()
+	dialogue.box.trigger("dialogueEnd", ascension.currentDialoguekey)
 }

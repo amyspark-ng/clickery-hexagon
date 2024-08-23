@@ -3,7 +3,7 @@ import { GameState, saveColor, scoreManager } from "../gamestate";
 import { addToast, mouse } from "./additives";
 import { autoLoopTime, cam, triggerGnome } from "./gamescene";
 import { hexagon } from "./hexagon";
-import { Achievement, achievements, getAchievement, unlockAchievement } from "./unlockables/achievements";
+import { achievements, getAchievement, unlockAchievement } from "./unlockables/achievements";
 import { openWindow } from "./windows/windows-api/windowManaging";
 import { powerupTypes, spawnPowerup } from "./powerups";
 import { playSfx } from "../sound";
@@ -428,6 +428,7 @@ export function debugTexts() {
 					"Time until auto loop ends: ": GameState.timeUntilAutoLoopEnds,
 					"Taskbar: ": GameState.taskbar,
 					"Ascending: ": ascension.ascending,
+					"Times ascended: ": GameState.stats.timesAscended
 				}	
 
 				for (let powerup in powerupTypes) {
@@ -480,16 +481,18 @@ export function debugFunctions() {
 		}
 
 		else if (isKeyPressed("g")) {
-			let longAchievement = getAchievement("750000score")
+			let longAchievement = getAchievement("score.100")
 			
+			let theIcon = `medals_${longAchievement.id}`
+
 			addToast({
-				title: "Helo, i am testing",
-				// title: "clickery Hexagon forever and forever a hundred years clickery Hexagon, all day long forever, forever a hundred times, over and over clickery Hexagon adventures dot com",
-				body: "This is a test toast, i am just testing the animations very very very descriptioner",
-				icon: "cursors.point"
-				// title: longAchievement.title,
-				// body: longAchievement.description,
+				// title: "Helo, i am testing",
+				// // title: "clickery Hexagon forever and forever a hundred years clickery Hexagon, all day long forever, forever a hundred times, over and over clickery Hexagon adventures dot com",
+				// body: "This is a test toast, i am just testing the animations very very very descriptioner",
 				// icon: "cursors.point"
+				title: longAchievement.title,
+				body: longAchievement.description,
+				icon: theIcon,
 			})
 		}
 	})

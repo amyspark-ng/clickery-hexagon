@@ -160,8 +160,8 @@ export function addHexagon() {
 						tween(-10, 0, 0.5, (p) => cam.rotation = p, easings.easeOutQuint)
 						playSfx("fullcombo", {detune: rand(-50, 50)})
 					
-						if (!isAchievementUnlocked("maxedcombo")) {
-							unlockAchievement("maxedcombo")
+						if (!isAchievementUnlocked("extra.maxedcombo")) {
+							unlockAchievement("extra.maxedcombo")
 						}
 					}
 				}

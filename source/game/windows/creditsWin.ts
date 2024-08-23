@@ -88,7 +88,7 @@ export async function creditsWinContent(winParent:GameObj) {
 	// #endregion
 
 	let specialCredits = winParent.add([
-		text("Candy&Carmel, OliverIsHere\nGGBot, WebadaZzz", { align: "center", size: 30 }),
+		text("Enysmo, Candy&Carmel, OliverIsHere\nGGBot, WebadaZzz", { align: "center", size: 30 }),
 		pos(0, 170),
 		anchor("center"),
 		area(),

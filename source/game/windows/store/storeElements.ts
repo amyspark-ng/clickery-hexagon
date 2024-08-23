@@ -314,7 +314,7 @@ export function addStoreElement(winParent:any, opts:storeElementOpt) {
 					GameState.stats.powerupsBoughtThisRun++
 				}
 
-				if (this.timesBoughtConsecutively >= 10 && !isAchievementUnlocked("buy10stuff")) unlockAchievement("buy10stuff") 
+				if (this.timesBoughtConsecutively >= 10 && !isAchievementUnlocked("store.stuffBought_10")) unlockAchievement("store.stuffBought_10") 
 				
 				this.trigger("buy")
 			},

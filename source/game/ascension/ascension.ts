@@ -7,12 +7,53 @@ import { folderObj } from "../windows/windows-api/folderObj";
 import { allPowerupsInfo } from "../powerups";
 import { addMage } from "./mage";
 import { isAchievementUnlocked, unlockAchievement } from "../unlockables/achievements";
-import { mageDialogues, startDialoguing, talk } from "./dialogues";
+import { dialogue, getDialogue, getRandomDialogue, mageDialogues, startDialoguing, talk } from "./dialogues";
+import { spawnCards } from "./cards";
+import { positionSetter } from "../plugins/positionSetter";
+import { playSfx } from "../../sound";
+import { mouse } from "../additives";
 
 export let ascension = {
 	ascending: false,
 	canLeave: false,
 	currentDialoguekey: ""
+}
+
+function addLeaveButton() {
+	let leaveButton = add([
+		sprite("leaveButton"),
+		pos(968, 286),
+		positionSetter(),
+		anchor("center"),
+		area({ scale: vec2(0) }),
+		scale(0),
+		layer("ascension"),
+		opacity(),
+		z(1),
+		"leaveButton"
+	])
+
+	leaveButton.fadeIn(0.25, easings.easeOutExpo)
+	tween(leaveButton.scale, vec2(1), 0.25, (p) => leaveButton.scale = p, easings.easeOutExpo).onEnd(() => {
+		leaveButton.area.scale = vec2(1)
+	
+		leaveButton.onHover(() => {
+			tween(leaveButton.scale, vec2(1.1), 0.25, (p) => leaveButton.scale = p, easings.easeOutExpo)
+			mouse.play("point")
+		})
+
+		leaveButton.onHoverEnd(() => {
+			tween(leaveButton.scale, vec2(1), 0.25, (p) => leaveButton.scale = p, easings.easeOutExpo)
+			mouse.play("cursor")
+		})
+
+		leaveButton.onClick(() => {
+			endAscension()
+			playSfx("clickButton")
+		})
+	})
+
+	return leaveButton;
 }
 
 export function startAscending() {
@@ -80,25 +121,41 @@ export function startAscending() {
 	})
 
 	function startTheTalking() {
-		if (GameState.stats.timesAscended < 1) {
-			let dialogues = mageDialogues.tutorial1
-			ascension.currentDialoguekey = "tutorial1"
-			talk("mage", dialogues.text, dialogues.speed)
+		// you've already met him
+		if (GameState.stats.timesAscended > 0) {
+			let backDialogue = getRandomDialogue("back")
+			ascension.currentDialoguekey = backDialogue.key
+			talk("mage", backDialogue.text, backDialogue.speed)
 		}
 
+		// first time ascending
 		else {
-			let dialogues = mageDialogues.back1
-			ascension.currentDialoguekey = "back1"
+			let dialogues = getDialogue("tutorial1")
+			ascension.currentDialoguekey = "tutorial1"
 			talk("mage", dialogues.text, dialogues.speed)
 		}
 	}
 
 	mage.on("endAnimating", () => {
 		startTheTalking()
+	
+		dialogue.box.on("dialogueEnd", (key:string) => {
+			if (key == null) return
+			if (key == "tutorial3" || (key.includes("back") && get("card").length == 0)) {
+				wait(0.5, () => {
+					spawnCards()
+				})
+			}
+
+			if (key == "tutorial7" || key.includes("back") && get("leaveButton").length == 0) {
+				addLeaveButton()
+			}
+		})
 	})
 }
 
 export function endAscension() {
+	GameState.stats.timesAscended++
 	folderObj.interactable = true
 	ROOT.trigger("endAscension")
 	allPowerupsInfo.canSpawnPowerups = true
@@ -122,7 +179,7 @@ export function endAscension() {
 			tween(obj.pos.y, -obj.height, 0.5, (p) => obj.pos.y = p, easings.easeOutQuart).onEnd(() => destroy(obj))
 		}
 
-		else if (obj.is("ascensionBg") || obj.is("leave}tton")) {
+		else if (obj.is("ascensionBg") || obj.is("leaveButton")) {
 			obj.fadeOut(0.5).onEnd(() => destroy(obj))
 		}
 	})
@@ -141,6 +198,6 @@ export function endAscension() {
 
 	wait(0.5, () => {
 		ascension.canLeave = false
-		if (!isAchievementUnlocked("ascend1time")) unlockAchievement("ascend1time")
+		if (!isAchievementUnlocked("ascension.times_1")) unlockAchievement("ascension.times_1")
 	})
 }

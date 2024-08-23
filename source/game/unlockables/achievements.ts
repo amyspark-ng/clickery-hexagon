@@ -35,6 +35,7 @@ interface AchievementInterface {
 	flavorText?: string,
 	/**
 	 * The sprite the icon will have
+	 * @deprecated Should use ID instead
 	*/
 	icon?: string,
 	/**
@@ -47,7 +48,7 @@ interface AchievementInterface {
 	 * Otherwise the question mark in the medals window will be tinted purple
 	* @returns Wheter the condition for it it's true or false, if it's true it means it's no longer secret
 	 */
-	secretCondition?: () => boolean;
+	visibleCondition?: () => boolean;
 	/**
 	 * The unlockCondition in "code", if it doesn't have one it has to be unlocked manuall by doing unlockAchievement()
 	 * @returns Wheter the condition for it it's true or false
@@ -78,7 +79,7 @@ class Achievement {
 		this.timeAfter = opts.timeAfter || 0
 		this.readingTime = opts.readingTime || 3
 		this.unlockCondition = opts.unlockCondition || null
-		this.secretCondition = opts.secretCondition || null
+		this.visibleCondition = opts.visibleCondition || null
 	}
 }
 
@@ -420,7 +421,7 @@ export let achievements = [
 		description: "Ascend for the first time",
 		flavorText: "It seems that you've met him", 
 		icon: "icon_ascend",
-		secretCondition: () => GameState.stats.timesAscended >= 1
+		visibleCondition: () => GameState.stats.timesAscended >= 1
 	}),
 
 	new Achievement({
@@ -429,7 +430,7 @@ export let achievements = [
 		description: "Ascend for the fifth time",
 		icon: "icon_ascend",
 		unlockCondition: () => GameState.stats.timesAscended >= 5,
-		secretCondition: () => isAchievementUnlocked("ascension.times_1"),
+		visibleCondition: () => isAchievementUnlocked("ascension.times_1"),
 	}),
 
 	new Achievement({
@@ -439,7 +440,7 @@ export let achievements = [
 		rare: true,
 		icon: "icon_ascend",
 		unlockCondition: () => GameState.stats.timesAscended >= 10,
-		secretCondition: () => isAchievementUnlocked("ascension.times_1"),
+		visibleCondition: () => isAchievementUnlocked("ascension.times_1"),
 	}),
 
 	new Achievement({
@@ -448,7 +449,7 @@ export let achievements = [
 		description: "Buy 10 cards",
 		icon: "icon_ascend",
 		unlockCondition: () => GameState.ascension.clickPercentagesBought + GameState.ascension.cursorsPercentagesBought + GameState.ascension.powerupPowersBought + GameState.ascension.critPowersBought >= 10,
-		secretCondition: () => isAchievementUnlocked("ascension.times_1"),
+		visibleCondition: () => isAchievementUnlocked("ascension.times_1"),
 	}),
 	// #endregion ASCENSION ACHIEVEMENTS =====================
 
@@ -491,7 +492,7 @@ export let achievements = [
 		icon: "gnome",
 		timeAfter: 1.5,
 		readingTime: 5,
-		secretCondition: () => GameState.stats.timesGnomed >= 1,
+		visibleCondition: () => GameState.stats.timesGnomed >= 1,
 	}),
 
 	new Achievement({
@@ -529,6 +530,7 @@ export let achievements = [
 
 // TODO: Find a working api for the secret achievements
 export function getAchievement(achievementId:string) {
+	if (!achievements.map(achievement => achievement.id).includes(achievementId)) throw new Error(`Achievement: ${achievementId} does not exist`)
 	return achievements.filter(achievementObject => achievementObject.id == achievementId)[0]
 }
 
@@ -563,12 +565,13 @@ export function checkForUnlockable() {
 
 export function unlockAchievement(id:string) {
 	if (isAchievementUnlocked(id)) return
+	if (!achievements.map(achievement => achievement.id).includes(id)) throw new Error(`Achievement: ${id} does not exist`)
 	GameState.unlockedAchievements.push(id)
 	
 	let achievement = getAchievement(id)
 	wait(achievement.timeAfter || 0, () => {
 		addToast({
-			icon: achievement.icon.includes("medals_") ? `medals_${achievement.id}` : achievement.icon,
+			icon: achievement.icon,
 			title: achievement.title,
 			body: `${achievement.description}. ${achievement.flavorText ?? achievement.flavorText}`,
 			duration: achievement.readingTime,

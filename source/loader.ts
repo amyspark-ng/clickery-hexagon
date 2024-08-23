@@ -710,7 +710,7 @@ function loadAllSprites() {
 		},
 	})
 	loadSprite("backcard", "sprites/ascendscene/backcard.png")
-	loadSprite("confirmAscension", "sprites/ascendscene/confirmAscension.png")
+	loadSprite("leaveButton", "sprites/ascendscene/leaveButton.png")
 
 	loadSprite("ascendWin", "sprites/windows/ascendWin/ascendWin.png")
 	loadSprite("winMage_body", "sprites/windows/ascendWin/winMage_body.png")
