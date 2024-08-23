@@ -1,8 +1,9 @@
+import { GameObj } from "kaplay";
 import { GameState } from "../../../gamestate";
 import { ROOT } from "../../../main";
 import { addTooltip } from "../../additives";
 import { addStoreElement, storeElementsInfo } from "./storeElements";
-import { addUpgrades, isUpgradeBought, upgradeInfo } from "./upgrades";
+import { addUpgrades, isUpgradeBought } from "./upgrades";
 
 export let storeElements:any = [];
 
@@ -18,7 +19,7 @@ let clickersElement:any;
 let cursorsElement:any;
 let powerupsElement:any;
 
-export function storeWinContent(winParent) {
+export function storeWinContent(winParent:GameObj) {
 	// clickers
 	clickersElement = addStoreElement(winParent, { type: "clickersElement", pos: vec2(0, -128) })
 	addUpgrades(clickersElement)

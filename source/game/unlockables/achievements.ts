@@ -10,9 +10,9 @@ import ng from 'newgrounds.js';
 import { ngEnabled } from '../../newgrounds';
 import { playSfx } from '../../sound';
 
-type achievementOpt = {
+interface AchievementInterface {
 	/**
-	 * The id the achievement will have, (eg: 100score)
+	 * The id the achievement will have, (eg: score.100)
 	 */
 	id: string,
 	/**
@@ -26,16 +26,21 @@ type achievementOpt = {
 	 */
 	title: string,
 	/**
-	 * The actual thing you have to do to get this achievement, can have a little flavour text at the end
-	 * (eg: Get 100 of score all time, that wasn't hard was it? )
-	 * If it has a flavor text, increase the reading time
+	 * The actual thing you have to do to get this achievement in readable string form
 	 */
 	description: string,
 	/**
-	 * The sprite the icon will have (eg: medals_100score)
+	 * Might be another funny title pun
+	 */
+	flavorText?: string,
+	/**
+	 * The sprite the icon will have
 	*/
-	// TODO: at some point deprecate this in favor of just using the id
-	icon: string,
+	icon?: string,
+	/**
+	 *  Wheter the achievement is RARE, the question mark will be yellow in that case 
+	 */
+	rare?: boolean,
 	/**
 	 * This means the achievement is secret!
 	 * It will only show its description and title when unlocked
@@ -59,25 +64,17 @@ type achievementOpt = {
 	readingTime?: number,
 }
 
-export class Achievement {
-	id:string;
-	ngId?:number;
-	title: string;
-	description: string;
-	icon: string;
-	timeAfter: number;
-	visible: { secret: boolean, unlockCondition: () => boolean };
-	readingTime: number;
-	unlockCondition: () => boolean;
-	secretCondition: () => boolean;
-
-	constructor(public opts: achievementOpt) {
+interface Achievement extends AchievementInterface { }
+class Achievement {
+    constructor(opts:AchievementInterface) {
 		this.id = opts.id
 		this.ngId = opts.ngId
 
 		this.title = opts.title
 		this.description = opts.description
-		this.icon = opts.icon
+		this.flavorText = opts.flavorText || ""
+		this.icon = opts.icon || `medals_${this.id}`
+		this.rare = opts.rare || false
 		this.timeAfter = opts.timeAfter || 0
 		this.readingTime = opts.readingTime || 3
 		this.unlockCondition = opts.unlockCondition || null
@@ -125,167 +122,150 @@ Wait, i got lazy.`
 export let achievements = [
 	// #region SCORE ACHIEVEMENTS =====================
 	new Achievement({
-		id: "100score",
+		id: "score.100",
 		title: "Clicktastic",
 		description: "Get 100 of score",
-		icon: "upgrades.k_0",
 		ngId: 80187,
 		unlockCondition: () => GameState.scoreAllTime >= 100,
 	}),
 
 	new Achievement({
-		id: "1000score",
-		title: "CAMBIAR",
+		id: "score.1_000",
+		title: "Finger clickin' good",
 		description: "Get 1.000 of score",
-		icon: "upgrades.k_1",
 		unlockCondition: () => GameState.scoreAllTime >= 1_000,
 	}),
 
 	new Achievement({
-		id: "5000score",
-		title: "CAMBIAR",
+		id: "score.5_000",
+		title: "Now you're clickin",
 		description: "Ok these seem to be working",
-		icon: "upgrades.k_1",
 		unlockCondition: () => GameState.scoreAllTime >= 5_000,
 	}),
 
 	new Achievement({
-		id: "10000score",
-		title: "CAMBIAR",
+		id: "score.10_000",
+		title: "Olimpic Hexagon",
 		description: "Get 10.000 of score",
-		icon: "upgrades.k_1",
 		unlockCondition: () => GameState.scoreAllTime >= 10_000,
 	}),
 
 	new Achievement({
-		id: "25000score",
-		title: "CAMBIAR",
+		id: "score.25_000",
+		title: "Usain Hexagon",
 		description: "Get 25.000 of score",
-		icon: "upgrades.k_1",
 		unlockCondition: () => GameState.scoreAllTime >= 25_000,
 	}),
 
 	new Achievement({
-		id: "50000score",
-		title: "CAMBIAR",
+		id: "score.50_000",
+		title: "Another one click the hexagon",
 		description: "Get 50.000 of score",
-		icon: "upgrades.k_1",
 		unlockCondition: () => GameState.scoreAllTime >= 50_000,
 	}),
 
 	new Achievement({
-		id: "100000score",
-		title: "CAMBIAR",
+		id: "score.100_000",
+		title: "You Spin Me Round (Like a hexagon)",
 		description: "Get 100.000 of score",
-		icon: "upgrades.k_1",
 		unlockCondition: () => GameState.scoreAllTime >= 100_000,
 	}),
 
 	new Achievement({
-		id: "250000score",
-		title: "CAMBIAR",
+		id: "score.250_000",
+		title: "Hex-a-Gone Crazy",
 		description: "Get 250.000 of score",
-		icon: "upgrades.k_1",
 		unlockCondition: () => GameState.scoreAllTime >= 250_000,
 	}),
 
 	new Achievement({
-		id: "500000score",
-		title: "CAMBIAR",
+		id: "score.500_000",
+		title: "[CAMBIAR]",
 		description: "Get 500.000 of score",
-		icon: "upgrades.k_1",
 		unlockCondition: () => GameState.scoreAllTime >= 500_000,
 	}),
 
 	new Achievement({
-		id: "750000score",
+		id: "score.750_000",
 		title: "Did you know there's no actual limit to how long these names can be? I specifically spent a lot of time working on them so they can be as LONG as i want them to be and they will do their best to look good",
-		description: `Get 750.000 score\nI'm not too sure how well it supports long descriptions, i can't really be bothered to test it, i'm pretty close to the deadline of this game coming out so i'd like not to dwell in those dark functions...`,
-		icon: "upgrades.k_1",
+		description: `Get 750.000 score`,
+		flavorText: "I'm not too sure how well it supports long descriptions, i can't really be bothered to test it, i'm pretty close to the deadline of this game coming out so i'd like not to dwell in those dark functions...",
 		readingTime: 20,
 		unlockCondition: () => GameState.scoreAllTime >= 750_000,
 	}),
 
 	new Achievement({
-		id: "1millionscore",
-		title: "CAMBIAR",
+		id: "score.1_million",
+		title: "Master of hexagons",
 		description: "Get 1 million of score",
-		icon: "upgrades.k_1",
 		unlockCondition: () => GameState.scoreAllTime >= 1_000_000,
 	}),
 
 	new Achievement({
-		id: "15millionscore",
-		title: "CAMBIAR",
+		id: "score.15_million",
+		title: "Hex-a-Lent",
 		description: "Get 15 million of score",
-		icon: "upgrades.k_1",
 		unlockCondition: () => GameState.scoreAllTime >= 15_000_000,
 	}),
 
 	new Achievement({
-		id: "50millionscore",
-		title: "CAMBIAR",
+		id: "score.50_million",
+		title: "Hex-machina",
 		description: "Get 50 million of score",
-		icon: "upgrades.k_1",
 		unlockCondition: () => GameState.scoreAllTime >= 50_000_000,
 	}),
 
 	new Achievement({
-		id: "100millionscore",
-		title: "CAMBIAR",
+		id: "score.100_million",
+		title: "Clickery Hexagon forever and forever a 100 years clickery Hexagon, all day long forever, forever a hundred times, over and over clickery Hexagon adventures dot com",
 		description: "Get 100 million of score",
-		icon: "upgrades.k_1",
 		unlockCondition: () => GameState.scoreAllTime >= 100_000_000,
 	}),
 
 	new Achievement({
-		id: "250millionscore",
-		title: "CAMBIAR",
+		id: "score.250_million",
+		title: "Hex-traordinary",
 		description: "Get 250 million of score",
-		icon: "upgrades.k_1",
 		unlockCondition: () => GameState.scoreAllTime >= 250_000_000,
 	}),
 
 	// cambialo
 	new Achievement({
-		id: "500millionscore",
-		title: "CAMBIAR",
+		id: "score.500_million",
+		title: "Hexagonmania!",
 		description: "Get 500 million of score",
-		icon: "upgrades.k_1",
 		unlockCondition: () => GameState.scoreAllTime >= 500_000_000,
 	}),
 
 	new Achievement({
-		id: "600millionscore",
+		id: "score.600_million",
 		title: "Click my hexagons...",
 		description: "Get 600 million of score",
-		icon: "upgrades.k_1",
 		unlockCondition: () => GameState.scoreAllTime >= 600_000_000,
 	}),
 
 	// this is the gimmiko achievement
 	new Achievement({
-		id: "750millionscore",
+		id: "score.750_million",
 		title: "Who else is gimmicking their dice right now?",
 		description: "Get 750 million of score",
-		icon: "upgrades.k_1",
 		unlockCondition: () => GameState.scoreAllTime >= 750_000_000,
 	}),
 
 	// cambialo
 	new Achievement({
-		id: "950millionscore",
-		title: "CAMBIAR",
+		id: "score.950_million",
+		title: "Hex-traordinary",
+		rare: true,
 		description: "Get 950 million of score",
-		icon: "upgrades.k_1",
 		unlockCondition: () => GameState.scoreAllTime >= 950_000_000,
 	}),
 
 	new Achievement({
-		id: "1billionscore",
-		title: "CAMBIAR",
+		id: "score.1_billion",
+		title: "F I N A L L Y",
+		rare: true,
 		description: "Get 1 billion of score, you're crazy for this...",
-		icon: "upgrades.k_1",
 		unlockCondition: () => GameState.scoreAllTime >= 1_000_000_000,
 	}),
 	// #endregion SCORE ACHIEVEMENTS ====================
@@ -293,7 +273,7 @@ export let achievements = [
 	// #region CLICKER/CURSOR ACHIEVEMENTS ==================
 	// ### CLICKERS
 	new Achievement({
-		id: "10clickers",
+		id: "clickers.10",
 		title: "CAMBIAR",
 		description: "Have 10 clickers",
 		icon: "cursors.cursor",
@@ -301,7 +281,7 @@ export let achievements = [
 	}),
 
 	new Achievement({
-		id: "20clickers",
+		id: "clickers.20",
 		title: "CAMBIAR",
 		description: "Have 20 clickers",
 		icon: "cursors.cursor",
@@ -309,7 +289,7 @@ export let achievements = [
 	}),
 
 	new Achievement({
-		id: "30clickers",
+		id: "clickers.30",
 		title: "CAMBIAR",
 		description: "Have 30 clickers",
 		icon: "cursors.cursor",
@@ -317,7 +297,7 @@ export let achievements = [
 	}),
 
 	new Achievement({
-		id: "40clickers",
+		id: "clickers.40",
 		title: "CAMBIAR",
 		description: "Have 40 clickers",
 		icon: "cursors.cursor",
@@ -325,16 +305,17 @@ export let achievements = [
 	}),
 
 	new Achievement({
-		id: "50clickers",
+		id: "clickers.50",
 		title: "CAMBIAR",
 		description: "Have 50 clickers",
+		rare: true,
 		icon: "cursors.cursor",
 		unlockCondition: () => GameState.clickers >= 50,
 	}),
 	
 	// ### CURSORS
 	new Achievement({
-		id: "10cursors",
+		id: "cursors.10",
 		title: "CAMBIAR",
 		description: "Have 10 cursors",
 		icon: "cursors.point",
@@ -342,7 +323,7 @@ export let achievements = [
 	}),
 
 	new Achievement({
-		id: "20cursors",
+		id: "cursors.20",
 		title: "CAMBIAR",
 		description: "Have 20 cursors",
 		icon: "cursors.point",
@@ -350,7 +331,7 @@ export let achievements = [
 	}),
 
 	new Achievement({
-		id: "30cursors",
+		id: "cursors.30",
 		title: "CAMBIAR",
 		description: "Have 30 cursors",
 		icon: "cursors.point",
@@ -358,7 +339,7 @@ export let achievements = [
 	}),
 
 	new Achievement({
-		id: "40cursors",
+		id: "cursors.40",
 		title: "CAMBIAR",
 		description: "Have 40 cursors",
 		icon: "cursors.point",
@@ -366,16 +347,17 @@ export let achievements = [
 	}),
 
 	new Achievement({
-		id: "50cursors",
+		id: "cursors.50",
 		title: "CAMBIAR",
 		description: "Have 50 cursors",
+		rare: true,
 		icon: "cursors.point",
 		unlockCondition: () => GameState.cursors >= 50,
 	}),
 	//#endregion CLICKERS/CURSORS ACHIEVEMENTS =================
 
 	new Achievement({
-		id: "allupgrades",
+		id: "store.allUpgrades",
 		title: "CAMBIAR",
 		description: "Buy all the available upgrades",
 		icon: "icon_store",
@@ -385,7 +367,7 @@ export let achievements = [
 
 	// #region POWERUP ACHIEVEMENTS =====================
 	new Achievement({
-		id: "click1powerup",
+		id: "powerups.click_1",
 		title: "What?! Help me!",
 		description: "Click 1 powerup",
 		icon: "cursors.cursor",
@@ -394,7 +376,7 @@ export let achievements = [
 	}),
 
 	new Achievement({
-		id: "click5powerup",
+		id: "powerups.click_5",
 		title: "What?! Help me!",
 		description: "Click 5 powerup",
 		icon: "cursors.cursor",
@@ -403,7 +385,7 @@ export let achievements = [
 	}),
 
 	new Achievement({
-		id: "click10powerup",
+		id: "powerups.click_10",
 		title: "What?! Help me!",
 		description: "Click 10 powerup",
 		icon: "cursors.cursor",
@@ -412,16 +394,17 @@ export let achievements = [
 	}),
 
 	new Achievement({
-		id: "click20powerup",
+		id: "powerups.click_20",
 		title: "What?! Help me!",
 		description: "Click 20 powerup",
+		rare: true,
 		icon: "cursors.cursor",
 		timeAfter: 0.5,
 		unlockCondition: () => GameState.stats.powerupsClicked >= 20,
 	}),
 
 	new Achievement({
-		id: "buy10powerup",
+		id: "powerups.buy_10",
 		title: "Pay to win",
 		description: "Buy 10 powerup",
 		icon: "icon_store",
@@ -432,15 +415,16 @@ export let achievements = [
 
 	// #region ASCENSION ACHIEVEMENTS =====================
 	new Achievement({
-		id: "ascend1time",
+		id: "ascension.times_1",
 		title: "Oh. So you've met him?",
-		description: "Ascend for the first time, it seems that you've met him",
+		description: "Ascend for the first time",
+		flavorText: "It seems that you've met him", 
 		icon: "icon_ascend",
 		secretCondition: () => GameState.stats.timesAscended >= 1
 	}),
 
 	new Achievement({
-		id: "ascend5time",
+		id: "ascension.times_5",
 		title: "He's funny, isn't he?",
 		description: "Ascend for the fifth time",
 		icon: "icon_ascend",
@@ -449,16 +433,17 @@ export let achievements = [
 	}),
 
 	new Achievement({
-		id: "ascend10time",
+		id: "ascension.times_10",
 		title: "I am the clickery...",
 		description: "Ascend for the tenth time",
+		rare: true,
 		icon: "icon_ascend",
 		unlockCondition: () => GameState.stats.timesAscended >= 10,
 		secretCondition: () => GameState.stats.timesAscended >= 1,
 	}),
 
 	new Achievement({
-		id: "buy10cards",
+		id: "ascension.cardsBought_10",
 		title: "The trickster",
 		description: "Buy 10 cards",
 		icon: "icon_ascend",
@@ -469,37 +454,38 @@ export let achievements = [
 
 	// #region EXTRA ACHIEVEMENTS =====================
 	new Achievement({
-		id: "click1000times",
-		title: "One hell of a clicker",
+		id: "clicks.1000",
+		title: "Letting the clicks go by",
 		description: "Click 1000 times",
 		icon: "hexagon",
 		unlockCondition: () => GameState.stats.timesClicked >= 1000
 	}),
 
 	new Achievement({
-		id: "maxedcombo",
+		id: "extra.maxedcombo",
 		title: "OVERDRIVE!!!",
-		description: "Max your combo for the first time, FULL COMBO!!",
+		description: "Max your combo for the first time",
+		flavorText: "FULL COMBO!!",
 		icon: "hexagon",
 		timeAfter: 2,
 	}),
 
 	new Achievement({
-		id: "panderitomode",
+		id: "extra.panderito",
 		title: "Hmmmmmmmm panderitos...",
 		description: "Spell panderito",
 		icon: "panderito",
 	}),
 
 	new Achievement({
-		id: "tapachievementslot",
+		id: "extra.theSlot",
 		title: "That was easy right?",
 		description: "Tap this achivement's slot",
 		icon: "cursors.point",
 	}),
 
 	new Achievement({
-		id: "gnome",
+		id: "extra.gnome",
 		title: "HOLY SHIT GUYS DID YOU SEE THAT???",
 		description: "WHAT THE FUCK WAS THAT DID WE GET THAT ON CAMERA??????!!",
 		icon: "gnome",
@@ -509,7 +495,7 @@ export let achievements = [
 	}),
 
 	new Achievement({
-		id: "allsongs",
+		id: "extra.songs",
 		title: "Big fan",
 		description: "Listen to all the songs at least once",
 		icon: "icon_music",
@@ -517,15 +503,15 @@ export let achievements = [
 	}),
 
 	new Achievement({
-		id: "buy10stuff",
+		id: "store.stuffBought_10",
 		title: "Inflation",
 		description: "Buy 10 things consecutively",
 		icon: "icon_store",
 	}),
 
 	new Achievement({
-		id: "play15minutes",
-		title: "Thank you for playing!",
+		id: "extra.time_15minutes",
+		title: "Hex-citing Times",
 		description: "Play for 15 minutes",
 		icon: "cursors.wait",
 		unlockCondition: () => GameState.stats.totalTimePlayed >= 60 * 15
@@ -533,7 +519,7 @@ export let achievements = [
 
 	// #endregion EXTRA ACHIEVEMENTS =====================
 	new Achievement({
-		id: "allAchievements",
+		id: "extra.ALL",
 		title: "CONGRATS!!!!",
 		description: "Complete all achievements",
 		icon: "osaka",
@@ -582,9 +568,9 @@ export function unlockAchievement(id:string) {
 	let achievement = getAchievement(id)
 	wait(achievement.timeAfter || 0, () => {
 		addToast({
-			icon: achievement.icon,
+			icon: achievement.icon.includes("medals_") ? `medals_${achievement.id}` : achievement.icon,
 			title: achievement.title,
-			body: achievement.description,
+			body: `${achievement.description}. ${achievement.flavorText ?? achievement.flavorText}`,
 			duration: achievement.readingTime,
 			type: "achievement",
 			whenAdded: (toastObj) => {

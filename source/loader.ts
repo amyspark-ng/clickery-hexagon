@@ -534,8 +534,8 @@ function loadAllSprites() {
 
 	//#endregion Settings
 
-	loadSprite("unknown", "sprites/windows/medalsWin/unknown.png")
-	loadSprite("tapper", "sprites/windows/medalsWin/tapper.png")
+	loadSprite("medalsUnknown", "sprites/windows/medalsWin/medalsUnknown.png")
+	loadSprite("medalsUnknown_tap", "sprites/windows/medalsWin/medalsUnknown_tap.png")
 	
 	const medalsX = 20
 	const medalsY = 1
@@ -559,7 +559,7 @@ function loadAllSprites() {
 
 		let position = getPosInGrid(vec2(0, 0), row, column, spacing)
 
-		medalSprites[`${achievementId}`] = {
+		medalSprites[`medals_${achievementId}`] = {
 			"x": position.x,
 			"y": position.y,
 			"width": spacing.x,
@@ -567,8 +567,10 @@ function loadAllSprites() {
 		}
 	})
 
-	loadSpriteAtlas("sprites/windows/medalsWin/medals.png", medalSprites)
-	
+	loadSpriteAtlas("sprites/windows/medalsWin/medalsMedals.png", medalSprites)
+	loadSprite("medalsWin", "sprites/windows/medalsWin/medalsWin.png")
+	loadSprite("medalsBg", "sprites/windows/medalsWin/medalsBg.png")
+
 	//#region Other ones huh
 	loadSprite("hexColorWin", "sprites/windows/colorWin/hexColorWin.png")
 	loadSprite("bgColorWin", "sprites/windows/colorWin/bgColorWin.png")

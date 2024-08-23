@@ -186,7 +186,13 @@ export function addToast(opts:toastOpts) {
 		}
 	]);
 
-	parseAnimation(icon, opts.icon)
+	if (!opts.icon.includes("medals_")) {
+		parseAnimation(icon, opts.icon)
+	}
+
+	else {
+		icon.use(outline(5, BLACK))
+	}
 
 	if (icon.width >= 70) icon.width = 60
 	if (icon.height >= 70) icon.height = 60
@@ -264,15 +270,22 @@ export function addToast(opts:toastOpts) {
 		bodyText.destroy();
 	});
 
-	if (toastBg.pos.y + toastBg.height >= height()) {
-		// find the bottomest position and set tit to it
-		let bottomestPosition;
+	const Ycenter = toastBg.pos.y + toastBg.height * 0.5
+
+	if (Ycenter >= height()) {
+		// move it to a proper position
+		const newYPos = height() - toastBg.height - 10
+		toastBg.setPosition(vec2(toastBg.getPosition().x, newYPos))
 		
-		let allTosts = get("toast")
-		allTosts.forEach((toast, index) => {
-			toast.setPosition(vec2(toast.getPosition().x, toast.getPosition().y - toastBg.height - 10))
+		// move the other ones up
+		const allTosts = get("toast")
+		allTosts.filter(toast => toast != toastBg).forEach((toast) => {
+			const newYPos = toast.getPosition().y - toastBg.height - 10
+			toast.setPosition(vec2(toast.getPosition().x, newYPos))
 		})
 	}
+
+	if (Ycenter < -10) toastBg.close()
 
 	return toastBg;
 }
@@ -348,11 +361,21 @@ export function addTooltip(obj:GameObj, opts?:tooltipOpts) {
 					break;
 				}
 				
-				this.width = lerp(this.width, sizeOfText.x + padding, opts.lerpValue)
-				this.height = lerp(this.height, sizeOfText.y + padding, opts.lerpValue)
+				if (opts.lerpValue == null || opts.lerpValue == undefined) {
+					this.pos.x = bgPos.x
+					this.pos.y = bgPos.y
 
-				this.pos.x = lerp(this.pos.x, bgPos.x, opts.lerpValue)
-				this.pos.y = lerp(this.pos.y, bgPos.y, opts.lerpValue)
+					this.width = sizeOfText.x + padding
+					this.height = sizeOfText.y + padding
+				}
+
+				else {
+					this.width = lerp(this.width, sizeOfText.x + padding, opts.lerpValue)
+					this.height = lerp(this.height, sizeOfText.y + padding, opts.lerpValue)
+	
+					this.pos.x = lerp(this.pos.x, bgPos.x, opts.lerpValue)
+					this.pos.y = lerp(this.pos.y, bgPos.y, opts.lerpValue)
+				}
 			},
 		}
 	])

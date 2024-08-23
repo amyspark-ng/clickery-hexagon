@@ -33,7 +33,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.amysparkng.clickery-hexagon",
+      "identifier": "com.amyspark-ng.clickery-hexagon",
       "longDescription": "",
       "macOS": {
         "entitlements": null,

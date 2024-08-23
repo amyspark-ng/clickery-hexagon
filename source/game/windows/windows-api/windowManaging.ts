@@ -230,7 +230,7 @@ export function openWindow(windowKey:windowKey) {
 			isMouseInClickingRange() {
 				let condition = 
 				(mouse.pos.y >= getPositionOfSide(this).top) &&
-				(mouse.pos.y <= getPositionOfSide(this).top + 25)
+				(mouse.pos.y <= getPositionOfSide(this).top + 35)
 				return condition;
 			},
 
