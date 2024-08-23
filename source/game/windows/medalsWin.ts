@@ -130,7 +130,7 @@ export function medalsWinContent(winParent:GameObj) {
 
 			if (!isAchievementUnlocked(theAchievement.id)) {
 				// is secret and is locked
-				if (!(theAchievement.secretCondition == null || theAchievement.secretCondition() == true)) {
+				if (theAchievement.secretCondition != null && theAchievement.secretCondition() == false) {
 					title = "???"
 					flavorText = ""
 					description = "This achievement is secret\nFor now..."

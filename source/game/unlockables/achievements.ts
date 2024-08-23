@@ -45,7 +45,7 @@ interface AchievementInterface {
 	 * This means the achievement is secret!
 	 * It will only show its description and title when unlocked
 	 * Otherwise the question mark in the medals window will be tinted purple
-	* @returns Wheter the condition for it it's true or false
+	* @returns Wheter the condition for it it's true or false, if it's true it means it's no longer secret
 	 */
 	secretCondition?: () => boolean;
 	/**
@@ -429,7 +429,7 @@ export let achievements = [
 		description: "Ascend for the fifth time",
 		icon: "icon_ascend",
 		unlockCondition: () => GameState.stats.timesAscended >= 5,
-		secretCondition: () => GameState.stats.timesAscended >= 1,
+		secretCondition: () => isAchievementUnlocked("ascension.times_1"),
 	}),
 
 	new Achievement({
@@ -439,7 +439,7 @@ export let achievements = [
 		rare: true,
 		icon: "icon_ascend",
 		unlockCondition: () => GameState.stats.timesAscended >= 10,
-		secretCondition: () => GameState.stats.timesAscended >= 1,
+		secretCondition: () => isAchievementUnlocked("ascension.times_1"),
 	}),
 
 	new Achievement({
@@ -448,7 +448,7 @@ export let achievements = [
 		description: "Buy 10 cards",
 		icon: "icon_ascend",
 		unlockCondition: () => GameState.ascension.clickPercentagesBought + GameState.ascension.cursorsPercentagesBought + GameState.ascension.powerupPowersBought + GameState.ascension.critPowersBought >= 10,
-		secretCondition: () => GameState.stats.timesAscended >= 1,
+		secretCondition: () => isAchievementUnlocked("ascension.times_1"),
 	}),
 	// #endregion ASCENSION ACHIEVEMENTS =====================
 
