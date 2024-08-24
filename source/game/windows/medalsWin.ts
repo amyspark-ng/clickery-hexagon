@@ -146,6 +146,7 @@ export function medalsWinContent(winParent:GameObj) {
 			let tooltip = addTooltip(medalObj, { 
 				text: title + "\n" + `${description}${flavorText.length < longerTitle ? `. ${flavorText}` : ""}`,
 				direction: "down",
+				lerpValue: 0.5
 			})
 			tooltip.tooltipText.align = "center"
 		})

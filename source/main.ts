@@ -4,14 +4,14 @@ import "kaplay/global";
 import { drawSeriousLoadScreen, loadEverything } from "./loader.ts"
 import { addBackground, addMouse, gameBg } from "./game/additives.ts";
 import { volumeManager } from "./sound.ts";
-import { newgroundsManagement } from "./newgrounds.ts";
+import { connectToNewgrounds } from "./newgrounds.ts";
 import ng from "newgrounds.js";
 import { runInTauri } from "./game/utils.ts";
 import { GameState } from "./gamestate.ts";
 import { windowsDefinition } from "./game/windows/windows-api/windowManaging.ts";
 
 export let DEBUG:boolean = true
-export let enableNg = true
+export let enableNg = false
 
 let kaplayOpts = {
 	width: 1024,
@@ -56,7 +56,7 @@ loadEverything()
 onLoad(() => {
 	volumeManager()
 	addBackground()
-	newgroundsManagement()
+	connectToNewgrounds()
 	
 	windowsDefinition()
 

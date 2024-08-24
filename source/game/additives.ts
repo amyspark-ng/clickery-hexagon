@@ -406,7 +406,7 @@ export function addTooltip(obj:GameObj, opts?:tooltipOpts) {
 		}),
 		color(WHITE),
 		anchor(tooltipBg.anchor),
-		opacity(),
+		opacity(0),
 		pos(tooltipBg.pos),
 		layer(opts.layer),
 		z(opts.z + 1),
@@ -428,6 +428,8 @@ export function addTooltip(obj:GameObj, opts?:tooltipOpts) {
 
 				this.pos.x = xPos
 				this.pos.y = tooltipBg.pos.y
+			
+				this.opacity = lerp(this.opacity, 1, opts.lerpValue)
 			}
 		}
 	])
@@ -436,6 +438,7 @@ export function addTooltip(obj:GameObj, opts?:tooltipOpts) {
 	if (obj.tooltip == null) obj.tooltip = tooltipinfo
 	
 	function end() {
+		// TODO: make it prettier to end
 		destroy(tooltipBg)
 		destroy(tooltipText)
 

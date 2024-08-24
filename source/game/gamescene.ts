@@ -290,7 +290,7 @@ export let hasStartedGame:boolean;
 export const gamescene = () => scene("gamescene", () => {
 	hasStartedGame = GameState.scoreAllTime > 1
 	ascension.ascending = false
-	
+
 	cam = {
 		pos: center(),
 		zoom: 1,
@@ -430,16 +430,14 @@ export const gamescene = () => scene("gamescene", () => {
 			totalTimeOutsideTab = 0
 			isTabActive = false;
 			startTimeOutsideTab = performance.now(); // Store the start time when the tab becomes inactive
-			
-			// save just in case
-			GameState.save(false)
 		}
 	
 		else {
 			if (!isTabActive) {
 				isTabActive = true
-				GameState.save(false)
 				
+				GameState.save(false)
+
 				// If the tab was previously inactive, calculate the time outside the tab and update the total time
 				const timeOutsideTab = performance.now() - startTimeOutsideTab;
 				totalTimeOutsideTab += timeOutsideTab;

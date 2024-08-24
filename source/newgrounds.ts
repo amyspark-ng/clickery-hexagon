@@ -4,15 +4,16 @@ import { gameBg } from "./game/additives";
 import { GameState } from "./gamestate";
 import { openWindow, windowsDefinition } from "./game/windows/windows-api/windowManaging";
 import { Session } from "newgrounds.js/dist/first";
+import { DEBUG } from "./main";
 
 export let ngEnabled:boolean;
 export let ngUser:User;
 
-export function newgroundsManagement() {
+export function connectToNewgrounds() {
 	return ng.connect(env.API_ID, env.ENCRIPTION_KEY);
 }
 
-export async function isLoggedIn() {
+export async function isLoggedIn() : Promise<boolean> {
     const session = await ng.NewgroundsClient.call("App.checkSession");
     return session?.result?.data?.session?.user == null ? false : true;
 }
@@ -69,23 +70,16 @@ export async function newgroundsSceneContent() {
 
 		if (session.user != null) {
 			debug.log("got an user")
+			ngUser = session.user
+			ngEnabled = true
 		}
 
 		else {
 			debug.log("no user, sad")
+		
+			ngUser = null
+			ngEnabled = false
 		}
-
-		// if (ng.getUsername() != null) {
-		// 	ngEnabled = true
-		// 	debug.log("You logged in! Youhoo!!!")
-		// 	wait(1, () => {
-		// 		go("gamescene")
-		// 	})
-		// }
-
-		// else {
-		// 	debug.log("something went wrong im sorry...")
-		// }
 	}
 
 	yesButton.onClick(() => {
