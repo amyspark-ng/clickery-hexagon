@@ -87,13 +87,20 @@ class _GameState {
 	}
 
 	load() {
-		let gottenData = getData("hexagon-save") 
-		if (gottenData) {
-			Object.assign(this, gottenData)
-		}
-		else {
-			gottenData = new _GameState();
-		}
+		let newSave = new _GameState()
+		
+		let gottenData = getData("hexagon-save") as _GameState
+		if (!gottenData) gottenData = newSave
+		
+		// Object.getOwnPropertyNames(gottenData).some(function(property){
+		// 	if (gottenData[property] == undefined || !(property in newSave)) {
+		// 		gottenData = new _GameState();
+		// 		console.error("=== STORED SAVE AND CURRENT SAVE DON'T MATCH UP, WILL DELETE AND GET A NEW ONE ===");
+		// 		return true
+		// 	}
+		// });
+
+		Object.assign(this, gottenData)
 		return gottenData;
 	}
 
@@ -123,6 +130,8 @@ class _GameState {
 		go("gamescene")
 		this.settings.music.muted = true
 	}
+
+	newDumbProperty = true;
 }
 
 export let GameState = new _GameState()
@@ -213,7 +222,7 @@ class _scoreManager {
 
 	// Is the actual formula that determines the amounts you get mana at
 	getScoreForManaAT = (manaAllTime:number) => {
-		return (manaAllTime ** 0.8) * this.ascensionConstant
+		return (manaAllTime ** 1) * this.ascensionConstant
 	}
 
 	// The score you get the next mana at

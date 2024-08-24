@@ -1,42 +1,72 @@
 // # by amyspark-ng
 
-export function positionSetter() {
+type properties = "pos" | "angle" | "width"
+
+export function positionSetter(property?:properties) {
+	property = property ?? "pos"
+	
+	let distance = 1
+	
 	return {
-		id: "setterAnimation",
-		distance: 1,
+		id: "positionSetter",
 		require: ["pos"],
 		update() {
-			if (this.parent.is("setterAnimation")) return
+			if (this.parent.is("positionSetter")) return
 			
-			if (isKeyDown("shift") && isKeyDown("control")) this.distance = 50
-			else if (isKeyDown("shift")) this.distance = 5
-			else if (isKeyDown("control")) this.distance = 10 
-			else this.distance = 1
+			if (isKeyDown("shift") && isKeyDown("control")) distance = 50
+			else if (isKeyDown("shift")) distance = 5
+			else if (isKeyDown("control")) distance = 10 
+			else distance = 1
 
 			if (isKeyPressedRepeat("up")) {
-				this.pos.y -= this.distance
-				debug.log(this.pos)
+				if (property == "pos") {
+					this.pos.y -= distance
+					debug.log(this.pos)
+				}
 			}
 			
 			if (isKeyPressedRepeat("down")) {
-				this.pos.y += this.distance
-				debug.log(this.pos)
+				if (property == "pos") {
+					this.pos.y += distance
+					debug.log(this.pos)
+				}
 			}
 
 			if (isKeyPressedRepeat("left")) {
-				this.pos.x -= this.distance
-				debug.log(this.pos)
+				if (property == "pos") {
+					this.pos.x -= distance
+					debug.log(this.pos)
+				}
+
+				else if (property == "angle") {
+					this.angle -= distance
+					debug.log(this.angle)
+				}
+
+				else if (property == "width") {
+					this.width -= distance
+					this.height -= distance
+					debug.log(this.width)
+				}
 			}
-				
+			
 			if (isKeyPressedRepeat("right")) {
-				this.pos.x += this.distance
-				debug.log(this.pos)
+				if (property == "pos") {
+					this.pos.x += distance
+					debug.log(this.pos)
+				}
+
+				else if (property == "angle") {
+					this.angle += distance
+					debug.log(this.angle)
+				}
+				
+				else if (property == "width") {
+					this.width += distance
+					this.height += distance
+					debug.log(this.width)
+				}
 			}
 		},
-
-		add() {
-			// this.use(area())
-			// this.use(drag())
-		}
 	}
 }

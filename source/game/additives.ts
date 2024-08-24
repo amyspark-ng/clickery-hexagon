@@ -305,7 +305,7 @@ type tooltipOpts = {
 	text:string;
 	direction?: "up" | "down" | "left" | "right",
 	/**
-	 * How "closely" will the tooltip follow the object, from 0 to 1
+	 * How smooth the tooltip will be
 	 */
 	lerpValue?:number,
 	textSize?:number,
@@ -338,7 +338,7 @@ export function addTooltip(obj:GameObj, opts?:tooltipOpts) {
 		z(0),
 		pos(obj.worldPos()),
 		color(BLACK),
-		opacity(0.95),
+		opacity(0),
 		opacity(),
 		anchor("center"),
 		layer(opts.layer),
@@ -387,6 +387,8 @@ export function addTooltip(obj:GameObj, opts?:tooltipOpts) {
 					this.pos.x = lerp(this.pos.x, bgPos.x, opts.lerpValue)
 					this.pos.y = lerp(this.pos.y, bgPos.y, opts.lerpValue)
 				}
+
+				this.opacity = lerp(this.opacity, 0.95, opts.lerpValue)
 			},
 		}
 	])

@@ -718,6 +718,12 @@ function loadAllSprites() {
 	loadSprite("winMage_cursors", "sprites/windows/ascendWin/winMage_cursors.png")
 	loadSprite("winMage_vignette", "sprites/windows/ascendWin/winMage_vignette.png")
 
+	loadSprite("manaCounterTri", "sprites/windows/ascendWin/manaCounterTri.png")
+	loadSprite("ascendBottomPolygon", "sprites/windows/ascendWin/ascendBottomPolygon.png")
+	loadSprite("ascendBar", "sprites/windows/ascendWin/ascendBar.png")
+	loadSprite("ascendManaStar", "sprites/windows/ascendWin/ascendManaStar.png")
+	loadSprite("ascendButton", "sprites/windows/ascendWin/ascendButton.png")
+
 	loadSprite("gnome", "sprites/gnome.png")
 	loadSprite("pinch", "sprites/pinch.png")
 	//#endregion

@@ -26,6 +26,7 @@ let kaplayOpts = {
 	backgroundAudio: true,
 	stretch: false,
 	letterbox: false,
+	maxFPS: 120,
 } as KAPLAYOpt
 
 runInTauri(() => {

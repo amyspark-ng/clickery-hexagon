@@ -6,6 +6,8 @@ import { insideWindowHover } from "../../hovers/insideWindowHover";
 import { positionSetter } from "../../plugins/positionSetter";
 import { blendColors, bop, formatNumber, getPositionOfSide, getRandomDirection, insertAtStart, parseAnimation } from "../../utils";
 
+const tooltipLerp = 0.65
+
 export let upgradeInfo = {
 	"k_0": { value: 2, price: 500 },
 	"k_1": { value: 4, price: 5_000 }, // TODO: look into this, between first and second there's a 5x gap, i think that's good
@@ -207,7 +209,7 @@ export function addUpgrades(elementParent) {
 				text: `${formatNumber(upgradeObj.price, { price: true, fixAmount: 0 })}`,
 				textSize: upgradeObj.height / 2,
 				direction: "down",
-				lerpValue: 0.95,
+				lerpValue: tooltipLerp,
 				type: "price",
 				layer: winParent.layer,
 				z: winParent.z
@@ -300,7 +302,7 @@ export function addUpgrades(elementParent) {
 						text: "You have to buy the previous one",
 						textSize: upgradeObj.height / 2,
 						direction: "down",
-						lerpValue: 0.65,
+						lerpValue: tooltipLerp,
 						type: "store",
 						layer: winParent.layer,
 						z: winParent.z
@@ -367,7 +369,7 @@ export function addUpgrades(elementParent) {
 
 					let tutorialTooltip = addTooltip(upgradeObj, {
 						text: "Hold down to buy!",
-						lerpValue: 0.75,
+						lerpValue: tooltipLerp,
 						type: "storeholddowntobuy",
 						direction: "down",
 					})

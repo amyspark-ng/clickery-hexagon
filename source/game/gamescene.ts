@@ -450,7 +450,7 @@ export const gamescene = () => scene("gamescene", () => {
 					triggerZZZ(false)
 					// false means it was out not idle
 					welcomeBack(false)
-				} 
+				}
 			}
 		}
 	}
