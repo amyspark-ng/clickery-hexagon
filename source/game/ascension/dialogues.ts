@@ -36,8 +36,9 @@ export const mageDialogues = [
 	new Dialogue("tutorial3", "You're ascending, which means you have a lot of stuff to learn..."),
 	new Dialogue("tutorial4", "These are cards, when they're clicked you get an additive percentage"),
 	new Dialogue("tutorial5", "You buy them with mana, which you get after gaining large amounts of score"),
-	new Dialogue("tutorial6", "When returning with your new cards, all your score will be lost"),
-	new Dialogue("tutorial7", "Good luck traveller (so corny)"),
+	new Dialogue("tutorial6", "For every mana you get, you'll get +1% on your score production"),
+	new Dialogue("tutorial7", "When returning with your new cards, all your score will be lost"),
+	new Dialogue("tutorial8", "Good luck traveller (so corny)"),
 	
 	// extra ones
 	new Dialogue("eye1", "Stop that", true),

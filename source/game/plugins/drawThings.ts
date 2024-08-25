@@ -1,10 +1,10 @@
+import { Color, KEventController } from "kaplay"
+
 /**
  * Draws a damn shadow 
  */
 export function drawDamnShadow(xSpacing: number, ySpacing: number, theOpacity: number) {
-	let drawEvent = null
-
-	const theColor = BLACK
+	let drawEvent:KEventController;
 
 	return {
 		id: "damnShadow",
@@ -20,7 +20,7 @@ export function drawDamnShadow(xSpacing: number, ySpacing: number, theOpacity: n
 
 						pos: vec2(this.pos.x + xSpacing, this.pos.y + ySpacing),
 						opacity: theOpacity,
-						color: theColor,
+						color: BLACK,
 						anchor: this.anchor,
 						scale: this.scale,
 						angle: this.angle,
@@ -36,7 +36,7 @@ export function drawDamnShadow(xSpacing: number, ySpacing: number, theOpacity: n
 
 						pos: vec2(this.pos.x + xSpacing, this.pos.y + ySpacing),
 						opacity: theOpacity,
-						color: theColor,
+						color: BLACK,
 						anchor: this.anchor,
 						scale: this.scale,
 						angle: this.angle,
@@ -51,7 +51,7 @@ export function drawDamnShadow(xSpacing: number, ySpacing: number, theOpacity: n
 
 						pos: vec2(this.pos.x + xSpacing, this.pos.y + ySpacing),
 						opacity: theOpacity,
-						color: theColor,
+						color: BLACK,
 						anchor: this.anchor,
 						scale: this.scale,
 						angle: this.angle,
@@ -65,6 +65,41 @@ export function drawDamnShadow(xSpacing: number, ySpacing: number, theOpacity: n
 		destroy() {
 			drawEvent.cancel()
 			drawEvent = null
+		}
+	}
+}
+
+/**
+ * Draws a dumb outline 
+ */
+export function drawDumbOutline(width:number, coliring:Color) : { changeDumbOutlineWidth(width:number), get dumbOutlineWidth():number, add():void, destroy():void } {
+	let drawEvent:KEventController;
+	
+	return {
+		changeDumbOutlineWidth(newWidth:number) {
+			width = newWidth
+		},
+
+		get dumbOutlineWidth() {
+			return width;
+		},
+		
+		add() {
+			drawEvent = this.parent.onDraw(() => {
+				drawRect({
+					pos: this.pos,
+					width: this.width + width,
+					height: this.height + width,
+					radius: this.radius,
+					anchor: this.anchor,
+					color: coliring,
+				})
+			})
+		},
+
+		destroy() {
+			drawEvent.cancel();
+			drawEvent = null;
 		}
 	}
 }

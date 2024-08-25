@@ -5,7 +5,7 @@ import { drag, curDraggin, setCurDraggin } from "../.././plugins/drag.ts";
 import { playSfx } from "../../../sound.ts";
 import { ROOT } from "../../../main.ts";
 import { folderObj } from "./folderObj.ts";
-import { Vec2 } from "kaplay";
+import { GameObj, Vec2 } from "kaplay";
 import { insideWindowHover } from "../../hovers/insideWindowHover.ts";
 import { isAchievementUnlocked, unlockAchievement } from "../../unlockables/achievements.ts";
 
@@ -159,6 +159,7 @@ export function openWindow(windowKey:windowKey) {
 		drag(),
 		area({ scale: vec2(1, 1) }),
 		timer(),
+		color(),
 		"window",
 		`${windowKey}`,
 		{
@@ -197,11 +198,12 @@ export function openWindow(windowKey:windowKey) {
 				this.active = true
 				this.trigger("activate")
 				
-				if (!this.is("shader")) return
-				this.unuse("shader")
-				this.get("*", { recursive: true }).forEach((obj) => {
-					obj.unuse("shader")
-				})
+				if (this.is("shader")) {
+					this.unuse("shader")
+					this.get("*", { recursive: true }).forEach((obj) => {
+						obj.unuse("shader")
+					})
+				}
 
 				// trigger some hovers
 				this.get("*").filter(obj => obj.is("insideHover") && obj.isHovering() == true && obj.isBeingHovered == false).forEach(obj => {
@@ -213,11 +215,12 @@ export function openWindow(windowKey:windowKey) {
 				this.active = false
 				this.trigger("deactivate")
 
-				if (this.is("shader")) return
-				this.use(shader("grayscale"))
-				this.get("*", { recursive: true }).forEach((obj) => {
-					obj.use(shader("grayscale"))
-				})
+				if (!this.is("shader")) {
+					this.use(shader("grayscale"))
+					this.get("*", { recursive: true }).forEach((obj) => {
+						obj.use(shader("grayscale"))
+					})
+				}
 
 				// untrigger some hovers
 				let objsWithHover = this.get("*").filter(obj => obj.is("insideHover") && obj.isBeingHovered == true)

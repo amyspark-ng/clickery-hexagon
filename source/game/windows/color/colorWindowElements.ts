@@ -4,7 +4,7 @@ import { curDraggin, drag, setCurDraggin } from "../../plugins/drag"
 import { blendColors, bop, getPositionOfSide } from "../../utils"
 import { playSfx } from "../../../sound"
 import { saveColor } from "../../../gamestate"
-import { drawDamnShadow } from "../../plugins/drawDamnShadow"
+import { drawDamnShadow } from "../../plugins/drawThings"
 import { insideWindowHover } from "../../hovers/insideWindowHover"
 import { mouse } from "../../additives"
 

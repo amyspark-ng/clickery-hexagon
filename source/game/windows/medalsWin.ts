@@ -4,6 +4,7 @@ import { addTooltip } from "../additives";
 import { insideWindowHover } from "../hovers/insideWindowHover";
 import { achievements, achievementsInfo, getAchievement, isAchievementUnlocked, unlockAchievement } from "../unlockables/achievements";
 import { blendColors } from "../utils";
+import { drawDumbOutline } from "../plugins/drawThings";
 
 let totalColumns = 5;
 let totalRows = 7;
@@ -23,7 +24,7 @@ function indexToGrid(i:number) {
 	return newDesiredPos
 }
 
-let medalsContainer:any;
+let medalsContainer:GameObj = null;
 export function medalsWinContent(winParent:GameObj) {
 	medalsContainer = winParent.add([
 		pos(-18, -214),
@@ -50,27 +51,27 @@ export function medalsWinContent(winParent:GameObj) {
 			area(),
 			insideWindowHover(winParent),
 			color(),
+			drawDumbOutline(10, BLACK),
 			"medal",
 			{
 				achievementId: medal_ID,
 				row: gridPosition.row,
 				column: gridPosition.column,
+				tooltip: null,
 				
 				update() {
 					if (isAchievementUnlocked(this.achievementId)) {
 						// if (achievement is in the available icon ones)
 						if (availableAchievements.map(achievement => achievement.id).includes(medal_ID)) {
 							if (this.sprite != medal_ID) this.sprite = "medals_" + medal_ID
+							if (this.dumbOutlineWidth != 8) this.changeDumbOutlineWidth(8)	
 						}
 
 						// nope
 						else {
 							if (this.sprite != "medalsUnknown") this.sprite = "medalsUnknown"
 							this.color = GREEN.lighten(100)
-						}
-
-						if (!this.is("outline")) {
-							this.use(outline(5, BLACK))
+							if (this.dumbOutlineWidth != 0) this.changeDumbOutlineWidth(0)	
 						}
 					}
 					
@@ -108,7 +109,6 @@ export function medalsWinContent(winParent:GameObj) {
 
 		// one less, i don't know why!!
 		medalObj.pos = getPositionInWindow(gridPosition.row - 1, gridPosition.column - 1)
-		medalObj.achievementIdx = achievements.indexOf(getAchievement(medal_ID))
 
 		medalObj.onPressClick(() => {
 			if (medalObj.achievementId == "extra.theSlot") {

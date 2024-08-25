@@ -11,7 +11,7 @@ import { dialogue, getDialogue, getRandomDialogue, mageDialogues, startDialoguin
 import { spawnCards } from "./cards";
 import { positionSetter } from "../plugins/positionSetter";
 import { playSfx } from "../../sound";
-import { mouse } from "../additives";
+import { addTooltip, mouse, tooltipInfo } from "../additives";
 
 export let ascension = {
 	ascending: false,
@@ -37,14 +37,26 @@ function addLeaveButton() {
 	tween(leaveButton.scale, vec2(1), 0.25, (p) => leaveButton.scale = p, easings.easeOutExpo).onEnd(() => {
 		leaveButton.area.scale = vec2(1)
 	
+		let tooltip:tooltipInfo;
+
 		leaveButton.onHover(() => {
 			tween(leaveButton.scale, vec2(1.1), 0.25, (p) => leaveButton.scale = p, easings.easeOutExpo)
 			mouse.play("point")
+
+			tooltip = addTooltip(leaveButton, {
+				text: "When clicked\nwill end the ascension",
+				direction: "left",
+				lerpValue: 0.5,
+				layer: leaveButton.layer,
+				z: leaveButton.z,
+			})
 		})
 
 		leaveButton.onHoverEnd(() => {
 			tween(leaveButton.scale, vec2(1), 0.25, (p) => leaveButton.scale = p, easings.easeOutExpo)
 			mouse.play("cursor")
+
+			tooltip.end()
 		})
 
 		leaveButton.onClick(() => {
@@ -147,7 +159,11 @@ export function startAscending() {
 				})
 			}
 
-			if (key == "tutorial7" || key.includes("back") && get("leaveButton").length == 0) {
+			// gets the last tutorial key
+			const thingy = mageDialogues.map(dialogue => dialogue.key).filter(dialogue => dialogue.includes("tutorial"))
+			const lastTutorialkey = thingy[thingy.length - 1] 
+
+			if (key == lastTutorialkey || key.includes("back") && get("leaveButton").length == 0) {
 				addLeaveButton()
 			}
 		})

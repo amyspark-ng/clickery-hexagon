@@ -1,4 +1,4 @@
-import { GameObj, KAPLAYCtx, Vec2 } from "kaplay"
+import { Anchor, GameObj, KAPLAYCtx, RectComp, TextComp, Vec2 } from "kaplay"
 import { GameState } from "../gamestate"
 import { playSfx } from "../sound"
 import { hexagon } from "./hexagon"
@@ -314,11 +314,13 @@ type tooltipOpts = {
 	z?:number,
 }
 
+export type tooltipInfo = { tooltipBg:GameObj<RectComp>, tooltipText:GameObj<TextComp>, end: () => void, type: string, }
+
 /**
  * Adds a tooltip to an object and pushes itself to a tooltips array
  * @returns An object that contains the bg, text and an end() function 
  */
-export function addTooltip(obj:GameObj, opts?:tooltipOpts) {
+export function addTooltip(obj:GameObj, opts?:tooltipOpts) : tooltipInfo {
 	if (opts == undefined) opts = {} as tooltipOpts 
 	opts.direction = opts.direction ?? "up";
 	opts.lerpValue = opts.lerpValue ?? 1;
@@ -333,13 +335,15 @@ export function addTooltip(obj:GameObj, opts?:tooltipOpts) {
 	let bgPos = vec2(obj.worldPos().x, obj.worldPos().y)
 	let padding = 10;
 
+	let ending = false
+	let theOpacity = 0.95
+
 	let tooltipBg = add([
 		rect(sizeOfText.x, sizeOfText.y, { radius: 5 }),
 		z(0),
 		pos(obj.worldPos()),
 		color(BLACK),
-		opacity(0),
-		opacity(),
+		opacity(theOpacity),
 		anchor("center"),
 		layer(opts.layer),
 		z(opts.z),
@@ -348,47 +352,39 @@ export function addTooltip(obj:GameObj, opts?:tooltipOpts) {
 			end: null,
 			type: opts.type,
 			update() {
-				switch (opts.direction) {
-					case "up":
-						bgPos.y = (obj.worldPos().y - obj.height / 2) - offset
-						bgPos.x = obj.worldPos().x
-					break;
-			
-					case "down":
-						bgPos.y = (obj.worldPos().y + obj.height / 2) + offset
-						bgPos.x = obj.worldPos().x
-					break;
-			
-					case "left":
-						this.anchor = "right"	
-						bgPos.x = (obj.worldPos().x - obj.width / 2) - offset
-						bgPos.y = obj.worldPos().y
-					break;
-			
-					case "right":
-						this.anchor = "left"	
-						bgPos.x = (obj.worldPos().x + obj.width / 2) + offset
-						bgPos.y = obj.worldPos().y
-					break;
+				if (ending == false) {
+					switch (opts.direction) {
+						case "up":
+							bgPos.y = (obj.worldPos().y - obj.height / 2) - offset
+							bgPos.x = obj.worldPos().x
+						break;
+				
+						case "down":
+							bgPos.y = (obj.worldPos().y + obj.height / 2) + offset
+							bgPos.x = obj.worldPos().x
+						break;
+				
+						case "left":
+							this.anchor = "right"	
+							bgPos.x = (obj.worldPos().x - obj.width / 2) - offset
+							bgPos.y = obj.worldPos().y
+						break;
+				
+						case "right":
+							this.anchor = "left"	
+							bgPos.x = (obj.worldPos().x + obj.width / 2) + offset
+							bgPos.y = obj.worldPos().y
+						break;
+					}
 				}
 				
-				if (opts.lerpValue == null || opts.lerpValue == undefined) {
-					this.pos.x = bgPos.x
-					this.pos.y = bgPos.y
+				this.width = lerp(this.width, sizeOfText.x + padding, opts.lerpValue)
+				this.height = lerp(this.height, sizeOfText.y + padding, opts.lerpValue)
 
-					this.width = sizeOfText.x + padding
-					this.height = sizeOfText.y + padding
-				}
+				this.pos.x = lerp(this.pos.x, bgPos.x, opts.lerpValue)
+				this.pos.y = lerp(this.pos.y, bgPos.y, opts.lerpValue)
 
-				else {
-					this.width = lerp(this.width, sizeOfText.x + padding, opts.lerpValue)
-					this.height = lerp(this.height, sizeOfText.y + padding, opts.lerpValue)
-	
-					this.pos.x = lerp(this.pos.x, bgPos.x, opts.lerpValue)
-					this.pos.y = lerp(this.pos.y, bgPos.y, opts.lerpValue)
-				}
-
-				this.opacity = lerp(this.opacity, 0.95, opts.lerpValue)
+				this.opacity = lerp(this.opacity, theOpacity, opts.lerpValue)
 			},
 		}
 	])
@@ -431,18 +427,23 @@ export function addTooltip(obj:GameObj, opts?:tooltipOpts) {
 				this.pos.x = xPos
 				this.pos.y = tooltipBg.pos.y
 			
-				this.opacity = lerp(this.opacity, 1, opts.lerpValue)
+				this.opacity = lerp(this.opacity, theOpacity > 0 ? 1 : theOpacity, opts.lerpValue)
 			}
 		}
 	])
 
-	let tooltipinfo = { tooltipBg, tooltipText, end, type: opts.type }
+	let tooltipinfo = { tooltipBg, tooltipText, end, type: opts.type } as tooltipInfo
 	if (obj.tooltip == null) obj.tooltip = tooltipinfo
 	
 	function end() {
-		// TODO: make it prettier to end
-		destroy(tooltipBg)
-		destroy(tooltipText)
+		ending = true
+		theOpacity = 0
+		bgPos = obj.worldPos()
+
+		wait(1 - opts.lerpValue, () => {
+			destroy(tooltipBg)
+			destroy(tooltipText)
+		})
 
 		obj.tooltip = null
 	}

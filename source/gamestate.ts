@@ -38,7 +38,7 @@ class _GameState {
 	hasUnlockedPowerups = false
 	
 	powerupPower = 1
-	critPower = 0
+	critPower = 1
 
 	ascension = {
 		mana: 0,
@@ -143,19 +143,18 @@ class _scoreManager {
 	
 	// score per click (no combo or powerups or percentage)
 	scorePerClick_Vanilla = () => {
-		return Math.round(GameState.clickers * GameState.clicksUpgradesValue)
+		return Math.round(GameState.clickers * GameState.clicksUpgradesValue) 
 	}
 
 	// score per click
 	scorePerClick = () => {
-		let vanillaValue = this.scorePerClick_Vanilla()
-		let noPercentage = (vanillaValue * (powerupTypes.clicks.multiplier * powerupTypes.awesome.multiplier) * this.combo)
-		let returnValue = noPercentage + percentage(GameState.clickPercentage, noPercentage)
-		return Math.round(returnValue)
-	}
-
-	getScoreWithCrit = () => {
-		return Math.round(this.scorePerClick() * (GameState.critPower * 0.5))
+		const vanillaValue = this.scorePerClick_Vanilla()
+		const countingPowerups = vanillaValue * powerupTypes.clicks.multiplier * powerupTypes.awesome.multiplier
+		const countingCombo = countingPowerups * this.combo
+		const countingCards = countingCombo + percentage(countingCombo, GameState.clickPercentage)
+		const countingManaAT = countingCards + percentage(countingCards, GameState.ascension.manaAllTime)
+		const countingCrit = countingManaAT * GameState.critPower
+		return Math.round(countingCrit)
 	}
 
 	// score per cursor click (not including powerups or percentages)
@@ -165,16 +164,17 @@ class _scoreManager {
 
 	// score per cursor click
 	scorePerAutoClick = () => {
-		let noPercentage = GameState.cursors * GameState.cursorsUpgradesValue * (powerupTypes.cursors.multiplier * powerupTypes.awesome.multiplier)
-		let returnValue = noPercentage + percentage(GameState.cursorsPercentage, noPercentage)
-		return Math.round(returnValue)
+		const vanillaValue = this.scorePerAutoClick_Vanilla()
+		const countingPowerups = vanillaValue * powerupTypes.cursors.multiplier * powerupTypes.awesome.multiplier
+		const countingCards = countingPowerups + percentage(countingPowerups, GameState.cursorsPercentage)
+		const countingManaAT = countingCards + percentage(countingCards, GameState.ascension.manaAllTime)
+		return Math.round(countingManaAT)
 	}
 
 	// the score per second you're getting by cursors
 	// no rounding because can be decimal (0.1)
 	autoScorePerSecond = () => {
-		let returnValue = this.scorePerAutoClick() / GameState.timeUntilAutoLoopEnds
-		return returnValue
+		return this.scorePerAutoClick() / GameState.timeUntilAutoLoopEnds
 	}
 
 	// the general score per second clicks and all
@@ -213,24 +213,32 @@ class _scoreManager {
 	// =====================
 	// Mana is a spendable currency
 	// When score is greater than scoreTilNextMana, mana is added by one
-	// Magic level is as multiplier
+	// Every mana all time gives +1% of score production 
 
 	/**
 	 * This is the number you start getting mana at
 	 */
 	ascensionConstant = 5_000_000
 
-	// Is the actual formula that determines the amounts you get mana at
+	/**
+	 * The actual formula used to calculate the score needed for a certain mana 
+	 * @param manaAllTime The mana all time
+	 * @returns The score needed for that mana all time
+	 */
 	getScoreForManaAT = (manaAllTime:number) => {
 		return (manaAllTime ** 1) * this.ascensionConstant
 	}
 
-	// The score you get the next mana at
+	/**
+	 * Why does this exist
+	 * @returns The score you get the next mana at
+	 */
 	scoreYouGetNextManaAt = () => {
 		let nextManaAt = this.getScoreForManaAT(GameState.ascension.manaAllTime + 1);
 		return nextManaAt;
 	}
 
+	// Oliver the goat 
 	manaPerSecond = () => {
 		const scoreNeededForNextMana = GameState.ascension.manaAllTime ** 0.8 * this.ascensionConstant;
 
