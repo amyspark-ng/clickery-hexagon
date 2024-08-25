@@ -38,7 +38,7 @@ class _GameState {
 	hasUnlockedPowerups = false
 	
 	powerupPower = 1
-	critPower = 1
+	critPower = 0
 
 	ascension = {
 		mana: 0,
@@ -146,15 +146,21 @@ class _scoreManager {
 		return Math.round(GameState.clickers * GameState.clicksUpgradesValue) 
 	}
 
-	// score per click
-	scorePerClick = () => {
+	/**
+	 * Gets the score per click with powerups combo cards mana and possibly crit
+	 * @param crit Wheter to also include critical power
+	 * @returns The score
+	 */
+	scorePerClick = (crit?:boolean) => {
 		const vanillaValue = this.scorePerClick_Vanilla()
 		const countingPowerups = vanillaValue * powerupTypes.clicks.multiplier * powerupTypes.awesome.multiplier
 		const countingCombo = countingPowerups * this.combo
 		const countingCards = countingCombo + percentage(countingCombo, GameState.clickPercentage)
 		const countingManaAT = countingCards + percentage(countingCards, GameState.ascension.manaAllTime)
-		const countingCrit = countingManaAT * GameState.critPower
-		return Math.round(countingCrit)
+		
+		crit = crit ?? false
+		if (crit) return Math.round(countingManaAT * GameState.critPower)
+		else return Math.round(countingManaAT) 
 	}
 
 	// score per cursor click (not including powerups or percentages)

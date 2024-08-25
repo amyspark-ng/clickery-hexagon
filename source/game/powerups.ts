@@ -65,22 +65,22 @@ export let powerupTypes = {
 	"blab": new Powerup("panderito", 20, 0.15),
 }
 
-let blabPhrases = [
+const blabPhrases = [
 	"Test powerup",
+	"Despite a text saying test powerup\nThis was the last powerup implemented",
 	"lol!",
-	"Why did you click me?",
-	"IT HAD A FAMILY!!!......",
-	"Clicking since 1999",
 	"Hexagoning since march 2024",
 	"Also try Cookie Clicker!",
 	"Orteil don't sue me",
 	"Area of an hexagon:\nA = (p * 2) / 2",
+	"Yummers",
+	"Enjoying the game so far?",
+	"These sometimes explain things things i was lazy enough to code an explanation for",
 	"Did you know?\nYou can hold to drag the buttons in your taskbar around!",
 	"Did you know?\nYou can hold and drag the buttons in the extra window\nto your taskbar!",
 	"Did you know?\nYou can hold your mouse when buying!",
 	"Did you know?\nYou can hold shift to bulk-buy 10x things!",
 	"Did you know?\nYou can click the big hexagon several times\nto start a combo!",
-	"Did you know?\nYou can click the score per second text to see how much\nyou'd make in different times!",
 	"Did you know?\nThe game has support for displaying numbers up until Vigintillions!",
 ]
 
@@ -248,7 +248,10 @@ export function addPowerupLog(powerupType:powerupName) {
 					textInText = `+${formatNumber(Math.round(scoreManager.autoScorePerSecond()) * powerupTime)}, the score you would have gained in ${stringPowerupTime}`
 				}
 				else if (powerupType == "awesome") textInText = `Score production increased by x${powerupMultiplier} for ${stringPowerupTime}, AWESOME!!`
-				else if (powerupType == "store") textInText = `Store prices have a discount of ${Math.round(powerupMultiplier * 100)}% for ${stringPowerupTime}, get em' now!`
+				else if (powerupType == "store") {
+					const discount = 100 - Math.round(powerupMultiplier * 100)
+					textInText = `Store prices have a discount of ${discount}% for ${stringPowerupTime}, get em' now!`
+				}
 				else if (powerupType == "blab") textInText = textInText
 				
 				else throw new Error("powerup type doesn't exist");
@@ -260,7 +263,7 @@ export function addPowerupLog(powerupType:powerupName) {
 
 	let icon = bg.add([
 		sprite("white_noise"),
-		pos(-bg.width / 2, -bg.height / 2),
+		pos(textInBg.pos.x - textInBg.width / 2 - 15, textInBg.pos.y),
 		anchor("center"),
 		opacity(),
 		{
@@ -279,7 +282,7 @@ export function addPowerupLog(powerupType:powerupName) {
 
 	bg.onUpdate(() => {
 		let radius = 5
-		let width = 315
+		let width = textInBg.width + icon.width * 2
 		let height = formatText({ text: textInText, ...textInBgOpts as TextCompOpt }).height + 15
 		
 		bg.height = lerp(bg.height, height, 0.5)
@@ -397,29 +400,28 @@ export function spawnPowerup(opts?:powerupOpt) {
 				let multiplier = 0
 				let time = 0
 
-				const power = GameState.powerupPower
-
 				if (opts.multiplier == null) {
 					if (opts.type == "clicks" || opts.type == "cursors") {
-						time = opts.time ?? randi(5, 15)
-						multiplier = randi(2, 5) * power
+						time = opts.time ?? randi(15, 30)
+						multiplier = randi(1.5, 3) * GameState.powerupPower
 					}
 					
 					// op powerups
 					else if (opts.type == "awesome") {
-						time = opts.time ?? randi(2.5, 5)
-						multiplier = randi(5, 10) * power
+						time = opts.time ?? randi(10, 15)
+						multiplier = randi(4, 8) * GameState.powerupPower
 					}
 
 					else if (opts.type == "store") {
-						time = opts.time ?? randi(2.5, 5)
-						multiplier = rand(0.05, 0.25) / power
+						time = opts.time ?? randi(10, 15)
+						// i don't understand this why is it the bigger the cheaper???????
+						multiplier = rand(0.5, 0.75) / GameState.powerupPower
 					}
 
 					// patience
 					else if (opts.type == "time") {
 						multiplier = 1
-						time = opts.time ?? rand(30, 60) * power
+						time = opts.time ?? rand(30, 60) * GameState.powerupPower
 						scoreManager.addTweenScore(scoreManager.scorePerSecond() * time)
 					}
 

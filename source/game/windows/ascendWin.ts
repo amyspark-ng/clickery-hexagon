@@ -5,6 +5,7 @@ import { allPowerupsInfo} from "../powerups"
 import { formatNumber, formatNumberSimple } from "../utils"
 import { waver } from "../plugins/wave"
 import { positionSetter } from "../plugins/positionSetter"
+import { ROOT } from "../../main"
 
 let objectsPositions = {
 	mage_hidden: 450,
@@ -258,5 +259,13 @@ export function ascendWinContent(winParent:GameObj) {
 	ascendButton.onClick(() => {
 		if (allPowerupsInfo.isHoveringAPowerup == true) return
 		if (GameState.ascension.mana >= 1) startAscending()
+	})
+
+	let manaGainedCheck = ROOT.on("manaGained", () => {
+
+	})
+
+	winParent.on("close", () => {
+		manaGainedCheck.cancel()
 	})
 }

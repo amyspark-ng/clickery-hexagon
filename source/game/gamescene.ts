@@ -14,6 +14,7 @@ import { curDraggin } from "./plugins/drag.ts"
 import { unlockableWindows } from "./unlockables/windowUnlocks.ts"
 import { appWindow } from '@tauri-apps/api/window';
 import { ngEnabled, postEverything } from "../newgrounds.ts"
+import { makeSmallParticles } from "./plugins/confetti.ts"
 
 let panderitoLetters = "panderito".split("")
 export let panderitoIndex = 0
@@ -619,4 +620,47 @@ export const gamescene = () => scene("gamescene", () => {
 	})
 
 	if (DEBUG == true) debugFunctions()
+
+	const addCriticalParticles = (big:boolean) => {
+		let redcritcolor = rgb(237, 92, 66)
+		let bluecritcolor = rgb(77, 138, 235)
+		
+		let angleSize = rand(0, 360)
+		let theColor = [big ? bluecritcolor : redcritcolor, big ? bluecritcolor : redcritcolor]
+		let randomDirection = rand(0, 360)
+
+		let critParticleEmitter = add([
+			layer("ui"),
+			pos(mousePos()),
+			opacity(),
+			particles({
+				max: 8,
+				texture: getSprite("part_star").data.tex,
+				quads: [getSprite("part_star").data.frames[0]],
+
+				speed: [100, 250],
+				angle: [0, 0],
+				colors: theColor,
+				scales: [1.5, 2.1],
+				lifeTime: [0.35, 0.5],
+				opacities: [1, 0],
+				damping: [1, 2],
+				acceleration: [vec2(0), vec2(-50)],
+			}, {
+				lifetime: 1.5,
+				rate: 100,
+				direction: randomDirection,
+				spread: -90,
+			})
+		])
+
+		critParticleEmitter.emit(rand(4, 8))
+		critParticleEmitter.onEnd(() => {
+			critParticleEmitter.destroy()
+		})
+	}
+	
+	// onClick(() => {
+	// 	addCriticalParticles(false)
+	// })
 })

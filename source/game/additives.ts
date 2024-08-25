@@ -6,6 +6,7 @@ import { blendColors, getPosInGrid, getPositionOfSide, parseAnimation, saveColor
 import { allObjWindows, manageWindow } from "./windows/windows-api/windowManaging"
 import { isWindowUnlocked } from "./unlockables/windowUnlocks"
 import { k } from "../main"
+import { drawDumbOutline } from "./plugins/drawThings"
 
 export let gameBg:GameObj;
 export function addBackground() {
@@ -195,6 +196,7 @@ export function addToast(opts:toastOpts) {
 	// the medal exists
 	if (opts.icon.includes("medals_")) {
 		icon.sprite = opts.icon
+		icon.use(drawDumbOutline(5, BLACK))
 	}
 	
 	else {

@@ -174,16 +174,16 @@ export function addHexagon() {
 				if (isCritical == true) {
 					if (chance(0.2)) isBigCrit = true
 					else isBigCrit = false
-				} 
+				}
 
 				if (GameState.critPower > 1 && isCritical == true) {
 					// it's a critical hit
-					scoreObtained = scoreManager.getScoreWithCrit()
-					if (isBigCrit == true) scoreObtained *= rand(1.2, 1.5)
+					scoreObtained = scoreManager.scorePerClick(true)
+					if (isBigCrit == true) scoreObtained *= rand(1.05, 1.1)
 				}
 
 				else {
-					scoreObtained = scoreManager.scorePerClick()
+					scoreObtained = scoreManager.scorePerClick(false)
 				}
 
 				scoreObtained = Math.round(scoreObtained)

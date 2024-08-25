@@ -3,6 +3,7 @@ import { removeNumbersOfString } from "../utils";
 import { ascension } from "./ascension";
 import { spawnCards } from "./cards";
 import { playSfx } from "../../sound";
+import { GameState } from "../../gamestate";
 
 class Dialogue {
 	/**
@@ -39,7 +40,7 @@ export const mageDialogues = [
 	new Dialogue("tutorial6", "For every mana you get, you'll get +1% on your score production"),
 	new Dialogue("tutorial7", "When returning with your new cards, all your score will be lost"),
 	new Dialogue("tutorial8", "Good luck traveller (so corny)"),
-	
+
 	// extra ones
 	new Dialogue("eye1", "Stop that", true),
 	new Dialogue("eye2", "Don't do that", true),
@@ -82,6 +83,11 @@ export function startDialoguing() {
 	dialogue.textBox = addDialogueText()
 }
 
+function playerReadAction() {
+	if (dialogue.textBox.text != currentlySaying) skipTalk()
+	else continueDialogue(ascension.currentDialoguekey)
+}
+
 function addDialogueBox() {
 	let box = add([
 		sprite("dialogue"),
@@ -113,8 +119,11 @@ function addDialogueBox() {
 	})
 
 	box.onClick(() => {
-		if (dialogue.textBox.text != currentlySaying) skipTalk()
-		else continueDialogue(ascension.currentDialoguekey)
+		playerReadAction()
+	})
+
+	box.onKeyPress(["space", "enter"], () => {
+		playerReadAction()
 	})
 
 	tween(0.5, 1, 0.25, (p) => box.scale.x = p, easings.easeOutQuint)

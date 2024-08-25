@@ -13,7 +13,8 @@ let totalRows = 7;
 let initialPos = { x: -132, y: 42 };
 let spacing = { x: 66, y: 65 };
 
-const availableAchievements = achievements.slice(0, 20);
+// DONT USE AVAILABLEMEDALSPRITES THAT SHIT DOESN?T MAKE SENSE
+const availableAchievements = achievements.slice(0, 30);
 
 function getPositionInWindow(row:number, column:number) {
 	return vec2(initialPos.x + spacing.x * (column), initialPos.y + spacing.y * (row));
@@ -34,14 +35,11 @@ export function medalsWinContent(winParent:GameObj) {
 		anchor("top"),
 	])
 
-	// TODO: you know what would be fun?????????????
-	
-	// make every medal a draw event that draws the sprite, map every row&column to an achievement
-	// everytime you scroll that achievements gets updated
-	// for hovers you can check the distance to the position the medal will be in
 	function addMedal(gridPosition:{ row:number, column:number }, medal_ID:string) {
 		const PURPLE = blendColors(RED, BLUE, 0.5)
 		
+		const theAchievement = getAchievement(medal_ID)
+
 		let medalObj = medalsContainer.add([
 			sprite("medalsUnknown"),
 			pos(),
@@ -104,8 +102,6 @@ export function medalsWinContent(winParent:GameObj) {
 				},
 			}
 		])
-
-		const theAchievement = getAchievement(medal_ID)
 
 		// one less, i don't know why!!
 		medalObj.pos = getPositionInWindow(gridPosition.row - 1, gridPosition.column - 1)

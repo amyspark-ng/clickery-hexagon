@@ -140,7 +140,7 @@ export let achievements = [
 	new Achievement({
 		id: "score.5_000",
 		title: "Now you're clickin",
-		description: "Ok these seem to be working",
+		description: "Get 5.000 of score",
 		unlockCondition: () => GameState.scoreAllTime >= 5_000,
 	}),
 
@@ -307,7 +307,7 @@ export let achievements = [
 
 	new Achievement({
 		id: "clickers.50",
-		title: "CAMBIAR",
+		title: "Iridescent Cursor",
 		description: "Have 50 clickers",
 		rare: true,
 		icon: "cursors.cursor",

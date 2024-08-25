@@ -68,3 +68,56 @@ export function addConfetti(opt:confettiOpt) {
 		})
 	}
 }
+
+type extraOpts = {
+	sprite: string,
+	layer: string,
+	z: number,
+}
+
+export function makeSmallParticles(opts:confettiOpt & extraOpts) {
+	opts = opts || {} as confettiOpt & extraOpts
+
+	opts.count = opts.count ?? 30
+	opts.pos = opts.pos ?? vec2(0, 0)
+	opts.color = opts.color ?? WHITE
+	opts.sprite = opts.sprite ?? "part_star"
+	opts.layer = opts.layer ?? "background"
+	opts.z = opts.z ?? 1
+	
+	for (let i = 0; i < (opts.count ?? DEF_COUNT); i++) {
+		const p = add([
+			sprite(opts.sprite),
+			pos(opts.pos),
+			color(opts.color),
+			opacity(1),
+			lifespan(4),
+			scale(1),
+			z(opts.z),
+			layer(opts.layer),
+			anchor("center"),
+			rotate(rand(0, 360)),
+		])
+		const spin = rand(DEF_SPIN[0], DEF_SPIN[1])
+		const gravity = opts.gravity ?? DEF_GRAVITY
+		const airDrag = opts.airDrag ?? DEF_AIR_DRAG
+		const heading = opts.heading ?? -90
+		const spread = opts.spread ?? DEF_SPREAD
+		const head = heading + rand(-spread / 2, spread / 2)
+		const fade = opts.fade ?? DEF_FADE
+		const vel = opts.velocity
+		let velX = Math.cos(deg2rad(head)) * vel
+		let velY = Math.sin(deg2rad(head)) * vel
+		const velA = opts.angularVelocity
+		p.onUpdate(() => {
+			velY += gravity * dt()
+			p.pos.x += velX * dt()
+			p.pos.y += velY * dt()
+			p.angle += velA * dt()
+			p.opacity -= fade * dt()
+			velX *= airDrag
+			velY *= airDrag
+			p.scale.x = wave(-1, 1, time() * spin)
+		})
+	}
+}

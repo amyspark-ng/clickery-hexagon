@@ -537,20 +537,18 @@ function loadAllSprites() {
 	loadSprite("medalsUnknown", "sprites/windows/medalsWin/medalsUnknown.png")
 	loadSprite("medalsUnknown_tap", "sprites/windows/medalsWin/medalsUnknown_tap.png")
 	
-	const medalsX = 20
-	const medalsY = 1
 	let medalSprites = {}
+	let availableAchievements = achievements.slice(0, 30)
 
-	let availableAchievements = achievements.slice(0, 21)
-
-	let row = 0
 	let column = -1
+	let row = 0
+
 	let spacing = vec2(60)
 
 	availableAchievements.map(achievement => achievement.id).forEach((achievementId, index) => {
-		if (row >= medalsX) {
-			row = 0
-			column++
+		if (column == 19) {
+			column = 0
+			row++
 		}
 
 		else {

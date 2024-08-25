@@ -31,8 +31,8 @@ let cardsInfo = {
 	},
 	"powerupsCard": { 
 		info: "Powerups will be +[number]x more powerful",
-		basePrice: 2,
-		percentageIncrease: 120,
+		basePrice: 4,
+		percentageIncrease: 75,
 		idx: 2,
 		gamestateInfo: {
 			key: "powerupPower",
@@ -41,8 +41,8 @@ let cardsInfo = {
 	},
 	"critsCard": {
 		info: "Criticals will be +[number]x more powerful",
-		basePrice: 3,
-		percentageIncrease: 122,
+		basePrice: 5,
+		percentageIncrease: 90,
 		idx: 3,
 		gamestateInfo: {
 			key: "critPower",
@@ -89,17 +89,19 @@ function getAdditive(type:card) {
 	}
 
 	else if (type == "powerupsCard") {
-		additive = randi(1, 5)
+		additive = rand(0.1, 1.5)
 	}
 
 	else if (type == "critsCard") {
 		if (GameState.ascension.critPowersBought == 0) additive = 1
-		else additive = randi(10, 15) 
+		else additive = rand(0.1, 0.25)
 	}
 
 	else if (type == "hexColorCard" || type == "bgColorCard") {
 		additive = 0
 	}
+
+	additive = parseFloat(additive.toFixed(1))
 
 	return additive;
 }
@@ -176,14 +178,15 @@ function addCard(cardType:string | card, position: Vec2) {
 					// it adds the % on the info message
 					message = cardsInfo[this.type].info.replace("[number]", this.additive)
 					if (!(this.type == "hexColorCard" || this.type == "bgColorCard")) {
-						let addition = getVariable(GameState, cardsInfo[this.type].gamestateInfo.objectAmount)
+						let currentGot = getVariable(GameState, cardsInfo[this.type].gamestateInfo.key)
+						currentGot = parseFloat(currentGot.toFixed(1))
 						
 						if (this.type == "powerupsCard" || this.type == "critsCard") {
-							message += ` (Current power: ${addition}x)`
+							message += ` (Current power: ${currentGot}x)`
 						}
 						
 						else {
-							message += ` (You have: ${addition}%)`
+							message += ` (You have: ${currentGot}%)`
 						}
 					}
 				}
