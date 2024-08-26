@@ -93,7 +93,7 @@ onLoad(() => {
 		else {
 			if (enableNg == true) {
 				debug.log("loading")
-				if (!await ng.getUsername()) go("ngScene")
+				if (!await ng.isLoggedIn()) go("ngScene")
 				else go("gamescene")
 			}
 

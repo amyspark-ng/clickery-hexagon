@@ -13,16 +13,6 @@ export function connectToNewgrounds() {
 	return ng.connect(env.API_ID, env.ENCRIPTION_KEY);
 }
 
-export async function isLoggedIn() : Promise<boolean> {
-    const session = await ng.NewgroundsClient.call("App.checkSession");
-    return session?.result?.data?.session?.user == null ? false : true;
-}
-
-export async function getSession() : Promise<Session> {
-    const session = await ng.NewgroundsClient.call("App.checkSession");
-    return session?.result?.data?.session;
-}
-
 export function postEverything() {
 	if (ngEnabled) {
 		ng.postScore(env.SCORE_LEADERBOARD_ID, GameState.scoreAllTime)
@@ -64,21 +54,23 @@ export async function newgroundsSceneContent() {
 
 	async function userAgreed() {
 		let loginResult = await ng.login()
-		let session = await getSession()
+		let loggedIn = await ng.isLoggedIn()
+		let session = await ng.getSession()
 
-		console.log(session)
-
-		if (session.user != null) {
-			debug.log("got an user")
+		if (loggedIn == true) {
 			ngUser = session.user
+			titleText.text = "Welcome, " + ngUser.name
 			ngEnabled = true
+
+			everythingDone()
 		}
 
 		else {
-			debug.log("no user, sad")
-		
 			ngUser = null
+			titleText.text = "Seems like there was an error\nI'm sorry"
 			ngEnabled = false
+
+			everythingDone()
 		}
 	}
 
@@ -95,7 +87,7 @@ export async function newgroundsSceneContent() {
 		"newgroundsButton"
 	])
 
-	async function userDeclined() {
+	async function everythingDone() {
 		// so sad
 		wait(1, () => {
 			go("gamescene")
@@ -104,6 +96,6 @@ export async function newgroundsSceneContent() {
 
 	noButton.onClick(() => {
 		titleText.trigger("userInteraction", false)
-		userDeclined()
+		everythingDone()
 	})
 }

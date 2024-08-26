@@ -7,11 +7,12 @@ import { folderObj } from "../windows/windows-api/folderObj";
 import { allPowerupsInfo } from "../powerups";
 import { addMage } from "./mage";
 import { isAchievementUnlocked, unlockAchievement } from "../unlockables/achievements";
-import { dialogue, getDialogue, getRandomDialogue, mageDialogues, startDialoguing, talk } from "./dialogues";
+import { dialogue, getDialogue, getRandomDialogue, humKey, mageDialogues, startDialoguing, talk, yummersKey } from "./dialogues";
 import { spawnCards } from "./cards";
 import { positionSetter } from "../plugins/positionSetter";
 import { playSfx } from "../../sound";
 import { addTooltip, mouse, tooltipInfo } from "../additives";
+import { KEventController } from "kaplay";
 
 export let ascension = {
 	ascending: false,
@@ -151,6 +152,31 @@ export function startAscending() {
 	mage.on("endAnimating", () => {
 		startTheTalking()
 	
+		dialogue.box.on("talk", (speaker:string, thingToSay:string) => {
+			// get the key that has the thingToSay text
+			let theDialogue = mageDialogues.find((dialogue) => dialogue.text == thingToSay)
+			if (theDialogue == undefined) return
+			let keySpoken = theDialogue.key
+
+			// huntress hum
+			if (keySpoken == humKey) {
+				let sfx = playSfx("mage_huntressHum")
+				let checker:KEventController
+				wait(0.1, () => {
+					checker = dialogue.box.on("talk", () => {sfx.stop(); checker.cancel()})
+				})
+			}
+			
+			// yummers
+			if (keySpoken == yummersKey) {
+				let sfx = playSfx("mage_yummers")
+				let checker:KEventController
+				wait(0.1, () => {
+					checker = dialogue.box.on("talk", () => {sfx.stop(); checker.cancel()})
+				})
+			}
+		})
+
 		dialogue.box.on("dialogueEnd", (key:string) => {
 			if (key == null) return
 			if (key == "tutorial3" || (key.includes("back") && get("card").length == 0)) {

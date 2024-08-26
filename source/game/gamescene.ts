@@ -9,7 +9,7 @@ import { DEBUG, ROOT } from "../main.ts"
 import { allPowerupsInfo, Powerup_NaturalSpawnManager, Powerup_RemovalTimeManager, spawnPowerup } from "./powerups.ts"
 import { checkForUnlockable, isAchievementUnlocked, unlockAchievement } from "./unlockables/achievements.ts"
 import { ascension } from "./ascension/ascension.ts"
-import { folderObj, folderObjManaging } from "./windows/windows-api/folderObj.ts"
+import { folderObj, addFolderObj } from "./windows/windows-api/folderObj.ts"
 import { curDraggin } from "./plugins/drag.ts"
 import { unlockableWindows } from "./unlockables/windowUnlocks.ts"
 import { appWindow } from '@tauri-apps/api/window';
@@ -302,7 +302,7 @@ export const gamescene = () => scene("gamescene", () => {
 
 	addHexagon()
 	uiCounters()
-	folderObjManaging()
+	addFolderObj()
 	checkForUnlockable()
 	
 	ROOT.on("gamestart", () => {

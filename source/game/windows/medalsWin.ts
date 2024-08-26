@@ -13,8 +13,7 @@ let totalRows = 7;
 let initialPos = { x: -132, y: 42 };
 let spacing = { x: 66, y: 65 };
 
-// DONT USE AVAILABLEMEDALSPRITES THAT SHIT DOESN?T MAKE SENSE
-const availableAchievements = achievements.slice(0, 30);
+const availableAchievements = achievements.slice(0, 36);
 
 function getPositionInWindow(row:number, column:number) {
 	return vec2(initialPos.x + spacing.x * (column), initialPos.y + spacing.y * (row));

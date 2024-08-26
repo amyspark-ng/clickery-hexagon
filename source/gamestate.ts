@@ -267,6 +267,7 @@ class _scoreManager {
 		tween(GameState.clicksUpgradesValue, 1, 0.5, (p) => GameState.clicksUpgradesValue = Math.round(p), easings.easeOutQuad)
 		tween(GameState.cursorsUpgradesValue, 1, 0.5, (p) => GameState.cursorsUpgradesValue = Math.round(p), easings.easeOutQuad)
 		
+		GameState.hasUnlockedPowerups = false
 		GameState.stats.powerupsBoughtThisRun = 0
 
 		GameState.upgradesBought = ["c_0"]

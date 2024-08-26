@@ -93,8 +93,6 @@ function drawDevkyLoadScreen(progress) {
 }
 
 function loadFonts() {
-	if (!DEBUG) {load(new Promise<void>((res) => { setTimeout(() => { res() }, 5000) })) }
-
 	loadFont("emulogic", "assets/emulogic.ttf", {
 		outline: 10,
 		filter: "linear"
@@ -120,8 +118,6 @@ function loadAllSprites() {
 	loadSprite("devky", "devky.png")
 	loadSprite("hexagon", "sprites/hexagon.png")
 	
-	if (!DEBUG) {load(new Promise<void>((res) => { setTimeout(() => { res() }, 5000) })) }
-
 	//#region SPRITES
 	// cursors
 	loadSprite("cursors", "sprites/cursors.png", {
@@ -538,7 +534,7 @@ function loadAllSprites() {
 	loadSprite("medalsUnknown_tap", "sprites/windows/medalsWin/medalsUnknown_tap.png")
 	
 	let medalSprites = {}
-	let availableAchievements = achievements.slice(0, 30)
+	let availableAchievements = achievements.slice(0, 36)
 
 	let column = -1
 	let row = 0
@@ -599,8 +595,6 @@ function loadAllSprites() {
 	//#endregion
 
 	//#endregion
-
-	if (!DEBUG) {load(new Promise<void>((res) => { setTimeout(() => { res() }, 5000) })) }
 
 	// #region clickerius hernelius  
 	loadSpriteAtlas("sprites/ascendscene/hexAgony.png", {
@@ -730,8 +724,6 @@ function loadAllSprites() {
 
 function loadAllSounds() {
 	// #region SOUNDS
-	if (!DEBUG) {load(new Promise<void>((res) => { setTimeout(() => { res() }, 5000) })) }
-
 	//#region hexagon-intro
 	loadSound("biglight", "sounds/sfx/hexagon-intro/biglight.mp3")
 	loadSound("ominus", "sounds/sfx/hexagon-intro/ominus.mp3")
@@ -746,6 +738,8 @@ function loadAllSounds() {
 	
 	//#region ascension
 	loadSound("mage_e", "sounds/sfx/ascension/mage_e.mp3")
+	loadSound("mage_yummers", "sounds/sfx/ascension/mage_yummers.wav")
+	loadSound("mage_huntressHum", "sounds/sfx/ascension/mage_huntressHum.wav")
 	loadSound("onecard", "sounds/sfx/ascension/onecard.mp3")
 	loadSound("allcards", "sounds/sfx/ascension/allcards.mp3")
 	//#endregion ascension
@@ -778,8 +772,6 @@ function loadAllSounds() {
 	// music
 	// don't load as music because then it won't play when the game loads
 	// only done on debug to make the game load quicker since im not listening the music really
-	if (!DEBUG) {load(new Promise<void>((res) => { setTimeout(() => { res() }, 5000) })) }
-
 	loadSound("clicker.wav", "sounds/music/clicker.ogg")
 	loadSound("menu.wav", "sounds/music/menu.ogg")
 	loadSound("whatttt.wav", "sounds/music/whatttt.ogg")
@@ -797,8 +789,7 @@ function loadAllSounds() {
 
 function loadAllStuff() {
 	// #region OTHER STUFF
-	if (!DEBUG) {load(new Promise<void>((res) => { setTimeout(() => { res() }, 5000) })) }
-	
+
 	// made by MF
 	loadShader("checkeredBg", null, `
 	uniform float u_time;
@@ -854,8 +845,6 @@ export function loadEverything() {
 	loadAllSprites()
 	loadAllSounds()
 	loadAllStuff()
-
-	if (!DEBUG) {load(new Promise<void>((res) => { setTimeout(() => { res() }, 5000) })) }
 
 	ngScene()
 	focuscene()

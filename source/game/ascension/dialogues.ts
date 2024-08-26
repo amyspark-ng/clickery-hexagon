@@ -1,9 +1,11 @@
 import { GameObj } from "kaplay";
-import { removeNumbersOfString } from "../utils";
+import { getRandomElementDifferentFrom, removeNumbersOfString } from "../utils";
 import { ascension } from "./ascension";
 import { spawnCards } from "./cards";
 import { playSfx } from "../../sound";
 import { GameState } from "../../gamestate";
+
+const defaultTalkingSpeed = 0.025
 
 class Dialogue {
 	/**
@@ -27,7 +29,7 @@ class Dialogue {
 		this.key = key
 		this.text = text
 		this.extra = extra || false
-		this.speed = speed || 0.025 // 1 is extremly slow remember that
+		this.speed = speed || defaultTalkingSpeed // 1 is extremly slow remember that
 	}
 }
 
@@ -45,21 +47,38 @@ export const mageDialogues = [
 	new Dialogue("eye1", "Stop that", true),
 	new Dialogue("eye2", "Don't do that", true),
 	new Dialogue("eye3", "STOP", true),
+	new Dialogue("eye4", "I'm throwing hands if you keep doing that", true),
+	new Dialogue("eye5", "How would YOU like your eye getting clicked", true),
+	new Dialogue("eye6", "...", true),
+	new Dialogue("eye7", "Ok", true),
 	
 	new Dialogue("hex1", "No backsies", true),
 	new Dialogue("hex2", "Mine now", true),
 	new Dialogue("hex3", "I want to play with it :(", true),
+	new Dialogue("hex4", "I'm not giving this back", true),
+	new Dialogue("hex5", "Pick a card", true),
+	new Dialogue("hex6", "Stop it", true),
 	
 	new Dialogue("back1", "Welcome back...", true),
 	new Dialogue("back2", "Here again?", true),
 	new Dialogue("back2", "Not busy it seems", true),
+	new Dialogue("back3", "Really putting in the work, huh?", true),
+	new Dialogue("back4", "Another one", true),
 	
-	new Dialogue("fun1", "Here's a fun text", true),
-	new Dialogue("fun2", "Here's another one", true),
-	new Dialogue("fun3", "Devky please write these", true),
-	new Dialogue("fun4", "I beg of you", true),
-	new Dialogue("fun5", "Welcome to fortnite", true),
+	new Dialogue("fun1", "Fun fact: Hexagons have 6 (six) sides", true),
+	new Dialogue("fun2", "Welcome to fortnite", true),
+	new Dialogue("fun3", "Cold, so cold...", true),
+	new Dialogue("fun4", "Find my obituaries", true),
+	new Dialogue("fun5", `"Gimmicking" your hexagon?`, true),
+	new Dialogue("fun6", "Tasty hexa-gone, none for you", true),
+	
+	new Dialogue("fun7", "Gotta click them all", true),
+	new Dialogue("fun8", "Hum... Hum...", true, 0.1),
+	new Dialogue("fun9", "Y U M M E R S", true, 0.1),
 ]
+
+export const yummersKey = mageDialogues.find(dialogue => dialogue.text == "Y U M M E R S").key
+export const humKey = mageDialogues.find(dialogue => dialogue.text == "Hum... Hum...").key
 
 export function getDialogue(key:string) : Dialogue {
 	return mageDialogues[mageDialogues.indexOf(mageDialogues.filter(dialogue => dialogue.key === key)[0])]
@@ -171,7 +190,7 @@ export function talk(speaker:"mage" | "card", thingToSay:string, speed?:number, 
 	if (!onEnd) currentOnEnd = () => {}
 	else currentOnEnd = onEnd
 
-	dialogue.box.trigger("talk", speaker)
+	dialogue.box.trigger("talk", speaker, thingToSay)
 
 	speaker = speaker || "card"
 	thingToSay = thingToSay || "No dialogue, missing a dialogue here"
@@ -260,7 +279,7 @@ function continueDialogue(dialogueKey:string) {
 		else {
 			// are extra but no specific ones like the eye, hex or back
 			let extraDialogueKeys = mageDialogues.map(dialogue => dialogue.key).filter(key => key.includes("fun"))
-			let nextDialogueKey = choose(extraDialogueKeys)
+			let nextDialogueKey = getRandomElementDifferentFrom(extraDialogueKeys,  ascension.currentDialoguekey) 
 			
 			thePlayedNewDialogue = getDialogue(nextDialogueKey)
 			ascension.currentDialoguekey = thePlayedNewDialogue.key

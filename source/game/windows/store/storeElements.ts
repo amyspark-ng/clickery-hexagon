@@ -21,7 +21,7 @@ export let storeElementsInfo = {
 		percentageIncrease: 20
 	},
 	"powerupsElement": { 
-		gamestateKey: "stats.powerupsBought",
+		gamestateKey: "stats.powerupsBoughtThisRun",
 		basePrice: 50500,
 		percentageIncrease: 110,
 		unlockPrice: 10500

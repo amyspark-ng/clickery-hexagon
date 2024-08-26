@@ -3,14 +3,11 @@
   "description": "A simple clicker game",
   "type": "module",
   "scripts": {
-
     "dev": "nodemon --exec esbuild --bundle source/main.ts --sourcemap --outfile=public/game.js --servedir=./public",
     "build": "esbuild --bundle source/main.ts --outfile=public/game.js",
-
     "desktop:dev": "tauri dev",
     "desktop:build": "tauri build",
     "tauri": "tauri",
-
     "old:dev": "esbuild --bundle source/main.ts --sourcemap --outfile=public/game.js --servedir=./public"
   },
   "nodemonConfig": {
@@ -21,7 +18,7 @@
   "dependencies": {
     "@tauri-apps/api": "^1.6.0",
     "kaplay": "4000.0.0-alpha.1",
-    "newgrounds.js": "4.0.0-beta.1"
+    "newgrounds.js": "^4.0.1"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^1.6.0",

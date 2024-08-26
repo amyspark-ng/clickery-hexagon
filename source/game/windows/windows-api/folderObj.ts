@@ -14,7 +14,13 @@ export let folded = true;
 let timeSinceFold = 0;
 
 let movingMinibuttons:boolean;
-export function folderObjManaging() {
+/**
+ * Adds the folder obj which contains manager for some things like:
+ * - window hovering
+ * - window number key shortcut
+ * - closest minibutton to drag
+ */
+export function addFolderObj() {
 	// reset variables
 	folded = true
 	timeSinceFold = 0
