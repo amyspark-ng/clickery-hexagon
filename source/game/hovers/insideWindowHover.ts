@@ -11,13 +11,32 @@ export function insideWindowHover(winParent:GameObj) {
 	return {
 		id: "insideHover",
 		require: ["area"],
+
+		/**
+		 * if the startHoverAnim function was called
+		 */
 		isBeingHovered: false,
 	
+		/**
+		 * Function you set to be called (with no conditions) to be called when the hover starts
+		 */
 		startHoverAnim: null,
+		/**
+		 * Function you set to be called (with no conditions) to be called when the hover ends
+		 */
 		endHoverAnim: null,
 
+		/**
+		 * Function you set to be called (under certain inside window hover conditions) when the hover starts
+		 */
 		startHoverFunction: null,
+		/**
+		 * Function you set to be called (under certain inside window hover conditions) when the hover ends
+		 */
 		endHoverFunction: null,
+		/**
+		 * Function you set to be called (under certain inside window hover conditions) when the object is clicked
+		 */
 		clickFunction: null,
 
 		winParent: winParent,
@@ -66,16 +85,26 @@ export function insideWindowHover(winParent:GameObj) {
 			})
 		},
 
+		/**
+		 * Sets the start hover anim
+		 */
 		startingHover(action: () => void) {
 			this.startHoverAnim = action
 			// return this.on("outsideHoverStart")
 		},
 
+		/**
+		 * Sets the end hover anim
+		 */
 		endingHover(action: () => void) {
 			this.endHoverAnim = action
 			// return this.on("outsideHoverEnd")
 		},
 
+		/**
+		 * Sets the click function
+		 * Can't run if the window is un-active
+		 */
 		onPressClick(action: () => void) {
 			this.clickFunction = action
 		}

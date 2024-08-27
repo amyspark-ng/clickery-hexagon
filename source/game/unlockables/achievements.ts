@@ -419,7 +419,6 @@ export let achievements = [
 		id: "ascension.times_1",
 		title: "Oh. So you've met him?",
 		description: "Ascend for the first time",
-		flavorText: "It seems that you've met him", 
 		icon: "icon_ascend",
 		visibleCondition: () => GameState.stats.timesAscended >= 1
 	}),

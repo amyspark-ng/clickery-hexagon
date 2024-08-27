@@ -1,4 +1,4 @@
-import { Anchor, GameObj, KAPLAYCtx, RectComp, TextComp, Vec2 } from "kaplay"
+import { Anchor, GameObj, KAPLAYCtx, PosComp, RectComp, TextComp, Vec2 } from "kaplay"
 import { GameState } from "../gamestate"
 import { playSfx } from "../sound"
 import { hexagon } from "./hexagon"
@@ -50,7 +50,7 @@ export function addBackground() {
 	})))
 }
 
-export let mouse:any;
+export let mouse:GameObj;
 export function addMouse() {
 	mouse = add([
 		sprite("cursors"),
@@ -80,6 +80,8 @@ export function addMouse() {
 			}
 		}
 	])
+
+	return mouse;
 } 
 
 const initialYPosition = 50;
