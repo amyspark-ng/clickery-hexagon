@@ -31,3 +31,6 @@ this game MIGHT be getting done
 - fix hexagon scale when ascending
 - upgrade tutorial tooltip doesn't work
 - format the properties on leaderboards
+
+# IDEAS!!
+- add gambling🧌
