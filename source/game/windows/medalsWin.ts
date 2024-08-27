@@ -2,17 +2,18 @@ import { GameObj } from "kaplay";
 import { DEBUG } from "../../main";
 import { addTooltip, mouse } from "../additives";
 import { insideWindowHover } from "../hovers/insideWindowHover";
-import { achievements, getAchievement, isAchievementUnlocked, unlockAchievement } from "../unlockables/achievements";
+import { AchievementInterface, achievements, getAchievement, isAchievementUnlocked, unlockAchievement } from "../unlockables/achievements";
 import { blendColors, getPositionOfSide } from "../utils";
 import { Vec2 } from "kaplay/src";
 import { curDraggin, drag, setCurDraggin } from "../plugins/drag";
+import { playSfx } from "../../sound";
 
 // Constants
 const totalColumns = 5;
 const totalRows = 7;
 const initialPos = { x: -132, y: 42 };
 const spacing = { x: 66, y: 65 };
-const availableAchievements = achievements.slice(0, 36);
+const availableAchievements = achievements.slice(0, 40);
 let medalsContainer: GameObj | undefined;
 let medalMap: Map<string, GameObj> = new Map();
 
@@ -156,27 +157,51 @@ function updateMedalState(medalObj) {
 	if (isAchievementUnlocked(medalObj.achievementId)) {
 		if (availableAchievements.some(a => a.id === medalObj.achievementId)) {
 			medalObj.sprite = "medals_" + medalObj.achievementId;
-		} else {
-			medalObj.sprite = "medalsUnknown";
+		}
+		
+		else {
+			if (theAchievement.id == "extra.theSlot") medalObj.sprite = "medalsUnknown_tap"
+			else medalObj.sprite = "medalsUnknown"
+			// PLACEHOLDER 
 			medalObj.color = GREEN.lighten(100);
 		}
-		if (!medalObj.is("outline")) {
-			medalObj.use(outline(5, BLACK));
-		}
-	} else {
+	}
+	
+	else {
 		updateMedalAppearance(medalObj, theAchievement);
 	}
+
 }
 
-// Update medal appearance
-function updateMedalAppearance(medalObj, theAchievement) {
+/**
+ * Updates medal color and sprite based on some conditions (all achievements color is not here) 
+ */
+function updateMedalAppearance(medalObj:GameObj, theAchievement:AchievementInterface) {
 	const PURPLE = blendColors(RED, BLUE, 0.5);
 	if (medalObj.achievementId === "extra.theSlot" && medalObj.sprite !== "medalsUnknown_tap") {
 		medalObj.sprite = "medalsUnknown_tap";
 	}
-	medalObj.color = theAchievement.visibleCondition ?
-		(theAchievement.visibleCondition() ? (theAchievement.rare ? YELLOW : RED) : PURPLE) :
-		(theAchievement.rare ? YELLOW : RED);
+	
+	if (theAchievement.id == "extra.ALL") {
+		medalObj.onUpdate(() => {
+			if (isAchievementUnlocked("extra.ALL")) medalObj.color = WHITE
+			else medalObj.color = hsl2rgb((time() * 0.2 + 0 * 0.1) % 1, 0.6, 0.6)
+		})
+	}
+	else if (theAchievement.visibleCondition != null) {
+		if (theAchievement.visibleCondition() == false) {
+			medalObj.color = PURPLE
+		}
+
+		else {
+			if (theAchievement.rare == true) medalObj.color = YELLOW
+			else medalObj.color = RED
+		}
+	} 
+	else {
+		if (theAchievement.rare == true) medalObj.color = YELLOW
+		else medalObj.color = RED
+	}
 }
 
 // Handle medal click
@@ -324,6 +349,34 @@ function addScrollBar(medalsContainer:GameObj, totalScrolls = 3) {
 		currentScroll = Math.max(0, Math.min(currentScroll + scrollStep, totalScrolls));
 		const elevatorY = (currentScroll / totalScrolls) * (scrollBarHeight - elevatorHeight);
 		elevatorYPos = elevatorY;
+	
+		// add goober devky
+		if (currentScroll == totalScrolls && medalsContainer.get("goober").length == 0 && chance(0.25)) {
+			const lastAchievement = medalsContainer.get("medal").filter(medal => medal.row == totalRows && medal.column == totalColumns - 1)[0] 
+			const thePosition = getPositionInWindow(lastAchievement.row, lastAchievement.column + 1)
+			let goober = medalsContainer.add([
+				sprite("devky"),
+				pos(thePosition.x, thePosition.y + 30),
+				anchor("bot"),
+				area(),
+				scale(),
+				insideWindowHover(winParent),
+				"goober",
+			])
+
+			goober.onPressClick(() => {
+				tween(rand(0.7, 0.9), 1, 0.15, (p) => goober.scale.y = p)
+				playSfx("squeak", { detune: rand(-100, 100) })
+			})
+
+			goober.width = 60
+			goober.height = 60
+		}
+
+		else {
+			if (currentScroll == totalScrolls) return
+			if (medalsContainer.get("goober").length > 0) medalsContainer.get("goober")[0].destroy()
+		}
 	}
 
 	medalsContainer.onScroll((delta) => {

@@ -401,8 +401,8 @@ export function debugTexts() {
 		layer("mouse"),
 		{
 			update() {
-				let fps = 1000 / dt()
-				this.text = "DEBUG" + ` ${fps.toFixed(0)}`
+				const fps = ((Math.round((1/dt())*10))/10)
+				this.text = "DEBUG" + ` ${fps}`
 			}
 		}
 	])
@@ -453,9 +453,8 @@ export function debugFunctions() {
 	window.globalThis.spawnPowerup = spawnPowerup
 	window.globalThis.hexagon = hexagon
 	window.globalThis.openWindow = openWindow
-	window.globalThis.powerupsTypes = powerupTypes
 	window.globalThis.unlockWindow = unlockWindow
-	window.globalThis.mageDialogues = mageDialogues
+	window.globalThis.triggerGnome = triggerGnome
 	
 	onUpdate(() => {
 		// if (isKeyDown("control")) {

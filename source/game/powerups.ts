@@ -314,7 +314,7 @@ export function spawnPowerup(opts?:powerupOpt) {
 		// this doesn't include random of course
 		let list = Object.keys(powerupTypes)
 		
-		if (Math.round(scoreManager.autoScorePerSecond()) < 1) list.splice(list.indexOf("time"), 1)
+		if (Math.round(scoreManager.autoScorePerSecond()) < 1 || GameState.cursors < 1) list.splice(list.indexOf("time"), 1)
 		if (opts.natural == false) list.splice(list.indexOf("awesome"), 1)
 		
 		let element = choose(list) as powerupName
@@ -329,7 +329,7 @@ export function spawnPowerup(opts?:powerupOpt) {
 	opts.pos = opts.pos || randomPos()
 
 	let powerupObj = add([
-		sprite("cursors"),
+		sprite(`${opts.type}Powerup`),
 		pos(opts.pos),
 		scale(1),
 		area(),
@@ -449,12 +449,8 @@ export function spawnPowerup(opts?:powerupOpt) {
 	])
 
 	// other stuff
-	parseAnimation(powerupObj, powerupTypes[opts.type].sprite)
 	powerupObj.startWave()
-
 	powerupObj.scale = vec2(1)
-	powerupObj.width = 60
-	powerupObj.height = 60
 
 	// spawn anim
 	tween(vec2(powerupObj.maxScale).sub(0.4), vec2(powerupObj.maxScale), 0.25, (p) => powerupObj.scale = p, easings.easeOutBack)

@@ -15,22 +15,16 @@ this game MIGHT be getting done
 
 <!-- ===== LEFT TO DO ====== -->
 - Balancing mana getting
-- Ascension window graphics
-- Ascension substate re-work, it sucks really hard!
-- Powerup graphics and animations
-
-<!-- balancing -->
 - do the prices increasing after ascending
-
-<!-- code -->
-- figure out api for secret achievements
-- find the actual discount the store powerup gives you
-- fix some powerup animations
-- change onmousepress to onclick
+- add powerup graphics
+- make it so leaveButton doesn't appear before cards
+- critical (balacing, graphics)
+- powerup cards (balacing)
+- add particle for powerups (also sprites)
 - change color of upgrades
-- fix hexagon scale when ascending
-- upgrade tutorial tooltip doesn't work
-- format the properties on leaderboards
+- upgrade tutorial tooltip doesn't work (for store window)
+- add medals to newgrounds and all the ids
+- make newgrounds window very pretty
+- make some cool thing window for when you finish the game with confetti and stuff
 
-# IDEAS!!
-- add gambling🧌
+- make itch.io page

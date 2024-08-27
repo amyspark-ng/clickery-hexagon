@@ -357,6 +357,8 @@ export const gamescene = () => scene("gamescene", () => {
 			wait(60, () => {
 				loop(1, () => {
 					if (chance(0.0025)) {
+						if (sleeping == true) return
+						if (GameState.stats.timesAscended < 1) return
 						if (ascension.ascending == true) return
 						if (!isAchievementUnlocked("gnome")) triggerGnome()
 					}
@@ -659,8 +661,4 @@ export const gamescene = () => scene("gamescene", () => {
 			critParticleEmitter.destroy()
 		})
 	}
-	
-	// onClick(() => {
-	// 	addCriticalParticles(false)
-	// })
 })

@@ -3,9 +3,10 @@ import { waver } from ".././plugins/wave";
 import { manageMute, musicHandler, playMusic, playSfx, scratchSong } from "../../sound";
 import { isAchievementUnlocked } from "../unlockables/achievements";
 import { bop, formatTime, getPositionOfSide } from "../utils";
-import { GameObj } from "kaplay";
+import { GameObj, SpriteComp } from "kaplay";
 import { positionSetter } from "../plugins/positionSetter";
 import { insideWindowHover } from "../hovers/insideWindowHover";
+import { isWindowOpen } from "./windows-api/windowManaging";
 
 export let songs = {
 	"clicker.wav": { name: "clicker.wav", idx: 0, speed: 2.5, cover: "wav", duration: 61},
@@ -38,7 +39,7 @@ export function setTimeSinceSkip(value = 0) {
 
 // such a nitpick! :/
 let angleOfDisc = 0
-export function musicWinContent(winParent) {
+export function musicWinContent(winParent:GameObj) {
 	currentSongIdx = GameState.settings.music.favoriteIdx == null ? 0 : GameState.settings.music.favoriteIdx
 	
 	let currentSong = songs[Object.keys(songs)[currentSongIdx]]
@@ -343,10 +344,10 @@ export function musicWinContent(winParent) {
 		if (!musicHandler.paused ) bpmChange.startWave()
 	})
 
-	onUpdate("bpmChange", (bpmChangeObj) => {
+	let bpmChangeUpdate = onUpdate("bpmChange", (bpmChangeObj) => {
 		bpmChangeObj.wave_speed = currentSong.speed
 	})
-	
+
 	// support for keys let's gooooo
 	winParent.onKeyPress((key) => {
 		if (winParent.active == false) return
@@ -389,6 +390,48 @@ export function musicWinContent(winParent) {
 		}
 	})
 
+	function addDancerMage() {
+		const mageDance = winParent.add([
+			sprite("mageDance", { anim: "dance" }),
+			pos(134, -1),
+			anchor("center"),
+			opacity(),
+			"mageDance",
+			{
+				update() {
+					this.opacity = winParent.opacity
+				}
+			}
+		])
+
+		return mageDance;
+	}
+
+	if (GameState.stats.timesAscended > 0) {
+		let mageDance = addDancerMage();
+		
+		winParent.onUpdate(() => {
+			let isThereMage = winParent.get("mageDance").length > 0 ? true : false
+
+			let currentSongSpeed = songs[Object.keys(songs)[currentSongIdx]].speed
+			let mageDancingSpeed = 0
+			if (currentSongSpeed < 1 && currentSongSpeed < 1.5) mageDancingSpeed = 0.5
+			else if (currentSongSpeed > 1.5 && currentSongSpeed < 2) mageDancingSpeed = 1
+			else if (currentSongSpeed >= 2) mageDancingSpeed = 1.5
+			
+			if (musicHandler.winding || musicHandler.paused || GameState.settings.music.muted) mageDancingSpeed = 0
+			mageDance.animSpeed = lerp(mageDance.animSpeed, mageDancingSpeed, 0.1)
+		
+			// you can't be in both windows at the same time silly
+			if (isWindowOpen("ascendWin") && isThereMage == true) destroy(mageDance)
+			else if (!isWindowOpen("ascendWin") && isThereMage == false) mageDance = addDancerMage()
+		})
+	}
+
 	if (musicHandler.paused == true) pauseButton.play("play")
-	else pauseButton.play("pause") 
+	else pauseButton.play("pause")
+
+	winParent.on("close", () => {
+		bpmChangeUpdate.cancel()
+	})
 }

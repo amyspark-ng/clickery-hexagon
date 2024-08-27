@@ -10,7 +10,7 @@ import ng from 'newgrounds.js';
 import { ngEnabled } from '../../newgrounds';
 import { playSfx } from '../../sound';
 
-interface AchievementInterface {
+export interface AchievementInterface {
 	/**
 	 * The id the achievement will have, (eg: score.100)
 	 */
@@ -447,7 +447,7 @@ export let achievements = [
 		title: "The trickster",
 		description: "Buy 10 cards",
 		icon: "icon_ascend",
-		unlockCondition: () => GameState.ascension.clickPercentagesBought + GameState.ascension.cursorsPercentagesBought + GameState.ascension.powerupPowersBought + GameState.ascension.critPowersBought >= 10,
+		unlockCondition: () => (GameState.ascension.clickPercentagesBought + GameState.ascension.cursorsPercentagesBought + GameState.ascension.powerupPowersBought + GameState.ascension.critPowersBought) >= 10,
 		visibleCondition: () => isAchievementUnlocked("ascension.times_1"),
 	}),
 	// #endregion ASCENSION ACHIEVEMENTS =====================

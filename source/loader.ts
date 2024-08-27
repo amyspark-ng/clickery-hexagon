@@ -5,6 +5,7 @@ import { focuscene } from "./game/scenes/focuscene.ts";
 import { ngScene } from "./game/scenes/ngScene.ts";
 import { achievements } from "./game/unlockables/achievements.ts";
 import { getPosInGrid } from "./game/utils.ts";
+import { SpriteAtlasData } from "kaplay";
 
 export function drawSeriousLoadScreen(progress, op = 1) {
 	function drawHexagon(opts = {
@@ -134,6 +135,45 @@ function loadAllSprites() {
 	
 	loadSprite("saveIcon", "sprites/saveIcon.png")
 	loadSprite("welcomeBackIcon", "sprites/welcomeBackIcon.png")
+
+	loadSpriteAtlas("sprites/powerUps.png", {
+		"clicksPowerup": {
+			x: 140 * 0,
+			y: 0,
+			width: 140,
+			height: 140,
+		},
+		"timePowerup": {
+			x: 140 * 1,
+			y: 0,
+			width: 140,
+			height: 140,
+		},
+		"cursorsPowerup": {
+			x: 140 * 2,
+			y: 0,
+			width: 140,
+			height: 140,
+		},
+		"storePowerup": {
+			x: 140 * 3,
+			y: 0,
+			width: 140,
+			height: 140,
+		},
+		"blabPowerup": {
+			x: 140 * 4,
+			y: 0,
+			width: 140,
+			height: 140,
+		},
+		"awesomePowerup": {
+			x: 140 * 5,
+			y: 0,
+			width: 140,
+			height: 140,
+		},
+	})
 
 	loadSprite("part_star", "sprites/part_star.png")
 	loadSprite("osaka", "sprites/osaka.png")
@@ -470,7 +510,18 @@ function loadAllSprites() {
 		}
 	})
 	loadSprite("mutedButton", "sprites/windows/musicWin/mutedButton.png")
-	
+	loadSprite("mageDance", "sprites/windows/musicWin/mageDance.png", {
+		sliceX: 4,
+		sliceY: 1,
+		anims: {
+			"dance": {
+				from: 0,
+				to: 3,
+				loop: true
+			}
+		}
+	})
+
 	//#endregion
 
 	// #region Settings
@@ -533,8 +584,8 @@ function loadAllSprites() {
 	loadSprite("medalsUnknown", "sprites/windows/medalsWin/medalsUnknown.png")
 	loadSprite("medalsUnknown_tap", "sprites/windows/medalsWin/medalsUnknown_tap.png")
 	
-	let medalSprites = {}
-	let availableAchievements = achievements.slice(0, 36)
+	let medalSprites = {} as SpriteAtlasData
+	let availableAchievements = achievements.slice(0, 48)
 
 	let column = -1
 	let row = 0
@@ -561,7 +612,26 @@ function loadAllSprites() {
 		}
 	})
 
+	medalSprites["devkyGoober"] = {
+		// SET THIS PROPERLY
+		x: 0,
+		y: 0,
+		width: 60,
+		height: 60,
+	}
+
 	loadSpriteAtlas("sprites/windows/medalsWin/medalsMedals.png", medalSprites)
+	loadSprite("medals_extra.ALL", "sprites/windows/medalsWin/masterMedal.png", {
+		sliceX: 24,
+		sliceY: 2,
+		anims: {
+			"master": {
+				from: 0,
+				to: 24,
+				loop: true,
+			}
+		},
+	})
 	loadSprite("medalsWin", "sprites/windows/medalsWin/medalsWin.png")
 	loadSprite("medalsBg", "sprites/windows/medalsWin/medalsBg.png")
 
@@ -768,6 +838,7 @@ function loadAllSounds() {
 	//#endregion window
 	
 	loadSound("gnome", "sounds/sfx/gnome.ogg")
+	loadSound("squeak", "sounds/sfx/squeak.mp3")
 
 	// music
 	// don't load as music because then it won't play when the game loads
