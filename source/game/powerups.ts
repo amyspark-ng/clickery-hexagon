@@ -331,7 +331,7 @@ export function spawnPowerup(opts?:powerupOpt) {
 	let powerupObj = add([
 		sprite(`${opts.type}Powerup`),
 		pos(opts.pos),
-		scale(1),
+		scale(),
 		area(),
 		anchor("center"),
 		opacity(),
@@ -344,7 +344,7 @@ export function spawnPowerup(opts?:powerupOpt) {
 		"powerup",
 		{
 			type: opts.type,
-			maxScale: 3,
+			maxScale: 1.1,
 			update() {
 				this.angle = wave(-1, 1, time() * 3)
 			},
@@ -450,7 +450,8 @@ export function spawnPowerup(opts?:powerupOpt) {
 
 	// other stuff
 	powerupObj.startWave()
-	powerupObj.scale = vec2(1)
+
+	debug.log(powerupObj.width)
 
 	// spawn anim
 	tween(vec2(powerupObj.maxScale).sub(0.4), vec2(powerupObj.maxScale), 0.25, (p) => powerupObj.scale = p, easings.easeOutBack)

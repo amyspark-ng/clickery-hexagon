@@ -13,7 +13,7 @@ const totalColumns = 5;
 const totalRows = 7;
 const initialPos = { x: -132, y: 42 };
 const spacing = { x: 66, y: 65 };
-const availableAchievements = achievements.slice(0, 40);
+const availableAchievements = achievements.slice(0, 49);
 let medalsContainer: GameObj | undefined;
 let medalMap: Map<string, GameObj> = new Map();
 

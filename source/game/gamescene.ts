@@ -661,4 +661,16 @@ export const gamescene = () => scene("gamescene", () => {
 			critParticleEmitter.destroy()
 		})
 	}
+
+	// add([
+	// 	sprite("clicksPowerup"),
+	// 	layer("ui"),
+	// 	anchor("center"),
+	// 	pos(),
+	// 	{
+	// 		update() {
+	// 			this.pos = mousePos()
+	// 		}
+	// 	}
+	// ])
 })
