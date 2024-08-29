@@ -391,6 +391,8 @@ export const gamescene = () => scene("gamescene", () => {
 			Powerup_NaturalSpawnManager()
 			Powerup_RemovalTimeManager()
 		}
+
+		debug.log(formatNumber(scoreManager.scoreYouGetNextManaAt()))
 	})
 	
 	// #region OUTSIDE OF TAB STUFF
