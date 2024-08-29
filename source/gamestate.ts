@@ -147,18 +147,18 @@ class _scoreManager {
 
 	/**
 	 * Gets the score per click with powerups combo cards mana and possibly crit
-	 * @param crit Wheter to also include critical power
+	 * @param includeCrits Wheter to also include crit power
 	 * @returns The score
 	 */
-	scorePerClick = (crit?:boolean) => {
+	scorePerClick = (includeCrits?:boolean) => {
 		const vanillaValue = this.scorePerClick_Vanilla()
 		const countingPowerups = vanillaValue * powerupTypes.clicks.multiplier * powerupTypes.awesome.multiplier
 		const countingCombo = countingPowerups * this.combo
 		const countingCards = countingCombo + percentage(countingCombo, GameState.clickPercentage)
 		const countingManaAT = countingCards + percentage(countingCards, GameState.ascension.manaAllTime)
 		
-		crit = crit ?? false
-		if (crit) return Math.round(countingManaAT * GameState.critPower)
+		includeCrits = includeCrits ?? false
+		if (includeCrits) return Math.round(countingManaAT * GameState.critPower)
 		else return Math.round(countingManaAT) 
 	}
 
@@ -167,11 +167,19 @@ class _scoreManager {
 		return Math.round(GameState.cursors * GameState.cursorsUpgradesValue)
 	}
 
-	// score per cursor click
-	scorePerAutoClick = () => {
+	/**
+	 * Gets the score per auto click
+	 * @param includePowerups wheter to include powerups in the formula or not
+	 */
+	scorePerAutoClick = (includePowerups?:boolean) => {
+		includePowerups = includePowerups ?? false
+		
 		const vanillaValue = this.scorePerAutoClick_Vanilla()
-		const countingPowerups = vanillaValue * powerupTypes.cursors.multiplier * powerupTypes.awesome.multiplier
-		const countingCards = countingPowerups + percentage(countingPowerups, GameState.cursorsPercentage)
+		
+		let nextValue = vanillaValue
+		if (includePowerups == true) nextValue = vanillaValue * powerupTypes.cursors.multiplier * powerupTypes.awesome.multiplier
+
+		const countingCards = vanillaValue + percentage(vanillaValue, GameState.cursorsPercentage)
 		const countingManaAT = countingCards + percentage(countingCards, GameState.ascension.manaAllTime)
 		return Math.round(countingManaAT)
 	}

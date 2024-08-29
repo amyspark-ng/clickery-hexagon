@@ -5,6 +5,7 @@ import { GameState, scoreManager } from "../gamestate";
 import { bop, formatNumber, formatTime, getPosInGrid, getPositionOfSide, parseAnimation, randomPos } from "./utils";
 import { positionSetter } from "./plugins/positionSetter";
 import { checkForUnlockable } from "./unlockables/achievements";
+import { outsideWindowHover } from "./hovers/outsideWindowHover";
 
 class Powerup {
 	sprite: string;
@@ -238,7 +239,8 @@ export function addPowerupLog(powerupType:powerupName) {
 		{
 			update() {
 				if (powerupTypes[powerupType].removalTime == null) {powerupTime = 0; return}
-				powerupTime = Math.round(powerupTypes[powerupType].removalTime)
+				powerupTime = Math.round(parseFloat(powerupTypes[powerupType].removalTime.toFixed(1)))
+				
 				let stringPowerupTime = formatTime(powerupTime, true)
 				let powerupMultiplier = powerupTypes[powerupType].multiplier
 
@@ -310,7 +312,7 @@ export function spawnPowerup(opts?:powerupOpt) {
 	if (allPowerupsInfo.canSpawnPowerups == false) return
 	if (opts == undefined) opts = {} as powerupOpt 
 
-	function getRandomPowerup() {
+	function getRandomPowerup() : powerupName {
 		// this doesn't include random of course
 		let list = Object.keys(powerupTypes)
 		
@@ -328,6 +330,8 @@ export function spawnPowerup(opts?:powerupOpt) {
 
 	opts.pos = opts.pos || randomPos()
 
+	const hoverScale = vec2(1.1)
+
 	let powerupObj = add([
 		sprite(`${opts.type}Powerup`),
 		pos(opts.pos),
@@ -341,23 +345,35 @@ export function spawnPowerup(opts?:powerupOpt) {
 		z(0),
 		waver({ wave_speed: 1.25, maxAmplitude: 5, minAmplitude: 0 }),
 		area(),
+		timer(),
 		"powerup",
 		{
 			type: opts.type,
-			maxScale: 1.1,
 			update() {
 				this.angle = wave(-1, 1, time() * 3)
 			},
 			startHover() {
-				tween(this.scale, vec2(this.maxScale).add(0.2), 0.15, (p) => this.scale = p, easings.easeOutBack)
+				tween(this.scale, hoverScale, 0.15, (p) => this.scale = p, easings.easeOutCubic)
 			},
 			endHover() {
-				tween(this.scale, vec2(this.maxScale).sub(0.2), 0.15, (p) => this.scale = p, easings.easeOutBack)
+				tween(this.scale, vec2(1), 0.15, (p) => this.scale = p, easings.easeOutCubic)
 			},
-			dieAnim() {
+			dissapear() {
+				this.loop(0.1, () => {
+					let maxOpacity = 1
+
+					if (this.opacity == maxOpacity) {this.opacity = 0; maxOpacity -= 0.1}
+					else if (this.opacity == 0) this.opacity = maxOpacity
+				})
+				this.wait(1, () => {
+					this.area.scale = vec2(0)
+					tween(this.opacity, 0, 0.15, (p) => this.opacity = p).onEnd(() => this.destroy())
+				})
+			},
+			clickAnim() {
 				this.area.scale = vec2(0)
-				tween(this.scale, vec2(this.maxScale).add(0.4), 0.15, (p) => this.scale = p, easings.easeOutBack)
-				tween(this.opacity, 0, 0.15, (p) => this.opacity = p, easings.easeOutBack).onEnd(() => {
+				tween(this.scale, hoverScale, 0.15, (p) => this.scale = p, easings.easeOutCubic)
+				tween(this.opacity, 0, 0.15, (p) => this.opacity = p, easings.easeOutCubic).onEnd(() => {
 					destroy(this)
 				})
 				
@@ -391,8 +407,8 @@ export function spawnPowerup(opts?:powerupOpt) {
 				})
 			},
 			click() {
-				this.dieAnim()
-				playSfx("powerup")
+				this.clickAnim()
+				playSfx("powerup", { detune: rand(-35, 35) })
 				checkForUnlockable()
 				GameState.stats.powerupsClicked++
 
@@ -402,18 +418,18 @@ export function spawnPowerup(opts?:powerupOpt) {
 
 				if (opts.multiplier == null) {
 					if (opts.type == "clicks" || opts.type == "cursors") {
-						time = opts.time ?? randi(15, 30)
+						time += opts.time ?? randi(15, 30)
 						multiplier = randi(1.5, 3) * GameState.powerupPower
 					}
 					
 					// op powerups
 					else if (opts.type == "awesome") {
-						time = opts.time ?? randi(10, 15)
+						time += opts.time ?? randi(10, 15)
 						multiplier = randi(4, 8) * GameState.powerupPower
 					}
 
 					else if (opts.type == "store") {
-						time = opts.time ?? randi(10, 15)
+						time += opts.time ?? randi(10, 15)
 						// i don't understand this why is it the bigger the cheaper???????
 						multiplier = rand(0.5, 0.75) / GameState.powerupPower
 					}
@@ -421,7 +437,7 @@ export function spawnPowerup(opts?:powerupOpt) {
 					// patience
 					else if (opts.type == "time") {
 						multiplier = 1
-						time = opts.time ?? rand(30, 60) * GameState.powerupPower
+						time += opts.time ?? rand(30, 60) * GameState.powerupPower
 						scoreManager.addTweenScore(scoreManager.scorePerSecond() * time)
 					}
 
@@ -452,7 +468,7 @@ export function spawnPowerup(opts?:powerupOpt) {
 	powerupObj.startWave()
 
 	// spawn anim
-	tween(vec2(powerupObj.maxScale).sub(0.4), vec2(powerupObj.maxScale), 0.25, (p) => powerupObj.scale = p, easings.easeOutBack)
+	tween(vec2(hoverScale).sub(0.4), hoverScale, 0.25, (p) => powerupObj.scale = p, easings.easeOutBack)
 	tween(0, 1, 0.2, (p) => powerupObj.opacity = p, easings.easeOutBack)
 
 	// events
@@ -483,39 +499,56 @@ export function spawnPowerup(opts?:powerupOpt) {
 	})
 
 	powerupObj.onClick(() => {
-		powerupObj.click()
+		powerupObj.dissapear()
+		// powerupObj.click()
 	})
 
-	// particles
-	// let shimmer = add([
-	// 	anchor("center"),
-	// 	pos(powerupObj.pos),
-	// 	particles({
-	// 		max: 20,
-	// 		speed: [50, 100],
-	// 		angle: [0, 360],
-	// 		angularVelocity: [45, 90],
-	// 		lifeTime: [1.0, 1.5],
-	// 		colors: [WHITE],
-	// 		opacities: [0.1, 1.0, 0.0],
-	// 		texture: getSprite("hexagon").data.tex,
-	// 		quads: [getSprite("hexagon").data.frames[0]],
-	// 	}, {
-	// 		lifetime: 1.5,
-	// 		rate: 1,
-	// 		direction: 90,
-	// 		spread: 10,
-	// 	}),
-	// ])
+	powerupObj.wait(20, () => {
+		powerupObj.dissapear()
+	})
 
-	// // let shimmerLoop = loop(0.5, () => {
-	// 	shimmer.emit(randi(5, 10))
-	// // })
+	let shimmer = add([
+		layer("ui"),
+		pos(mousePos()),
+		opacity(),
+		timer(),
+		particles({
+			max: 8,
+			texture: getSprite("part_star").data.tex,
+			quads: [getSprite("part_star").data.frames[0]],
 
-	// shimmer.onDestroy(() => {
-	// 	// shimmerLoop.cancel()
-	// })
+			speed: [100, 250],
+			angle: [0, 0],
+			colors: [WHITE],
+			scales: [1.5, 2.1],
+			lifeTime: [0.35, 0.5],
+			opacities: [1, 0],
+			damping: [1, 2],
+			acceleration: [vec2(0), vec2(-50)],
+		}, {
+			lifetime: 1.5,
+			rate: 100,
+			direction: 90,
+			spread: -90,
+		})
+	])
 
+	let shimmerLoopTime = 0
+	shimmer.onUpdate(() => {
+		shimmerLoopTime += dt()
+
+		if (shimmerLoopTime > 0.5) {
+			shimmerLoopTime = 0 
+			shimmer.emit(5)
+			debug.log("emitted")
+		}
+
+		debug.log(shimmerLoopTime)
+	})
+
+	shimmer.onEnd(() => {
+		shimmer.destroy()
+	})
 }
 
 /**
@@ -552,10 +585,11 @@ export function Powerup_NaturalSpawnManager() {
 			powerupTypes[powerup].runningTime = 0
 
 			if (chance(powerupTypes[powerup].chance)) {
+				powerupTypes[powerup].maxTime += rand(-5, 5)
 				spawnPowerup({
 					type: powerup as powerupName,
 				})
 			}
 		}
 	}
-} 
+}

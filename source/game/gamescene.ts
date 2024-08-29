@@ -11,11 +11,8 @@ import { checkForUnlockable, isAchievementUnlocked, unlockAchievement } from "./
 import { ascension } from "./ascension/ascension.ts"
 import { folderObj, addFolderObj } from "./windows/windows-api/folderObj.ts"
 import { curDraggin } from "./plugins/drag.ts"
-import { unlockableWindows } from "./unlockables/windowUnlocks.ts"
 import { appWindow } from '@tauri-apps/api/window';
 import { ngEnabled, postEverything } from "../newgrounds.ts"
-import { makeSmallParticles } from "./plugins/confetti.ts"
-import { allObjWindows } from "./windows/windows-api/windowManaging.ts"
 
 let panderitoLetters = "panderito".split("")
 export let panderitoIndex = 0
@@ -170,34 +167,7 @@ function welcomeBack(idle = false) {
 		if (GameState.hasUnlockedPowerups == true) {
 			// if you left for this seconds there's a 10% chance you get a powerup
 			if (timeInSeconds > TIME_FOR_SLEEP) {
-				if (chance(0.1)) spawnPowerup()
-			}
-
-			// if the time you left is greater than 120 seconds
-			if (timeInSeconds > TIME_FOR_SLEEP * 2) {
-				// there's a chance of 25% to get a powerup
-				if (chance(0.25)) {
-					// if an additional 5% chance also happens to be you get 2
-					if (chance(0.05)) {
-						for (let i = 0; i < 2; i++) spawnPowerup({ type: "random" })
-					}
-
-					// else you get a single one
-					else {
-						spawnPowerup({
-							type: "random",
-						})
-					}
-				}
-			}
-
-			if (timeInSeconds > TIME_FOR_SLEEP * 3) {
-				if (chance(0.5)) {
-					spawnPowerup({
-						type: "awesome",
-						pos: randomPos(),
-					})
-				}
+				if (chance(0.1)) spawnPowerup({ type: "random" })
 			}
 		}
 
@@ -214,7 +184,7 @@ function welcomeBack(idle = false) {
 			gainedScore = Math.floor(excessTime / GameState.timeUntilAutoLoopEnds); // can't add scorePerAutoClick here bc
 			excessTime -= GameState.timeUntilAutoLoopEnds * gainedScore // I use it before to shave off the extra time
 			// actual gainedScore
-			gainedScore = gainedScore * scoreManager.scorePerAutoClick()
+			gainedScore = gainedScore * scoreManager.scorePerAutoClick(false)
 			scoreManager.addTweenScore(gainedScore)
 			
 			scoreGained = gainedScore // this is for the log
@@ -655,21 +625,13 @@ export const gamescene = () => scene("gamescene", () => {
 			})
 		])
 
-		critParticleEmitter.emit(rand(4, 8))
+		critParticleEmitter.emit(randi(4, 8))
 		critParticleEmitter.onEnd(() => {
 			critParticleEmitter.destroy()
 		})
 	}
 
-	// add([
-	// 	sprite("clicksPowerup"),
-	// 	layer("ui"),
-	// 	anchor("center"),
-	// 	pos(),
-	// 	{
-	// 		update() {
-	// 			this.pos = mousePos()
-	// 		}
-	// 	}
-	// ])
+	onClick(() => {
+		addCriticalParticles(false)
+	})
 })

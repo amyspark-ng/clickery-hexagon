@@ -8,8 +8,9 @@ import { setTimeSinceSkip, timeSinceSkip } from "../musicWindow";
 import { addMinibutton, getMinibuttonPos,  } from "./minibuttons";
 import { manageWindow, allObjWindows, windowKey } from "./windowManaging";
 import { outsideWindowHover } from "../../hovers/outsideWindowHover";
+import { GameObj } from "kaplay";
 
-export let folderObj;
+export let folderObj:GameObj;
 export let folded = true;
 let timeSinceFold = 0;
 
@@ -30,7 +31,7 @@ export function addFolderObj() {
 	
 	movingMinibuttons = false;
 
-	folderObj = add([
+	let theFolderObj = add([
 		sprite("folderObj"),
 		pos(width() - 40, height() - 40),
 		area({ scale: vec2(1.2) }),
@@ -56,7 +57,7 @@ export function addFolderObj() {
 						let newminibutton = addMinibutton({
 							windowKey: key as windowKey,
 							taskbarIndex: taskbarIndex,
-							initialPosition: folderObj.pos,
+							initialPosition: theFolderObj.pos,
 						})
 					});
 					
@@ -79,7 +80,7 @@ export function addFolderObj() {
 				get("minibutton").forEach(minibutton => {
 					minibutton.area.scale = vec2(0)
 					tween(minibutton.opacity, 0, 0.32, (p) => minibutton.opacity = p, easings.easeOutQuint)
-					tween(minibutton.pos, folderObj.pos, 0.32, (p) => minibutton.pos = p, easings.easeOutQuint).then(() => {
+					tween(minibutton.pos, theFolderObj.pos, 0.32, (p) => minibutton.pos = p, easings.easeOutQuint).then(() => {
 						destroy(minibutton)
 						movingMinibuttons = false
 					})
@@ -90,8 +91,8 @@ export function addFolderObj() {
 			},
 
 			manageFold() {
-				if (folded) folderObj.unfold()
-				else folderObj.fold()
+				if (folded) theFolderObj.unfold()
+				else theFolderObj.fold()
 			},
 
 			addSlots() {
@@ -140,16 +141,16 @@ export function addFolderObj() {
 		}
 	])
 
-	folderObj.startingHover(() => {
+	theFolderObj.startingHover(() => {
 		mouse.play("point")
 	})
 
-	folderObj.endingHover(() => {
+	theFolderObj.endingHover(() => {
 		mouse.play("cursor")
 	})
 
 	// this can't be attached to the buttons because you won't be able to call the event if the buttons don't exist
-	folderObj.onCharInput((key) => {
+	theFolderObj.onCharInput((key) => {
 		if (ascension.ascending == true) return;
 		if (isKeyDown("control")) return
 		if (curDraggin) return
@@ -166,7 +167,7 @@ export function addFolderObj() {
 
 		// silly
 		if (numberPressed == 0) {
-			if (folded) folderObj.unfold();
+			if (folded) theFolderObj.unfold();
 			manageWindow("extraWin")
 		}
 
@@ -174,7 +175,7 @@ export function addFolderObj() {
 			const windowKey = GameState.taskbar[index];
 	
 			if (GameState.unlockedWindows.includes(windowKey)) {
-				if (folded) folderObj.unfold();
+				if (folded) theFolderObj.unfold();
 				
 				let minibutton = get(windowKey)?.filter(obj => obj.is("minibutton"))[0]
 				if (minibutton) minibutton.click()
@@ -183,7 +184,7 @@ export function addFolderObj() {
 		}
 	});
 
-	folderObj.on("winClose", () => {
+	theFolderObj.on("winClose", () => {
 		// wait(0.05, () => {
 			// gets the topmost window
 			let allWindows = get("window")
@@ -198,7 +199,7 @@ export function addFolderObj() {
 		}
 	})
 
-	folderObj.onUpdate(() => {
+	theFolderObj.onUpdate(() => {
 		if ((get("window").length > 0)) {
 			// if any window is being hovered on
 			allObjWindows.isHoveringAWindow = get("window").some((window) => window.isMouseInRange())
@@ -225,4 +226,7 @@ export function addFolderObj() {
 		minibutton.scale.y = map(distanceToCurDragging, 20, 120, 0.8, 1)
 		minibutton.color = blendColors(WHITE, BLACK, blackness)
 	})
+
+	folderObj = theFolderObj
+	return theFolderObj;
 }
