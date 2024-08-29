@@ -1,4 +1,5 @@
-import { Color, KEventController } from "kaplay"
+import { Color, GameObj, KEventController } from "kaplay"
+import { ROOT } from "../../main";
 
 /**
  * Draws a damn shadow 
@@ -72,26 +73,33 @@ export function drawDamnShadow(xSpacing: number, ySpacing: number, theOpacity: n
 /**
  * Draws a dumb outline 
  */
-export function drawDumbOutline(width:number, coloring:Color) : { changeDumbOutlineWidth(width:number):void, get dumbOutlineWidth():number, add():void, destroy():void } {
+export function drawDumbOutline(theWidth:number, coloring:Color, theParent?:GameObj) : { changeDumbOutlineWidth(width:number):void, get dumbOutlineWidth():number, add():void, destroy():void } {
 	let drawEvent:KEventController;
 	
 	return {
 		changeDumbOutlineWidth(newWidth:number) {
-			width = newWidth
+			theWidth = newWidth
 		},
-
+		
 		get dumbOutlineWidth() {
-			return width;
+			return theWidth;
 		},
 		
 		add() {
-			drawEvent = this.parent.onDraw(() => {
+			theParent = theParent ?? this.parent
+			drawEvent = theParent.onDraw(() => {
 				drawRect({
-					pos: this.pos,
-					width: this.width + width,
-					height: this.height + width,
-					anchor: this.anchor,
-					color: coloring,
+					pos: this.screenPos(),
+					width: this.width,
+					height: this.height,
+					color: BLACK,
+					fill: false,
+					anchor: this.anchor || "topleft",
+					outline: {
+						width: theWidth,
+						color: coloring
+					},
+					fixed: this.fixed
 				})
 			})
 		},

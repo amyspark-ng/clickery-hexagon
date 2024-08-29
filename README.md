@@ -1,6 +1,7 @@
 # Clickery Hexagon
 
 "Simple" clicker game
+Clicker/Idle game where you click an hexagon to make virtual numbers go up until they can't anymore.
 
 Made in [KAPLAY](https://kaplayjs.com)
 

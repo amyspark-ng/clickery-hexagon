@@ -121,6 +121,7 @@ function addMedal(gridPosition: { row: number, column: number }, medal_ID: strin
 	medalObj.onClick(() => handleMedalClick(medalObj));
 	medalObj.onHover(() => handleMedalHover(medalObj));
 	medalObj.onHoverEnd(() => handleMedalHoverEnd(medalObj));
+	medalObj.onDraw(() => handleMedalDraw(medalObj, isAchievementUnlocked(medalObj.achievementId)));
 	medalMap.set(medal_ID, medalObj);
 }
 
@@ -237,6 +238,22 @@ function handleMedalHover(medalObj) {
 	});
 	tooltip.tooltipText.align = "center";
 	medalObj.tooltip = tooltip;
+}
+
+function handleMedalDraw(medalObj:GameObj, drawOutline: boolean) {
+	if (drawOutline == false) return
+	drawRect({
+		anchor: medalObj.anchor,
+		width: medalObj.width,
+		height: medalObj.height,
+		color: BLACK,
+		fill: false,
+		fixed: true,
+		outline: {
+			width: 3,
+			color: BLACK
+		}
+	})
 }
 
 // Format text for tooltip

@@ -631,13 +631,4 @@ export const gamescene = () => scene("gamescene", () => {
 			critParticleEmitter.destroy()
 		})
 	}
-
-	onClick(() => {
-		addCriticalParticles(false)
-	})
-
-	add([
-		sprite("medals_score.100"),
-		drawDumbOutline(5, BLACK)
-	])
 })

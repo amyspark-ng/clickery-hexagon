@@ -499,55 +499,39 @@ export function spawnPowerup(opts?:powerupOpt) {
 	})
 
 	powerupObj.onClick(() => {
-		powerupObj.dissapear()
-		// powerupObj.click()
+		powerupObj.click()
 	})
 
 	powerupObj.wait(20, () => {
 		powerupObj.dissapear()
 	})
 
-	let shimmer = add([
-		layer("ui"),
-		pos(mousePos()),
-		opacity(),
-		timer(),
-		particles({
-			max: 8,
-			texture: getSprite("part_star").data.tex,
-			quads: [getSprite("part_star").data.frames[0]],
+	powerupObj.loop(0.5, () => {
+		let shimmer = add([
+			layer(powerupObj.layer),
+			pos(powerupObj.pos),
+			opacity(1),
+			timer(),
+			particles({
+				max: 20,
+				speed: [50, 100],
+				angle: [0, 360],
+				angularVelocity: [45, 90],
+				lifeTime: [1.0, 1.5],
+				colors: [rgb(128, 128, 255), WHITE],
+				opacities: [0.1, 1.0, 0.0],
+				texture: getSprite("part_star").data.tex,
+				quads: [getSprite("part_star").data.frames[0]],
+			}, {
+				lifetime: 1.5,
+				rate: 0,
+				direction: 90,
+				spread: 0,
+			})
+		])
 
-			speed: [100, 250],
-			angle: [0, 0],
-			colors: [WHITE],
-			scales: [1.5, 2.1],
-			lifeTime: [0.35, 0.5],
-			opacities: [1, 0],
-			damping: [1, 2],
-			acceleration: [vec2(0), vec2(-50)],
-		}, {
-			lifetime: 1.5,
-			rate: 100,
-			direction: 90,
-			spread: -90,
-		})
-	])
-
-	let shimmerLoopTime = 0
-	shimmer.onUpdate(() => {
-		shimmerLoopTime += dt()
-
-		if (shimmerLoopTime > 0.5) {
-			shimmerLoopTime = 0 
-			shimmer.emit(5)
-			debug.log("emitted")
-		}
-
-		debug.log(shimmerLoopTime)
-	})
-
-	shimmer.onEnd(() => {
-		shimmer.destroy()
+		shimmer.emit(randi(20))
+		shimmer.onEnd(() => shimmer.destroy())
 	})
 }
 

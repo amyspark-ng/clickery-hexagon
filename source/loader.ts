@@ -858,7 +858,7 @@ function loadAllSounds() {
 	//#endregion MUSIC
 }
 
-function loadAllStuff() {
+function loadShaders() {
 	// #region OTHER STUFF
 
 	// made by MF
@@ -915,7 +915,7 @@ export function loadEverything() {
 
 	loadAllSprites()
 	loadAllSounds()
-	loadAllStuff()
+	loadShaders()
 
 	ngScene()
 	focuscene()

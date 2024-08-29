@@ -310,7 +310,7 @@ type tooltipOpts = {
 	z?:number,
 }
 
-export type tooltipInfo = { tooltipBg:GameObj<RectComp>, tooltipText:GameObj<TextComp>, end: () => void, type: string, }
+export type tooltipInfo = { tooltipBg:GameObj, tooltipText:GameObj, end: () => void, type: string, }
 
 /**
  * Adds a tooltip to an object and pushes itself to a tooltips array

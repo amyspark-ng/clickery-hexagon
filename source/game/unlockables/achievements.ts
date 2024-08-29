@@ -543,7 +543,21 @@ export function unlockAchievement(id:string) {
 			type: "achievement",
 			whenAdded: (toastObj, icon) => {
 				playSfx("unlockachievement", { detune: toastObj.index * 100 })
-				icon.use(drawDumbOutline(100000, BLACK))
+			
+				icon.onDraw(() => {
+					drawRect({
+						anchor: icon.anchor,
+						width: icon.width,
+						height: icon.height,
+						color: BLACK,
+						fill: false,
+						fixed: true,
+						outline: {
+							width: 3,
+							color: BLACK
+						}
+					})
+				})
 			},
 		})
 
