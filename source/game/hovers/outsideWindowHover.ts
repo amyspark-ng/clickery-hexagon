@@ -1,7 +1,6 @@
-
 // =========================
 // OUTSIDE HOVER COMPONENT
-
+import { GameObj } from "kaplay"
 import { mouse } from "../additives"
 import { curDraggin } from "../plugins/drag"
 import { allPowerupsInfo } from "../powerups"
@@ -14,11 +13,11 @@ export function outsideWindowHover() {
 		require: ["area"],
 		isBeingHovered: false,
 
-		startHoverAnim: null,
-		endHoverAnim: null,
+		startHoverAnim: null as () => void,
+		endHoverAnim: null as () => void,
 
-		startHoverFunction: null,
-		endHoverFunction: null,
+		startHoverFunction: null as () => void,
+		endHoverFunction: null as () => void,
 
 		add() {
 			this.startHoverFunction = function() {
@@ -51,30 +50,40 @@ export function outsideWindowHover() {
 				this.endHoverFunction()
 			})
 
-			this.on("cursorEnterWindow", (windowObj) => {
+			this.on("cursorEnterWindow", (windowObj:GameObj) => {
 				// if the hover animation is playing then stop playing it
 				if (this.isBeingHovered == true) {
 					this.endHoverFunction()
 				}
 			})
 
-			this.on("cursorExitWindow", (windowObj) => {
+			this.on("cursorExitWindow", (windowObj:GameObj) => {
 				// if is being hovered but the animation is not playing
 				// due to being inside a window
 				if (this.isHovering()) {
 					this.startHoverFunction()
 				}
 			})
+
+			// this.onMouseMove(() => {
+			// 	if (allObjWindows.isHoveringAWindow == true || allPowerupsInfo.isHoveringAPowerup == true || allObjWindows.isDraggingAWindow == true) {
+			// 		this.endHoverFunction()
+			// 	}
+			// })
 		},
 
+		/**
+		 * Sets hover anim
+		 */
 		startingHover(action: () => void) {
 			this.startHoverAnim = action
-			// return this.on("outsideHoverStart")
 		},
 
+		/**
+		 * Sets end hover anim
+		 */
 		endingHover(action: () => void) {
 			this.endHoverAnim = action
-			// return this.on("outsideHoverEnd")
 		}
 	}
 }

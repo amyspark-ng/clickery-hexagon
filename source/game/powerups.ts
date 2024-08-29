@@ -451,8 +451,6 @@ export function spawnPowerup(opts?:powerupOpt) {
 	// other stuff
 	powerupObj.startWave()
 
-	debug.log(powerupObj.width)
-
 	// spawn anim
 	tween(vec2(powerupObj.maxScale).sub(0.4), vec2(powerupObj.maxScale), 0.25, (p) => powerupObj.scale = p, easings.easeOutBack)
 	tween(0, 1, 0.2, (p) => powerupObj.opacity = p, easings.easeOutBack)

@@ -87,6 +87,7 @@ onLoad(() => {
 	
 	ROOT.on("rungame", async () => {
 		GameState.load()
+		volume(GameState.settings.volume)
 		addMouse()
 
 		if (!isFocused()) go("focuscene")

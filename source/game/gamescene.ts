@@ -15,6 +15,7 @@ import { unlockableWindows } from "./unlockables/windowUnlocks.ts"
 import { appWindow } from '@tauri-apps/api/window';
 import { ngEnabled, postEverything } from "../newgrounds.ts"
 import { makeSmallParticles } from "./plugins/confetti.ts"
+import { allObjWindows } from "./windows/windows-api/windowManaging.ts"
 
 let panderitoLetters = "panderito".split("")
 export let panderitoIndex = 0
@@ -391,14 +392,12 @@ export const gamescene = () => scene("gamescene", () => {
 		GameState.score = Math.round(GameState.score)
 	
 		// INCREASES MANA
-		if (GameState.scoreAllTime >= scoreManager.scoreYouGetNextManaAt() && unlockableWindows.ascendWin.condition() == true) {
+		if (GameState.scoreAllTime >= scoreManager.scoreYouGetNextManaAt()) {
 			GameState.ascension.mana++
 			GameState.ascension.manaAllTime++
 			ROOT.trigger("manaGained")
 		}
 
-		GameState.ascension.magicLevel = GameState.stats.timesAscended + 1
-	
 		// auto loop stuff
 		if (GameState.cursors >= 1 && ascension.ascending == false) {
 			autoLoopTime += dt()

@@ -5,9 +5,9 @@
 Made in [KAPLAY](https://kaplayjs.com)
 
 ## CREDITS:
-- AmySpark - Code
-- DevkyRD - Art & Design
-- lajbel - Code & Design
+- [AmySparK](https://amyspark-ng.github.io) - Code
+- [DevkyRD](https://twitter.com/devkyRD) - Art & Design
+- [lajbel](https://lajbel.com) - Code & Design
 - MF - Code & Shaders
 - Khriz28 - Playtesting & Support & Achievement titles
 - niceEli - Code & Desktop support

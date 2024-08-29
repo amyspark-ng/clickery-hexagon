@@ -43,7 +43,6 @@ class _GameState {
 	ascension = {
 		mana: 0,
 		manaAllTime: 0,
-		magicLevel: 1, // times ascended + 1
 		
 		// stuff bought for price calculation
 		clickPercentagesBought: 0,
@@ -231,8 +230,8 @@ class _scoreManager {
 	 * @param manaAllTime The mana all time
 	 * @returns The score needed for that mana all time
 	 */
-	getScoreForManaAT = (manaAllTime:number) => {
-		return (manaAllTime ** 1) * this.ascensionConstant
+	getScoreForManaAT = (manaAllTime = GameState.ascension.manaAllTime + 1) => {
+		return (manaAllTime ** 1) * this.ascensionConstant;
 	}
 
 	/**
@@ -240,13 +239,12 @@ class _scoreManager {
 	 * @returns The score you get the next mana at
 	 */
 	scoreYouGetNextManaAt = () => {
-		let nextManaAt = this.getScoreForManaAT(GameState.ascension.manaAllTime + 1);
-		return nextManaAt;
+		return Math.round(this.getScoreForManaAT(GameState.ascension.manaAllTime + 1));
 	}
 
 	// Oliver the goat 
 	manaPerSecond = () => {
-		const scoreNeededForNextMana = GameState.ascension.manaAllTime ** 0.8 * this.ascensionConstant;
+		const scoreNeededForNextMana = this.getScoreForManaAT(GameState.ascension.manaAllTime + 1) - Math.round(GameState.scoreAllTime);
 
 		// Calculate time to reach the next mana
 		const timeToNextMana = scoreNeededForNextMana / GameState.scoreAllTime;

@@ -154,6 +154,8 @@ function updateMedalState(medalObj) {
 		return;
 	}
 	const theAchievement = getAchievement(medalObj.achievementId);
+
+	// is unlocked 
 	if (isAchievementUnlocked(medalObj.achievementId)) {
 		if (availableAchievements.some(a => a.id === medalObj.achievementId)) {
 			medalObj.sprite = "medals_" + medalObj.achievementId;
@@ -162,9 +164,9 @@ function updateMedalState(medalObj) {
 		else {
 			if (theAchievement.id == "extra.theSlot") medalObj.sprite = "medalsUnknown_tap"
 			else medalObj.sprite = "medalsUnknown"
-			// PLACEHOLDER 
-			medalObj.color = GREEN.lighten(100);
 		}
+
+		medalObj.color = WHITE
 	}
 	
 	else {

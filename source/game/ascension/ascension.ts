@@ -203,8 +203,6 @@ export function endAscension() {
 	allPowerupsInfo.canSpawnPowerups = true
 	ascension.ascending = false
 
-	// the multiplier cool!!!
-	GameState.ascension.magicLevel++
 
 	get("*", { recursive: true }).filter(obj => obj.layer == "ascension").forEach((obj) => {
 		if (obj.is("area")) obj.area.scale = vec2(0)
