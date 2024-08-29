@@ -295,7 +295,6 @@ export function addMinibutton(opts:minibuttonOpt) {
 		
 		if (currentMinibutton.extraMb) currentMinibutton.shut ? currentMinibutton.play("shut_default") : currentMinibutton.play("open_default")
 		else currentMinibutton.play("default")
-		mouse.play("cursor")
 
 		if (currentMinibutton.extraMb || currentMinibutton.dragging) return
 		

@@ -22,7 +22,7 @@ export function outsideWindowHover() {
 		add() {
 			this.startHoverFunction = function() {
 				if (curDraggin == null && this.isBeingHovered == false) {
-					this.startHoverAnim()
+					if (this.startHoverAnim != null) this.startHoverAnim()
 					
 					this.trigger("outsideHoverStart")
 					mouse.play("point")
@@ -32,7 +32,7 @@ export function outsideWindowHover() {
 
 			this.endHoverFunction = function() {
 				if (this.isBeingHovered == false || this.dragging == true) return
-				this.endHoverAnim()
+				if (this.endHoverAnim != null) this.endHoverAnim()
 				
 				this.trigger("outsideHoverEnd")
 				mouse.play("cursor")
@@ -41,7 +41,7 @@ export function outsideWindowHover() {
 
 			this.onHover(() => {
 				// only check for these conditions here
-				if (allObjWindows.isHoveringAWindow == false && allPowerupsInfo.isHoveringAPowerup == false && allObjWindows.isDraggingAWindow == false) {
+				if (allObjWindows.isHoveringAWindow == false && allObjWindows.isDraggingAWindow == false && allPowerupsInfo.isHoveringAPowerup == false) {
 					this.startHoverFunction()
 				}
 			})

@@ -95,7 +95,7 @@ export type toastOpts = {
 	/**
 	 * Will run when the toast is actually added
 	 */
-	whenAdded?:(toastObj:GameObj) => void;
+	whenAdded?:(toastObj:GameObj, icon:GameObj) => void;
 }
 
 let allToasts:GameObj[] = []
@@ -195,15 +195,7 @@ export function addToast(opts:toastOpts) {
 		}
 	]);
 
-	// the medal exists
-	if (opts.icon.includes("medals_")) {
-		icon.sprite = opts.icon
-		icon.use(drawDumbOutline(5, BLACK))
-	}
-	
-	else {
-		parseAnimation(icon, opts.icon)
-	}
+	icon.sprite = opts.icon
 
 	if (icon.width >= 70) icon.width = 60
 	if (icon.height >= 70) icon.height = 60
@@ -268,7 +260,7 @@ export function addToast(opts:toastOpts) {
 
 	toastPosition.x = toastBg.width / 2
 	
-	if (opts.whenAdded) opts.whenAdded(toastBg)
+	if (opts.whenAdded) opts.whenAdded(toastBg, icon)
 
 	toastBg.wait(opts.duration ?? 3, () => {
 		toastBg.close();

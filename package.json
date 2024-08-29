@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "@tauri-apps/api": "^1.6.0",
-    "kaplay": "4000.0.0-alpha.1",
+    "kaplay": "4000.0.0-alpha.3",
     "newgrounds.js": "^4.0.1"
   },
   "devDependencies": {

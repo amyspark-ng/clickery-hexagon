@@ -67,10 +67,7 @@ export function insideWindowHover(winParent:GameObj) {
 			this.onHover(() => {
 				if (curDraggin) return
 				if (this.winParent.active == false) return
-				// only check for these conditions here
-				// if (allObjWindows.isHoveringAWindow == false && allObjWindows.isDraggingAWindow == false) {
-					if (this.startHoverFunction != null) this.startHoverFunction()
-				// }
+				if (this.startHoverFunction != null) this.startHoverFunction()
 			})
 
 			this.onHoverEnd(() => {
@@ -90,7 +87,6 @@ export function insideWindowHover(winParent:GameObj) {
 		 */
 		startingHover(action: () => void) {
 			this.startHoverAnim = action
-			// return this.on("outsideHoverStart")
 		},
 
 		/**
@@ -98,7 +94,6 @@ export function insideWindowHover(winParent:GameObj) {
 		 */
 		endingHover(action: () => void) {
 			this.endHoverAnim = action
-			// return this.on("outsideHoverEnd")
 		},
 
 		/**

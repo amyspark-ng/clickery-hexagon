@@ -315,6 +315,16 @@ export function openWindow(windowKey:windowKey) {
 		if (windowObj.canClose == true && windowObj.active && curDraggin != windowObj && !(windowObj.is("extraWin") && curDraggin?.is("gridMiniButton"))) windowObj.close()
 	})
 
+	windowObj.onMouseMove(() => {
+		// if (windowObj.isHovering()) {
+		// 	if (get("outsideWindowHover").filter(obj => obj.isHovering() && obj.isBeingHovered).length > 0) {
+		// 		get("outsideWindowHover").filter(obj => obj.isHovering() && obj.isBeingHovered).forEach((theObj) => {
+		// 			theObj.trigger("cursorEnterWindow", windowObj)
+		// 		})
+		// 	} 
+		// }
+	})
+
 	// activate
 	deactivateAllWindows()
 	windowObj.activate()

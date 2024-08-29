@@ -141,14 +141,6 @@ export function addFolderObj() {
 		}
 	])
 
-	theFolderObj.startingHover(() => {
-		mouse.play("point")
-	})
-
-	theFolderObj.endingHover(() => {
-		mouse.play("cursor")
-	})
-
 	// this can't be attached to the buttons because you won't be able to call the event if the buttons don't exist
 	theFolderObj.onCharInput((key) => {
 		if (ascension.ascending == true) return;

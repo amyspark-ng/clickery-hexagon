@@ -13,6 +13,7 @@ import { folderObj, addFolderObj } from "./windows/windows-api/folderObj.ts"
 import { curDraggin } from "./plugins/drag.ts"
 import { appWindow } from '@tauri-apps/api/window';
 import { ngEnabled, postEverything } from "../newgrounds.ts"
+import { drawDumbOutline } from "./plugins/drawThings.ts"
 
 let panderitoLetters = "panderito".split("")
 export let panderitoIndex = 0
@@ -634,4 +635,9 @@ export const gamescene = () => scene("gamescene", () => {
 	onClick(() => {
 		addCriticalParticles(false)
 	})
+
+	add([
+		sprite("medals_score.100"),
+		drawDumbOutline(5, BLACK)
+	])
 })

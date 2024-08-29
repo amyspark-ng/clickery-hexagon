@@ -72,7 +72,7 @@ export function drawDamnShadow(xSpacing: number, ySpacing: number, theOpacity: n
 /**
  * Draws a dumb outline 
  */
-export function drawDumbOutline(width:number, coliring:Color) : { changeDumbOutlineWidth(width:number), get dumbOutlineWidth():number, add():void, destroy():void } {
+export function drawDumbOutline(width:number, coloring:Color) : { changeDumbOutlineWidth(width:number):void, get dumbOutlineWidth():number, add():void, destroy():void } {
 	let drawEvent:KEventController;
 	
 	return {
@@ -90,9 +90,8 @@ export function drawDumbOutline(width:number, coliring:Color) : { changeDumbOutl
 					pos: this.pos,
 					width: this.width + width,
 					height: this.height + width,
-					radius: this.radius,
 					anchor: this.anchor,
-					color: coliring,
+					color: coloring,
 				})
 			})
 		},

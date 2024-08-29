@@ -9,6 +9,7 @@ import { ROOT } from '../../main';
 import ng from 'newgrounds.js';
 import { ngEnabled } from '../../newgrounds';
 import { playSfx } from '../../sound';
+import { drawDumbOutline } from '../plugins/drawThings';
 
 export interface AchievementInterface {
 	/**
@@ -33,11 +34,6 @@ export interface AchievementInterface {
 	 * Might be another funny title pun
 	 */
 	flavorText?: string,
-	/**
-	 * The sprite the icon will have
-	 * @deprecated Should use ID instead
-	*/
-	icon?: string,
 	/**
 	 *  Wheter the achievement is RARE, the question mark will be yellow in that case 
 	 */
@@ -74,7 +70,6 @@ class Achievement {
 		this.title = opts.title
 		this.description = opts.description
 		this.flavorText = opts.flavorText || ""
-		this.icon = opts.icon || `medals_${this.id}`
 		this.rare = opts.rare || false
 		this.timeAfter = opts.timeAfter || 0
 		this.readingTime = opts.readingTime || 3
@@ -277,7 +272,6 @@ export let achievements = [
 		id: "clickers.10",
 		title: "CAMBIAR",
 		description: "Have 10 clickers",
-		icon: "cursors.cursor",
 		unlockCondition: () => GameState.clickers >= 10,
 	}),
 
@@ -285,7 +279,6 @@ export let achievements = [
 		id: "clickers.20",
 		title: "CAMBIAR",
 		description: "Have 20 clickers",
-		icon: "cursors.cursor",
 		unlockCondition: () => GameState.clickers >= 20,
 	}),
 
@@ -293,7 +286,6 @@ export let achievements = [
 		id: "clickers.30",
 		title: "CAMBIAR",
 		description: "Have 30 clickers",
-		icon: "cursors.cursor",
 		unlockCondition: () => GameState.clickers >= 30,
 	}),
 
@@ -301,7 +293,6 @@ export let achievements = [
 		id: "clickers.40",
 		title: "CAMBIAR",
 		description: "Have 40 clickers",
-		icon: "cursors.cursor",
 		unlockCondition: () => GameState.clickers >= 40,
 	}),
 
@@ -310,7 +301,6 @@ export let achievements = [
 		title: "Iridescent Cursor",
 		description: "Have 50 clickers",
 		rare: true,
-		icon: "cursors.cursor",
 		unlockCondition: () => GameState.clickers >= 50,
 	}),
 	
@@ -319,7 +309,6 @@ export let achievements = [
 		id: "cursors.10",
 		title: "CAMBIAR",
 		description: "Have 10 cursors",
-		icon: "cursors.point",
 		unlockCondition: () => GameState.cursors >= 10,
 	}),
 
@@ -327,7 +316,6 @@ export let achievements = [
 		id: "cursors.20",
 		title: "CAMBIAR",
 		description: "Have 20 cursors",
-		icon: "cursors.point",
 		unlockCondition: () => GameState.cursors >= 20,
 	}),
 
@@ -335,7 +323,6 @@ export let achievements = [
 		id: "cursors.30",
 		title: "CAMBIAR",
 		description: "Have 30 cursors",
-		icon: "cursors.point",
 		unlockCondition: () => GameState.cursors >= 30,
 	}),
 
@@ -343,7 +330,6 @@ export let achievements = [
 		id: "cursors.40",
 		title: "CAMBIAR",
 		description: "Have 40 cursors",
-		icon: "cursors.point",
 		unlockCondition: () => GameState.cursors >= 40,
 	}),
 
@@ -352,7 +338,6 @@ export let achievements = [
 		title: "CAMBIAR",
 		description: "Have 50 cursors",
 		rare: true,
-		icon: "cursors.point",
 		unlockCondition: () => GameState.cursors >= 50,
 	}),
 	//#endregion CLICKERS/CURSORS ACHIEVEMENTS =================
@@ -361,7 +346,6 @@ export let achievements = [
 		id: "store.allUpgrades",
 		title: "CAMBIAR",
 		description: "Buy all the available upgrades",
-		icon: "icon_store",
 		timeAfter: 1,
 		unlockCondition: () => GameState.clicksUpgradesValue >= fullUpgradeValues.clicks() && GameState.cursorsUpgradesValue >= fullUpgradeValues.cursors(),
 	}),
@@ -371,7 +355,6 @@ export let achievements = [
 		id: "powerups.click_1",
 		title: "What?! Help me!",
 		description: "Click 1 powerup",
-		icon: "cursors.cursor",
 		timeAfter: 0.5,
 		unlockCondition: () => GameState.stats.powerupsClicked >= 1,
 	}),
@@ -380,7 +363,6 @@ export let achievements = [
 		id: "powerups.click_5",
 		title: "What?! Help me!",
 		description: "Click 5 powerup",
-		icon: "cursors.cursor",
 		timeAfter: 0.5,
 		unlockCondition: () => GameState.stats.powerupsClicked >= 5,
 	}),
@@ -389,7 +371,6 @@ export let achievements = [
 		id: "powerups.click_10",
 		title: "What?! Help me!",
 		description: "Click 10 powerup",
-		icon: "cursors.cursor",
 		timeAfter: 0.5,
 		unlockCondition: () => GameState.stats.powerupsClicked >= 10,
 	}),
@@ -399,7 +380,6 @@ export let achievements = [
 		title: "What?! Help me!",
 		description: "Click 20 powerup",
 		rare: true,
-		icon: "cursors.cursor",
 		timeAfter: 0.5,
 		unlockCondition: () => GameState.stats.powerupsClicked >= 20,
 	}),
@@ -408,7 +388,6 @@ export let achievements = [
 		id: "powerups.buy_10",
 		title: "Pay to win",
 		description: "Buy 10 powerup",
-		icon: "icon_store",
 		timeAfter: 1,
 		unlockCondition: () => GameState.stats.powerupsBought >= 10,
 	}),
@@ -419,7 +398,6 @@ export let achievements = [
 		id: "ascension.times_1",
 		title: "Oh. So you've met him?",
 		description: "Ascend for the first time",
-		icon: "icon_ascend",
 		visibleCondition: () => GameState.stats.timesAscended >= 1
 	}),
 
@@ -427,7 +405,6 @@ export let achievements = [
 		id: "ascension.times_5",
 		title: "He's funny, isn't he?",
 		description: "Ascend for the fifth time",
-		icon: "icon_ascend",
 		unlockCondition: () => GameState.stats.timesAscended >= 5,
 		visibleCondition: () => isAchievementUnlocked("ascension.times_1"),
 	}),
@@ -437,7 +414,6 @@ export let achievements = [
 		title: "I am the clickery...",
 		description: "Ascend for the tenth time",
 		rare: true,
-		icon: "icon_ascend",
 		unlockCondition: () => GameState.stats.timesAscended >= 10,
 		visibleCondition: () => isAchievementUnlocked("ascension.times_1"),
 	}),
@@ -446,7 +422,6 @@ export let achievements = [
 		id: "ascension.cardsBought_10",
 		title: "The trickster",
 		description: "Buy 10 cards",
-		icon: "icon_ascend",
 		unlockCondition: () => (GameState.ascension.clickPercentagesBought + GameState.ascension.cursorsPercentagesBought + GameState.ascension.powerupPowersBought + GameState.ascension.critPowersBought) >= 10,
 		visibleCondition: () => isAchievementUnlocked("ascension.times_1"),
 	}),
@@ -457,7 +432,6 @@ export let achievements = [
 		id: "clicks.1000",
 		title: "Letting the clicks go by",
 		description: "Click 1000 times",
-		icon: "hexagon",
 		unlockCondition: () => GameState.stats.timesClicked >= 1000
 	}),
 
@@ -466,7 +440,6 @@ export let achievements = [
 		title: "OVERDRIVE!!!",
 		description: "Max your combo for the first time",
 		flavorText: "FULL COMBO!!",
-		icon: "hexagon",
 		timeAfter: 2,
 	}),
 
@@ -474,21 +447,18 @@ export let achievements = [
 		id: "extra.panderito",
 		title: "Hmmmmmmmm panderitos...",
 		description: "Spell panderito",
-		icon: "panderito",
 	}),
 
 	new Achievement({
 		id: "extra.theSlot",
 		title: "That was easy right?",
 		description: "Tap this achivement's slot",
-		icon: "cursors.point",
 	}),
 
 	new Achievement({
 		id: "extra.gnome",
 		title: "HOLY SHIT GUYS DID YOU SEE THAT???",
 		description: "WHAT THE FUCK WAS THAT DID WE GET THAT ON CAMERA??????!!",
-		icon: "gnome",
 		timeAfter: 1.5,
 		readingTime: 5,
 		visibleCondition: () => GameState.stats.timesGnomed >= 1,
@@ -498,7 +468,6 @@ export let achievements = [
 		id: "extra.songs",
 		title: "Big fan",
 		description: "Listen to all the songs at least once",
-		icon: "icon_music",
 		unlockCondition: () => songsListened.length == Object.keys(songs).length
 	}),
 
@@ -506,14 +475,12 @@ export let achievements = [
 		id: "store.stuffBought_10",
 		title: "Inflation",
 		description: "Buy 10 things consecutively",
-		icon: "icon_store",
 	}),
 
 	new Achievement({
 		id: "extra.time_15minutes",
 		title: "Hex-citing Times",
 		description: "Play for 15 minutes",
-		icon: "cursors.wait",
 		unlockCondition: () => GameState.stats.totalTimePlayed >= 60 * 15
 	}),
 
@@ -522,7 +489,6 @@ export let achievements = [
 		id: "extra.ALL",
 		title: "CONGRATS!!!!",
 		description: "Complete all achievements",
-		icon: "osaka",
 		unlockCondition: () => GameState.unlockedAchievements.length == achievements.length - 1
 	}),
 ] as Achievement[]
@@ -570,13 +536,14 @@ export function unlockAchievement(id:string) {
 	let achievement = getAchievement(id)
 	wait(achievement.timeAfter || 0, () => {
 		addToast({
-			icon: achievement.icon,
+			icon: `medals_${achievement.id}`,
 			title: achievement.title,
 			body: `${achievement.description}. ${achievement.flavorText ?? achievement.flavorText}`,
 			duration: achievement.readingTime,
 			type: "achievement",
-			whenAdded: (toastObj) => {
+			whenAdded: (toastObj, icon) => {
 				playSfx("unlockachievement", { detune: toastObj.index * 100 })
+				icon.use(drawDumbOutline(100000, BLACK))
 			},
 		})
 
