@@ -356,14 +356,6 @@ export function spawnCards() {
 		// wait
 		wait(0.75, () => {
 			dealTheCards()
-		
-			wait(1.5, () => {
-				let lowestPrice = get("card").map((card) => card.price).reduce((a, b) => a < b ? a : b)
-				
-				if (GameState.ascension.mana < lowestPrice) {
-					if (ascension.canLeave == false) {ascension.canLeave = true; ROOT.trigger("canLeaveAscension")}
-				}
-			})
 		})
 	})
 }

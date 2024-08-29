@@ -627,7 +627,7 @@ function loadAllSprites() {
 		anims: {
 			"master": {
 				from: 0,
-				to: 24,
+				to: 47,
 				loop: true,
 			}
 		},

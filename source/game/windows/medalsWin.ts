@@ -1,4 +1,4 @@
-import { GameObj } from "kaplay";
+import { GameObj, SpriteComp } from "kaplay";
 import { DEBUG } from "../../main";
 import { addTooltip, mouse } from "../additives";
 import { insideWindowHover } from "../hovers/insideWindowHover";
@@ -149,7 +149,7 @@ function createMedalObject(gridPosition: { row: number, column: number }, medal_
 }
 
 // Update medal state
-function updateMedalState(medalObj) {
+function updateMedalState(medalObj:GameObj) {
 	if (!medalsContainer) {
 		console.error("medalsContainer is not defined in updateMedalState");
 		return;
@@ -158,7 +158,7 @@ function updateMedalState(medalObj) {
 
 	// is unlocked 
 	if (isAchievementUnlocked(medalObj.achievementId)) {
-		if (availableAchievements.some(a => a.id === medalObj.achievementId)) {
+		if (availableAchievements.some(achievement => achievement.id === medalObj.achievementId)) {
 			medalObj.sprite = "medals_" + medalObj.achievementId;
 		}
 		
@@ -168,6 +168,8 @@ function updateMedalState(medalObj) {
 		}
 
 		medalObj.color = WHITE
+	
+		if (medalObj.achievementId == "extra.ALL" && medalObj.getCurAnim() == null) medalObj.play("master")
 	}
 	
 	else {

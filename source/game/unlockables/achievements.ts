@@ -558,6 +558,8 @@ export function unlockAchievement(id:string) {
 						}
 					})
 				})
+
+				if (achievement.id == "extra.ALL") icon.play("master")
 			},
 		})
 

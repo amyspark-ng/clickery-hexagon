@@ -165,6 +165,9 @@ export function startAscending() {
 				wait(0.1, () => {
 					checker = dialogue.box.on("talk", () => {sfx.stop(); checker.cancel()})
 				})
+				dialogue.box.onDestroy(() => {
+					sfx.stop(); checker.cancel()
+				})
 			}
 			
 			// yummers
@@ -173,6 +176,9 @@ export function startAscending() {
 				let checker:KEventController
 				wait(0.1, () => {
 					checker = dialogue.box.on("talk", () => {sfx.stop(); checker.cancel()})
+				})
+				dialogue.box.onDestroy(() => {
+					sfx.stop(); checker.cancel()
 				})
 			}
 		})
