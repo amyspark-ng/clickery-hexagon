@@ -1,7 +1,7 @@
 import { GameObj, Vec2 } from "kaplay"
 import { getPrice, getVariable, setVariable } from "../utils"
 import { GameState } from "../../gamestate"
-import { ascension } from "./ascension"
+import { addLeaveButton, ascension, leaveButtonSpawnAnim } from "./ascension"
 import { ROOT } from "../../main"
 import { playSfx } from "../../sound"
 import { windowKey } from "../windows/windows-api/windowManaging"
@@ -347,6 +347,13 @@ export function spawnCards() {
 					tween(theCard.scale.x, 1, 0.25, (p) => theCard.scale.x = p, easings.easeOutQuart).onEnd(() => {
 						theCard.area.scale = vec2(1)
 						theCard.trigger("dealingOver")
+
+						if (GameState.stats.timesAscended > 0) {
+							if (theCard.indexInDeck == 3) {
+								let button = addLeaveButton()
+								leaveButtonSpawnAnim(button)
+							}
+						}
 					})
 				})
 			})

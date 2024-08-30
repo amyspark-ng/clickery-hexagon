@@ -20,7 +20,24 @@ export let ascension = {
 	currentDialoguekey: ""
 }
 
-function leaveButtonSpawnAnim(leaveButton:GameObj) {
+export function addLeaveButton() {
+	let leaveButton = add([
+		sprite("leaveButton"),
+		pos(968, 286),
+		positionSetter(),
+		anchor("center"),
+		area({ scale: vec2(0) }),
+		scale(0),
+		layer("ascension"),
+		opacity(),
+		z(1),
+		"leaveButton"
+	])
+
+	return leaveButton;
+}
+
+export function leaveButtonSpawnAnim(leaveButton:GameObj) {
 	leaveButton.fadeIn(0.25, easings.easeOutExpo)
 	tween(leaveButton.scale, vec2(1), 0.25, (p) => leaveButton.scale = p, easings.easeOutExpo).onEnd(() => {
 		leaveButton.area.scale = vec2(1)
@@ -52,23 +69,6 @@ function leaveButtonSpawnAnim(leaveButton:GameObj) {
 			playSfx("clickButton")
 		})
 	})
-}
-
-function addLeaveButton() {
-	let leaveButton = add([
-		sprite("leaveButton"),
-		pos(968, 286),
-		positionSetter(),
-		anchor("center"),
-		area({ scale: vec2(0) }),
-		scale(0),
-		layer("ascension"),
-		opacity(),
-		z(1),
-		"leaveButton"
-	])
-
-	return leaveButton;
 }
 
 export function startAscending() {
@@ -196,14 +196,10 @@ export function startAscending() {
 			const lastTutorialkey = thingy[thingy.length - 1] 
 		
 			if (GameState.stats.timesAscended < 1) {
-				if (key == lastTutorialkey) addLeaveButton()
-			}
-
-			else {
-				let button = addLeaveButton()
-				wait(2.6, () => {
+				if (key == lastTutorialkey) {
+					let button = addLeaveButton()
 					leaveButtonSpawnAnim(button)
-				})
+				} 
 			}
 		})
 	})
