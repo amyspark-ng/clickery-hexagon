@@ -63,6 +63,10 @@ class _GameState {
 		powerupsBoughtThisRun: 0,
 		powerupsBought: 0,
 		totalTimePlayed: 0,
+		/**
+		 * Time it took you to complete the game
+		 */
+		timeGameComplete: 0,
 		timesGnomed: 0,
 	}
 
@@ -89,15 +93,12 @@ class _GameState {
 		let newSave = new _GameState()
 		
 		let gottenData = getData("hexagon-save") as _GameState
+		
 		if (!gottenData) gottenData = newSave
 		
-		// Object.getOwnPropertyNames(gottenData).some(function(property){
-		// 	if (gottenData[property] == undefined || !(property in newSave)) {
-		// 		gottenData = new _GameState();
-		// 		console.error("=== STORED SAVE AND CURRENT SAVE DON'T MATCH UP, WILL DELETE AND GET A NEW ONE ===");
-		// 		return true
-		// 	}
-		// });
+		else if (gottenData.saveVersion == undefined || gottenData.saveVersion == null || gottenData.saveVersion < this.saveVersion) {
+			gottenData = newSave
+		}
 
 		Object.assign(this, gottenData)
 		return gottenData;
@@ -130,7 +131,10 @@ class _GameState {
 		this.settings.music.muted = true
 	}
 
-	newDumbProperty = true;
+	/**
+	 *  Every time there's a change to the gamestate save this has to be changed
+	 */
+	saveVersion = 1.0
 }
 
 export let GameState = new _GameState()

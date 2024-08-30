@@ -129,6 +129,7 @@ export let achievements = [
 		id: "score.1_000",
 		title: "Finger clickin' good",
 		description: "Get 1.000 of score",
+		ngId: 80364,
 		unlockCondition: () => GameState.scoreAllTime >= 1_000,
 	}),
 
@@ -136,6 +137,7 @@ export let achievements = [
 		id: "score.5_000",
 		title: "Now you're clickin",
 		description: "Get 5.000 of score",
+		ngId: 80365,
 		unlockCondition: () => GameState.scoreAllTime >= 5_000,
 	}),
 
@@ -143,6 +145,7 @@ export let achievements = [
 		id: "score.10_000",
 		title: "Olimpic Hexagon",
 		description: "Get 10.000 of score",
+		ngId: 80367,
 		unlockCondition: () => GameState.scoreAllTime >= 10_000,
 	}),
 
@@ -150,13 +153,15 @@ export let achievements = [
 		id: "score.25_000",
 		title: "Usain Hexagon",
 		description: "Get 25.000 of score",
+		ngId: 80368,
 		unlockCondition: () => GameState.scoreAllTime >= 25_000,
 	}),
 
 	new Achievement({
 		id: "score.50_000",
-		title: "Another one click the hexagon",
+		title: "Another one clicks the hexagon",
 		description: "Get 50.000 of score",
+		ngId: 80369,
 		unlockCondition: () => GameState.scoreAllTime >= 50_000,
 	}),
 
@@ -164,6 +169,7 @@ export let achievements = [
 		id: "score.100_000",
 		title: "You Spin Me Round (Like a hexagon)",
 		description: "Get 100.000 of score",
+		ngId: 80370,
 		unlockCondition: () => GameState.scoreAllTime >= 100_000,
 	}),
 
@@ -171,13 +177,15 @@ export let achievements = [
 		id: "score.250_000",
 		title: "Hex-a-Gone Crazy",
 		description: "Get 250.000 of score",
+		ngId: 80371,
 		unlockCondition: () => GameState.scoreAllTime >= 250_000,
 	}),
 
 	new Achievement({
 		id: "score.500_000",
-		title: "[CAMBIAR]",
+		title: "Placeholder title",
 		description: "Get 500.000 of score",
+		ngId: 80372,
 		unlockCondition: () => GameState.scoreAllTime >= 500_000,
 	}),
 
@@ -186,7 +194,8 @@ export let achievements = [
 		title: "Did you know there's no actual limit to how long these names can be? I specifically spent a lot of time working on them so they can be as LONG as i want them to be and they will do their best to look good",
 		description: `Get 750.000 score`,
 		flavorText: "I'm not too sure how well it supports long descriptions, i can't really be bothered to test it, i'm pretty close to the deadline of this game coming out so i'd like not to dwell in those dark functions...",
-		readingTime: 20,
+		readingTime: 10,
+		ngId: 80384,
 		unlockCondition: () => GameState.scoreAllTime >= 750_000,
 	}),
 
@@ -194,6 +203,7 @@ export let achievements = [
 		id: "score.1_million",
 		title: "Master of hexagons",
 		description: "Get 1 million of score",
+		ngId: 80374,
 		unlockCondition: () => GameState.scoreAllTime >= 1_000_000,
 	}),
 
@@ -201,6 +211,7 @@ export let achievements = [
 		id: "score.15_million",
 		title: "Hex-a-Lent",
 		description: "Get 15 million of score",
+		ngId: 80375,
 		unlockCondition: () => GameState.scoreAllTime >= 15_000_000,
 	}),
 
@@ -208,6 +219,7 @@ export let achievements = [
 		id: "score.50_million",
 		title: "Hex-machina",
 		description: "Get 50 million of score",
+		ngId: 80376,
 		unlockCondition: () => GameState.scoreAllTime >= 50_000_000,
 	}),
 
@@ -215,6 +227,7 @@ export let achievements = [
 		id: "score.100_million",
 		title: "Clickery Hexagon forever and forever a 100 years clickery Hexagon, all day long forever, forever a hundred times, over and over clickery Hexagon adventures dot com",
 		description: "Get 100 million of score",
+		ngId: 80385,
 		unlockCondition: () => GameState.scoreAllTime >= 100_000_000,
 	}),
 
@@ -222,14 +235,15 @@ export let achievements = [
 		id: "score.250_million",
 		title: "Hex-traordinary",
 		description: "Get 250 million of score",
+		ngId: 80378,
 		unlockCondition: () => GameState.scoreAllTime >= 250_000_000,
 	}),
 
-	// cambialo
 	new Achievement({
 		id: "score.500_million",
 		title: "Hexagonmania!",
 		description: "Get 500 million of score",
+		ngId: 80379,
 		unlockCondition: () => GameState.scoreAllTime >= 500_000_000,
 	}),
 
@@ -237,6 +251,7 @@ export let achievements = [
 		id: "score.600_million",
 		title: "Click my hexagons...",
 		description: "Get 600 million of score",
+		ngId: 80380,
 		unlockCondition: () => GameState.scoreAllTime >= 600_000_000,
 	}),
 
@@ -245,15 +260,15 @@ export let achievements = [
 		id: "score.750_million",
 		title: "Who else is gimmicking their dice right now?",
 		description: "Get 750 million of score",
+		ngId: 80381,
 		unlockCondition: () => GameState.scoreAllTime >= 750_000_000,
 	}),
 
-	// cambialo
 	new Achievement({
 		id: "score.950_million",
-		title: "Hex-traordinary",
-		rare: true,
+		title: "You've come so far",
 		description: "Get 950 million of score",
+		ngId: 80382,
 		unlockCondition: () => GameState.scoreAllTime >= 950_000_000,
 	}),
 
@@ -262,6 +277,7 @@ export let achievements = [
 		title: "F I N A L L Y",
 		rare: true,
 		description: "Get 1 billion of score, you're crazy for this...",
+		ngId: 80383,
 		unlockCondition: () => GameState.scoreAllTime >= 1_000_000_000,
 	}),
 	// #endregion SCORE ACHIEVEMENTS ====================
@@ -533,33 +549,35 @@ export function unlockAchievement(id:string) {
 	if (!achievements.map(achievement => achievement.id).includes(id)) throw new Error(`Achievement: ${id} does not exist`)
 	GameState.unlockedAchievements.push(id)
 	
-	let achievement = getAchievement(id)
-	wait(achievement.timeAfter || 0, () => {
+	const theAchievement = getAchievement(id)
+	wait(theAchievement.timeAfter || 0, () => {
 		addToast({
-			icon: `medals_${achievement.id}`,
-			title: achievement.title,
-			body: `${achievement.description}. ${achievement.flavorText ?? achievement.flavorText}`,
-			duration: achievement.readingTime,
+			icon: `medals_${theAchievement.id}`,
+			title: theAchievement.title,
+			body: `${theAchievement.description}. ${theAchievement.flavorText ?? theAchievement.flavorText}`,
+			duration: theAchievement.readingTime,
 			type: "achievement",
 			whenAdded: (toastObj, icon) => {
 				playSfx("unlockachievement", { detune: toastObj.index * 100 })
 			
-				icon.onDraw(() => {
-					drawRect({
-						anchor: icon.anchor,
-						width: icon.width,
-						height: icon.height,
-						color: BLACK,
-						fill: false,
-						fixed: true,
-						outline: {
-							width: 3,
-							color: BLACK
-						}
+				if (theAchievement.id != "extra.theSlot") {
+					icon.onDraw(() => {
+						drawRect({
+							anchor: icon.anchor,
+							width: icon.width,
+							height: icon.height,
+							color: BLACK,
+							fill: false,
+							fixed: true,
+							outline: {
+								width: 3,
+								color: BLACK
+							}
+						})
 					})
-				})
-
-				if (achievement.id == "extra.ALL") icon.play("master")
+	
+					if (theAchievement.id == "extra.ALL") icon.play("master")
+				}
 			},
 		})
 
@@ -571,6 +589,6 @@ export function unlockAchievement(id:string) {
 	})
 
 	if (ngEnabled == true) {
-		if (achievement.ngId) ng.unlockMedal(achievement.ngId)
+		if (theAchievement.ngId) ng.unlockMedal(theAchievement.ngId)
 	}
 }

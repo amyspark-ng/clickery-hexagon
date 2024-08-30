@@ -12,7 +12,7 @@ import { spawnCards } from "./cards";
 import { positionSetter } from "../plugins/positionSetter";
 import { playSfx } from "../../sound";
 import { addTooltip, mouse, tooltipInfo } from "../additives";
-import { KEventController } from "kaplay";
+import { GameObj, KEventController } from "kaplay";
 
 export let ascension = {
 	ascending: false,
@@ -20,20 +20,7 @@ export let ascension = {
 	currentDialoguekey: ""
 }
 
-function addLeaveButton() {
-	let leaveButton = add([
-		sprite("leaveButton"),
-		pos(968, 286),
-		positionSetter(),
-		anchor("center"),
-		area({ scale: vec2(0) }),
-		scale(0),
-		layer("ascension"),
-		opacity(),
-		z(1),
-		"leaveButton"
-	])
-
+function leaveButtonSpawnAnim(leaveButton:GameObj) {
 	leaveButton.fadeIn(0.25, easings.easeOutExpo)
 	tween(leaveButton.scale, vec2(1), 0.25, (p) => leaveButton.scale = p, easings.easeOutExpo).onEnd(() => {
 		leaveButton.area.scale = vec2(1)
@@ -65,6 +52,21 @@ function addLeaveButton() {
 			playSfx("clickButton")
 		})
 	})
+}
+
+function addLeaveButton() {
+	let leaveButton = add([
+		sprite("leaveButton"),
+		pos(968, 286),
+		positionSetter(),
+		anchor("center"),
+		area({ scale: vec2(0) }),
+		scale(0),
+		layer("ascension"),
+		opacity(),
+		z(1),
+		"leaveButton"
+	])
 
 	return leaveButton;
 }
@@ -161,24 +163,22 @@ export function startAscending() {
 			// huntress hum
 			if (keySpoken == humKey) {
 				let sfx = playSfx("mage_huntressHum")
-				let checker:KEventController
+				let cancelDialogueChecker:KEventController
+				let endAscensionChecker:KEventController
 				wait(0.1, () => {
-					checker = dialogue.box.on("talk", () => {sfx.stop(); checker.cancel()})
-				})
-				dialogue.box.onDestroy(() => {
-					sfx.stop(); checker.cancel()
+					cancelDialogueChecker = dialogue.box.on("talk", () => {sfx.stop(); cancelDialogueChecker.cancel()})
+					endAscensionChecker = ROOT.on("endAscension", () => {sfx.stop(); endAscensionChecker.cancel()})
 				})
 			}
 			
 			// yummers
 			if (keySpoken == yummersKey) {
 				let sfx = playSfx("mage_yummers")
-				let checker:KEventController
+				let cancelDialogueChecker:KEventController
+				let endAscensionChecker:KEventController
 				wait(0.1, () => {
-					checker = dialogue.box.on("talk", () => {sfx.stop(); checker.cancel()})
-				})
-				dialogue.box.onDestroy(() => {
-					sfx.stop(); checker.cancel()
+					cancelDialogueChecker = dialogue.box.on("talk", () => {sfx.stop(); cancelDialogueChecker.cancel()})
+					endAscensionChecker = ROOT.on("endAscension", () => {sfx.stop(); endAscensionChecker.cancel()})
 				})
 			}
 		})
@@ -194,9 +194,16 @@ export function startAscending() {
 			// gets the last tutorial key
 			const thingy = mageDialogues.map(dialogue => dialogue.key).filter(dialogue => dialogue.includes("tutorial"))
 			const lastTutorialkey = thingy[thingy.length - 1] 
+		
+			if (GameState.stats.timesAscended < 1) {
+				if (key == lastTutorialkey) addLeaveButton()
+			}
 
-			if (key == lastTutorialkey || key.includes("back") && get("leaveButton").length == 0) {
-				addLeaveButton()
+			else {
+				let button = addLeaveButton()
+				wait(2.6, () => {
+					leaveButtonSpawnAnim(button)
+				})
 			}
 		})
 	})
@@ -208,7 +215,6 @@ export function endAscension() {
 	ROOT.trigger("endAscension")
 	allPowerupsInfo.canSpawnPowerups = true
 	ascension.ascending = false
-
 
 	get("*", { recursive: true }).filter(obj => obj.layer == "ascension").forEach((obj) => {
 		if (obj.is("area")) obj.area.scale = vec2(0)

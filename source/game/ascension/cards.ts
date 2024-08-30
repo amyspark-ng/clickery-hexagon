@@ -140,7 +140,6 @@ function addCard(cardType:string | card, position: Vec2) {
 		anchor("center"),
 		area({ scale: vec2(0) }),
 		"card",
-		"ascensionHover",
 		{
 			indexInDeck: 0, // 1 - 4 / 1 being leftmost
 			price: 1,
@@ -316,38 +315,38 @@ export function spawnCards() {
 	let dealingXPosition = 947;
 	playSfx("allcards", { detune: rand(-25, 25) })
 	cardsToAdd.forEach((cardToAdd, index) => {
-		let card = addCard(cardToAdd, vec2(dealingXPosition, cardYPositions.hidden))
-		card.angle = rand(-4, 4)
-		card.pos.x = dealingXPosition + rand(-5, 5)
-		card.pos.y = cardYPositions.hidden
-		card.indexInDeck = index
+		let theCard = addCard(cardToAdd, vec2(dealingXPosition, cardYPositions.hidden))
+		theCard.angle = rand(-4, 4)
+		theCard.pos.x = dealingXPosition + rand(-5, 5)
+		theCard.pos.y = cardYPositions.hidden
+		theCard.indexInDeck = index
 
 		// put it in the dealing position
 		let randOffset = rand(-5, 5)
-		tween(card.pos.y, cardYPositions.dealing + randOffset, 0.75, (p) => card.pos.y = p, easings.easeOutQuint)
+		tween(theCard.pos.y, cardYPositions.dealing + randOffset, 0.75, (p) => theCard.pos.y = p, easings.easeOutQuint)
 
 		function dealTheCards() {
 			// now, deal them to them places
-			wait(0.25 * card.indexInDeck, () => {
+			wait(0.25 * theCard.indexInDeck, () => {
 				function getCardXPos(index:number) {
 					let startPoint = 492
 					return (startPoint + cardSpacing) + cardSpacing * (index - 1);
 				}
 
-				playSfx("onecard", { detune: rand(-25, 25) * card.indexInDeck})
-				tween(card.angle, rand(-1.5, 1.5), 0.25, (p) => card.angle = p, easings.easeOutQuart)
+				playSfx("onecard", { detune: rand(-25, 25) * theCard.indexInDeck})
+				tween(theCard.angle, rand(-1.5, 1.5), 0.25, (p) => theCard.angle = p, easings.easeOutQuart)
 			
 				// pos
-				tween(card.pos.x, getCardXPos(card.indexInDeck), 0.25, (p) => card.pos.x = p, easings.easeOutQuart)
-				tween(card.pos.y, cardYPositions.unhovered, 0.25, (p) => card.pos.y = p, easings.easeOutQuart)
+				tween(theCard.pos.x, getCardXPos(theCard.indexInDeck), 0.25, (p) => theCard.pos.x = p, easings.easeOutQuart)
+				tween(theCard.pos.y, cardYPositions.unhovered, 0.25, (p) => theCard.pos.y = p, easings.easeOutQuart)
 				
 				// turn it over
-				tween(card.scale.x, 0, 0.25, (p) => card.scale.x = p, easings.easeOutQuart).onEnd(() => {
-					card.sprite = typeToSprite(card.type)
+				tween(theCard.scale.x, 0, 0.25, (p) => theCard.scale.x = p, easings.easeOutQuart).onEnd(() => {
+					theCard.sprite = typeToSprite(theCard.type)
 					
-					tween(card.scale.x, 1, 0.25, (p) => card.scale.x = p, easings.easeOutQuart).onEnd(() => {
-						card.area.scale = vec2(1)
-						card.trigger("dealingOver")
+					tween(theCard.scale.x, 1, 0.25, (p) => theCard.scale.x = p, easings.easeOutQuart).onEnd(() => {
+						theCard.area.scale = vec2(1)
+						theCard.trigger("dealingOver")
 					})
 				})
 			})

@@ -155,60 +155,58 @@ function updateMedalState(medalObj:GameObj) {
 		return;
 	}
 	const theAchievement = getAchievement(medalObj.achievementId);
+	const medalSprite = "medals_" + theAchievement.id
 
 	// is unlocked 
 	if (isAchievementUnlocked(medalObj.achievementId)) {
-		if (availableAchievements.some(achievement => achievement.id === medalObj.achievementId)) {
-			medalObj.sprite = "medals_" + medalObj.achievementId;
-		}
-		
-		else {
-			if (theAchievement.id == "extra.theSlot") medalObj.sprite = "medalsUnknown_tap"
-			else medalObj.sprite = "medalsUnknown"
-		}
-
-		medalObj.color = WHITE
-	
+		if (medalObj.sprite != medalSprite) medalObj.sprite = medalSprite
+		if (medalObj.color != WHITE) medalObj.color = WHITE		
+		// manages master medal
 		if (medalObj.achievementId == "extra.ALL" && medalObj.getCurAnim() == null) medalObj.play("master")
-		medalObj.opacity = 1;
+		medalObj.opacity = 1
 	}
 	
 	else {
-		updateMedalAppearance(medalObj, theAchievement);
+		manageLockedMedalApp(medalObj, theAchievement);
 	}
 }
 
 /**
- * Updates medal color and sprite based on some conditions 
- */
-function updateMedalAppearance(medalObj:GameObj, theAchievement:AchievementInterface) {
+* Gets the color and sprite of the medal when it's locked 
+* Runs on update
+*/
+function manageLockedMedalApp(medalObj:GameObj, theAchievement:AchievementInterface) {
 	const PURPLE = blendColors(RED, BLUE, 0.5);
-	if (medalObj.achievementId === "extra.theSlot" && medalObj.sprite !== "medalsUnknown_tap") {
+	
+	if (theAchievement.id === "extra.theSlot" && medalObj.sprite !== "medalsUnknown_tap") {
 		medalObj.sprite = "medalsUnknown_tap";
 	}
-	
-	if (theAchievement.id == "extra.ALL") {
-		// medalObj.onUpdate(() => {
-			if (isAchievementUnlocked("extra.ALL")) medalObj.color = WHITE
-			else medalObj.color = hsl2rgb((time() * 0.2 + 0 * 0.1) % 1, 0.6, 0.6)
-		// })
+
+	else if (theAchievement.id != "extra.theSlot" && medalObj.sprite != "medalsUnknown") {
+		medalObj.sprite = "medalsUnknown"
 	}
-	else if (theAchievement.visibleCondition != null) {
-		if (theAchievement.visibleCondition() == false) {
-			medalObj.color = PURPLE
+
+	if (theAchievement.id == "extra.ALL") medalObj.color = hsl2rgb((time() * 0.2 + 0 * 0.1) % 1, 0.6, 0.6)
+	
+	else {
+		if (theAchievement.visibleCondition != null) {
+			if (theAchievement.visibleCondition() == true) {
+				if (theAchievement.rare == true) medalObj.color = YELLOW
+				else medalObj.color = RED
+			}
+
+			else {
+				medalObj.color = PURPLE
+			}
 		}
 
 		else {
 			if (theAchievement.rare == true) medalObj.color = YELLOW
 			else medalObj.color = RED
 		}
-	} 
-	else {
-		if (theAchievement.rare == true) medalObj.color = YELLOW
-		else medalObj.color = RED
 	}
 
-	if (!isAchievementUnlocked(theAchievement.id)) medalObj.opacity = 0.5
+	medalObj.opacity = 0.5
 }
 
 // Handle medal click
@@ -347,7 +345,6 @@ function addScrollBar(medalsContainer:GameObj, totalScrolls = 3) {
 		insideWindowHover(winParent),
 		"elevator",
 	]);
-	// elevator.area.offset = vec2(elevator.width / 4, 0);
 
 	let isDragging = false
 

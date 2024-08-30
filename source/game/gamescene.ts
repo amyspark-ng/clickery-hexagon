@@ -362,7 +362,8 @@ export const gamescene = () => scene("gamescene", () => {
 		}
 
 		GameState.stats.totalTimePlayed += dt()
-		
+		if (!isAchievementUnlocked("extra.ALL")) GameState.stats.timeGameComplete += dt()
+
 		GameState.score = clamp(GameState.score, 0, Infinity)
 		GameState.score = Math.round(GameState.score)
 	

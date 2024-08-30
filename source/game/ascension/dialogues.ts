@@ -1,9 +1,6 @@
 import { GameObj } from "kaplay";
 import { getRandomElementDifferentFrom, removeNumbersOfString } from "../utils";
 import { ascension } from "./ascension";
-import { spawnCards } from "./cards";
-import { playSfx } from "../../sound";
-import { GameState } from "../../gamestate";
 
 const defaultTalkingSpeed = 0.025
 

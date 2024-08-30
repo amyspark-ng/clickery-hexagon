@@ -236,7 +236,7 @@ export function addMinibutton(opts:minibuttonOpt) {
 	currentMinibutton.opacity = 0
 	currentMinibutton.area.scale = vec2(0)
     tween(currentMinibutton.opacity, 1, 0.32, (p) => currentMinibutton.opacity = p, easings.easeOutQuad)
-	
+
 	// currentMinibutton is the one being swapped to met the curDragging wish
 	currentMinibutton.on("dragHasSurpassed", (left) => {
 		currentMinibutton.dragHasSurpassed = true
