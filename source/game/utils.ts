@@ -4,8 +4,8 @@ import { addToast, mouse } from "./additives";
 import { autoLoopTime, cam, triggerGnome } from "./gamescene";
 import { hexagon } from "./hexagon";
 import { achievements, getAchievement, unlockAchievement } from "./unlockables/achievements";
-import { openWindow } from "./windows/windows-api/windowManaging";
-import { powerupTypes, spawnPowerup } from "./powerups";
+import { allObjWindows, openWindow } from "./windows/windows-api/windowManaging";
+import { allPowerupsInfo, powerupTypes, spawnPowerup } from "./powerups";
 import { playSfx } from "../sound";
 import { ascension } from "./ascension/ascension";
 import { unlockWindow } from "./unlockables/windowUnlocks";
@@ -426,14 +426,10 @@ export function debugTexts() {
 				keys = {
 					"Auto loop time: ": autoLoopTime.toFixed(2),
 					"Time until auto loop ends: ": GameState.timeUntilAutoLoopEnds,
-					"Taskbar: ": GameState.taskbar,
-					"Ascending: ": ascension.ascending,
-					"Times ascended: ": GameState.stats.timesAscended
+					"isHoveringPowerup": allPowerupsInfo.isHoveringAPowerup,
+					"isHoveringWindow": allObjWindows.isHoveringAWindow,
+					"isDraggingWindow": allObjWindows.isDraggingAWindow
 				}	
-
-				for (let powerup in powerupTypes) {
-					keys[`${powerup} running time :`] = powerupTypes[powerup].runningTime.toFixed(1)
-				}
 
 				this.text = createKeys()
 			}

@@ -18,13 +18,13 @@ FEATURES
 	* Balancing
 	* Animations
 	* Particles
+	* Timers
 - Cards (Amy)
 	* Balancing
 - Leaderboards window (Amy)
 	* Add mana all time leaderboard
 	* Add times ascended leaderboard (but only to newgrounds)
 - Login newgrounds window (Amy)
-- THANKS FOR PLAYING window (Amy)
 
 GRAPHICS / ETC
 - Achievement titles left (most of them damn you chris) (Amy/Chris)

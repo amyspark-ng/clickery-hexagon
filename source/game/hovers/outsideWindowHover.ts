@@ -31,12 +31,13 @@ export function outsideWindowHover() {
 			}
 
 			this.endHoverFunction = function() {
-				if (this.isBeingHovered == false || this.dragging == true) return
-				if (this.endHoverAnim != null) this.endHoverAnim()
-				
-				this.trigger("outsideHoverEnd")
-				mouse.play("cursor")
-				this.isBeingHovered = false
+				if (curDraggin == null && this.isBeingHovered == true) {
+					if (this.endHoverAnim != null) this.endHoverAnim()
+
+					this.trigger("outsideHoverEnd")
+					mouse.play("cursor")
+					this.isBeingHovered = false
+				}
 			} 
 
 			this.onHover(() => {
@@ -64,12 +65,6 @@ export function outsideWindowHover() {
 					this.startHoverFunction()
 				}
 			})
-
-			// this.onMouseMove(() => {
-			// 	if (allObjWindows.isHoveringAWindow == true || allPowerupsInfo.isHoveringAPowerup == true || allObjWindows.isDraggingAWindow == true) {
-			// 		this.endHoverFunction()
-			// 	}
-			// })
 		},
 
 		/**

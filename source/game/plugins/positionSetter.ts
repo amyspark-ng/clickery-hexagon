@@ -7,9 +7,14 @@ export function positionSetter(property?:properties) {
 	
 	let distance = 1
 	
+	let requirement = ""
+	if (property == "angle") requirement = "rotate"
+	else if (property == "width") requirement = "rect"
+	else if (property == "pos") requirement = "pos"
+
 	return {
 		id: "positionSetter",
-		require: ["pos"],
+		require: [requirement],
 		update() {
 			if (this.parent.is("positionSetter")) return
 			

@@ -14,6 +14,7 @@ import { curDraggin } from "./plugins/drag.ts"
 import { appWindow } from '@tauri-apps/api/window';
 import { ngEnabled, postEverything } from "../newgrounds.ts"
 import { drawDumbOutline } from "./plugins/drawThings.ts"
+import { allObjWindows } from "./windows/windows-api/windowManaging.ts"
 
 let panderitoLetters = "panderito".split("")
 export let panderitoIndex = 0
@@ -263,6 +264,9 @@ export let hasStartedGame:boolean;
 export const gamescene = () => scene("gamescene", () => {
 	hasStartedGame = GameState.scoreAllTime > 1
 	ascension.ascending = false
+	allPowerupsInfo.isHoveringAPowerup = false
+	allObjWindows.isDraggingAWindow = false
+	allObjWindows.isHoveringAWindow = false
 
 	cam = {
 		pos: center(),
@@ -630,5 +634,6 @@ export const gamescene = () => scene("gamescene", () => {
 		critParticleEmitter.onEnd(() => {
 			critParticleEmitter.destroy()
 		})
+
 	}
 })

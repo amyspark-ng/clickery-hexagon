@@ -612,10 +612,10 @@ function loadAllSprites() {
 		}
 	})
 
+	const gooberPos = getPosInGrid(vec2(0, 0), 2, 8, vec2(60))
 	medalSprites["devkyGoober"] = {
-		// SET THIS PROPERLY
-		x: 0,
-		y: 0,
+		x: gooberPos.x,
+		y: gooberPos.y,
 		width: 60,
 		height: 60,
 	}
@@ -787,7 +787,16 @@ function loadAllSprites() {
 	loadSprite("ascendButton", "sprites/windows/ascendWin/ascendButton.png")
 
 	loadSprite("gnome", "sprites/gnome.png")
-	loadSprite("pinch", "sprites/pinch.png")
+	loadSprite("pinch", "sprites/pinch.png", {
+		anims: {
+			pinching: {
+				from: 0,
+				to: 3,
+			}
+		},
+		sliceX: 4,
+		sliceY: 1,
+	})
 	//#endregion
 	//#endregion SPRITES
 }

@@ -1,4 +1,4 @@
-import { Anchor, GameObj, KAPLAYCtx, PosComp, RectComp, TextComp, Vec2 } from "kaplay"
+import { Anchor, Color, GameObj, KAPLAYCtx, PosComp, RectComp, TextComp, Vec2 } from "kaplay"
 import { GameState } from "../gamestate"
 import { playSfx } from "../sound"
 import { hexagon } from "./hexagon"
@@ -7,6 +7,7 @@ import { allObjWindows, manageWindow } from "./windows/windows-api/windowManagin
 import { isWindowUnlocked } from "./unlockables/windowUnlocks"
 import { k } from "../main"
 import { drawDumbOutline } from "./plugins/drawThings"
+import { positionSetter } from "./plugins/positionSetter"
 
 export let gameBg:GameObj;
 export function addBackground() {
@@ -68,6 +69,31 @@ export function addMouse() {
 			grab() {
 				this.grabbing = true
 				mouse.play("grab")
+			},
+
+			pinch(theColor?:Color) {
+				const theCursor = this
+				
+				let pinch = add([
+					sprite("pinch"),
+					layer("mouse"),
+					z(theCursor.z - 1),
+					anchor("center"),
+					pos(mousePos()),
+					color(theColor ?? WHITE),
+					rotate(0),
+				])
+
+				if (theCursor.getCurAnim() != null) {
+					if (theCursor.getCurAnim().name == "cursor") pinch.angle = -32
+					pinch.pos.x -= 12
+					pinch.pos.y -= 14
+				}
+
+				pinch.play("pinching")
+				pinch.onAnimEnd((anim) => {
+					if (anim == "pinching") pinch.destroy()
+				})
 			},
 
 			releaseAndPlay(newAnim:string) {

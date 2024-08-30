@@ -22,6 +22,9 @@ export function getMinibuttonPos(taskbarIndex:number) {
 	return getPosInGrid(folderObj.pos, 0, -taskbarIndex - 1, vec2(75, 0))
 }
 
+export const miniButtonXarea = 0.8
+export const miniButtonYarea = 1.3
+
 export function addMinibutton(opts:minibuttonOpt) {
 	let quad;
 
@@ -233,10 +236,6 @@ export function addMinibutton(opts:minibuttonOpt) {
 	currentMinibutton.opacity = 0
 	currentMinibutton.area.scale = vec2(0)
     tween(currentMinibutton.opacity, 1, 0.32, (p) => currentMinibutton.opacity = p, easings.easeOutQuad)
-	tween(currentMinibutton.pos, currentMinibutton.destinedPosition, 0.32, (p) => currentMinibutton.pos = p, easings.easeOutBack).then(() => {
-		currentMinibutton.area.scale.x = 0.8
-		currentMinibutton.area.scale.y = 1.3
-	})
 	
 	// currentMinibutton is the one being swapped to met the curDragging wish
 	currentMinibutton.on("dragHasSurpassed", (left) => {

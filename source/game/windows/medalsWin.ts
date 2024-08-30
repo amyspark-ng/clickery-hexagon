@@ -121,7 +121,7 @@ function addMedal(gridPosition: { row: number, column: number }, medal_ID: strin
 	medalObj.onClick(() => handleMedalClick(medalObj));
 	medalObj.onHover(() => handleMedalHover(medalObj));
 	medalObj.onHoverEnd(() => handleMedalHoverEnd(medalObj));
-	medalObj.onDraw(() => handleMedalDraw(medalObj, isAchievementUnlocked(medalObj.achievementId)));
+	medalObj.onDraw(() => handleMedalDraw(medalObj, isAchievementUnlocked(medalObj.achievementId) && medalObj.achievementId != "extra.theSlot"));
 	medalMap.set(medal_ID, medalObj);
 }
 
@@ -170,16 +170,16 @@ function updateMedalState(medalObj:GameObj) {
 		medalObj.color = WHITE
 	
 		if (medalObj.achievementId == "extra.ALL" && medalObj.getCurAnim() == null) medalObj.play("master")
+		medalObj.opacity = 1;
 	}
 	
 	else {
 		updateMedalAppearance(medalObj, theAchievement);
 	}
-
 }
 
 /**
- * Updates medal color and sprite based on some conditions (all achievements color is not here) 
+ * Updates medal color and sprite based on some conditions 
  */
 function updateMedalAppearance(medalObj:GameObj, theAchievement:AchievementInterface) {
 	const PURPLE = blendColors(RED, BLUE, 0.5);
@@ -188,10 +188,10 @@ function updateMedalAppearance(medalObj:GameObj, theAchievement:AchievementInter
 	}
 	
 	if (theAchievement.id == "extra.ALL") {
-		medalObj.onUpdate(() => {
+		// medalObj.onUpdate(() => {
 			if (isAchievementUnlocked("extra.ALL")) medalObj.color = WHITE
 			else medalObj.color = hsl2rgb((time() * 0.2 + 0 * 0.1) % 1, 0.6, 0.6)
-		})
+		// })
 	}
 	else if (theAchievement.visibleCondition != null) {
 		if (theAchievement.visibleCondition() == false) {
@@ -207,6 +207,8 @@ function updateMedalAppearance(medalObj:GameObj, theAchievement:AchievementInter
 		if (theAchievement.rare == true) medalObj.color = YELLOW
 		else medalObj.color = RED
 	}
+
+	if (!isAchievementUnlocked(theAchievement.id)) medalObj.opacity = 0.5
 }
 
 // Handle medal click
@@ -242,6 +244,7 @@ function handleMedalHover(medalObj) {
 	medalObj.tooltip = tooltip;
 }
 
+// drawDumbOutline
 function handleMedalDraw(medalObj:GameObj, drawOutline: boolean) {
 	if (drawOutline == false) return
 	drawRect({
@@ -376,7 +379,7 @@ function addScrollBar(medalsContainer:GameObj, totalScrolls = 3) {
 			const lastAchievement = medalsContainer.get("medal").filter(medal => medal.row == totalRows && medal.column == totalColumns - 1)[0] 
 			const thePosition = getPositionInWindow(lastAchievement.row, lastAchievement.column + 1)
 			let goober = medalsContainer.add([
-				sprite("devky"),
+				sprite("devkyGoober"),
 				pos(thePosition.x, thePosition.y + 30),
 				anchor("bot"),
 				area(),

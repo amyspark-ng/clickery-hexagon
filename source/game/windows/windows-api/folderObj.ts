@@ -5,10 +5,11 @@ import { mouse } from "../../additives";
 import { ascension } from "../../ascension/ascension";
 import { blendColors, bop, sortedTaskbar } from "../../utils";
 import { setTimeSinceSkip, timeSinceSkip } from "../musicWindow";
-import { addMinibutton, getMinibuttonPos,  } from "./minibuttons";
+import { addMinibutton, getMinibuttonPos, miniButtonXarea, miniButtonYarea,  } from "./minibuttons";
 import { manageWindow, allObjWindows, windowKey } from "./windowManaging";
 import { outsideWindowHover } from "../../hovers/outsideWindowHover";
 import { GameObj } from "kaplay";
+import { allPowerupsInfo } from "../../powerups";
 
 export let folderObj:GameObj;
 export let folded = true;
@@ -28,7 +29,8 @@ export function addFolderObj() {
 	
 	allObjWindows.isHoveringAWindow = false;
 	allObjWindows.isDraggingAWindow = false;
-	
+	allPowerupsInfo.isHoveringAPowerup = false;
+
 	movingMinibuttons = false;
 
 	let theFolderObj = add([
@@ -65,6 +67,7 @@ export function addFolderObj() {
 					get("minibutton").forEach((miniButton) => {
 						tween(miniButton.pos, miniButton.destinedPosition, 0.32, (p) => miniButton.pos = p, easings.easeOutBack).then(() => {
 							movingMinibuttons = false;
+							miniButton.area.scale = vec2(miniButtonXarea, miniButtonYarea);
 						})
 					})
 				}
