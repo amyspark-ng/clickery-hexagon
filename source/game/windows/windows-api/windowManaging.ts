@@ -22,26 +22,6 @@ import { hexColorWinContent } from "../color/hexColorWin.ts";
 import { bgColorWinContent } from "../color/bgColorWin.ts";
 import { leaderboardsWinContent } from "../leaderboardsWin.ts";
 
-class Window {
-	key: string;
-	idx: number;
-	pos: Vec2;
-	content: (winParent:any) => void;
-	icon?: string;
-
-	// they can't be the same names lol
-	constructor(public windowKey: string, public index: number, public position: Vec2, public contentObjs: (winParent:any) => void, public iconing?: string) {
-		this.key = windowKey
-		this.idx = index
-		this.pos = position
-		this.content = contentObjs
-		this.icon = iconing
-	}
-}
-
-// TODO: look into this, the 'vec2 is not defined' issue still persist, but it's a better alternative to the infoForWindows object
-// let windowMaybe = new Window("storeWin", 0, vec2(264, 285), storeWinContent, "icon_store")
-
 export let infoForWindows = {}
 
 export let allObjWindows = {

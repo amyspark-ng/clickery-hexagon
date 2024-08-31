@@ -10,7 +10,7 @@ const tooltipLerp = 0.65
 
 export let upgradeInfo = {
 	"k_0": { value: 2, price: 500 },
-	"k_1": { value: 4, price: 5_000 }, // TODO: look into this, between first and second there's a 5x gap, i think that's good
+	"k_1": { value: 4, price: 5_000 },
 	"k_2": { value: 8, price: 10_000 },
 	// ending
 	"k_3": { value: 16, price: 150_000,},
@@ -25,6 +25,8 @@ export let upgradeInfo = {
 	"c_4": { value: 32, price: 100_000 },
 	"c_5": { value: 64, price: 500_000 },
 }
+
+const upgradePriceIncrease = 0.070
 
 export function isUpgradeBought(id:string):boolean {
 	return (GameState.upgradesBought.includes(id))
@@ -192,7 +194,8 @@ export function addUpgrades(elementParent) {
 		
 		// sets info like id price and value/freq
 		upgradeObj.id = upgradeObj.type + upgradeObj.idx
-		upgradeObj.price = upgradeInfo[upgradeObj.id].price
+		const upgradePrice = upgradeInfo[upgradeObj.id].price
+		upgradeObj.price = upgradePrice + upgradePrice * upgradePriceIncrease * GameState.stats.timesAscended
 		
 		if (upgradeObj.type == "k_") upgradeObj.value = upgradeInfo[upgradeObj.id].value
 		else if (upgradeObj.type == "c_") {

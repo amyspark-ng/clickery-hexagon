@@ -509,7 +509,6 @@ export let achievements = [
 	}),
 ] as Achievement[]
 
-// TODO: Find a working api for the secret achievements
 export function getAchievement(achievementId:string) {
 	if (!achievements.map(achievement => achievement.id).includes(achievementId)) throw new Error(`Achievement: ${achievementId} does not exist`)
 	return achievements.filter(achievementObject => achievementObject.id == achievementId)[0]
@@ -588,7 +587,7 @@ export function unlockAchievement(id:string) {
 		ROOT.trigger("achivementUnlock", id)
 	})
 
-	if (ngEnabled == true) {
-		if (theAchievement.ngId) ng.unlockMedal(theAchievement.ngId)
-	}
+	// if (ngEnabled == true) {
+	// 	if (theAchievement.ngId) ng.unlockMedal(theAchievement.ngId)
+	// }
 }

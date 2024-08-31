@@ -367,8 +367,8 @@ export function addStoreElement(winParent:any, opts:storeElementOpt) {
 			// price
 			const elementInfo = storeElementsInfo[opts.type]
 			btn.price = getPrice({
-				basePrice: elementInfo.basePrice,
-				percentageIncrease: elementInfo.percentageIncrease + 1 * GameState.stats.timesAscended,
+				basePrice: elementInfo.basePrice + elementInfo.basePrice * ((elementInfo.percentageIncrease / 100) / 2) * GameState.stats.timesAscended,
+				percentageIncrease: elementInfo.percentageIncrease,
 				objectAmount: amountBought,
 				amountToBuy: opts.type == "powerupsElement" ? 1 : amountToBuy,
 				gifted: opts.type == "clickersElement" ? 1 : 0

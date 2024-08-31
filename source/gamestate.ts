@@ -90,7 +90,7 @@ class _GameState {
 	}
 
 	load() {
-		let newSave = new _GameState()
+		const newSave = new _GameState()
 		
 		let gottenData = getData("hexagon-save") as _GameState
 		
@@ -142,8 +142,6 @@ class _GameState {
 export let GameState = new _GameState()
 
 class _scoreManager {
-	scientificENOT = 1000000000000000000000
-
 	combo = 1
 	
 	// score per click (no combo or powerups or percentage)

@@ -20,10 +20,13 @@ FEATURES
 	* Timers
 - Cards
 	* Balancing
+- Balance prices increasing after ascension
 
 GRAPHICS / ETC
+- Get ascension sound
 - Achievement titles left (most of them damn you chris)
 - All achievements achievement animation
 - Itch.io web page
+	* Trailer, oh shit
 	* Screenshots
 	* Background being cutted, make it a "texture"

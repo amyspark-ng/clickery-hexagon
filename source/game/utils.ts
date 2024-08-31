@@ -38,7 +38,7 @@ type formatNumberOpts = {
 	fullWord?:boolean,
 }
 
-let numTypes = {
+const numTypes = {
 	n: { small: "", large: "" }, // just for offset apparently
 	K: { small: "K", large: "Thousands" },
 	M: { small: "M", large: "Millions" },

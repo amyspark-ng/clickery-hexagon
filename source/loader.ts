@@ -705,7 +705,15 @@ function loadAllSprites() {
 	loadSprite("ascendBottomPolygon", "sprites/windows/ascendWin/ascendBottomPolygon.png")
 	loadSprite("ascendBar", "sprites/windows/ascendWin/ascendBar.png")
 	loadSprite("ascendManaStar", "sprites/windows/ascendWin/ascendManaStar.png")
-	loadSprite("ascendButton", "sprites/windows/ascendWin/ascendButton.png")
+	loadSprite("ascendButtonEyes", "sprites/windows/ascendWin/ascendButtonEyes.png", {
+		sliceX: 2,
+		sliceY: 1,
+		anims: {
+			"woke": 0,
+			"dumb": 1
+		}
+	})
+	loadSprite("ascendButtonScroll", "sprites/windows/ascendWin/ascendButtonScroll.png")
 
 	loadSprite("gnome", "sprites/gnome.png")
 	loadSprite("pinch", "sprites/pinch.png", {
@@ -754,7 +762,11 @@ function loadAllSounds() {
 	//#endregion hexagon-intro
 	
 	//#region ascension
-	loadSound("mage_e", "sounds/sfx/ascension/mage_e.mp3")
+	loadSound("mage_a", "sounds/sfx/ascension/mage_a.ogg")
+	loadSound("mage_e", "sounds/sfx/ascension/mage_e.ogg")
+	loadSound("mage_o", "sounds/sfx/ascension/mage_o.ogg")
+	loadSound("mage_i", "sounds/sfx/ascension/mage_i.ogg")
+
 	loadSound("mage_yummers", "sounds/sfx/ascension/mage_yummers.wav")
 	loadSound("mage_huntressHum", "sounds/sfx/ascension/mage_huntressHum.wav")
 	loadSound("onecard", "sounds/sfx/ascension/onecard.mp3")

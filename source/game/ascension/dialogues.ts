@@ -1,8 +1,10 @@
 import { GameObj } from "kaplay";
 import { getRandomElementDifferentFrom, removeNumbersOfString } from "../utils";
 import { ascension } from "./ascension";
+import { playSfx } from "../../sound";
 
 const defaultTalkingSpeed = 0.025
+const someVowels = ["a", "e", "o", "i"] 
 
 class Dialogue {
 	/**
@@ -89,8 +91,8 @@ type dialogueType = "tutorial" | "eye" | "hex" | "back" | "fun"
  * @returns A random dialogue corresponding to the key 
  */
 export function getRandomDialogue(generalType:dialogueType) : Dialogue {
-	let arrayOfDialoguesWithThatType = mageDialogues.filter(dialogue => dialogue.key.includes(generalType))
-	return choose(arrayOfDialoguesWithThatType)
+	const arrayOfDialoguesWithThatType = mageDialogues.filter(dialogue => dialogue.key.includes(generalType))
+	return getRandomElementDifferentFrom(arrayOfDialoguesWithThatType, ascension.currentDialoguekey)
 }
 
 export function startDialoguing() {
@@ -213,8 +215,11 @@ export function talk(speaker:"mage" | "card", thingToSay:string, speed?:number, 
 		const waitCall = wait(currentDelay, () => {
 			dialogue.textBox.text += letter;
 
-			// playSfx(`${speaker}_e`, { detune: rand(-150, 150) }); 
-			// playSfx(`mage_e`, { detune: rand(-150, 150) }); 
+			if (speaker == "mage") {
+				if (!(thingToSay == "Y U M M E R S" || thingToSay == "Hum... Hum...")) {
+					playSfx(`mage_${choose(someVowels)}`, { detune: rand(-150, 150) }); 
+				}
+			}
 			
 			if (index == thingToSay.length - 1) {
 				// i have to search in magedialogues for thingToSay and get its key

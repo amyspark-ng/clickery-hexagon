@@ -2,10 +2,12 @@ import { GameObj, PosComp, TextComp, Vec2 } from "kaplay"
 import { GameState, scoreManager } from "../../gamestate"
 import { startAscending } from "../ascension/ascension"
 import { allPowerupsInfo} from "../powerups"
-import { formatNumber, formatNumberSimple } from "../utils"
+import { bop, formatNumber, formatNumberSimple } from "../utils"
 import { waver } from "../plugins/wave"
 import { positionSetter } from "../plugins/positionSetter"
 import { ROOT } from "../../main"
+import { insideWindowHover } from "../hovers/insideWindowHover"
+import { makeSmallParticles } from "../plugins/confetti"
 
 let objectsPositions = {
 	mage_hidden: 450,
@@ -47,20 +49,89 @@ function addWinMage(position: Vec2, parent:GameObj) {
 	};
 }
 
-export function ascendWinContent(winParent:GameObj) {
-	// TODO: if mana is increased while the ascend window is open add a little spark and a sound
+/**
+ * @returns An object holding the eye and the scroll
+ */
+function addAscendButton(position: Vec2, winParent:GameObj) {
+	const buttonContainer = winParent.add([
+		pos(position),
+		anchor("center"),
+		positionSetter(),
+		{
+			eye: null,
+			scroll: null,
+		}
+	])
+	
+	const scroll = buttonContainer.add([
+		sprite("ascendButtonScroll"),
+		pos(-15, -1),
+		anchor("right"),
+		scale(),
+	])
 
+	scroll.scale.x = 0
+	
+	const eye = buttonContainer.add([
+		sprite("ascendButtonEyes", { anim: "dumb" }),
+		pos(position),
+		anchor("center"),
+		area(),
+		insideWindowHover(winParent),
+		scale(),
+		opacity(),
+		{
+			update() {
+				if (GameState.ascension.mana < 1) this.opacity = 0.8
+				else this.opacity = 1
+			}
+		}
+	])
+
+	eye.startingHover(() => {
+		if (GameState.ascension.mana > 0) {
+			tween(scroll.scale.x, 1, 0.15, (p) => scroll.scale.x = p, easings.easeOutQuint)
+			eye.play("woke")
+		}
+		
+		else {
+			eye.play("dumb")
+		}
+
+		tween(1.5, 1.05, 0.15, (p) => eye.scale.y = p, easings.easeOutQuint)
+		tween(1, 1.05, 0.15, (p) => eye.scale.x = p, easings.easeOutQuint)
+	})
+
+	eye.endingHover(() => {
+		eye.play("dumb")
+		tween(scroll.scale.x, 0, 0.15, (p) => scroll.scale.x = p, easings.easeOutQuint)
+		
+		tween(eye.scale.y, 1, 0.15, (p) => eye.scale.y = p, easings.easeOutQuint)
+		tween(eye.scale.x, 1, 0.15, (p) => eye.scale.x = p, easings.easeOutQuint)
+	})
+
+	eye.onPressClick(() => {
+		bop(eye)
+		startAscending()
+	})
+
+	buttonContainer.eye = eye
+	buttonContainer.scroll = scroll
+	return buttonContainer;
+}
+
+export function ascendWinContent(winParent:GameObj) {
 	// ADDS THE MAAAAAGEEE
-	let masked = winParent.add([
+	const masked = winParent.add([
 		mask("intersect"),
 		anchor("center"),
 		pos(),
 		rect(winParent.width, winParent.height),
 	])
 
-	let winMageFull = addWinMage(vec2(0, 450), masked)
-	let winMage = winMageFull.mage
-	let winMageCursors = winMageFull.cursors
+	const winMageFull = addWinMage(vec2(0, 450), masked)
+	const winMage = winMageFull.mage
+	const winMageCursors = winMageFull.cursors
 	winMageCursors.pos.y = objectsPositions.cursors_hidden
 
 	tween(objectsPositions.mage_hidden, objectsPositions.mage_visible, 0.6, (p) => winMage.pos.y = p, easings.easeOutQuint).onEnd(() => {
@@ -96,7 +167,7 @@ export function ascendWinContent(winParent:GameObj) {
 
 	// MANA COUNTER
 	// 36 tall
-	let manaCounterText = winParent.add([
+	const manaCounterText = winParent.add([
 		text("✦", { align: "left" }),
 		pos(-308, -169),
 		anchor("left"),
@@ -108,7 +179,7 @@ export function ascendWinContent(winParent:GameObj) {
 		}
 	])
 	
-	let manaCounterRect = winParent.add([
+	const manaCounterRect = winParent.add([
 		rect(0, 10),
 		color(BLACK),
 		anchor("topleft"),
@@ -126,7 +197,7 @@ export function ascendWinContent(winParent:GameObj) {
 		}
 	])
 	
-	let manaCounterTri = winParent.add([
+	const manaCounterTri = winParent.add([
 		sprite("manaCounterTri"),
 		pos(),
 		anchor(manaCounterRect.anchor),
@@ -144,13 +215,12 @@ export function ascendWinContent(winParent:GameObj) {
 	// BOTTOM POLYGON
 
 	// can't bother to make it masked
-	let bottomPolygon = winParent.add([
+	const bottomPolygon = winParent.add([
 		sprite("ascendBottomPolygon"),
 		pos(140, 249),
 		color(manaCounterRect.color),
 		opacity(manaCounterRect.opacity),
 		anchor("bot"),
-		positionSetter(),
 		{
 			add() {
 				this.height = 0
@@ -163,7 +233,7 @@ export function ascendWinContent(winParent:GameObj) {
 	])
 
 	const barColor = rgb(105, 180, 225)
-	let ascendEmptyBar = winParent.add([
+	const ascendEmptyBar = winParent.add([
 		sprite("ascendBar"),
 		pos(150, 178),
 		anchor("center"),
@@ -171,7 +241,7 @@ export function ascendWinContent(winParent:GameObj) {
 		opacity(0.5),
 	])
 
-	let maskedBarContent = winParent.add([
+	const maskedBarContent = winParent.add([
 		mask("intersect"),
 		anchor("botleft"),
 		pos(ascendEmptyBar.pos.x - ascendEmptyBar.width / 2, ascendEmptyBar.pos.y + ascendEmptyBar.height / 2),
@@ -190,7 +260,7 @@ export function ascendWinContent(winParent:GameObj) {
 		}
 	])
 
-	let ascendContentBar = maskedBarContent.add([
+	const ascendContentBar = maskedBarContent.add([
 		sprite("ascendBar"),
 		pos(157, -65),
 		anchor("center"),
@@ -207,14 +277,15 @@ export function ascendWinContent(winParent:GameObj) {
 		}
 	])
 
-	let manaStar = winParent.add([
+	const manaStar = winParent.add([
 		sprite("ascendManaStar"),
 		pos(306, 116),
 		anchor("center"),
-		color(barColor.lighten(10))
+		color(barColor.lighten(10)),
+		scale(),
 	])
 
-	let scoreTilNextManaText = winParent.add([
+	const scoreTilNextManaText = winParent.add([
 		text("", {
 			align: "right",
 			size: 22,
@@ -241,28 +312,43 @@ export function ascendWinContent(winParent:GameObj) {
 		}
 	])
 
-	let ascendButton = winParent.add([
-		sprite("ascendButton"),
-		anchor("center"),
-		color(WHITE),
-		pos(262, 224),
-		area(),
-		opacity(),
-		z(4),
-		{
-			update() {
-				this.opacity = GameState.ascension.mana < 1 ? 0.5 : 1
-			}
-		}
-	])
+	// i wasn't able to place it properly using positionSetter() for the LIFE of me i swear
+	const buttonPos = vec2(280, 220)
+	const ascendButton = addAscendButton(vec2(0), winParent)
+	ascendButton.pos = buttonPos
+	
+	function manaParticles(position:Vec2) {
+		let manaParticles = add([
+			pos(position),
+			particles({
+				max: 8,
+				texture: getSprite("part_star").data.tex,
+				quads: [getSprite("part_star").data.frames[0]],
 
-	ascendButton.onClick(() => {
-		if (allPowerupsInfo.isHoveringAPowerup == true) return
-		if (GameState.ascension.mana >= 1) startAscending()
-	})
+				speed: [100, 250],
+				angle: [0, 0],
+				colors: [manaStar.color.lighten(50), manaStar.color.darken(50)],
+				scales: [1, 1.1],
+				lifeTime: [0.35, 0.5],
+				opacities: [1, 0],
+				acceleration: [vec2(50), vec2(-50)],
+				angularVelocity: [30, 60],
+			}, {
+				lifetime: 1.5,
+				rate: 100,
+				direction: 180,
+				spread: -90,
+			}),
+			layer(winParent.layer),
+		])
 
-	let manaGainedCheck = ROOT.on("manaGained", () => {
+		manaParticles.emit(randi(4, 8))
+		manaParticles.onEnd(() => manaParticles.destroy())
+	}
 
+	const manaGainedCheck = ROOT.on("manaGained", () => {
+		tween(2, 1, 0.15, (p) => manaStar.scale.y = p, easings.easeOutQuad)
+		manaParticles(manaStar.worldPos())
 	})
 
 	winParent.on("close", () => {
