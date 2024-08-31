@@ -718,6 +718,23 @@ function loadAllSprites() {
 		sliceX: 4,
 		sliceY: 1,
 	})
+
+	loadSpriteAtlas("sprites/newgroundsButtons.png", {
+		"newgroundsSignInButton": {
+			"x": 0,
+			"y": 0,
+			"width": 200,
+			"height": 100,
+		},
+		"newgroundsNahButton": {
+			"x": 5 + 190 + 5 + 5,
+			"y": 0,
+			"width": 200,
+			"height": 100,
+		},
+	})
+
+	loadSprite("newgroundsPopup", "sprites/newgroundsPopup.png")
 	//#endregion
 	//#endregion SPRITES
 }

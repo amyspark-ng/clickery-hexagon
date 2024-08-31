@@ -11,7 +11,7 @@ import { GameState } from "./gamestate.ts";
 import { windowsDefinition } from "./game/windows/windows-api/windowManaging.ts";
 
 export let DEBUG:boolean = true
-export let enableNg = false
+export let enableNg = true
 
 let kaplayOpts = {
 	width: 1024,
@@ -63,6 +63,7 @@ onLoad(() => {
 
 	gameBg.movAngle = -5
 	gameBg.color = BLACK
+	gameBg.color.a = 0.9
 
 	if (!DEBUG) {
 		let opacity = 1
@@ -93,9 +94,20 @@ onLoad(() => {
 		if (!isFocused()) go("focuscene")
 		else {
 			if (enableNg == true) {
-				debug.log("loading")
+				let loadingEvent = onDraw(() => {
+					drawText({
+						text: "Loading newgrounds, might take a second\nLoading" + ".".repeat(wave(1, 4, time() * 8)),
+						size: 26,
+						align: "center",
+						anchor: "center",
+						pos: center(),
+					});
+				})
+			
 				if (!await ng.isLoggedIn()) go("ngScene")
 				else go("gamescene")
+				// gets cancelled after the await is finished
+				loadingEvent.cancel()
 			}
 
 			else go("gamescene")

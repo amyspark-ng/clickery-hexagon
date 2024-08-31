@@ -3,7 +3,7 @@ import * as env from "../../env.json"
 import { ScoreBoardGetScoresParams } from "newgrounds.js/dist/first";
 import { GameObj, TextCompOpt } from 'kaplay';
 import { Score } from 'newgrounds.js/dist/first';
-import { formatNumber } from '../utils';
+import { formatNumber, formatTime, toHHMMSS } from '../utils';
 
 async function updateScores(winParent:GameObj) {
 	const paramsForGettingScores = { period: "A", limit: 5 } as ScoreBoardGetScoresParams 
@@ -33,7 +33,8 @@ async function updateScores(winParent:GameObj) {
 
 	let times = winParent.get("times")[0]
 	if (times) {
-		let timeValues = timeLeaderboards.map((score) => score.value + "h")
+		// have to convert back from miliseconds
+		let timeValues = timeLeaderboards.map((score) => formatTime(score.value / 1000, true))
 		times.text = timeValues.join("\n")
 	}
 }
@@ -42,7 +43,7 @@ export async function leaderboardsWinContent(winParent:GameObj) {
 	// is loading waiting for update scores
 	let loadingEvent = winParent.onDraw(() => {
 		drawText({
-			text: "loading" + ".".repeat(wave(1, 4, time() * 12)),
+			text: "Loading" + ".".repeat(wave(1, 4, time() * 10)),
 			size: 24,
 			anchor: "center",
 			pos: vec2(0),
@@ -98,7 +99,7 @@ export async function leaderboardsWinContent(winParent:GameObj) {
 		anchor("center"),
 		"times"
 	])
-	
+
 	// now after being added update them all
 	await updateScores(winParent)
 

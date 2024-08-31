@@ -20,10 +20,6 @@ FEATURES
 	* Timers
 - Cards
 	* Balancing
-- Leaderboards window
-	* Add mana all time leaderboard
-	* Add times ascended leaderboard (but only to newgrounds)
-- Login newgrounds window
 
 GRAPHICS / ETC
 - Achievement titles left (most of them damn you chris)

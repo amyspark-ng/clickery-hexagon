@@ -1,9 +1,9 @@
-import { Color, GameObj, Vec2 } from "kaplay";
+import { Color, GameObj, ScaleComp, Vec2 } from "kaplay";
 import { GameState, saveColor, scoreManager } from "../gamestate";
 import { addToast, mouse } from "./additives";
 import { autoLoopTime, cam, triggerGnome } from "./gamescene";
 import { hexagon } from "./hexagon";
-import { achievements, getAchievement, unlockAchievement } from "./unlockables/achievements";
+import { achievements, getAchievement, isAchievementUnlocked, unlockAchievement } from "./unlockables/achievements";
 import { allObjWindows, openWindow } from "./windows/windows-api/windowManaging";
 import { allPowerupsInfo, powerupTypes, spawnPowerup } from "./powerups";
 import { playSfx } from "../sound";
@@ -133,24 +133,24 @@ export function getPosInGrid(initialpos:Vec2, row:number, column:number, spacing
 	return vec2(initialpos.x + spacing.x * (column), initialpos.y + spacing.y * (row));
 }
 
+export function toHHMMSS(timeInSeconds:number) {
+	const hours = Math.floor(timeInSeconds / 3600);
+	const minutes = Math.floor((timeInSeconds % 3600) / 60);
+	const seconds = Math.floor(timeInSeconds % 60);
+
+	const formattedHours = hours > 0 ? `${hours}:` : '';
+	const formattedMinutes = hours > 0 ? `${minutes < 10 ? '0' + minutes : minutes}` : minutes;
+	const formattedSeconds = seconds < 10 ? '0' + seconds : seconds;
+
+	return `${formattedHours}${formattedMinutes}:${formattedSeconds}`;
+}
+
 /**
  * Formats time
  * @param time Time in seconds
  * @param opts Options for formatting
  */
 export function formatTime(time:number, includeWords:boolean) {
-	function toHHMMSS(timeInSeconds:number) {
-		const hours = Math.floor(timeInSeconds / 3600);
-		const minutes = Math.floor((timeInSeconds % 3600) / 60);
-		const seconds = Math.floor(timeInSeconds % 60);
-	
-		const formattedHours = hours > 0 ? `${hours}:` : '';
-		const formattedMinutes = hours > 0 ? `${minutes < 10 ? '0' + minutes : minutes}` : minutes;
-		const formattedSeconds = seconds < 10 ? '0' + seconds : seconds;
-	
-		return `${formattedHours}${formattedMinutes}:${formattedSeconds}`;
-	}
-	
 	let returnValue = toHHMMSS(time);
 
 	if (includeWords == true) {
@@ -368,7 +368,7 @@ export function randomPos() {
 	return vec2(rand(0, width()), rand(0, height()))
 }
 
-export function bop(obj:any, howMuch = 0.1, bopEasing = easings.easeOutQuint) {
+export function bop(obj:GameObj, howMuch = 0.1, bopEasing = easings.easeOutQuint) {
 	if (!obj.is("scale")) throw new Error("Obj must have scale component")
 	if (obj.bopDefScale == null) obj.bopDefScale = obj.scale
 
@@ -451,6 +451,9 @@ export function debugFunctions() {
 	window.globalThis.openWindow = openWindow
 	window.globalThis.unlockWindow = unlockWindow
 	window.globalThis.triggerGnome = triggerGnome
+	window.globalThis.unlockAllAchievements = () => {
+		achievements.forEach(achievement => unlockAchievement(achievement.id))
+	}
 	
 	onUpdate(() => {
 		// if (isKeyDown("control")) {

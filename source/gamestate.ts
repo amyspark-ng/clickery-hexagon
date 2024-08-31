@@ -134,7 +134,9 @@ class _GameState {
 	/**
 	 *  Every time there's a change to the gamestate save this has to be changed
 	 */
-	saveVersion = 1.0
+	// 0.9 was in the last days before the release of the game
+	// 1.0 will be in the moment of release
+	saveVersion = 0.9
 }
 
 export let GameState = new _GameState()

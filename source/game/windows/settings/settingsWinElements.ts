@@ -3,7 +3,7 @@ import { ROOT } from "../../../main"
 import { blendColors, bop, getRandomDirection } from "../../utils"
 import { manageMute, playSfx, volChangeTune } from "../../../sound"
 import { GameState, scoreManager } from "../../../gamestate"
-import { addTooltip, mouse } from "../../additives"
+import { addTooltip, mouse, tooltipInfo } from "../../additives"
 import { spsText } from "../../uicounters"
 import { positionSetter } from "../../plugins/positionSetter"
 import { insideWindowHover } from "../../hovers/insideWindowHover"
@@ -366,10 +366,9 @@ export function addDeleteSaveButton(otherButtonsBg:GameObj) {
 		}
 	])
 	
-	let deleteSaveButtonTooltip = null;
+	let deleteSaveButtonTooltip:tooltipInfo = null;
 	deleteSaveButton.startingHover(() => {
-		// @ts-ignore
-		if (deleteSaveButton.tooltip == null) {
+		if (deleteSaveButtonTooltip == null) {
 			deleteSaveButtonTooltip = addTooltip(deleteSaveButton, {
 				direction: "up",
 				text: "WILL DELETE YOUR SAVE"
