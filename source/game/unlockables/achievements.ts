@@ -286,125 +286,154 @@ export let achievements = [
 	// ### CLICKERS
 	new Achievement({
 		id: "clickers.10",
-		title: "CAMBIAR",
+		title: "Seeing decuple",
 		description: "Have 10 clickers",
+		ngId: 80446,
 		unlockCondition: () => GameState.clickers >= 10,
 	}),
 
 	new Achievement({
 		id: "clickers.20",
-		title: "CAMBIAR",
+		title: "Mitosis",
+		flavorText: "At the Telophase",
 		description: "Have 20 clickers",
+		ngId: 80447,
 		unlockCondition: () => GameState.clickers >= 20,
 	}),
 
 	new Achievement({
 		id: "clickers.30",
-		title: "CAMBIAR",
+		title: "DIE HARD",
+		flavorText: "I've never seen die hard",
 		description: "Have 30 clickers",
+		ngId: 80448,
 		unlockCondition: () => GameState.clickers >= 30,
 	}),
 
 	new Achievement({
 		id: "clickers.40",
-		title: "CAMBIAR",
+		title: "Ommmmmm",
+		flavorText: "Mastering clicking power",
 		description: "Have 40 clickers",
+		ngId: 80449,
 		unlockCondition: () => GameState.clickers >= 40,
 	}),
 
 	new Achievement({
 		id: "clickers.50",
 		title: "Iridescent Cursor",
+		flavorText: "50 millions clicks, is what it would take for you to break your mouse, kinda",
 		description: "Have 50 clickers",
 		rare: true,
+		ngId: 80450,
 		unlockCondition: () => GameState.clickers >= 50,
 	}),
 	
 	// ### CURSORS
 	new Achievement({
 		id: "cursors.10",
-		title: "CAMBIAR",
+		title: "I work hard for the money",
+		flavorText: "So hard for the money",
 		description: "Have 10 cursors",
+		ngId: 80451,
 		unlockCondition: () => GameState.cursors >= 10,
 	}),
 
 	new Achievement({
 		id: "cursors.20",
-		title: "CAMBIAR",
+		title: "Check out this ruby i got",
+		flavorText: "That's an emerald dude",
 		description: "Have 20 cursors",
+		ngId: 80452,
 		unlockCondition: () => GameState.cursors >= 20,
 	}),
 
 	new Achievement({
 		id: "cursors.30",
-		title: "CAMBIAR",
+		title: "Telekinesis",
+		flavorText: "Not even touching the mouse",
 		description: "Have 30 cursors",
+		ngId: 80453,
 		unlockCondition: () => GameState.cursors >= 30,
 	}),
 
 	new Achievement({
 		id: "cursors.40",
-		title: "CAMBIAR",
+		title: "Twisted",
+		flavorText: "Scrumptious amounts",
 		description: "Have 40 cursors",
+		ngId: 80454,
 		unlockCondition: () => GameState.cursors >= 40,
 	}),
 
 	new Achievement({
 		id: "cursors.50",
-		title: "CAMBIAR",
+		title: "Frankenstein's cursor",
+		flavorText: "RAAAAAA",
 		description: "Have 50 cursors",
 		rare: true,
+		ngId: 80455,
 		unlockCondition: () => GameState.cursors >= 50,
 	}),
 	//#endregion CLICKERS/CURSORS ACHIEVEMENTS =================
 
 	new Achievement({
 		id: "store.allUpgrades",
-		title: "CAMBIAR",
+		title: "All done (no)",
+		flavorText: "Some Power-Ups would go great on this",
 		description: "Buy all the available upgrades",
 		timeAfter: 1,
+		ngId: 80456,
 		unlockCondition: () => GameState.clicksUpgradesValue >= fullUpgradeValues.clicks() && GameState.cursorsUpgradesValue >= fullUpgradeValues.cursors(),
 	}),
 
 	// #region POWERUP ACHIEVEMENTS =====================
 	new Achievement({
 		id: "powerups.click_1",
-		title: "What?! Help me!",
+		title: "Golden Cook- wait",
+		flavorText: "Wrong game sorry",
 		description: "Click 1 powerup",
 		timeAfter: 0.5,
+		ngId: 80457,
 		unlockCondition: () => GameState.stats.powerupsClicked >= 1,
 	}),
 
 	new Achievement({
 		id: "powerups.click_5",
 		title: "What?! Help me!",
+		flavorText: "Help = LIKE",
 		description: "Click 5 powerup",
 		timeAfter: 0.5,
+		ngId: 80458,
 		unlockCondition: () => GameState.stats.powerupsClicked >= 5,
 	}),
 
 	new Achievement({
 		id: "powerups.click_10",
-		title: "What?! Help me!",
-		description: "Click 10 powerup",
+		title: "Full of power",
+		description: "And soup",
 		timeAfter: 0.5,
+		ngId: 80459,
 		unlockCondition: () => GameState.stats.powerupsClicked >= 10,
 	}),
 
 	new Achievement({
 		id: "powerups.click_20",
-		title: "What?! Help me!",
+		title: "Super HEXAGON",
 		description: "Click 20 powerup",
 		rare: true,
 		timeAfter: 0.5,
+		ngId: 80460,
 		unlockCondition: () => GameState.stats.powerupsClicked >= 20,
 	}),
 
 	new Achievement({
 		id: "powerups.buy_10",
 		title: "Pay to win",
+		flavorText: "Only 899.99 monthly",
 		description: "Buy 10 powerup",
 		timeAfter: 1,
+		ngId: 80461,
 		unlockCondition: () => GameState.stats.powerupsBought >= 10,
 	}),
 	// #endregion POWERUP ACHIEVEMENTS ====================
@@ -414,6 +443,7 @@ export let achievements = [
 		id: "ascension.times_1",
 		title: "Oh. So you've met him?",
 		description: "Ascend for the first time",
+		ngId: 80462,
 		visibleCondition: () => GameState.stats.timesAscended >= 1
 	}),
 
@@ -421,6 +451,7 @@ export let achievements = [
 		id: "ascension.times_5",
 		title: "He's funny, isn't he?",
 		description: "Ascend for the fifth time",
+		ngId: 80463,
 		unlockCondition: () => GameState.stats.timesAscended >= 5,
 		visibleCondition: () => isAchievementUnlocked("ascension.times_1"),
 	}),
@@ -430,6 +461,7 @@ export let achievements = [
 		title: "I am the clickery...",
 		description: "Ascend for the tenth time",
 		rare: true,
+		ngId: 80464,
 		unlockCondition: () => GameState.stats.timesAscended >= 10,
 		visibleCondition: () => isAchievementUnlocked("ascension.times_1"),
 	}),
@@ -437,7 +469,9 @@ export let achievements = [
 	new Achievement({
 		id: "ascension.cardsBought_10",
 		title: "The trickster",
+		flavorText: "Wooimabouttomakeanameformyselfhere",
 		description: "Buy 10 cards",
+		ngId: 80465,
 		unlockCondition: () => (GameState.ascension.clickPercentagesBought + GameState.ascension.cursorsPercentagesBought + GameState.ascension.powerupPowersBought + GameState.ascension.critPowersBought) >= 10,
 		visibleCondition: () => isAchievementUnlocked("ascension.times_1"),
 	}),
@@ -447,7 +481,9 @@ export let achievements = [
 	new Achievement({
 		id: "clicks.1000",
 		title: "Letting the clicks go by",
+		flavorText: "Score flowing underground",
 		description: "Click 1000 times",
+		ngId: 80466,
 		unlockCondition: () => GameState.stats.timesClicked >= 1000
 	}),
 
@@ -456,55 +492,68 @@ export let achievements = [
 		title: "OVERDRIVE!!!",
 		description: "Max your combo for the first time",
 		flavorText: "FULL COMBO!!",
+		ngId: 80467,
 		timeAfter: 2,
 	}),
 
 	new Achievement({
 		id: "extra.panderito",
-		title: "Hmmmmmmmm panderitos...",
+		title: "So tasty",
+		flavorText: "Panderitos.....",
 		description: "Spell panderito",
+		ngId: 80468,
 	}),
 
 	new Achievement({
 		id: "extra.theSlot",
-		title: "That was easy right?",
-		description: "Tap this achivement's slot",
+		title: "Click click lick",
+		flavorText: "It wasn't hard was it?",
+		description: "Click this achivement's slot",
+		ngId: 80469,
 	}),
 
 	new Achievement({
 		id: "extra.gnome",
-		title: "HOLY SHIT GUYS DID YOU SEE THAT???",
-		description: "WHAT THE FUCK WAS THAT DID WE GET THAT ON CAMERA??????!!",
+		title: "HOLY CRAP GUYS DID YOU SEE THAT???",
+		description: "WHAT THE HELL WAS THAT DID WE GET THAT ON CAMERA??????!!",
 		timeAfter: 1.5,
 		readingTime: 5,
+		ngId: 80470,
 		visibleCondition: () => GameState.stats.beenGnomed == true,
 	}),
 
 	new Achievement({
 		id: "extra.songs",
-		title: "Big fan",
+		title: "Music lover",
 		description: "Listen to all the songs at least once",
+		ngId: 80471,
 		unlockCondition: () => songsListened.length == Object.keys(songs).length
 	}),
 
+	// inflation was the original name, it was pretty good i think
 	new Achievement({
 		id: "store.stuffBought_10",
-		title: "Inflation",
+		title: "Scrooge McDuck",
 		description: "Buy 10 things consecutively",
+		ngId: 80472,
 	}),
 
 	new Achievement({
 		id: "extra.time_15minutes",
 		title: "Hex-citing Times",
 		description: "Play for 15 minutes",
+		flavorText: "Thanks for playing!",
+		ngId: 80473,
 		unlockCondition: () => GameState.stats.totalTimePlayed >= 60 * 15
 	}),
 
 	// #endregion EXTRA ACHIEVEMENTS =====================
 	new Achievement({
 		id: "extra.ALL",
-		title: "CONGRATS!!!!",
+		title: "F I N A L L Y",
+		flavorText: "You're the master now",
 		description: "Complete all achievements",
+		ngId: 80474,
 		unlockCondition: () => GameState.unlockedAchievements.length == achievements.length - 1
 	}),
 ] as Achievement[]
