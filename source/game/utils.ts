@@ -10,6 +10,7 @@ import { playSfx } from "../sound";
 import { ascension } from "./ascension/ascension";
 import { unlockWindow } from "./unlockables/windowUnlocks";
 import { mageDialogues } from "./ascension/dialogues";
+import { appWindow } from "@tauri-apps/api/window";
 
 // definetely not stack overflow
 // dots are always for thousands, leave it like this
@@ -516,4 +517,11 @@ export function runInTauri(func: () => void): void {
 	if ("__TAURI__" in window) {
 		func();
 	}
+}
+
+export function toggleTheFullscreen() {
+	GameState.settings.fullscreen = !GameState.settings.fullscreen
+	setFullscreen(GameState.settings.fullscreen)
+	runInTauri(() => appWindow.setFullscreen(GameState.settings.fullscreen))
+	return GameState.settings.fullscreen;
 }

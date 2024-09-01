@@ -90,6 +90,9 @@ const blabPhrases = [
 	"Did you know?\nYou can hold shift to bulk-buy 10x things!",
 	"Did you know?\nYou can click the big hexagon several times\nto start a combo!",
 	"Did you know?\nThe game has support for displaying numbers up until Vigintillions!",
+	"Did you know?\nYou can press Shift + R to restart the game's scene",
+	"Did you know?\nYou can press Shift + C to save your game",
+	"Did you know?\nYou can press F2 to remove all toasts/logs",
 ]
 
 export type powerupName = keyof typeof powerupTypes | "random";

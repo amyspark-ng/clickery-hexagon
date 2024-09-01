@@ -430,6 +430,9 @@ export function addTooltip(obj:GameObj, opts?:tooltipOpts) : tooltipInfo {
 				},
 				"green": {
 					color: GREEN,
+				},
+				"title": {
+					scale: vec2(1.1),
 				}
 			}
 		}),

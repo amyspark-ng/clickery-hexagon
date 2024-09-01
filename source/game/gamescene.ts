@@ -1,7 +1,7 @@
 import { GameState, scoreManager } from "../gamestate.ts"
 import { addHexagon, hexagon } from "./hexagon.ts"
 import { buildingsText, scoreText, spsText, uiCounters } from "./uicounters.ts"
-import { coolSetFullscreen, debugFunctions, formatNumber, formatTime, randomPos, runInTauri, saveColorToColor } from "./utils.ts"
+import { coolSetFullscreen, debugFunctions, formatNumber, formatTime, randomPos, runInTauri, saveColorToColor, toggleTheFullscreen } from "./utils.ts"
 import { addToast, gameBg, mouse } from "./additives.ts"
 import { musicHandler, playMusic, playSfx, stopAllSounds } from "../sound.ts"
 import { songs } from "./windows/musicWindow.ts"
@@ -360,6 +360,10 @@ export const gamescene = () => scene("gamescene", () => {
 		
 		if (isKeyPressed("f2")) {
 			get("toast").forEach(toast => toast.close())
+		}
+
+		if (isKeyPressed("f11")) {
+			toggleTheFullscreen()
 		}
 
 		GameState.stats.totalTimePlayed += dt()

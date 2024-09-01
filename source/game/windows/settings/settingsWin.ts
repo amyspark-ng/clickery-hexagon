@@ -1,7 +1,7 @@
 import { GameObj } from "kaplay";
 import { GameState } from "../../../gamestate"
 import { ROOT } from "../../../main";
-import { runInTauri } from "../../utils";
+import { runInTauri, toggleTheFullscreen } from "../../utils";
 import { addCheckbox, addDeleteSaveButton, addMinigame, addSaveButton, addScorePerTimeCounter, addVolumeControl } from "./settingsWinElements"
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 const appWindow = getCurrentWebviewWindow()
@@ -36,9 +36,7 @@ export function settingsWinContent(winParent:GameObj) {
 		name: "fullscreenCheckbox",
 		checked: GameState.settings.fullscreen,
 		onCheck: function (): boolean {
-			GameState.settings.fullscreen = !GameState.settings.fullscreen
-			setFullscreen(GameState.settings.fullscreen)
-			runInTauri(() => appWindow.setFullscreen(GameState.settings.fullscreen))
+			toggleTheFullscreen()
 			return GameState.settings.fullscreen;
 		},
 		title: "Fullscreen"

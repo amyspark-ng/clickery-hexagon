@@ -226,6 +226,8 @@ function handleMedalHover(medalObj) {
 	let title = formatTooltipText(theAchievement.title, 50);
 	let description = formatTooltipText(theAchievement.description, 50);
 	let flavorText = theAchievement.flavorText;
+	
+	title = `[title]${title}[/title]`
 	if (!isAchievementUnlocked(theAchievement.id)) {
 		if (theAchievement.visibleCondition && !theAchievement.visibleCondition()) {
 			title = "???";
