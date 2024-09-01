@@ -11,10 +11,11 @@ import { checkForUnlockable, isAchievementUnlocked, unlockAchievement } from "./
 import { ascension } from "./ascension/ascension.ts"
 import { folderObj, addFolderObj } from "./windows/windows-api/folderObj.ts"
 import { curDraggin } from "./plugins/drag.ts"
-import { appWindow } from '@tauri-apps/api/window';
+import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 import { ngEnabled, postEverything } from "../newgrounds.ts"
 import { drawDumbOutline } from "./plugins/drawThings.ts"
 import { allObjWindows } from "./windows/windows-api/windowManaging.ts"
+const appWindow = getCurrentWebviewWindow()
 
 let panderitoLetters = "panderito".split("")
 export let panderitoIndex = 0
