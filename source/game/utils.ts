@@ -519,8 +519,9 @@ export function runInTauri(func: () => void): void {
 	}
 }
 
-export function toggleTheFullscreen() {
-	GameState.settings.fullscreen = !GameState.settings.fullscreen
+export function toggleTheFullscreen(newFullscreen?:boolean) {
+	newFullscreen = newFullscreen || !GameState.settings.fullscreen
+	GameState.settings.fullscreen = newFullscreen
 	setFullscreen(GameState.settings.fullscreen)
 	runInTauri(() => appWindow.setFullscreen(GameState.settings.fullscreen))
 	return GameState.settings.fullscreen;
