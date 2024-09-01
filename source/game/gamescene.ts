@@ -665,6 +665,8 @@ export const gamescene = () => scene("gamescene", () => {
 		})
 	})
 
+	toggleTheFullscreen(GameState.settings.fullscreen)
+
 	if (DEBUG == true) debugFunctions()
 
 	const addCriticalParticles = (big:boolean) => {

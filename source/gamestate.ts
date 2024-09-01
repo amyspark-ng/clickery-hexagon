@@ -245,7 +245,7 @@ class _scoreManager {
 	 * @returns The score needed for that mana all time
 	 */
 	getScoreForManaAT = (manaAllTime = GameState.ascension.manaAllTime + 1) => {
-		return (manaAllTime ** 0.75) * this.ascensionConstant;
+		return (manaAllTime ** 1.05) * this.ascensionConstant;
 	}
 
 	/**
