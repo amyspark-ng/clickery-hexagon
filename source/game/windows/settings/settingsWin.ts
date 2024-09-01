@@ -3,8 +3,6 @@ import { GameState } from "../../../gamestate"
 import { ROOT } from "../../../main";
 import { runInTauri, toggleTheFullscreen } from "../../utils";
 import { addCheckbox, addDeleteSaveButton, addMinigame, addSaveButton, addScorePerTimeCounter, addVolumeControl } from "./settingsWinElements"
-import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
-const appWindow = getCurrentWebviewWindow()
 
 let volumeControlBG:GameObj;
 let generalOptionsBG:GameObj;

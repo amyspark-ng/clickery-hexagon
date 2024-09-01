@@ -98,7 +98,7 @@ export function addMouse() {
 			},
 
 			update() {
-				this.pos = lerp(this.pos, mousePos(), 0.8)
+				this.pos = lerp(this.pos, mousePos(), 0.9)
 			}
 		}
 	])

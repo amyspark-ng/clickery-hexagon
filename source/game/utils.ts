@@ -10,7 +10,7 @@ import { playSfx } from "../sound";
 import { ascension } from "./ascension/ascension";
 import { unlockWindow } from "./unlockables/windowUnlocks";
 import { mageDialogues } from "./ascension/dialogues";
-import { appWindow } from "@tauri-apps/api/window";
+import { appWindow } from "../main";
 
 // definetely not stack overflow
 // dots are always for thousands, leave it like this

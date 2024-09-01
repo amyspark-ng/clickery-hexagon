@@ -5,7 +5,7 @@ import { coolSetFullscreen, debugFunctions, formatNumber, formatTime, randomPos,
 import { addToast, gameBg, mouse } from "./additives.ts"
 import { musicHandler, playMusic, playSfx, stopAllSounds } from "../sound.ts"
 import { songs } from "./windows/musicWindow.ts"
-import { DEBUG, ROOT } from "../main.ts"
+import { appWindow, DEBUG, ROOT } from "../main.ts"
 import { allPowerupsInfo, Powerup_NaturalSpawnManager, Powerup_RemovalTimeManager, spawnPowerup } from "./powerups.ts"
 import { checkForUnlockable, isAchievementUnlocked, unlockAchievement } from "./unlockables/achievements.ts"
 import { ascension } from "./ascension/ascension.ts"
@@ -15,7 +15,6 @@ import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 import { ngEnabled, postEverything } from "../newgrounds.ts"
 import { drawDumbOutline } from "./plugins/drawThings.ts"
 import { allObjWindows } from "./windows/windows-api/windowManaging.ts"
-const appWindow = getCurrentWebviewWindow()
 
 let panderitoLetters = "panderito".split("")
 export let panderitoIndex = 0
