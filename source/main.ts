@@ -13,12 +13,11 @@ import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow'
 import { webviewWindow } from "@tauri-apps/api";
 
 export let appWindow: webviewWindow.WebviewWindow = null
-
 runInTauri(() => appWindow = getCurrentWebviewWindow())
 
 console.log(appWindow)
 
-export let DEBUG = true
+export let DEBUG = false
 export let enableNg = true
 
 let kaplayOpts = {

@@ -15,8 +15,8 @@ importers:
         specifier: 2.0.0-rc.2
         version: 2.0.0-rc.2
       kaplay:
-        specifier: 4000.0.0-alpha.2
-        version: 4000.0.0-alpha.2
+        specifier: 4000.0.0-alpha.1
+        version: 4000.0.0-alpha.1
       newgrounds.js:
         specifier: ^4.0.1
         version: 4.0.1
@@ -373,8 +373,8 @@ packages:
   kaplay@3000.1.17:
     resolution: {integrity: sha512-h2dwFuxGS7jrTTQafRLzxbBbG/M6yvV3kT4DvmbefWzwYr//68cNKl1Rz4l61bTDjEZTXcOzNwtsS2mwEJl5FQ==}
 
-  kaplay@4000.0.0-alpha.2:
-    resolution: {integrity: sha512-lJ4bDZAU6XH7Z2F6NYyvXvIvFsPPPT5tDa9PgxnAaNQswIeWIu/3vHfKPSEkGhlx5xZ44+GnY9Q7MY1QxKUcCg==}
+  kaplay@4000.0.0-alpha.1:
+    resolution: {integrity: sha512-EDjKet/DwSr8VPMI25B1LNQVGig2DZGZ7f0M9DvM+n5rKETFeVG/PaQZyQ7SEEQ88W8MuRERISnFQWqgQAE07g==}
 
   minimatch@3.1.2:
     resolution: {integrity: sha512-J7p63hRiAjw1NDEww1W7i37+ByIrOWO5XQQAzZ3VOcL0PNybwpfmV/N05zFAzwQ9USyEcX6t3UO+K5aqBQOIHw==}
@@ -687,7 +687,7 @@ snapshots:
 
   kaplay@3000.1.17: {}
 
-  kaplay@4000.0.0-alpha.2:
+  kaplay@4000.0.0-alpha.1:
     dependencies:
       '@kaplayjs/dprint-config': 1.0.0
 

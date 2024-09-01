@@ -3,6 +3,7 @@
 <!-- ================ -->
 
 THE B-UGS
+<!-- for the life of me i couldn't fix this im sorry -->
 - The thing where after a while you can't close windows with the X button
 	* Also all the hovers in buttons become trigereable when hovering the folder obj
 	* Might be related to their respective components meaning they suck hard ass

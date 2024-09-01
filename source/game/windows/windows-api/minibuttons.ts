@@ -224,7 +224,7 @@ export function addMinibutton(opts:minibuttonOpt) {
 				get("minibutton").forEach(element => {
 					tween(element.angle, 0, 0.32, (p) => element.angle = p, easings.easeOutQuint)
 				});
-			}
+			},
 		}
 	])
 

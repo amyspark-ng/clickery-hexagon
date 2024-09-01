@@ -138,7 +138,7 @@ class _GameState {
 	// 0.9 was in the last days before the release of the game
 	// 0.91 was has been gnomed, devky goobered
 	// 1.0 will be in the moment of release
-	saveVersion = 0.91
+	saveVersion = 1
 }
 
 export let GameState = new _GameState()

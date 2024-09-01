@@ -104,8 +104,8 @@ export function storeWinContent(winParent:GameObj) {
 
 			const upgradesTutorialTooltip = () => {
 				let tooltip = addTooltip(firstUpgrade, {
-					text: "Upgrades help make your clicks worth! →",
-					direction: "left",
+					text: "← Upgrades help make your clicks worth!",
+					direction: "right",
 					type: "tutorialUpgrades",
 					layer: winParent.layer,
 					z: winParent.z

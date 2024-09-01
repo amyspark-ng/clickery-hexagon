@@ -41,6 +41,7 @@ export function addFolderObj() {
 		z(0),
 		scale(),
 		anchor("center"),
+		outsideWindowHover(),
 		"folderObj",
 		{
 			defaultScale: vec2(1.2),
@@ -63,12 +64,7 @@ export function addFolderObj() {
 					});
 					
 					movingMinibuttons = true
-					get("minibutton").forEach((miniButton) => {
-						tween(miniButton.pos, miniButton.destinedPosition, 0.32, (p) => miniButton.pos = p, easings.easeOutBack).then(() => {
-							movingMinibuttons = false;
-							miniButton.area.scale = vec2(1, 1);
-						})
-					})
+					wait(0.32, () => movingMinibuttons = false)
 				}
 
 				this.trigger("unfold")
@@ -142,6 +138,12 @@ export function addFolderObj() {
 			}
 		}
 	])
+
+	theFolderObj.onClick(() => {
+		folderObj.manageFold()
+		folderObj.deleteSlots()
+		bop(folderObj)
+	})
 
 	// this can't be attached to the buttons because you won't be able to call the event if the buttons don't exist
 	theFolderObj.onCharInput((key) => {
