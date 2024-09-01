@@ -276,6 +276,10 @@ export function sortedTaskbar() {
 	return taskbarCopy
 }
 
+export function arrToColor(arr:[number, number, number]) {
+	return rgb(arr[0], arr[1], arr[2])
+}
+
 export function saveColorToColor(color:saveColor) {
 	return rgb(color.r, color.g, color.b)
 }

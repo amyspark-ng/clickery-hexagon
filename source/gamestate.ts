@@ -67,7 +67,7 @@ class _GameState {
 		 * Time it took you to complete the game
 		 */
 		timeGameComplete: 0,
-		timesGnomed: 0,
+		beenGnomed: false,
 	}
 
 	settings = {
@@ -243,7 +243,7 @@ class _scoreManager {
 	 * @returns The score needed for that mana all time
 	 */
 	getScoreForManaAT = (manaAllTime = GameState.ascension.manaAllTime + 1) => {
-		return (manaAllTime ** 1.34) * this.ascensionConstant;
+		return (manaAllTime ** 0.75) * this.ascensionConstant;
 	}
 
 	/**

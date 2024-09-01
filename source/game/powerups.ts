@@ -2,10 +2,11 @@ import { TextCompOpt, Vec2 } from "kaplay"
 import { waver } from "./plugins/wave";
 import { playSfx } from "../sound";
 import { GameState, scoreManager } from "../gamestate";
-import { bop, formatNumber, formatTime, getPosInGrid, getPositionOfSide, parseAnimation, randomPos } from "./utils";
+import { arrToColor, bop, formatNumber, formatTime, getPosInGrid, getPositionOfSide, parseAnimation, randomPos } from "./utils";
 import { positionSetter } from "./plugins/positionSetter";
 import { checkForUnlockable } from "./unlockables/achievements";
 import { outsideWindowHover } from "./hovers/outsideWindowHover";
+import { addTooltip } from "./additives";
 
 class Powerup {
 	sprite: string;
@@ -29,41 +30,47 @@ class Powerup {
 	 * The multiplier the powerup is currently running
 	 */
 	multiplier: number;
+	/**
+	 * Just a color
+	 */
+	color?: [number, number, number];
 
-	constructor(sprite:string, maxTime: number, chance: number, runningTime?:number, multiplier?:number) {
+	// DON'T DELETE SPRITE!!!!!! needed for powerup logs
+	constructor(sprite:string, maxTime: number, chance: number, color?: [number, number, number], runningTime?:number, multiplier?:number) {
 		this.sprite = sprite;
 		this.maxTime = maxTime;
 		this.chance = chance;
+		this.color = color || [255, 255, 255]
 		this.runningTime = runningTime || 0
 		this.multiplier = multiplier || 1
 	}
 }
 
-export let powerupTypes = {
+export const powerupTypes = {
 	/**
 	 * Makes clicks more powerful
 	 */
-	"clicks": new Powerup("cursors.cursor", 80, 0.15),
+	"clicks": new Powerup("cursors.cursor", 80, 0.15, [66, 144, 245]),
 	/**
 	 * Makes cursors more powerful
 	 */
-	"cursors": new Powerup("cursors.point", 60, 0.2),
+	"cursors": new Powerup("cursors.point", 60, 0.2, [35, 232, 64]),
 	/**
 	 * Gives you the score you would have gotten in X amount of time
 	 */
-	"time": new Powerup("cursors.wait", 60, 0.45),
+	"time": new Powerup("cursors.wait", 60, 0.45, [232, 199, 35]),
 	/**
 	 * Increses production
 	 */
-	"awesome": new Powerup("cursors.check", 120, 0.30),
+	"awesome": new Powerup("cursors.check", 120, 0.30, [162, 60, 240]),
 	/**
 	 * Gives discounts for clickers and cursors
 	 */
-	"store": new Powerup("icon_store", 90, 0.45),
+	"store": new Powerup("icon_store", 90, 0.45, [87, 214, 51]),
 	/**
 	 * Is just silly, very silly
 	 */
-	"blab": new Powerup("panderito", 20, 0.15),
+	"blab": new Powerup("panderito", 20, 0.15, [214, 154, 51]),
 }
 
 const blabPhrases = [
@@ -95,32 +102,36 @@ type powerupOpt = {
 	natural?: boolean,
 }
 
-let timerSpacing = 65
+let timerSpacing = 70
 function getTimerXPos(index:number) : number {
 	let initialPos = vec2(width() + timerSpacing / 2)
 	return getPosInGrid(initialPos, 0, -index - 1, vec2(timerSpacing, 0)).x
 }
 
-function addTimer(opts:{ sprite: string, type: string }) {
-	let timerObj = add([
-		rect(60, 60),
+function addTimer(type:powerupName) {
+	const powerupColor = arrToColor(powerupTypes[type].color)
+
+	let timerSprite = add([
+		sprite(`${type}Powerup`),
 		color(WHITE),
-		outline(3, BLACK),
 		pos(0, 40),
 		anchor("center"),
 		opacity(1),
 		scale(),
 		rotate(0),
 		layer("ui"),
+		color(),
 		area(),
+		z(0),
 		"putimer",
-		`${opts.type}_putimer`,
+		`${type}_putimer`,
 		{
 			index: get("putimer").length,
 			updateTime() {
 				tween(vec2(1), vec2(1.1), 0.32, (p) => this.scale = p, easings.easeOutQuint).onEnd(() => {
-					tween(this.scale, vec2(1), 0.32, (p) => this.scale = p, easings.easeOutElastic)
+					tween(this.scale, vec2(1), 0.32, (p) => this.scale = p, easings.easeOutQuint)
 				})
+				tween(powerupColor, WHITE, 1, (p) => timerSprite.color = p, easings.easeOutQuint)
 			},
 			end() {
 				this.tags.forEach(tag => this.unuse(tag));
@@ -141,68 +152,42 @@ function addTimer(opts:{ sprite: string, type: string }) {
 		}
 	])
 
-	tween(30, 40, 0.32, (p) => timerObj.pos.y = p, easings.easeOutQuint)
-	tween(90, 0, 0.32, (p) => timerObj.angle = p, easings.easeOutQuint)
+	timerSprite.angle = -10
+	timerSprite.width = timerSpacing + 5
+	timerSprite.height = timerSpacing + 5
+	timerSprite.pos.x = width() + timerSpacing
+	
+	let tooltip = addTooltip(timerSprite, {
+		text: "",
+		direction: "down",
+		layer: "ui",
+		z: timerSprite.z - 1,
+	})
+	
+	tween(timerSprite.pos.x, getTimerXPos(timerSprite.index), 0.32, (p) => timerSprite.pos.x = p, easings.easeOutBack).onEnd(() => {
+		tween(timerSprite.angle, 0, 0.32, (p) => timerSprite.angle = p, easings.easeOutQuint)
+	})
+	tween(powerupColor, WHITE, 1, (p) => timerSprite.color = p, easings.easeOutQuint)
+	tween(30, 40, 0.32, (p) => timerSprite.pos.y = p, easings.easeOutQuint)
+	tween(90, 0, 0.32, (p) => timerSprite.angle = p, easings.easeOutQuint)
 
-	timerObj.pos.x = getTimerXPos(timerObj.index)
+	timerSprite.onUpdate(() => {
+		tooltip.changePos(vec2(timerSprite.pos.x, (timerSprite.pos.y + timerSprite.height / 2) + 5))
+		tooltip.tooltipBg.opacity = timerSprite.opacity
+		tooltip.tooltipText.opacity = timerSprite.opacity
+		
+		if (powerupTypes[type].removalTime == null) return
+		tooltip.tooltipText.text = `${powerupTypes[type].removalTime.toFixed(0)}s` 
+	})
 
-	// add the text object
-	timerObj.add([
-		text("", { font: "lambdao", size: timerObj.height / 2 }),
-		pos(0, timerObj.height / 2 + 15),
-		anchor("center"),
-		opacity(),
-		z(3),
-		{
-			update() {
-				this.opacity = timerObj.opacity
-				
-				if (powerupTypes[opts.type].removalTime == null) return
-				this.text = `${powerupTypes[opts.type].removalTime.toFixed(0)}s\n`
-			}
-		}
-	])
-
-	timerObj.onClick(() => {
-		if (get(`poweruplog_${opts.type}`).length == 0) {
-			bop(timerObj)
-			addPowerupLog(opts.type as powerupName)
+	timerSprite.onClick(() => {
+		if (get(`poweruplog_${type}`).length == 0) {
+			bop(timerSprite)
+			addPowerupLog(type)
 		}
 	})
 
-	let icon = timerObj.add([
-		sprite("white_noise"),
-		anchor("center"),
-		z(1),
-		{
-			update() {
-				this.opacity = timerObj.opacity
-			}
-		}
-	])
-
-	parseAnimation(icon, opts.sprite)
-
-	icon.width = 50
-	icon.height = 50
-
-	let maxTime = powerupTypes[opts.type].removalTime
-
-	let round = timerObj.add([
-		z(2),
-		{
-			draw() {
-				drawRect({
-					width: timerObj.width - timerObj.outline.width,
-					height: map(powerupTypes[opts.type].removalTime, 0, maxTime, 0, timerObj.height - timerObj.outline.width),
-					color: YELLOW,
-					anchor: "bot",
-					pos: vec2(0, timerObj.height / 2),
-					opacity: 0.25,
-				})
-			}
-		}
-	])
+	let maxTime = powerupTypes[type].removalTime
 }
 
 export function addPowerupLog(powerupType:powerupName) {
@@ -284,11 +269,12 @@ export function addPowerupLog(powerupType:powerupName) {
 
 	bg.onUpdate(() => {
 		let radius = 5
-		let width = textInBg.width + icon.width * 2
-		let height = formatText({ text: textInText, ...textInBgOpts as TextCompOpt }).height + 15
+		let textWidth = textInBg.width + icon.width * 2
+		let textHeight = formatText({ text: textInText, ...textInBgOpts as TextCompOpt }).height + 15
+		if (textHeight < 50) textHeight = 50
 		
-		bg.height = lerp(bg.height, height, 0.5)
-		bg.width = lerp(bg.width, width, 0.5)
+		bg.height = lerp(bg.height, textHeight, 0.5)
+		bg.width = lerp(bg.width, textWidth, 0.5)
 		bg.radius = lerp(bg.radius, radius, 0.5)
 	})
 
@@ -318,7 +304,8 @@ export function spawnPowerup(opts?:powerupOpt) {
 		
 		if (Math.round(scoreManager.autoScorePerSecond()) < 1 || GameState.cursors < 1) list.splice(list.indexOf("time"), 1)
 		if (opts.natural == false) list.splice(list.indexOf("awesome"), 1)
-		
+		else list.splice(list.indexOf("blab"), 1)
+
 		let element = choose(list) as powerupName
 		if (chance(0.2) && opts.natural == true) element = "blab"
 		
@@ -327,6 +314,8 @@ export function spawnPowerup(opts?:powerupOpt) {
 
 	opts.type = opts.type
 	if (opts.type == "random") opts.type = getRandomPowerup()
+	const powerupColor = arrToColor(powerupTypes[opts.type].color)
+	// was struggling because this returned undefined but then i realized it's because the type was random lol!
 
 	opts.pos = opts.pos || randomPos()
 
@@ -378,32 +367,32 @@ export function spawnPowerup(opts?:powerupOpt) {
 				})
 				
 				// little blink shadow
+				let maxOpacity = 0.5
 				let blink = add([
-					sprite("white_noise"),
+					sprite(this.type + "Powerup"),
 					pos(this.pos),
 					scale(this.scale),
 					anchor(this.anchor),
 					opacity(0.5),
+					color(),
 					layer("powerups"),
 					z(this.z - 1),
 					timer(),
-					{
-						maxOpacity: 0.5,
-						update() {
-							this.pos.y -= 0.5
-						}
-					}
 				])
 
-				parseAnimation(blink, powerupTypes[opts.type].sprite)
-				blink.scale = this.scale
-				blink.width = this.width
-				blink.height = this.height
+				blink.onUpdate(() => {
+					blink.scale = this.scale
+					blink.width = this.width
+					blink.height = this.height
+					blink.pos.y -= 0.5
+				})
 
 				let timeToLeave = 0.75
-				tween(0.5, 0, timeToLeave, (p) => blink.maxOpacity = p, easings.easeOutBack)
+				tween(blink.color, powerupColor, timeToLeave, (p) => blink.color = p, easings.easeOutBack)
+				tween(blink.opacity, 0, timeToLeave, (p) => blink.opacity = p, easings.easeOutBack)
 				blink.wait(timeToLeave, () => {
 					destroy(blink)
+					// was going to add a second shimmer but got lazy
 				})
 			},
 			click() {
@@ -416,10 +405,11 @@ export function spawnPowerup(opts?:powerupOpt) {
 				let multiplier = 0
 				let time = 0
 
+				// getAdditive
 				if (opts.multiplier == null) {
 					if (opts.type == "clicks" || opts.type == "cursors") {
 						time += opts.time ?? randi(15, 30)
-						multiplier = randi(1.5, 3) * GameState.powerupPower
+						multiplier = rand(1.5, 3) * GameState.powerupPower
 					}
 					
 					// op powerups
@@ -430,8 +420,7 @@ export function spawnPowerup(opts?:powerupOpt) {
 
 					else if (opts.type == "store") {
 						time += opts.time ?? randi(10, 15)
-						// i don't understand this why is it the bigger the cheaper???????
-						multiplier = rand(0.5, 0.75) / GameState.powerupPower
+						multiplier = rand(0.85, 0.9) / GameState.powerupPower
 					}
 
 					// patience
@@ -449,12 +438,14 @@ export function spawnPowerup(opts?:powerupOpt) {
 					}
 				}
 
-				if (opts.type != "time") {
+				if (opts.type == "clicks" || opts.type == "cursors" || opts.type == "store" || opts.type == "awesome") {
 					// if there's already a timer don't add a new one!
 					let checkTimer = get(`${opts.type}_putimer`)[0] 
 					if (checkTimer) checkTimer.updateTime()
-					else addTimer({ sprite: powerupTypes[powerupObj.type].sprite, type: opts.type}) 
+					else addTimer(opts.type) 
 				}
+
+				multiplier = parseFloat(multiplier.toFixed(1))
 
 				powerupTypes[opts.type].multiplier = multiplier
 				powerupTypes[opts.type].removalTime = time
@@ -509,6 +500,7 @@ export function spawnPowerup(opts?:powerupOpt) {
 	powerupObj.loop(0.5, () => {
 		let shimmer = add([
 			layer(powerupObj.layer),
+			z(powerupObj.z - 1),
 			pos(powerupObj.pos),
 			opacity(1),
 			timer(),
@@ -517,8 +509,9 @@ export function spawnPowerup(opts?:powerupOpt) {
 				speed: [50, 100],
 				angle: [0, 360],
 				angularVelocity: [45, 90],
-				lifeTime: [1.0, 1.5],
-				colors: [rgb(128, 128, 255), WHITE],
+				lifeTime: [1, 2],
+				scales: [0.7, 1],
+				colors: [powerupColor, powerupColor.darken(25), powerupColor.lighten(100)],
 				opacities: [0.1, 1.0, 0.0],
 				texture: getSprite("part_star").data.tex,
 				quads: [getSprite("part_star").data.frames[0]],
@@ -526,11 +519,11 @@ export function spawnPowerup(opts?:powerupOpt) {
 				lifetime: 1.5,
 				rate: 0,
 				direction: 90,
-				spread: 0,
+				spread: 20,
 			})
 		])
 
-		shimmer.emit(randi(20))
+		shimmer.emit(randi(2, 4))
 		shimmer.onEnd(() => shimmer.destroy())
 	})
 }

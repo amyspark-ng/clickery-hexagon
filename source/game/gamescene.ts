@@ -254,8 +254,8 @@ export function triggerGnome() {
 		destroy(gnome)
 	})
 
+	GameState.stats.beenGnomed
 	if (!isAchievementUnlocked("extra.gnome")) unlockAchievement("extra.gnome")
-	GameState.stats.timesGnomed++
 }
 
 export let hexagonIntro:() => void;
@@ -332,11 +332,11 @@ export const gamescene = () => scene("gamescene", () => {
 		if (!isAchievementUnlocked("gnome")) {
 			wait(60, () => {
 				loop(1, () => {
+					if (isAchievementUnlocked("extra.gnome")) return
+					if (GameState.stats.timesAscended < 1) return
+					if (sleeping == true) return
 					if (chance(0.0025)) {
-						if (sleeping == true) return
-						if (GameState.stats.timesAscended < 1) return
-						if (ascension.ascending == true) return
-						if (!isAchievementUnlocked("gnome")) triggerGnome()
+						triggerGnome()
 					}
 				})
 			})
@@ -487,7 +487,7 @@ export const gamescene = () => scene("gamescene", () => {
 		},
 		intro_gameBg() {
 			tween(BLACK, saveColorToColor(GameState.settings.bgColor), 0.5, (p) => gameBg.color = p, easings.easeOutQuad)
-			tween(1, GameState.settings.bgColor.a, 0.5, (p) => gameBg.color.a = p, easings.easeOutQuad)
+			tween(1, GameState.settings.bgColor.a, 0.5, (p) => gameBg.colorA = p, easings.easeOutQuad)
 			tween(-5, 5, 0.5, (p) => gameBg.movAngle = p, easings.easeOutQuad)
 		},
 		intro_scoreCounter() {
@@ -530,7 +530,7 @@ export const gamescene = () => scene("gamescene", () => {
 	}
 	
 	else {
-		gameBg.color.a = 1
+		gameBg.colorA = 1
 		hexagon.interactable = false
 		let black = add([
 			rect(width(), height()),
@@ -557,7 +557,7 @@ export const gamescene = () => scene("gamescene", () => {
 				switch (GameState.scoreAllTime) {
 					case 1:
 						ominus.stop()
-						gameBg.color.a = 0.84
+						gameBg.colorA = 0.84
 						introAnimations.intro_scoreCounter()
 					break;
 				
@@ -594,6 +594,71 @@ export const gamescene = () => scene("gamescene", () => {
 		ROOT.on("scoreDecreased", () => {
 			appWindow.setTitle(`Clickery Hexagon - ${formatNumber(Math.round(GameState.score))} score`)
 		})
+
+		// # make it exitable
+		
+		// from 0 to 5 i guess being seconds	
+		let exitDesire = 0
+		let desireToOpacity = 0
+		let phrase = "" 
+		
+		const goodbyephrases = [
+			"don't go :(",
+			":(",
+			"fine i don't care",
+			"the most difficult part of programming this game\nwas programming a button to leave\nbecause im no good with goobyes"
+		]
+		
+		const backagainphrases = [
+			"good, i missed you",
+			":)",
+			"i knew it",
+			"i knew you'd come back!"
+		]
+
+		let drawing = add([layer("mouse"), z(mouse.z + 1)])
+		drawing.onUpdate(() => {
+			let mapped = map(exitDesire, 0, 1.2, 0, 1)
+			desireToOpacity = lerp(desireToOpacity, mapped, 0.1)
+		})
+		drawing.onDraw(() => {
+			drawRect({
+				width: width(),
+				height: height(),
+				fixed: true,
+				pos: vec2(center()),
+				color: BLACK,
+				anchor: "center",
+				opacity: desireToOpacity,
+			})
+
+			drawText({
+				text: phrase,
+				fixed: true,
+				size: 30,
+				pos: vec2(center()),
+				color: WHITE,
+				align: "center",
+				anchor: "center",
+				opacity: desireToOpacity,
+			})
+		})
+
+		onKeyPress("escape", () => phrase = choose(goodbyephrases))
+
+		onKeyDown("escape", () => {
+			exitDesire += dt()
+			if (exitDesire >= 1.2) {
+				appWindow.close()
+				quit()
+				phrase = choose(["goodbye...", "AAAAAAAAAAAAAAAAAAAAAAAA", "...", "i hate you"])
+			}
+		})
+
+		onKeyRelease("escape", () => {
+			phrase = choose(backagainphrases)
+			exitDesire = 0
+		})
 	})
 
 	if (DEBUG == true) debugFunctions()
@@ -615,18 +680,18 @@ export const gamescene = () => scene("gamescene", () => {
 				texture: getSprite("part_star").data.tex,
 				quads: [getSprite("part_star").data.frames[0]],
 
-				speed: [100, 250],
-				angle: [0, 0],
+				speed: [100, 100],
+				acceleration: [vec2(0, 100), vec2(0, 100)],
+				angle: [225, 315],
+
 				colors: theColor,
 				scales: [1.5, 2.1],
 				lifeTime: [0.35, 0.5],
 				opacities: [1, 0],
-				damping: [1, 2],
-				acceleration: [vec2(0), vec2(-50)],
 			}, {
 				lifetime: 1.5,
 				rate: 100,
-				direction: randomDirection,
+				direction: 0,
 				spread: -90,
 			})
 		])
@@ -635,6 +700,9 @@ export const gamescene = () => scene("gamescene", () => {
 		critParticleEmitter.onEnd(() => {
 			critParticleEmitter.destroy()
 		})
-
 	}
+
+	// onClick(() => {
+	// 	addCriticalParticles(true)
+	// })
 })

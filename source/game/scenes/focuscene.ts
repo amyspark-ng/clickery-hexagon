@@ -4,7 +4,7 @@ import { enableNg } from "../../main"
 
 export function focuscene() {
 	return scene("focuscene", () => {
-		tween(1, 0.95, 0.25, (p) => gameBg.color.a = p, easings.linear)
+		tween(1, 0.95, 0.25, (p) => gameBg.colorA = p, easings.linear)
 
 		// // if debug ignore the focus scene and just go to the game
 		// if (DEBUG) {go("gamescene")}
@@ -30,7 +30,7 @@ export function focuscene() {
 		})
 
 		onClick(async () => {
-			gameBg.color.a = 1
+			gameBg.colorA = 1
 			
 			if (enableNg == true) {
 				if (!await ng.getUsername()) go("ngScene")

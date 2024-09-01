@@ -28,6 +28,11 @@ export let storeElementsInfo = {
 	},
 }
 
+/**
+ * Converts base price and increases 
+ */
+const basePriceAscensionTimes = (basePrice:number, percentage: number) => basePrice + basePrice * ((percentage / 100) / 2) * GameState.stats.timesAscended   
+
 function addSmoke(winParent:any, btn:any) {
 	let smoke = winParent.add([
 		sprite("smoke"),
@@ -355,7 +360,7 @@ export function addStoreElement(winParent:any, opts:storeElementOpt) {
 		btn.area.scale = vec2(1 / btn.scale.x, 1 / btn.scale.y)
 
 		if (opts.type == "powerupsElement" && GameState.hasUnlockedPowerups == false) {
-			btn.price = storeElementsInfo.powerupsElement.unlockPrice
+			btn.price = basePriceAscensionTimes(storeElementsInfo.powerupsElement.unlockPrice, storeElementsInfo.powerupsElement.percentageIncrease)
 		}
 
 		else {
@@ -367,7 +372,7 @@ export function addStoreElement(winParent:any, opts:storeElementOpt) {
 			// price
 			const elementInfo = storeElementsInfo[opts.type]
 			btn.price = getPrice({
-				basePrice: elementInfo.basePrice + elementInfo.basePrice * ((elementInfo.percentageIncrease / 100) / 2) * GameState.stats.timesAscended,
+				basePrice: basePriceAscensionTimes(elementInfo.basePrice, elementInfo.percentageIncrease),
 				percentageIncrease: elementInfo.percentageIncrease,
 				objectAmount: amountBought,
 				amountToBuy: opts.type == "powerupsElement" ? 1 : amountToBuy,

@@ -26,7 +26,7 @@ export let upgradeInfo = {
 	"c_5": { value: 64, price: 500_000 },
 }
 
-const upgradePriceIncrease = 0.070
+const upgradePriceIncrease = 0.030
 
 export function isUpgradeBought(id:string):boolean {
 	return (GameState.upgradesBought.includes(id))

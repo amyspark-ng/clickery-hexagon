@@ -1,4 +1,4 @@
-import { Vec2 } from "kaplay";
+import { OpacityComp, SpriteComp, Vec2 } from "kaplay";
 import { playSfx } from "../sound"
 import { cam } from "./gamescene"
 import { COMBO_MINCLICKS, COMBO_MAX, COMBO_MAXCLICKS, clickVars } from "./hexagon"
@@ -331,6 +331,7 @@ export function startCombo() {
 export function dropCombo() {
 	clickVars.comboDropped = true
 	clickVars.consecutiveClicks = 0
+
 	get("comboBar", { recursive: true }).forEach(comboBar => {
 		comboBar.fadeOut(0.25).onEnd(() => {
 			comboBar.destroy()

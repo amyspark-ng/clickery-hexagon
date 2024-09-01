@@ -1,7 +1,7 @@
 import { GameState } from "../../gamestate";
 import { waver } from ".././plugins/wave";
 import { manageMute, musicHandler, playMusic, playSfx, scratchSong } from "../../sound";
-import { isAchievementUnlocked } from "../unlockables/achievements";
+import { checkForUnlockable, isAchievementUnlocked } from "../unlockables/achievements";
 import { bop, formatTime, getPositionOfSide } from "../utils";
 import { GameObj, SpriteComp } from "kaplay";
 import { positionSetter } from "../plugins/positionSetter";
@@ -46,6 +46,7 @@ export function musicWinContent(winParent:GameObj) {
 
 	function checkForSongListen(songIdx) {
 		if (songsListened.includes(songIdx) == false) songsListened.push(songIdx)
+		checkForUnlockable()
 	}
 
 	if (!isAchievementUnlocked("allsongs")) {

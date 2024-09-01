@@ -368,12 +368,10 @@ export function addDeleteSaveButton(otherButtonsBg:GameObj) {
 	
 	let deleteSaveButtonTooltip:tooltipInfo = null;
 	deleteSaveButton.startingHover(() => {
-		if (deleteSaveButtonTooltip == null) {
-			deleteSaveButtonTooltip = addTooltip(deleteSaveButton, {
-				direction: "up",
-				text: "WILL DELETE YOUR SAVE"
-			})
-		}
+		deleteSaveButtonTooltip = addTooltip(deleteSaveButton, {
+			direction: "up",
+			text: "WILL DELETE YOUR SAVE"
+		})
 	})
 
 	deleteSaveButton.endingHover(() => {

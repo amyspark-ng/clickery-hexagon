@@ -251,7 +251,6 @@ function handleMedalDraw(medalObj:GameObj, drawOutline: boolean) {
 		height: medalObj.height,
 		color: BLACK,
 		fill: false,
-		fixed: true,
 		outline: {
 			width: 3,
 			color: BLACK
@@ -361,6 +360,7 @@ function addScrollBar(medalsContainer:GameObj, totalScrolls = 3) {
 	})
 
 	let currentScroll = 0;
+	let hasCheckedLastScroll = false
 
 	/**
 	 * Increases elevator y position by scrollStep based on total scrolls 
@@ -372,7 +372,11 @@ function addScrollBar(medalsContainer:GameObj, totalScrolls = 3) {
 		elevatorYPos = elevatorY;
 	
 		// add goober devky
-		if (currentScroll == totalScrolls && medalsContainer.get("goober").length == 0 && chance(0.25)) {
+		if (currentScroll == totalScrolls && medalsContainer.get("goober").length == 0 && hasCheckedLastScroll == false) {
+			if (!chance(0.25)) {
+				hasCheckedLastScroll = true
+				return
+			}
 			const lastAchievement = medalsContainer.get("medal").filter(medal => medal.row == totalRows && medal.column == totalColumns - 1)[0] 
 			const thePosition = getPositionInWindow(lastAchievement.row, lastAchievement.column + 1)
 			let goober = medalsContainer.add([
@@ -396,6 +400,7 @@ function addScrollBar(medalsContainer:GameObj, totalScrolls = 3) {
 
 		else {
 			if (currentScroll == totalScrolls) return
+			hasCheckedLastScroll = false
 			if (medalsContainer.get("goober").length > 0) medalsContainer.get("goober")[0].destroy()
 		}
 	}

@@ -63,7 +63,7 @@ onLoad(() => {
 
 	gameBg.movAngle = -5
 	gameBg.color = BLACK
-	gameBg.color.a = 0.9
+	gameBg.colorA = 0.9
 
 	if (!DEBUG) {
 		let opacity = 1

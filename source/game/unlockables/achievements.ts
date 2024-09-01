@@ -477,7 +477,7 @@ export let achievements = [
 		description: "WHAT THE FUCK WAS THAT DID WE GET THAT ON CAMERA??????!!",
 		timeAfter: 1.5,
 		readingTime: 5,
-		visibleCondition: () => GameState.stats.timesGnomed >= 1,
+		visibleCondition: () => GameState.stats.beenGnomed == true,
 	}),
 
 	new Achievement({

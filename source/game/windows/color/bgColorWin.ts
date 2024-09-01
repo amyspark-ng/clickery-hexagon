@@ -50,7 +50,7 @@ export function bgColorWinContent(winParent) {
 		range: [0, 1],
 		color: "alpha",
 		onValueChange: (value) => {
-			gameBg.color.a = value
+			gameBg.colorA = value
 			GameState.settings.bgColor.a = value
 			playSliderSound(value)
 		}
@@ -73,6 +73,6 @@ export function bgColorWinContent(winParent) {
 
 	// setting the color and other stuff
 	winParent.onUpdate(() => {
-		winParent.color = blendColors(WHITE, gameBg.color.lighten(50), gameBg.color.a)
+		winParent.color = blendColors(WHITE, gameBg.color.lighten(50), gameBg.colorA)
 	})
 }

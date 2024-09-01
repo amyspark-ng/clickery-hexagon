@@ -1,13 +1,9 @@
-import { Anchor, Color, GameObj, KAPLAYCtx, PosComp, RectComp, TextComp, Vec2 } from "kaplay"
+import { Color, GameObj, Vec2 } from "kaplay"
 import { GameState } from "../gamestate"
-import { playSfx } from "../sound"
 import { hexagon } from "./hexagon"
-import { blendColors, getPosInGrid, getPositionOfSide, parseAnimation, saveColorToColor } from "./utils"
+import { blendColors, saveColorToColor } from "./utils"
 import { allObjWindows, manageWindow } from "./windows/windows-api/windowManaging"
 import { isWindowUnlocked } from "./unlockables/windowUnlocks"
-import { k } from "../main"
-import { drawDumbOutline } from "./plugins/drawThings"
-import { positionSetter } from "./plugins/positionSetter"
 
 export let gameBg:GameObj;
 export function addBackground() {
@@ -25,6 +21,7 @@ export function addBackground() {
 			uScale: 2,
 			col1D: rgb(128, 128, 128),
 			col2D: rgb(190, 190, 190),
+			colorA: GameState.settings.bgColor.a,
 			update() {
 				if (getSceneName() != "gamescene") return
 				if (!isWindowUnlocked("bgColorWin")) return
@@ -38,12 +35,11 @@ export function addBackground() {
 			}
 		}
 	])
-	gameBg.color.a = GameState.settings.bgColor.a
 
 	gameBg.use(shader("checkeredBg", () => ({
 		"u_time": time() / 10,
-		"u_color1": blendColors(gameBg.col1D, gameBg.color, gameBg.color.a),
-		"u_color2": blendColors(gameBg.col2D, gameBg.color, gameBg.color.a),
+		"u_color1": blendColors(gameBg.col1D, gameBg.color, gameBg.colorA),
+		"u_color2": blendColors(gameBg.col2D, gameBg.color, gameBg.colorA),
 		"u_speed": vec2(-1, 2).scale(gameBg.speed),
 		"u_angle": gameBg.movAngle,
 		"u_scale": gameBg.uScale,
@@ -102,7 +98,7 @@ export function addMouse() {
 			},
 
 			update() {
-				this.pos = mousePos()
+				this.pos = lerp(this.pos, mousePos(), 0.8)
 			}
 		}
 	])
@@ -128,7 +124,7 @@ let allToasts:GameObj[] = []
 export function addToast(opts:toastOpts) {
 	opts = opts || {} as toastOpts
 
-	let toasts = get("toast", { recursive: true });
+	let toasts = get("toast", { recursive: true }) as any[]
 	
 	function getAvailableIndex(toasts:GameObj[]) {
 		let occupiedIndices = toasts.map(log => log.index);
@@ -307,7 +303,7 @@ export function addToast(opts:toastOpts) {
 		toastBg.setPosition(vec2(toastBg.getPosition().x, newYPos))
 		
 		// move the other ones up
-		const allTosts = get("toast")
+		const allTosts = get("toast") as any
 		allTosts.filter(toast => toast != toastBg).forEach((toast) => {
 			const newYPos = toast.getPosition().y - toastBg.height - 10
 			toast.setPosition(vec2(toast.getPosition().x, newYPos))
@@ -333,10 +329,17 @@ type tooltipOpts = {
 	textSize?:number,
 	type?:string,
 	layer?:string,
+	position?: Vec2,
 	z?:number,
 }
 
-export type tooltipInfo = { tooltipBg:GameObj, tooltipText:GameObj, end: () => void, type: string, }
+export type tooltipInfo = { 
+	tooltipBg:any,
+	tooltipText:any,
+	type: string,
+	end: () => void,
+	changePos: (newPos: Vec2) => void,
+}
 
 /**
  * Adds a tooltip to an object and pushes itself to a tooltips array
@@ -375,29 +378,35 @@ export function addTooltip(obj:GameObj, opts?:tooltipOpts) : tooltipInfo {
 			type: opts.type,
 			update() {
 				if (ending == false) {
-					switch (opts.direction) {
-						case "up":
-							bgPos.y = (obj.worldPos().y - obj.height / 2) - offset
-							bgPos.x = obj.worldPos().x
-						break;
-				
-						case "down":
-							bgPos.y = (obj.worldPos().y + obj.height / 2) + offset
-							bgPos.x = obj.worldPos().x
-						break;
-				
-						case "left":
-							this.anchor = "right"	
-							bgPos.x = (obj.worldPos().x - obj.width / 2) - offset
-							bgPos.y = obj.worldPos().y
-						break;
-				
-						case "right":
-							this.anchor = "left"	
-							bgPos.x = (obj.worldPos().x + obj.width / 2) + offset
-							bgPos.y = obj.worldPos().y
-						break;
+					if (!opts.position) {
+						switch (opts.direction) {
+							case "up":
+								bgPos.y = (obj.worldPos().y - obj.height / 2) - offset
+								bgPos.x = obj.worldPos().x
+							break;
+					
+							case "down":
+								bgPos.y = (obj.worldPos().y + obj.height / 2) + offset
+								bgPos.x = obj.worldPos().x
+							break;
+					
+							case "left":
+								this.anchor = "right"	
+								bgPos.x = (obj.worldPos().x - obj.width / 2) - offset
+								bgPos.y = obj.worldPos().y
+							break;
+					
+							case "right":
+								this.anchor = "left"	
+								bgPos.x = (obj.worldPos().x + obj.width / 2) + offset
+								bgPos.y = obj.worldPos().y
+							break;
+						}
 					}
+
+					else {
+						bgPos = opts.position
+					} 
 				}
 				
 				this.width = lerp(this.width, sizeOfText.x + padding, opts.lerpValue)
@@ -454,10 +463,7 @@ export function addTooltip(obj:GameObj, opts?:tooltipOpts) : tooltipInfo {
 		}
 	])
 
-	let tooltipinfo = { tooltipBg, tooltipText, end, type: opts.type } as tooltipInfo
-	if (obj.tooltip == null) obj.tooltip = tooltipinfo
-	
-	function end() {
+	function end() : void {
 		ending = true
 		theOpacity = 0
 		bgPos = obj.worldPos()
@@ -469,6 +475,20 @@ export function addTooltip(obj:GameObj, opts?:tooltipOpts) : tooltipInfo {
 
 		obj.tooltip = null
 	}
+
+	function changePos(newPos:Vec2) : void {
+		opts.position = newPos
+	}
+
+	let tooltipinfo = { 
+		tooltipBg,
+		tooltipText,
+		type: opts.type,
+		end: end,
+		changePos: changePos
+	} as tooltipInfo
+	
+	if (obj.tooltip == null) obj.tooltip = tooltipinfo
 
 	obj.onDestroy(() => {
 		end()

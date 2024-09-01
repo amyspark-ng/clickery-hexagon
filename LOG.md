@@ -15,9 +15,6 @@ FEATURES
 	* Particles
 - Powerups
 	* Balancing
-	* Animations
-	* Particles
-	* Timers
 - Cards
 	* Balancing
 - Balance prices increasing after ascension

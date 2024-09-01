@@ -12,7 +12,7 @@ let cardsInfo = {
 	"clickersCard": { 
 		info: "Clickers are +[number]% more efficient",
 		basePrice: 1,
-		percentageIncrease: 100,
+		percentageIncrease: 80,
 		idx: 0,
 		gamestateInfo: {
 			key: "clickPercentage",
@@ -89,7 +89,7 @@ function getAdditive(type:card) {
 	}
 
 	else if (type == "powerupsCard") {
-		additive = rand(0.1, 1.5)
+		additive = rand(0.1, 0.6)
 	}
 
 	else if (type == "critsCard") {

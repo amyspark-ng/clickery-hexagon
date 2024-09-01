@@ -5,7 +5,7 @@ import { bop, getPosInGrid } from "../../utils";
 import { mouse } from "../../additives";
 import { infoForWindows, manageWindow, buttonSpacing, openWindow, allObjWindows, windowKey, } from "./windowManaging";
 import { GameState } from "../../../gamestate";
-import { Vec2 } from "kaplay";
+import { GameObj, Vec2 } from "kaplay";
 import { openWindowButton } from "./openWindowButton";
 import { folded, folderObj } from "./folderObj";
 import { destroyExclamation } from "../../unlockables/windowUnlocks";
@@ -25,6 +25,10 @@ export function getMinibuttonPos(taskbarIndex:number) {
 export const miniButtonXarea = 0.8
 export const miniButtonYarea = 1.3
 
+export function moveButtonToPos(minibutton:GameObj, index:number) {
+	return tween(minibutton.pos.x, getMinibuttonPos(index).x, 0.32, (p) => minibutton.pos.x = p, easings.easeOutBack)
+}
+
 export function addMinibutton(opts:minibuttonOpt) {
 	let quad;
 
@@ -42,7 +46,7 @@ export function addMinibutton(opts:minibuttonOpt) {
 		else destinedPosition = getMinibuttonPos(opts.taskbarIndex)
 	}
 
-	let currentMinibutton = add([
+	const currentMinibutton = add([
 		sprite("white_noise"),
 		pos(opts.initialPosition),
 		anchor("center"),
@@ -236,6 +240,10 @@ export function addMinibutton(opts:minibuttonOpt) {
 	currentMinibutton.opacity = 0
 	currentMinibutton.area.scale = vec2(0)
     tween(currentMinibutton.opacity, 1, 0.32, (p) => currentMinibutton.opacity = p, easings.easeOutQuad)
+    tween(currentMinibutton.pos, currentMinibutton.destinedPosition, 0.32, (p) => currentMinibutton.pos = p, easings.easeOutBack).then(() => {
+		currentMinibutton.area.scale.x = miniButtonXarea
+		currentMinibutton.area.scale.y = miniButtonYarea
+	})
 
 	// currentMinibutton is the one being swapped to met the curDragging wish
 	currentMinibutton.on("dragHasSurpassed", (left) => {
