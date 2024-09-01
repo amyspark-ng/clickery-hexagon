@@ -750,15 +750,15 @@ function loadAllSprites() {
 function loadAllSounds() {
 	// #region SOUNDS
 	//#region hexagon-intro
-	loadSound("biglight", "sounds/sfx/hexagon-intro/biglight.mp3")
-	loadSound("ominus", "sounds/sfx/hexagon-intro/ominus.mp3")
+	loadSound("biglight", "sounds/sfx/hexagon-intro/biglight.ogg")
+	loadSound("ominus", "sounds/sfx/hexagon-intro/ominus.ogg")
 
-	loadSound("clickPress", "sounds/sfx/hexagon-intro/clickPress.mp3")
-	loadSound("clickRelease", "sounds/sfx/hexagon-intro/clickRelease.mp3")
-	loadSound("powerup", "sounds/sfx/hexagon-intro/powerup.wav")
-	loadSound("fullcombo", "sounds/sfx/hexagon-intro/fullcombo.wav")
-	loadSound("combo", "sounds/sfx/hexagon-intro/combo.wav")
-	loadSound("punch", "sounds/sfx/hexagon-intro/punch.mp3")
+	loadSound("clickPress", "sounds/sfx/hexagon-intro/clickPress.ogg")
+	loadSound("clickRelease", "sounds/sfx/hexagon-intro/clickRelease.ogg")
+	loadSound("powerup", "sounds/sfx/hexagon-intro/powerup.ogg")
+	loadSound("fullcombo", "sounds/sfx/hexagon-intro/fullcombo.ogg")
+	loadSound("combo", "sounds/sfx/hexagon-intro/combo.ogg")
+	loadSound("punch", "sounds/sfx/hexagon-intro/punch.ogg")
 	//#endregion hexagon-intro
 	
 	//#region ascension
@@ -767,37 +767,37 @@ function loadAllSounds() {
 	loadSound("mage_o", "sounds/sfx/ascension/mage_o.ogg")
 	loadSound("mage_i", "sounds/sfx/ascension/mage_i.ogg")
 
-	loadSound("mage_yummers", "sounds/sfx/ascension/mage_yummers.wav")
-	loadSound("mage_huntressHum", "sounds/sfx/ascension/mage_huntressHum.wav")
+	loadSound("mage_yummers", "sounds/sfx/ascension/mage_yummers.ogg")
+	loadSound("mage_huntressHum", "sounds/sfx/ascension/mage_huntressHum.ogg")
 	loadSound("onecard", "sounds/sfx/ascension/onecard.mp3")
-	loadSound("allcards", "sounds/sfx/ascension/allcards.mp3")
+	loadSound("allcards", "sounds/sfx/ascension/allcards.ogg")
 	//#endregion ascension
 
 	//#region ui
-	loadSound("unlockachievement", "sounds/sfx/ui/unlockachievement.wav")
-	loadSound("gamesaved", "sounds/sfx/ui/gamesaved.wav")
+	loadSound("unlockachievement", "sounds/sfx/ui/unlockachievement.ogg")
+	loadSound("gamesaved", "sounds/sfx/ui/gamesaved.ogg")
 	loadSound("clickButton", "sounds/sfx/ui/clickButton.ogg")
-	loadSound("kaching", "sounds/sfx/ui/kaching.mp3")
-	loadSound("unhoverhex", "sounds/sfx/ui/unhoverhex.wav")
-	loadSound("volumeChange", "sounds/sfx/ui/volumeChange.mp3")
+	loadSound("kaching", "sounds/sfx/ui/kaching.ogg")
+	loadSound("unhoverhex", "sounds/sfx/ui/unhoverhex.ogg")
+	loadSound("volumeChange", "sounds/sfx/ui/volumeChange.ogg")
 	//#endregion ui
 
 	//#region window
-	loadSound("fold", "sounds/sfx/window/fold.wav")
-	loadSound("hoverMiniButton", "sounds/sfx/window/hoverMiniButton.wav")
-	loadSound("plap", "sounds/sfx/window/plap.mp3")
-	loadSound("plop", "sounds/sfx/window/plop.mp3")
-	loadSound("windowUnlocked", "sounds/sfx/window/windowUnlocked.wav")
-	loadSound("openWin", "sounds/sfx/window/openWin.wav")
-	loadSound("closeWin", "sounds/sfx/window/closeWin.wav")
-	loadSound("progress", "sounds/sfx/window/progress.wav")
-	loadSound("wrong", "sounds/sfx/window/wrong.wav")
-	loadSound("chainwrong", "sounds/sfx/window/chainwrong.mp3")
-	loadSound("chainbreak", "sounds/sfx/window/chainbreak.mp3")
+	loadSound("fold", "sounds/sfx/window/fold.ogg")
+	loadSound("hoverMiniButton", "sounds/sfx/window/hoverMiniButton.ogg")
+	loadSound("plap", "sounds/sfx/window/plap.ogg")
+	loadSound("plop", "sounds/sfx/window/plop.ogg")
+	loadSound("windowUnlocked", "sounds/sfx/window/windowUnlocked.ogg")
+	loadSound("openWin", "sounds/sfx/window/openWin.ogg")
+	loadSound("closeWin", "sounds/sfx/window/closeWin.ogg")
+	loadSound("progress", "sounds/sfx/window/progress.ogg")
+	loadSound("wrong", "sounds/sfx/window/wrong.ogg")
+	loadSound("chainwrong", "sounds/sfx/window/chainwrong.ogg")
+	loadSound("chainbreak", "sounds/sfx/window/chainbreak.ogg")
 	//#endregion window
 	
 	loadSound("gnome", "sounds/sfx/gnome.ogg")
-	loadSound("squeak", "sounds/sfx/squeak.mp3")
+	loadSound("squeak", "sounds/sfx/squeak.ogg")
 
 	// music
 	// don't load as music because then it won't play when the game loads
@@ -812,7 +812,7 @@ function loadAllSounds() {
 	loadSound("magic", "sounds/music/magic.ogg")
 	loadSound("watchout", "sounds/music/watchout.ogg")
 	loadSound("catnip", "sounds/music/catnip.ogg")
-	loadSound("project_23", "sounds/music/project_23.wav")
+	loadSound("project_23", "sounds/music/project_23.ogg")
 
 	//#endregion MUSIC
 }

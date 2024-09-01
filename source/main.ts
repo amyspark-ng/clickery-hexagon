@@ -11,7 +11,8 @@ import { GameState } from "./gamestate.ts";
 import { windowsDefinition } from "./game/windows/windows-api/windowManaging.ts";
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow'
 
-export const appWindow = getCurrentWebviewWindow()
+export let appWindow = null
+runInTauri(() => appWindow = getCurrentWebviewWindow())
 
 export let DEBUG = true
 export let enableNg = false
