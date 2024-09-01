@@ -7,6 +7,10 @@ import { blendColors, getPositionOfSide } from "../utils";
 import { Vec2 } from "kaplay/src";
 import { curDraggin, drag, setCurDraggin } from "../plugins/drag";
 import { playSfx } from "../../sound";
+import { ngEnabled } from "../../newgrounds";
+import ng from "newgrounds.js";
+import { GameState } from "../../gamestate";
+import * as env from "../../env.json"
 
 // Constants
 const totalColumns = 5;
@@ -390,6 +394,13 @@ function addScrollBar(medalsContainer:GameObj, totalScrolls = 3) {
 			])
 
 			goober.onPressClick(() => {
+				if (ngEnabled) {
+					if (GameState.stats.hasDevkyGoobered == false) {
+						GameState.stats.hasDevkyGoobered = true
+						ng.unlockMedal(env.DEVKY_MEDAL_ID)
+					}
+				}
+				
 				tween(rand(0.7, 0.9), 1, 0.15, (p) => goober.scale.y = p)
 				playSfx("squeak", { detune: rand(-100, 100) })
 			})

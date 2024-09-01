@@ -68,6 +68,7 @@ class _GameState {
 		 */
 		timeGameComplete: 0,
 		beenGnomed: false,
+		hasDevkyGoobered: false,
 	}
 
 	settings = {
@@ -135,6 +136,7 @@ class _GameState {
 	 *  Every time there's a change to the gamestate save this has to be changed
 	 */
 	// 0.9 was in the last days before the release of the game
+	// 0.91 was has been gnomed, devky goobered
 	// 1.0 will be in the moment of release
 	saveVersion = 0.9
 }
