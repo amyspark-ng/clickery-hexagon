@@ -1,6 +1,6 @@
 import { GameObj } from "kaplay";
 import { GameState } from "../../../gamestate"
-import { ROOT } from "../../../main";
+import { ROOT, appWindow } from "../../../main";
 import { runInTauri, toggleTheFullscreen } from "../../utils";
 import { addCheckbox, addDeleteSaveButton, addMinigame, addSaveButton, addScorePerTimeCounter, addVolumeControl } from "./settingsWinElements"
 

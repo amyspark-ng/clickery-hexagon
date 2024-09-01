@@ -514,7 +514,7 @@ export function debugFunctions() {
  * This function is used to run a function that will only run if you're on Tauri (desktop)
  */
 export function runInTauri(func: () => void): void {
-	if ("__TAURI__" in window) {
+	if ("__TAURI_INTERNALS__" in window) {
 		func();
 	}
 }
