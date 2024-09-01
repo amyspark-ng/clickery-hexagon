@@ -217,7 +217,8 @@ export function talk(speaker:"mage" | "card", thingToSay:string, speed?:number, 
 
 			if (speaker == "mage") {
 				if (!(thingToSay == "Y U M M E R S" || thingToSay == "Hum... Hum...")) {
-					playSfx(`mage_${choose(someVowels)}`, { detune: rand(-150, 150) }); 
+					const vowel = chance(0.5) ? choose(someVowels) : "e"
+					playSfx(`mage_${vowel}`, { detune: rand(-150, 150) }); 
 				}
 			}
 			

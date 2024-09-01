@@ -10,8 +10,8 @@ import { runInTauri } from "./game/utils.ts";
 import { GameState } from "./gamestate.ts";
 import { windowsDefinition } from "./game/windows/windows-api/windowManaging.ts";
 
-export let DEBUG:boolean = true
-export let enableNg = false
+export let DEBUG:boolean = false
+export let enableNg = true
 
 let kaplayOpts = {
 	width: 1024,
