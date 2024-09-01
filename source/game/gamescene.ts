@@ -361,7 +361,7 @@ export const gamescene = () => scene("gamescene", () => {
 			get("toast").forEach(toast => toast.close())
 		}
 
-		if (isKeyPressed("f11")) {
+		if (isKeyPressed("f")) {
 			toggleTheFullscreen()
 		}
 
@@ -665,50 +665,5 @@ export const gamescene = () => scene("gamescene", () => {
 		})
 	})
 
-	toggleTheFullscreen(GameState.settings.fullscreen)
-
 	if (DEBUG == true) debugFunctions()
-
-	const addCriticalParticles = (big:boolean) => {
-		let redcritcolor = rgb(237, 92, 66)
-		let bluecritcolor = rgb(77, 138, 235)
-		
-		let angleSize = rand(0, 360)
-		let theColor = [big ? bluecritcolor : redcritcolor, big ? bluecritcolor : redcritcolor]
-		let randomDirection = rand(0, 360)
-
-		let critParticleEmitter = add([
-			layer("ui"),
-			pos(mousePos()),
-			opacity(),
-			particles({
-				max: 8,
-				texture: getSprite("part_star").data.tex,
-				quads: [getSprite("part_star").data.frames[0]],
-
-				speed: [100, 100],
-				acceleration: [vec2(0, 100), vec2(0, 100)],
-				angle: [225, 315],
-
-				colors: theColor,
-				scales: [1.5, 2.1],
-				lifeTime: [0.35, 0.5],
-				opacities: [1, 0],
-			}, {
-				lifetime: 1.5,
-				rate: 100,
-				direction: 0,
-				spread: -90,
-			})
-		])
-
-		critParticleEmitter.emit(randi(4, 8))
-		critParticleEmitter.onEnd(() => {
-			critParticleEmitter.destroy()
-		})
-	}
-
-	// onClick(() => {
-	// 	addCriticalParticles(true)
-	// })
 })

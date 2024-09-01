@@ -5,8 +5,8 @@ import { GameState, scoreManager } from "../gamestate";
 import { arrToColor, bop, formatNumber, formatTime, getPosInGrid, getPositionOfSide, parseAnimation, randomPos } from "./utils";
 import { positionSetter } from "./plugins/positionSetter";
 import { checkForUnlockable } from "./unlockables/achievements";
-import { outsideWindowHover } from "./hovers/outsideWindowHover";
 import { addTooltip } from "./additives";
+import { outsideWindowHover } from "./hovers/outsideWindowHover";
 
 class Powerup {
 	sprite: string;
@@ -306,8 +306,7 @@ export function spawnPowerup(opts?:powerupOpt) {
 		let list = Object.keys(powerupTypes)
 		
 		if (Math.round(scoreManager.autoScorePerSecond()) < 1 || GameState.cursors < 1) list.splice(list.indexOf("time"), 1)
-		if (opts.natural == false) list.splice(list.indexOf("awesome"), 1)
-		else list.splice(list.indexOf("blab"), 1)
+		if (opts.natural == false) list.splice(list.indexOf("blab"), 1)
 
 		let element = choose(list) as powerupName
 		if (chance(0.2) && opts.natural == true) element = "blab"
@@ -338,6 +337,7 @@ export function spawnPowerup(opts?:powerupOpt) {
 		waver({ wave_speed: 1.25, maxAmplitude: 5, minAmplitude: 0 }),
 		area(),
 		timer(),
+		outsideWindowHover(),
 		"powerup",
 		{
 			type: opts.type,
@@ -466,30 +466,12 @@ export function spawnPowerup(opts?:powerupOpt) {
 	tween(0, 1, 0.2, (p) => powerupObj.opacity = p, easings.easeOutBack)
 
 	// events
-	powerupObj.onHover(() => {
+	powerupObj.startingHover(() => {
 		powerupObj.startHover()
-	
-		query({
-			include: ["insideHover", "outsideHover"],
-			includeOp: "or",
-		}).forEach((obj) => {
-			if (obj.isBeingHovered == true) {
-				obj.endHoverFunction()
-			}
-		})
 	})
 
-	powerupObj.onHoverEnd(() => {
+	powerupObj.endingHover(() => {
 		powerupObj.endHover()
-
-		query({
-			include: ["insideHover", "outsideHover"],
-			includeOp: "or",
-		}).forEach((obj) => {
-			if (obj.isHovering() == true && obj.isBeingHovered == false) {
-				obj.startHoverFunction()
-			}
-		})
 	})
 
 	powerupObj.onClick(() => {

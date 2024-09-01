@@ -3,7 +3,6 @@
 import { GameObj } from "kaplay"
 import { mouse } from "../additives"
 import { curDraggin } from "../plugins/drag"
-import { allPowerupsInfo } from "../powerups"
 import { allObjWindows } from "../windows/windows-api/windowManaging"
 
 // =========================
@@ -21,7 +20,9 @@ export function outsideWindowHover() {
 
 		add() {
 			this.startHoverFunction = function() {
-				if (curDraggin == null && this.isBeingHovered == false) {
+				if (curDraggin != null) return
+				
+				if (this.isBeingHovered == false) {
 					if (this.startHoverAnim != null) this.startHoverAnim()
 					
 					this.trigger("outsideHoverStart")
@@ -31,18 +32,19 @@ export function outsideWindowHover() {
 			}
 
 			this.endHoverFunction = function() {
-				if (curDraggin == null && this.isBeingHovered == true) {
+				if (curDraggin != null) return
+				
+				if (this.isBeingHovered == true) {
 					if (this.endHoverAnim != null) this.endHoverAnim()
 
 					this.trigger("outsideHoverEnd")
 					mouse.play("cursor")
 					this.isBeingHovered = false
 				}
-			} 
+			}
 
 			this.onHover(() => {
-				// only check for these conditions here
-				if (allObjWindows.isHoveringAWindow == false && allObjWindows.isDraggingAWindow == false && allPowerupsInfo.isHoveringAPowerup == false) {
+				if (allObjWindows.isHoveringAWindow == false) {
 					this.startHoverFunction()
 				}
 			})
@@ -61,9 +63,16 @@ export function outsideWindowHover() {
 			this.on("cursorExitWindow", (windowObj:GameObj) => {
 				// if is being hovered but the animation is not playing
 				// due to being inside a window
-				if (this.isHovering()) {
+				if (this.isHovering() && this.isBeingHovered == false) {
 					this.startHoverFunction()
 				}
+			})
+		},
+
+		drawInspect() {
+			drawText({
+				text: this.isBeingHovered,
+				size: 20,
 			})
 		},
 

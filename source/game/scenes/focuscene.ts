@@ -15,7 +15,9 @@ export function focuscene() {
 		tween(y_posToDrawText, center().y, 0.25, (p) => y_posToDrawText = p, easings.easeOutCirc)
 		tween(opacityToDrawText, 1, 0.25, (p) => opacityToDrawText = p, easings.easeOutCirc)
 		
+		let hasClicked = false
 		onDraw(() => {
+			if (hasClicked) return
 			drawText({
 				text: "Thanks for playing!\nClick to focus the game",
 				size: 60,
@@ -30,15 +32,18 @@ export function focuscene() {
 		})
 
 		onClick(async () => {
-			gameBg.colorA = 1
-			
-			if (enableNg == true) {
-				if (!await ng.getUsername()) go("ngScene")
+			if (hasClicked == true) return
+			else {
+				hasClicked = true
+				gameBg.colorA = 1
+				
+				if (enableNg == true) {
+					if (!await ng.isLoggedIn()) go("ngScene")
+					else go("gamescene")
+				}
+	
 				else go("gamescene")
 			}
-
-			else go("gamescene")
-			
 		})
 	})	
 }

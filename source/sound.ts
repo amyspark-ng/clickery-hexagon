@@ -301,15 +301,15 @@ export function volumeManager() {
 	soundManager.on("show", () => {
 		if (get("trayVolElement").length === 0) addSoundElements()
 
-		if (showTween) {
-			showTween.cancel()
-		}
-		showTween = tween(bg.pos.y, bg.downYPos, 0.32, (p) => bg.pos.y = p, easings.easeOutQuad)
+		// if (showTween) {
+		// 	showTween.cancel()
+		// }
+		// showTween = tween(bg.pos.y, bg.downYPos, 0.32, (p) => bg.pos.y = p, easings.easeOutQuad)
 
-		waitingTimer.cancel()
-		waitingTimer = wait(1, () => {
-			soundManager.trigger("hide")
-		})
+		// waitingTimer.cancel()
+		// waitingTimer = wait(1, () => {
+		// 	soundManager.trigger("hide")
+		// })
 
 		if (GameState.settings.volume < 10)	play("volumeChange", { detune: changeVolTune })
 	})

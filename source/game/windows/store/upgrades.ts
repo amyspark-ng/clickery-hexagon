@@ -28,8 +28,8 @@ export let upgradeInfo = {
 
 const upgradePriceIncrease = 0.030
 
-export function isUpgradeBought(id:string):boolean {
-	return (GameState.upgradesBought.includes(id))
+export function isUpgradeBought(upgradeId:string):boolean {
+	return (GameState.upgradesBought.includes(upgradeId))
 }
 
 export function addUpgrades(elementParent) {
@@ -68,7 +68,7 @@ export function addUpgrades(elementParent) {
 				// is setted below
 				value: null, 
 				freq: null, 
-				id: "",
+				upgradeId: "",
 				price: 0,
 				
 				boughtProgress: 0,
@@ -90,7 +90,7 @@ export function addUpgrades(elementParent) {
 							positionSetter(),
 							"blinkText",
 							{
-								upgradeId: thisUpgrade.id,
+								upgradeId: thisUpgrade.upgradeId,
 								update() {
 									this.text = texty
 									this.opacity = wave(0.25, 1, time() * 8)
@@ -112,7 +112,7 @@ export function addUpgrades(elementParent) {
 					}
 
 					function end() {
-						elementParent.get("blinkText", { recursive: true }).filter((t) => t.upgradeId == thisUpgrade.id).forEach((t) => t.destroy())
+						elementParent.get("blinkText", { recursive: true }).filter((t) => t.upgradeId == thisUpgrade.upgradeId).forEach((t) => t.destroy())
 					}
 
 					return { addT, end }
@@ -129,7 +129,7 @@ export function addUpgrades(elementParent) {
 				buy() {
 					this.tooltip?.end()
 					
-					GameState.upgradesBought.push(this.id)
+					GameState.upgradesBought.push(this.upgradeId)
 					playSfx("kaching", { detune: 25 * this.idx })
 					tween(this.scale, vec2(1.1), 0.15, (p) => this.scale = p, easings.easeOutQuad)
 				
@@ -148,7 +148,7 @@ export function addUpgrades(elementParent) {
 					}
 					
 					scoreManager.subTweenScore(this.price)
-					ROOT.trigger("buy", { element: "upgrade", id: this.id, price: this.price })
+					ROOT.trigger("buy", { element: "upgrade", upgradeId: this.upgradeId, price: this.price })
 					this.trigger("buy")
 				},
 
@@ -161,7 +161,7 @@ export function addUpgrades(elementParent) {
 						align: "center",
 					})
 					
-					if (isUpgradeBought(upgradeObj.id)) return
+					if (isUpgradeBought(upgradeObj.upgradeId)) return
 					// draw the bought progress bar
 					drawRect({
 						width: this.width,
@@ -185,22 +185,22 @@ export function addUpgrades(elementParent) {
 				},
 
 				inspect() {
-					return `upgradeId: ${this.id}`
+					return `upgradeId: ${this.upgradeId}`
 				},
 			}
 		])
 
 		const addedPosition = upgradeObj.pos
 		
-		// sets info like id price and value/freq
-		upgradeObj.id = upgradeObj.type + upgradeObj.idx
-		const upgradePrice = upgradeInfo[upgradeObj.id].price
+		// sets info like upgradeId price and value/freq
+		upgradeObj.upgradeId = upgradeObj.type + upgradeObj.idx
+		const upgradePrice = upgradeInfo[upgradeObj.upgradeId].price
 		upgradeObj.price = upgradePrice + upgradePrice * upgradePriceIncrease * GameState.stats.timesAscended
 		
-		if (upgradeObj.type == "k_") upgradeObj.value = upgradeInfo[upgradeObj.id].value
+		if (upgradeObj.type == "k_") upgradeObj.value = upgradeInfo[upgradeObj.upgradeId].value
 		else if (upgradeObj.type == "c_") {
-			if (upgradeObj.idx > -1 && upgradeObj.idx < 3) upgradeObj.freq = upgradeInfo[upgradeObj.id].freq
-			else upgradeObj.value = upgradeInfo[upgradeObj.id].value
+			if (upgradeObj.idx > -1 && upgradeObj.idx < 3) upgradeObj.freq = upgradeInfo[upgradeObj.upgradeId].freq
+			else upgradeObj.value = upgradeInfo[upgradeObj.upgradeId].value
 		}
 
 		upgradeObj.outline.color = upgradeObj.color.darken(10)
@@ -237,7 +237,7 @@ export function addUpgrades(elementParent) {
 			// tooltips
 			let textInBlink = upgradeObj.value != null ? `+${upgradeObj.value}` : `Clicks every ${upgradeObj.freq} ${upgradeObj.freq > 1 ? "seconds" : "second"}`;
 			
-			if (!isUpgradeBought(upgradeObj.id)) {
+			if (!isUpgradeBought(upgradeObj.upgradeId)) {
 				if (upgradeObj.tooltip == null) {
 					upgradeTooltip = addPriceTooltip()
 					upgradeObj.manageBlinkText(textInBlink).addT()
@@ -250,7 +250,7 @@ export function addUpgrades(elementParent) {
 			
 			tween(upgradeObj.parent.opacity, 1, 0.15, (p) => upgradeObj.parent.opacity = p, easings.easeOutQuad)
 
-			if (!isUpgradeBought(upgradeObj.id) && upgradeObj.boughtProgress > 0 && GameState.score >= upgradeObj.price) upgradeObj.dropBuy()
+			if (!isUpgradeBought(upgradeObj.upgradeId) && upgradeObj.boughtProgress > 0 && GameState.score >= upgradeObj.price) upgradeObj.dropBuy()
 			tween(upgradeObj.scale, vec2(1), 0.15, (p) => upgradeObj.scale = p, easings.easeOutQuad)
 			
 			if (upgradeObj.tooltip != null) {
@@ -264,7 +264,7 @@ export function addUpgrades(elementParent) {
 		upgradeObj.onClick(() => {
 			if (!winParent.active) return
 
-			if (isUpgradeBought(upgradeObj.id)) {
+			if (isUpgradeBought(upgradeObj.upgradeId)) {
 				bop(upgradeObj)
 				upgradeObj.trigger("dummyClick")
 
@@ -297,7 +297,7 @@ export function addUpgrades(elementParent) {
 
 			// hasn't bought it
 			else {
-				if (upgradeObj.id == "c_2" && !isUpgradeBought("c_1")) {
+				if (upgradeObj.upgradeId == "c_2" && !isUpgradeBought("c_1")) {
 					// remove all tooltips that are not buy previous one
 					upgradeObj.tooltip.end()
 
@@ -327,7 +327,7 @@ export function addUpgrades(elementParent) {
 
 					// down event
 					downEvent = upgradeObj.onMouseDown(() => {
-						if (isUpgradeBought(upgradeObj.id)) return
+						if (isUpgradeBought(upgradeObj.upgradeId)) return
 						if (upgradeObj.boughtProgress >= 5) {
 							
 							if (upgradeObj.tooltip.type == "storeholddowntobuy") {
@@ -359,7 +359,7 @@ export function addUpgrades(elementParent) {
 		upgradeObj.onMouseRelease(() => {
 			if (!winParent.active) return
 		
-			if (isUpgradeBought(upgradeObj.id)) return
+			if (isUpgradeBought(upgradeObj.upgradeId)) return
 			if (!upgradeObj.isHovering()) return
 			upgradeObj.dropBuy()
 

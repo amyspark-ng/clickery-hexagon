@@ -241,8 +241,8 @@ export function addMinibutton(opts:minibuttonOpt) {
 	currentMinibutton.area.scale = vec2(0)
     tween(currentMinibutton.opacity, 1, 0.32, (p) => currentMinibutton.opacity = p, easings.easeOutQuad)
     tween(currentMinibutton.pos, currentMinibutton.destinedPosition, 0.32, (p) => currentMinibutton.pos = p, easings.easeOutBack).then(() => {
-		currentMinibutton.area.scale.x = miniButtonXarea
-		currentMinibutton.area.scale.y = miniButtonYarea
+		currentMinibutton.area.scale.x = 1
+		currentMinibutton.area.scale.y = 1
 	})
 
 	// currentMinibutton is the one being swapped to met the curDragging wish

@@ -3,6 +3,7 @@ import * as env from "./env.json"
 import { GameState } from "./gamestate";
 import { positionSetter } from "./game/plugins/positionSetter";
 import { bop } from "./game/utils";
+import { gameBg } from "./game/additives";
 
 export let ngEnabled:boolean;
 export let ngUser:User;
@@ -21,6 +22,7 @@ export function postEverything() {
 }
 
 export async function newgroundsSceneContent() {
+	gameBg.colorA = 0.9
 	let newgroundsInfoText = "You don't seem to be signed in.\nWould you like to? Includes:\n +Your score in leaderboards\n+Medals in newgrounds (up to 300 points)\n+Cloud saves\nPretty good deal huh?"
 	let titleText = add([
 		text("You don't seem to be signed in.\nWould you like to?", { align: "center", size: 40 }),

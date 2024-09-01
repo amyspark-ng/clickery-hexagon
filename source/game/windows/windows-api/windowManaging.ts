@@ -233,21 +233,21 @@ export function openWindow(windowKey:windowKey) {
 	windowObj.pos = infoForWindows[windowKey].lastPos
 
 	windowObj.onHover(() => {
-		query({
-			include: [ "outsideHover", "insideHover" ],
-			includeOp: "or",
-			hierarchy: "descendants",
-		}).forEach((obj) => {
+		get("outsideHover", { recursive: true }).forEach((obj) => {
+			obj.trigger("cursorEnterWindow", windowObj)
+		})
+
+		get("insideHover", { recursive: true }).forEach((obj) => {
 			obj.trigger("cursorEnterWindow", windowObj)
 		})
 	})
 	
 	windowObj.onHoverEnd(() => {
-		query({
-			include: [ "outsideHover", "insideHover" ],
-			includeOp: "or",
-			hierarchy: "descendants",
-		}).forEach((obj) => {
+		get("outsideHover", { recursive: true }).forEach((obj) => {
+			obj.trigger("cursorExitWindow", windowObj)
+		})
+
+		get("insideHover", { recursive: true }).forEach((obj) => {
 			obj.trigger("cursorExitWindow", windowObj)
 		})
 	})

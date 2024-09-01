@@ -397,20 +397,20 @@ export function debugTexts() {
 		return text
 	}
 
-	add([
-		text("DEBUG", { size: 18 }),
-		anchor("botleft"),
-		opacity(0.25),
-		pos(0, height()),
-		fixed(),
-		layer("mouse"),
-		{
-			update() {
-				const fps = ((Math.round((1/dt())*10))/10)
-				this.text = "DEBUG" + ` ${fps}`
-			}
-		}
-	])
+	// add([
+	// 	text("DEBUG", { size: 18 }),
+	// 	anchor("botleft"),
+	// 	opacity(0.25),
+	// 	pos(0, height()),
+	// 	fixed(),
+	// 	layer("mouse"),
+	// 	{
+	// 		update() {
+	// 			const fps = ((Math.round((1/dt())*10))/10)
+	// 			this.text = "DEBUG" + ` ${fps}`
+	// 		}
+	// 	}
+	// ])
 
 	let debugTexts = add([
 		text("", {
@@ -498,6 +498,10 @@ export function debugFunctions() {
 				icon: theIcon,
 			})
 		}
+
+		else if (isKeyPressed("k")) {
+			achievements.forEach(achievement => unlockAchievement(achievement.id))
+		}
 	})
 
 	// #region debug stuff
@@ -520,7 +524,7 @@ export function runInTauri(func: () => void): void {
 }
 
 export function toggleTheFullscreen(newFullscreen?:boolean) {
-	newFullscreen = newFullscreen || !GameState.settings.fullscreen
+	newFullscreen = newFullscreen ?? !GameState.settings.fullscreen
 	GameState.settings.fullscreen = newFullscreen
 	setFullscreen(GameState.settings.fullscreen)
 	runInTauri(() => appWindow.setFullscreen(GameState.settings.fullscreen))

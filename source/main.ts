@@ -19,7 +19,7 @@ runInTauri(() => appWindow = getCurrentWebviewWindow())
 console.log(appWindow)
 
 export let DEBUG = true
-export let enableNg = false
+export let enableNg = true
 
 let kaplayOpts = {
 	width: 1024,

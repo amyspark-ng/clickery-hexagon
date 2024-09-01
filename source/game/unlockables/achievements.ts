@@ -20,7 +20,7 @@ export interface AchievementInterface {
 	 * The id the achievement has on newgrounds
 	 * (remember to pass it as a number don't mess it up this time)
 	*/
-	ngId?: number, // IS OPTIONAL WHILE I ADD THEM
+	ngId: number,
 	/**
 	 * The name/funny pun the achievement will have
 	 * (eg: the achievement is get 100 score, 'It starts...')
@@ -637,7 +637,7 @@ export function unlockAchievement(id:string) {
 		ROOT.trigger("achivementUnlock", id)
 	})
 
-	// if (ngEnabled == true) {
-	// 	if (theAchievement.ngId) ng.unlockMedal(theAchievement.ngId)
-	// }
+	if (ngEnabled == true) {
+		if (theAchievement.ngId) ng.unlockMedal(theAchievement.ngId)
+	}
 }

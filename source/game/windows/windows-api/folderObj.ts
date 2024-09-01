@@ -41,7 +41,6 @@ export function addFolderObj() {
 		z(0),
 		scale(),
 		anchor("center"),
-		outsideWindowHover(),
 		"folderObj",
 		{
 			defaultScale: vec2(1.2),
@@ -67,7 +66,7 @@ export function addFolderObj() {
 					get("minibutton").forEach((miniButton) => {
 						tween(miniButton.pos, miniButton.destinedPosition, 0.32, (p) => miniButton.pos = p, easings.easeOutBack).then(() => {
 							movingMinibuttons = false;
-							miniButton.area.scale = vec2(miniButtonXarea, miniButtonYarea);
+							miniButton.area.scale = vec2(1, 1);
 						})
 					})
 				}
@@ -131,7 +130,7 @@ export function addFolderObj() {
 				
 				if (curDraggin?.is("gridMiniButton") || curDraggin?.is("minibutton")) return
 				if (!movingMinibuttons) {
-					if (this.interactable == true && isKeyPressed("space") || (isMousePressed("left") && this.isHovering())) {
+					if (this.interactable == true && isKeyPressed("space")) {
 						this.manageFold()
 						this.deleteSlots()
 						bop(this)
@@ -180,18 +179,13 @@ export function addFolderObj() {
 	});
 
 	theFolderObj.on("winClose", () => {
-		// wait(0.05, () => {
-			// gets the topmost window
-			let allWindows = get("window")
-			if (allWindows.length > 0) allWindows.reverse()[0].activate()
-		// })
+		// gets the topmost window
+		let allWindows = get("window")
+		if (allWindows.length > 0) allWindows.reverse()[0].activate()
 
-		let isAnyObjGettingHovered = get("outsideHover", { recursive: true }).some((outsideHover) => outsideHover.isHovering() == true && outsideHover.isBeingHovered == false)
-		if (isAnyObjGettingHovered == true) {
-			// get all the objs that are being hovered
-			let allHoveredObjs = get("outsideHover", { recursive: true }).filter((outsideHover) => outsideHover.isHovering() == true && outsideHover.isBeingHovered == false)
-			allHoveredObjs.forEach((obj) => obj.startHoverFunction())
-		}
+		get("outsideHover").forEach((obj) => {
+			obj.trigger("cursorExitWindow")
+		})
 	})
 
 	theFolderObj.onUpdate(() => {

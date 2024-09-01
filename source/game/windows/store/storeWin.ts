@@ -34,7 +34,7 @@ export function storeWinContent(winParent:GameObj) {
 	// save them
 	storeElements = [clickersElement, cursorsElement, powerupsElement]
 
-	let firstUpgrade = clickersElement.get("upgrade").filter(upgrade => upgrade.id == "k_0")[0]
+	let firstUpgrade = clickersElement.get("upgrade").filter(upgrade => upgrade.upgradeId == "k_0")[0]
 
 	// determines store pitch
 	winParent.onUpdate(() => {
@@ -103,13 +103,8 @@ export function storeWinContent(winParent:GameObj) {
 			}
 
 			const upgradesTutorialTooltip = () => {
-				let tutorialObj = firstUpgrade.add([
-					pos(),
-					anchor(firstUpgrade.anchor),
-				])
-
-				let tooltip = addTooltip(tutorialObj, {
-					text: "← Upgrades help make your clicks worth!",
+				let tooltip = addTooltip(firstUpgrade, {
+					text: "Upgrades help make your clicks worth! →",
 					direction: "left",
 					type: "tutorialUpgrades",
 					layer: winParent.layer,
