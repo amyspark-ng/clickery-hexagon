@@ -21,5 +21,4 @@ FEATURES
 GRAPHICS / ETC
 - All achievements achievement animation
 - Itch.io web page
-	* Screenshots
 	* Background being cutted, make it a "texture"

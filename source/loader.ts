@@ -420,6 +420,7 @@ function loadAllSprites() {
 			}
 		}
 	})
+	loadSprite("musicDisc", "sprites/windows/musicWin/musicDisc.png")
 	loadSprite("musicWinButtons", "sprites/windows/musicWin/musicWinButtons.png", {
 		sliceX: 4,
 		sliceY: 1,

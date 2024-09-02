@@ -15,6 +15,7 @@ import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 import { ngEnabled, postEverything } from "../newgrounds.ts"
 import { drawDumbOutline } from "./plugins/drawThings.ts"
 import { allObjWindows } from "./windows/windows-api/windowManaging.ts"
+import ng from "newgrounds.js"
 
 let panderitoLetters = "panderito".split("")
 export let panderitoIndex = 0
@@ -664,6 +665,8 @@ export const gamescene = () => scene("gamescene", () => {
 			exitDesire = 0
 		})
 	})
+
+	ng.autoPing(5000)
 
 	if (DEBUG == true) debugFunctions()
 })

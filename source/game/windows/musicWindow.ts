@@ -54,9 +54,10 @@ export function musicWinContent(winParent:GameObj) {
 	}
 
 	let disc = winParent.add([
-		sprite("discs", {
-			anim: `${songs[Object.keys(songs)[currentSongIdx]].cover}`
-		}),
+		sprite("musicDisc"),
+		// sprite("discs", {
+		// 	anim: `${songs[Object.keys(songs)[currentSongIdx]].cover}`
+		// }),
 		pos(-152, -17),
 		rotate(angleOfDisc),
 		anchor("center"),
@@ -300,7 +301,7 @@ export function musicWinContent(winParent:GameObj) {
 			else tween(disc.angle, disc.angle + rand(75, 100), 0.5, (p) => disc.angle = p, easings.easeOutQuint)
 		}
 		
-		disc.play(songs[Object.keys(songs)[currentSongIdx]].cover)
+		// disc.play(songs[Object.keys(songs)[currentSongIdx]].cover)
 		GameState.settings.music.favoriteIdx = currentSongIdx
 		timeSinceSkip = 0
 
