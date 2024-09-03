@@ -97,9 +97,9 @@ class _GameState {
 		
 		if (!gottenData) gottenData = newSave
 		
-		else if (gottenData.saveVersion == undefined || gottenData.saveVersion == null || gottenData.saveVersion < this.saveVersion) {
-			gottenData = newSave
-		}
+		Object.keys(gottenData).forEach(function(k) {
+			if (!gottenData.hasOwnProperty(k)) gottenData[k] = newSave[k];
+		});
 
 		Object.assign(this, gottenData)
 		return gottenData;
@@ -238,14 +238,15 @@ class _scoreManager {
 	 * This is the number you start getting mana at
 	 */
 	ascensionConstant = 5_000_000
-
+	ascensionExponent = 1.5
+	
 	/**
 	 * The actual formula used to calculate the score needed for a certain mana 
 	 * @param manaAllTime The mana all time
 	 * @returns The score needed for that mana all time
-	 */
+	*/
 	getScoreForManaAT = (manaAllTime = GameState.ascension.manaAllTime + 1) => {
-		return (manaAllTime ** 1.05) * this.ascensionConstant;
+		return this.ascensionConstant * Math.pow(manaAllTime, this.ascensionExponent)
 	}
 
 	/**

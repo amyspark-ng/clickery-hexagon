@@ -379,7 +379,7 @@ function addScrollBar(medalsContainer:GameObj, totalScrolls = 3) {
 	
 		// add goober devky
 		if (currentScroll == totalScrolls && medalsContainer.get("goober").length == 0 && hasCheckedLastScroll == false) {
-			if (!chance(0.25)) {
+			if (!chance(0.4)) {
 				hasCheckedLastScroll = true
 				return
 			}
@@ -396,7 +396,7 @@ function addScrollBar(medalsContainer:GameObj, totalScrolls = 3) {
 			])
 
 			goober.onPressClick(() => {
-				if (ngEnabled) {
+				if (ngEnabled == true) {
 					if (GameState.stats.hasDevkyGoobered == false) {
 						GameState.stats.hasDevkyGoobered = true
 						ng.unlockMedal(env.DEVKY_MEDAL_ID)

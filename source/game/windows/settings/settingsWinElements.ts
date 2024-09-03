@@ -415,7 +415,6 @@ export function addMinigame(otherButtonsBg:GameObj) {
 		sprite("settingsDottedHex"),
 		pos(190, 34),
 		area(),
-		positionSetter(),
 		anchor("center"),
 		scale(),
 		insideWindowHover(winParent),

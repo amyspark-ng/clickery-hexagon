@@ -5,6 +5,7 @@ import { addTooltip } from "../../additives";
 import { insideWindowHover } from "../../hovers/insideWindowHover";
 import { positionSetter } from "../../plugins/positionSetter";
 import { blendColors, bop, formatNumber, getPositionOfSide, getRandomDirection, insertAtStart, parseAnimation } from "../../utils";
+import { priceAscensionMultiplier } from "./storeElements";
 
 const tooltipLerp = 0.65
 
@@ -87,7 +88,6 @@ export function addUpgrades(elementParent) {
 							anchor("left"),
 							layer("windows"),
 							opacity(),
-							positionSetter(),
 							"blinkText",
 							{
 								upgradeId: thisUpgrade.upgradeId,
@@ -195,7 +195,7 @@ export function addUpgrades(elementParent) {
 		// sets info like upgradeId price and value/freq
 		upgradeObj.upgradeId = upgradeObj.type + upgradeObj.idx
 		const upgradePrice = upgradeInfo[upgradeObj.upgradeId].price
-		upgradeObj.price = upgradePrice + upgradePrice * upgradePriceIncrease * GameState.stats.timesAscended
+		upgradeObj.price = priceAscensionMultiplier(upgradePrice, 0.15)
 		
 		if (upgradeObj.type == "k_") upgradeObj.value = upgradeInfo[upgradeObj.upgradeId].value
 		else if (upgradeObj.type == "c_") {

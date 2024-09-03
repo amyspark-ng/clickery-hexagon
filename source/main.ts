@@ -4,7 +4,7 @@ import "kaplay/global";
 import { drawSeriousLoadScreen, loadEverything } from "./loader.ts"
 import { addBackground, addMouse, gameBg } from "./game/additives.ts";
 import { volumeManager } from "./sound.ts";
-import { connectToNewgrounds } from "./newgrounds.ts";
+import { connectToNewgrounds, ngUser, onLogIn, setNgUser } from "./newgrounds.ts";
 import ng from "newgrounds.js";
 import { runInTauri } from "./game/utils.ts";
 import { GameState } from "./gamestate.ts";
@@ -15,10 +15,11 @@ import { webviewWindow } from "@tauri-apps/api";
 export let appWindow: webviewWindow.WebviewWindow = null
 runInTauri(() => appWindow = getCurrentWebviewWindow())
 
-console.log(appWindow)
+console.log(`appWindow: ` + appWindow)
 
 export let DEBUG = false
 export let enableNg = true
+const VERSION = "1.1.0"
 
 let kaplayOpts = {
 	width: 1024,
@@ -42,6 +43,7 @@ runInTauri(() => {
 })
 
 export const k = kaplay(kaplayOpts as KAPLAYOpt);
+console.log("Game's version: " + VERSION)
 
 export let ROOT = getTreeRoot()
 setBackground(BLACK)
@@ -112,7 +114,13 @@ onLoad(() => {
 				})
 			
 				if (!await ng.isLoggedIn()) go("ngScene")
-				else go("gamescene")
+				
+				// is logged, jarvis set ngUser and enableNg, YOU'RE SO STUPID! 
+				else {
+					const session = await ng.getSession()
+					onLogIn(session)
+					go("gamescene")
+				}
 				// gets cancelled after the await is finished
 				loadingEvent.cancel()
 			}

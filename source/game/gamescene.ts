@@ -336,7 +336,7 @@ export const gamescene = () => scene("gamescene", () => {
 					if (isAchievementUnlocked("extra.gnome")) return
 					if (GameState.stats.timesAscended < 1) return
 					if (sleeping == true) return
-					if (chance(0.0025)) {
+					if (chance(0.0020)) {
 						triggerGnome()
 					}
 				})

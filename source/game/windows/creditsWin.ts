@@ -109,7 +109,6 @@ export async function creditsWinContent(winParent:GameObj) {
 		anchor("center"),
 		area(),
 		insideWindowHover(winParent),
-		positionSetter(),
 	])
 
 	let creditsHeart = winParent.add([

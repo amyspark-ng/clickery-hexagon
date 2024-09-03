@@ -168,7 +168,7 @@ export function addHexagon() {
 
 				// # actual score additions
 				let scoreObtained = 0;
-				let isCritical = chance(rand(0.08, 0.1));
+				let isCritical = chance(rand(0.02, 0.08));
 				let isBigCrit:boolean;
 
 				if (isCritical == true) {
@@ -201,27 +201,31 @@ export function addHexagon() {
 					let redcritcolor = RED.lighten(rand(110, 130))
 					let bluecritcolor = BLUE.lighten(rand(110, 130))
 					
-					let angles = [big ? 45 : 0, big ? 45 : 0]
-					let color = [big ? bluecritcolor : redcritcolor, big ? bluecritcolor : redcritcolor]
+					let theColor = big ? bluecritcolor : redcritcolor
 					
 					let starparticle = add([
 						layer("ui"),
 						pos(mousePos()),
 						opacity(),
 						particles({
-							max: 4,
+							max: 8,
 							texture: getSprite("part_star").data.tex,
 							quads: [getSprite("part_star").data.frames[0]],
-							speed: [50, 100],
-							// angle: angles,
-							colors: color,
-							lifeTime: [1.0, 1.5],
+			
+							speed: [100, 250],
+							angle: [0, 0],
+							colors: [theColor.lighten(50), theColor.darken(50)],
+							scales: [1, 1.1],
+							lifeTime: [0.35, 0.5],
+							opacities: [1, 0],
+							acceleration: [vec2(50), vec2(-50)],
+							angularVelocity: [30, 60],
 						}, {
 							lifetime: 1.5,
 							rate: 100,
-							direction: -90,
-							spread: 25,
-						})
+							direction: 180,
+							spread: -90,
+						}),
 					])
 					starparticle.fadeIn(0.1)
 

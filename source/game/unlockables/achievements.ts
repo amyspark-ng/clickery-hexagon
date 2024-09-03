@@ -580,6 +580,10 @@ export function checkForUnlockable() {
 			if (achievement.unlockCondition()) {
 				unlockAchievement(achievement.id)
 			}
+
+			else {
+				lockAchievement(achievement.id)
+			}
 		}
 	})
 
@@ -639,5 +643,11 @@ export function unlockAchievement(id:string) {
 
 	if (ngEnabled == true) {
 		if (theAchievement.ngId) ng.unlockMedal(theAchievement.ngId)
+		console.log("NG: Medal unlocked: " + theAchievement.id)
 	}
+}
+
+export function lockAchievement(id:string) {
+	if (GameState.unlockedAchievements.includes(id)) GameState.unlockedAchievements = GameState.unlockedAchievements.filter(achievement => achievement != id)
+	// can't remov from newgrounds sorry
 }

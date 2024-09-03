@@ -1,20 +1,19 @@
+import { GameObj } from "kaplay";
 import { GameState } from "../../gamestate";
 import { positionSetter } from ".././plugins/positionSetter";
-import { achievements } from "../unlockables/achievements";
+import { achievements, isAchievementUnlocked } from "../unlockables/achievements";
 import { formatNumber, formatNumberSimple, formatTime } from "../utils";
 
 class Stat {
 	key:string
 	value: number | string
-	icon: string
-	constructor(key:string, value: number | string, icon?: string) {
+	constructor(key:string, value: number | string) {
 		this.key = key
 		this.value = value
-		this.icon = icon
 	}
 }
 
-export function statsWinContent(winParent) {
+export function statsWinContent(winParent:GameObj) {
 	let stats = [];
 
 	winParent.onUpdate(() => {
@@ -26,6 +25,7 @@ export function statsWinContent(winParent) {
 		let timesAscended = new Stat("Times ascended", formatNumberSimple(GameState.stats.timesAscended))
 		let achievementsUnlocked = new Stat("Achievements unlocked", `${GameState.unlockedAchievements.length}/${achievements.length}`)
 		let timePlayed = new Stat("Total time played", formatTime(Math.round(GameState.stats.totalTimePlayed), true))
+		let timeForGameComplete = new Stat("Time for game completed", formatTime(Math.round(GameState.stats.timeGameComplete), true))
 
 		stats = [
 			scoreAllTime, timesClicked, powerupsClicked, powerupsBought, achievementsUnlocked, timePlayed
@@ -34,6 +34,10 @@ export function statsWinContent(winParent) {
 		if (GameState.stats.timesAscended > 0) {
 			stats.splice(stats.indexOf(achievementsUnlocked), 0, timesAscended);
 			stats.splice(stats.indexOf(timesClicked), 0, scoreThisRun);
+		}
+
+		if (isAchievementUnlocked("extra.ALL")) {
+			if (!stats.includes(timeForGameComplete)) stats.push(timeForGameComplete)
 		}
 	})
 
@@ -44,22 +48,21 @@ export function statsWinContent(winParent) {
 
 	let icons = winParent.add([
 		sprite("statIcons1"),
-		pos(-221, -127),
-		positionSetter(),
+		pos(-222, -152),
 		anchor("top"),
 		{
 			update() {
-				if (GameState.stats.timesAscended > 0 && this.sprite != "statIcons2") this.sprite = "statIcons2"
-				else if (GameState.stats.timesAscended == 0 && this.sprite != "statIcons1") this.sprite = "statIcons1"
+				if (isAchievementUnlocked("extra.ALL") && this.sprite != "statIcons3") this.sprite = "statIcons3"
+				else if (GameState.stats.timesAscended > 0 && this.sprite != "statIcons2") this.sprite = "statIcons2"
+				else if (GameState.stats.timesAscended < 1 && this.sprite != "statIcons1") this.sprite = "statIcons1"
 			}
 		}
 	])
 
 	let statsText = winParent.add([
 		text(createStats()),
-		pos(14, -122),
-		anchor("top"),
-		// positionSetter(),
+		pos(-202, -150),
+		anchor("topleft"),
 		{
 			update() {
 				this.text = createStats()

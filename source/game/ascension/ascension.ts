@@ -13,6 +13,7 @@ import { positionSetter } from "../plugins/positionSetter";
 import { playSfx } from "../../sound";
 import { addTooltip, mouse, tooltipInfo } from "../additives";
 import { GameObj, KEventController } from "kaplay";
+import { formatNumberSimple } from "../utils";
 
 export let ascension = {
 	ascending: false,
@@ -24,7 +25,6 @@ export function addLeaveButton() {
 	let leaveButton = add([
 		sprite("leaveButton"),
 		pos(968, 286),
-		positionSetter(),
 		anchor("center"),
 		area({ scale: vec2(0) }),
 		scale(0),
@@ -126,7 +126,7 @@ export function startAscending() {
 			{
 				hiddenXPos: -72,
 				update() {
-					this.text = `✦${GameState.ascension.mana}`
+					this.text = `✦${formatNumberSimple(GameState.ascension.mana)}`
 				}
 			}
 		])

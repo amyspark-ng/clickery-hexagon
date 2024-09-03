@@ -3,7 +3,7 @@ import { GameState, saveColor, scoreManager } from "../gamestate";
 import { addToast, mouse } from "./additives";
 import { autoLoopTime, cam, triggerGnome } from "./gamescene";
 import { hexagon } from "./hexagon";
-import { achievements, getAchievement, isAchievementUnlocked, unlockAchievement } from "./unlockables/achievements";
+import { achievements, getAchievement, isAchievementUnlocked, lockAchievement, unlockAchievement } from "./unlockables/achievements";
 import { allObjWindows, openWindow } from "./windows/windows-api/windowManaging";
 import { allPowerupsInfo, powerupTypes, spawnPowerup } from "./powerups";
 import { playSfx } from "../sound";
@@ -451,6 +451,7 @@ export function debugFunctions() {
 	window.globalThis.GameState = GameState
 	window.globalThis.scoreManager = scoreManager
 	window.globalThis.unlockAchievement = unlockAchievement
+	window.globalThis.lockAchievement = lockAchievement
 	window.globalThis.spawnPowerup = spawnPowerup
 	window.globalThis.hexagon = hexagon
 	window.globalThis.openWindow = openWindow

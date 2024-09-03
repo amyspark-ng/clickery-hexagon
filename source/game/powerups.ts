@@ -213,7 +213,6 @@ export function addPowerupLog(powerupType:powerupName) {
 		rect(0, 0, { radius: 0 }),
 		pos(center().x, height() - 100),
 		color(BLACK.lighten(2)),
-		positionSetter(),
 		anchor("center"),
 		layer("powerups"),
 		opacity(bgOpacity),

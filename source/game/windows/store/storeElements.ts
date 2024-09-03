@@ -29,9 +29,12 @@ export let storeElementsInfo = {
 }
 
 /**
- * Converts base price and increases 
+ * Increases price by ascension times
+ * @param percentage must be between 0 and 1 (15 / 100 -> 0.15) 
  */
-const basePriceAscensionTimes = (basePrice:number, percentage: number) => basePrice + basePrice * ((percentage / 100) / 2) * GameState.stats.timesAscended   
+export function priceAscensionMultiplier(basePrice:number, percentage: number) {
+	return basePrice + basePrice * (percentage * 1.5) * GameState.stats.timesAscended
+} 
 
 function addSmoke(winParent:any, btn:any) {
 	let smoke = winParent.add([
@@ -331,7 +334,7 @@ export function addStoreElement(winParent:any, opts:storeElementOpt) {
 	if (opts.type == "powerupsElement" && GameState.hasUnlockedPowerups == false) {
 		btn.use(lockedPowerupStoreElement(winParent))
 		tooltip = addTooltip(btn, {
-			text: `${formatNumber(storeElementsInfo.powerupsElement.unlockPrice, { price: true })}`,
+			text: `${formatNumber(btn.price, { price: true })}`,
 			direction: "down",
 			lerpValue: 1,
 			layer: winParent.layer,
@@ -345,6 +348,8 @@ export function addStoreElement(winParent:any, opts:storeElementOpt) {
 		tooltip.tooltipText.onUpdate(() => {
 			if (GameState.score >= storeElementsInfo.powerupsElement.unlockPrice) tooltip.tooltipText.color = greenPrice
 			else tooltip.tooltipText.color = redPrice  
+
+			tooltip.tooltipText.text = formatNumber(btn.price, { price: true })
 		})
 	}
 
@@ -360,7 +365,7 @@ export function addStoreElement(winParent:any, opts:storeElementOpt) {
 		btn.area.scale = vec2(1 / btn.scale.x, 1 / btn.scale.y)
 
 		if (opts.type == "powerupsElement" && GameState.hasUnlockedPowerups == false) {
-			btn.price = basePriceAscensionTimes(storeElementsInfo.powerupsElement.unlockPrice, storeElementsInfo.powerupsElement.percentageIncrease)
+			btn.price = priceAscensionMultiplier(storeElementsInfo.powerupsElement.unlockPrice, storeElementsInfo.powerupsElement.percentageIncrease / 100)
 		}
 
 		else {
@@ -372,7 +377,7 @@ export function addStoreElement(winParent:any, opts:storeElementOpt) {
 			// price
 			const elementInfo = storeElementsInfo[opts.type]
 			btn.price = getPrice({
-				basePrice: basePriceAscensionTimes(elementInfo.basePrice, elementInfo.percentageIncrease),
+				basePrice: priceAscensionMultiplier(elementInfo.basePrice, elementInfo.percentageIncrease / 100),
 				percentageIncrease: elementInfo.percentageIncrease,
 				objectAmount: amountBought,
 				amountToBuy: opts.type == "powerupsElement" ? 1 : amountToBuy,
@@ -489,6 +494,7 @@ export function addStoreElement(winParent:any, opts:storeElementOpt) {
 			{
 				update() {
 					if (GameState.hasUnlockedPowerups == false) this.destroy() 
+					GameState.powerupPower = parseFloat(GameState.powerupPower.toFixed(1))
 					this.text = `Power: ${GameState.powerupPower}x`
 				}
 			}

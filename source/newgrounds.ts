@@ -4,6 +4,9 @@ import { GameState } from "./gamestate";
 import { positionSetter } from "./game/plugins/positionSetter";
 import { bop } from "./game/utils";
 import { gameBg } from "./game/additives";
+import { Session } from "newgrounds.js/dist/first";
+import { AchievementInterface, achievements, getAchievement, isAchievementUnlocked, unlockAchievement } from "./game/unlockables/achievements";
+import { Medal } from "newgrounds.js/dist/first";
 
 export let ngEnabled:boolean;
 export let ngUser:User;
@@ -12,13 +15,62 @@ export function connectToNewgrounds() {
 	return ng.connect(env.API_ID, env.ENCRIPTION_KEY);
 }
 
+export function setNgUser(theUser:User) {
+	ngUser = theUser
+}
+
 export function postEverything() {
-	if (ngEnabled) {
+	if (ngEnabled == true) {
 		ng.postScore(env.SCORE_LEADERBOARD_ID, GameState.scoreAllTime)
 		// have to send the time in miliseconds
 		ng.postScore(env.TIME_LEADERBOARD_ID, GameState.stats.totalTimePlayed * 1000)
 		ng.postScore(env.MANA_LEADERBOARD_ID, GameState.ascension.manaAllTime)
+		console.log("NG: Posted your scores!")
 	}
+}
+
+/**
+ * Enables NG
+ */
+export async function onLogIn(session: Session) {
+	ngUser = session.user
+	console.log("ngUser: ")
+	console.log(ngUser)
+	console.log("NG: Enabled")
+	ngEnabled = true
+
+	let gottenMedals = await ng.getMedals()
+	let gottenMedalsIds = gottenMedals.filter(medal => medal.unlocked == true).map(medal => medal.id)
+
+	let idsToUnlock = []
+	GameState.unlockedAchievements.forEach((unlockedAchievement) => {
+		if (!gottenMedalsIds.includes(getAchievement(unlockedAchievement).ngId)) {
+			const achievement = getAchievement(unlockedAchievement)
+			idsToUnlock.push(achievement.ngId)
+		}
+	})
+
+	function processArray(array, process, delay) {
+		// Start the iteration with the first element in the array
+		function processNext(index) {
+			if (index < array.length) {
+			process(array[index]); // Process the current element
+			setTimeout(() => {
+				processNext(index + 1); // Schedule the next iteration
+			}, delay);
+			}
+		}
+	
+		processNext(0); // Start processing with the first element
+	}
+
+	function medalProcessing(ngId:number) {
+		const achievement = achievements.filter(achievement => achievement.ngId == ngId)[0]
+		console.log("NG: (Recovered) unlocked medal: " + achievement.id)
+		ng.unlockMedal(achievement.ngId)
+	}
+
+	processArray(idsToUnlock, medalProcessing, 5000)
 }
 
 export async function newgroundsSceneContent() {
@@ -27,7 +79,6 @@ export async function newgroundsSceneContent() {
 	let titleText = add([
 		text("You don't seem to be signed in.\nWould you like to?", { align: "center", size: 40 }),
 		pos(center().x, center().y - 200),
-		positionSetter(),
 		anchor("center"),
 	])
 
@@ -69,14 +120,13 @@ export async function newgroundsSceneContent() {
 		])
 		
 		// does actual api stuff
-		let loginResult = await ng.login()
-		let loggedIn = await ng.isLoggedIn()
-		let session = await ng.getSession()
+		const loginResult = await ng.login()
+		const loggedIn = await ng.isLoggedIn()
+		const session = await ng.getSession()
 
 		if (loggedIn == true) {
-			ngUser = session.user
+			onLogIn(session)
 			titleText.text = `Welcome: ${ngUser.name}\nClick to start the game!`
-			ngEnabled = true
 			onClick(() => go("gamescene"))
 			get("newgroundsPopup").forEach(obj => obj.destroy())
 			

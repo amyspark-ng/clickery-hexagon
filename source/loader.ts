@@ -570,6 +570,7 @@ function loadAllSprites() {
 	loadSprite("statsWin", "sprites/windows/statsWin/statsWin.png")
 	loadSprite("statIcons1", "sprites/windows/statsWin/statIcons1.png")
 	loadSprite("statIcons2", "sprites/windows/statsWin/statIcons2.png")
+	loadSprite("statIcons3", "sprites/windows/statsWin/statIcons3.png")
 	
 	loadSprite("leaderboardsWin", "sprites/windows/leaderboardsWin/leaderboardsWin.png")
 	loadSprite("leaderboardsHeader", "sprites/windows/leaderboardsWin/leaderboardsHeader.png")

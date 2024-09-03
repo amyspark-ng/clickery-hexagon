@@ -95,7 +95,6 @@ export function musicWinContent(winParent:GameObj) {
 	let mutedButton = winParent.add([
 		sprite("mutedButton"),
 		pos(172, -30),
-		positionSetter(),
 		area(),
 		insideWindowHover(winParent),
 		anchor("center"),

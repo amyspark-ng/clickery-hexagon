@@ -56,7 +56,6 @@ function addAscendButton(position: Vec2, winParent:GameObj) {
 	const buttonContainer = winParent.add([
 		pos(position),
 		anchor("center"),
-		positionSetter(),
 		{
 			eye: null,
 			scroll: null,
@@ -174,7 +173,7 @@ export function ascendWinContent(winParent:GameObj) {
 		z(1),
 		{
 			update() {
-				this.text = `+${formatNumberSimple(GameState.ascension.manaAllTime)}%\n✦${GameState.ascension.mana}`
+				this.text = `+${formatNumberSimple(GameState.ascension.manaAllTime)}%\n✦${formatNumberSimple(GameState.ascension.mana)}`
 			}
 		}
 	])
@@ -303,7 +302,7 @@ export function ascendWinContent(winParent:GameObj) {
 
 				// getting scrumptious amounts of mana
 				if (scoreTilNextMana < -1) {
-					formattedNumber = formatNumber(Math.round(scoreManager.manaPerSecond()))
+					formattedNumber = formatNumber(scoreManager.manaPerSecond())
 					scoreTextOrManaPerSecond = "Mana per second: "
 				}
 

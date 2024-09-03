@@ -18,8 +18,8 @@ importers:
         specifier: 4000.0.0-alpha.1
         version: 4000.0.0-alpha.1
       newgrounds.js:
-        specifier: ^4.0.1
-        version: 4.0.1
+        specifier: ^4.1.1
+        version: 4.1.1
     devDependencies:
       '@tauri-apps/cli':
         specifier: 2.0.0-rc.10
@@ -382,8 +382,8 @@ packages:
   ms@2.1.2:
     resolution: {integrity: sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==}
 
-  newgrounds.js@4.0.1:
-    resolution: {integrity: sha512-PExRxpSL0NUUg9Gj1kIPIbosQzY+5IDfxa0eSJfJhcorlgkEjJNqrZkYFuBv/wjhFrOK+29girB1TfCaTX4IIw==}
+  newgrounds.js@4.1.1:
+    resolution: {integrity: sha512-EQ5+EgbeUzfbeoYD45sSfrrX33J3NjuF1f8hdDoRHQk0ho7MX7/A1jtNhtNLJm4rvm6pgho5SPOzwQFcBTuI9w==}
 
   nodemon@3.1.4:
     resolution: {integrity: sha512-wjPBbFhtpJwmIeY2yP7QF+UKzPfltVGtfce1g/bB15/8vCGZj8uxD62b/b9M9/WVgme0NZudpownKN+c0plXlQ==}
@@ -697,7 +697,7 @@ snapshots:
 
   ms@2.1.2: {}
 
-  newgrounds.js@4.0.1:
+  newgrounds.js@4.1.1:
     dependencies:
       crypto-js: 4.2.0
       kapcacher: 0.2.9
