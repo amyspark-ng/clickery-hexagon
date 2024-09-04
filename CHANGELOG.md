@@ -1,18 +1,19 @@
 # CLICKERY HEXAGON CHANGELOG
 
-1.0.0
+## 1.0.0
 - The game released, with its ascension and everything and its bugs, so crazy
 
-1.0.1
+## 1.0.1
 - Game didn't ping newgrounds so leaderboards wouldn't work and medals i think
 - Fixed songs that were sped up due to audacity tempo stuff
 - Added more blab phrases
 
-1.1.0
-FEATURES:
+## 1.1.0
+
+### FEATURES:
 - Added stat for game complete time
 
-FIXES/CHANGES:
+### FIXES/CHANGES:
 - Removed position setters
 - Modified formula for getting prices after ascending
 - Hopefully made saves compatible with previous ones in case they don't have the properties
