@@ -20,6 +20,7 @@
 - Hopefully fix the issue with medals, newgrounds wasn't being enabled on newgrounds (ironically)
 - Now at log in, for every medal you have in game but not on newgrounds, it will be unlocked every 5 seconds each
 
+- Changed critical particles
 - Changed critical chance
 - Goober devky has more chance of appearing
 - Gnome is SLIGHTLY rarer
