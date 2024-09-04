@@ -1,6 +1,7 @@
 import ng from "newgrounds.js"
 import { gameBg } from "../additives"
 import { enableNg } from "../../main"
+import { onLogIn } from "../../newgrounds"
 
 export function focuscene() {
 	return scene("focuscene", () => {
@@ -38,8 +39,12 @@ export function focuscene() {
 				gameBg.colorA = 1
 				
 				if (enableNg == true) {
-					if (!await ng.isLoggedIn()) go("ngScene")
-					else go("gamescene")
+					if (await ng.isLoggedIn() == false) go("ngScene")
+					else {
+						// is logged in
+						onLogIn(await ng.getSession())
+						go("gamescene")
+					}
 				}
 	
 				else go("gamescene")

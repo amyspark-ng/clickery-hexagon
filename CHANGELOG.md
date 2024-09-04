@@ -30,3 +30,6 @@
 	- Ascension substate mana counter
 	- Store element power text
 - Fixed store element for powerups not showing the correct price after ascending
+
+## 1.1.1
+- Game didn't set log in on focus scene
