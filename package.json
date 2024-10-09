@@ -7,6 +7,8 @@
     "build": "esbuild --bundle source/main.ts --outfile=public/game.js",
     "desktop:dev": "tauri dev",
     "desktop:build": "tauri build",
+    "android:dev": "tauri android dev",
+    "android:build": "tauri android build",
     "tauri": "tauri",
     "old:dev": "esbuild --bundle source/main.ts --sourcemap --outfile=public/game.js --servedir=./public"
   },
@@ -22,8 +24,8 @@
     "newgrounds.js": "^4.1.1"
   },
   "devDependencies": {
-    "@tauri-apps/cli": "2.0.0-rc.10",
+    "@tauri-apps/cli": "2.0.2",
     "esbuild": "^0.20.2",
-    "nodemon": "^3.1.4"
+    "nodemon": "^3.1.7"
   }
 }
