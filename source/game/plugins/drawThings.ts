@@ -1,5 +1,4 @@
 import { Color, GameObj, KEventController } from "kaplay"
-import { ROOT } from "../../main";
 
 /**
  * Draws a damn shadow 

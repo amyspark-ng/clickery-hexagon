@@ -6,6 +6,9 @@ import { achievements } from "./game/unlockables/achievements.ts";
 import { getPosInGrid } from "./game/utils.ts";
 import { SpriteAtlasData } from "kaplay";
 
+/** String with raw changelog data */
+export let CHANGELOG = ""
+
 export function drawSeriousLoadScreen(progress:number, op = 1) {
 	function drawHexagon(opts = {
 		pos: center(),
@@ -905,6 +908,12 @@ export async function loadEverything() {
 	// 20% of getting devky's funny loading screen 
 	if (chance(0.2)) onLoading((progress) => drawDevkyLoadScreen(progress))
 	else onLoading((progress) => drawSeriousLoadScreen(progress))
+
+	// load changelog
+	load(new Promise(async (resolve, reject) => {
+		CHANGELOG = await (await fetch("assets/CHANGELOG.md")).text()
+		resolve(CHANGELOG)
+	}))
 
 	loadAllSprites()
 	loadAllSounds()

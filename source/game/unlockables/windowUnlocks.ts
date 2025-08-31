@@ -6,7 +6,6 @@ import { bop, sortedTaskbar } from "../utils";
 import { playSfx } from "../../sound";
 import { folded, folderObj } from "../windows/windows-api/folderObj";
 import { addMinibutton } from "../windows/windows-api/minibuttons";
-import { ROOT } from "../../main";
 import { addGridButton } from "../windows/extraWin";
 
 export let unlockableWindows = {
@@ -156,7 +155,7 @@ export function unlockWindow(windowJustUnlocked:windowKey) {
 		}
 
 		else {
-			let extraWinOpenCheck = ROOT.on("winOpen", (windowOpened) => {
+			let extraWinOpenCheck = getTreeRoot().on("winOpen", (windowOpened) => {
 				if (windowOpened == "extraWin") {
 					let gridMinibtn = get("gridMiniButton", { recursive: true }).filter((btn) => btn.windowKey == windowJustUnlocked)[0]
 					addExclamation(gridMinibtn)

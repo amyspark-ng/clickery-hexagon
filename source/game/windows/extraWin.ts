@@ -1,5 +1,4 @@
 import { GameState } from "../../gamestate";
-import { ROOT } from "../../main";
 import { curDraggin, drag, DragComp, setCurDraggin } from "../plugins/drag";
 import { dummyShadow } from "../plugins/dummyShadow";
 import { playSfx } from "../../sound";
@@ -213,8 +212,8 @@ export function addGridButton(windowKey:windowKey) {
 	gridButton.onHold(() => {
 		// get out of the parent and sends him to the real world (root)
 		gridButton.parent.children.splice(gridButton.parent.children.indexOf(gridButton), 1)
-		gridButton.parent = ROOT
-		ROOT.children.push(gridButton)
+		gridButton.parent = getTreeRoot()
+		getTreeRoot().children.push(gridButton)
 
 		// important
 		gridButton.pos = toScreen(mousePos())

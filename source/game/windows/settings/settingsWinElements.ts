@@ -1,5 +1,4 @@
 import { GameObj, Vec2 } from "kaplay"
-import { ROOT } from "../../../main"
 import { blendColors, bop, getRandomDirection } from "../../utils"
 import { manageMute, playSfx, volChangeTune } from "../../../sound"
 import { GameState, scoreManager } from "../../../gamestate"
@@ -36,7 +35,7 @@ type checkBoxOpt = {
 	titleSize?: number
 }
 export function addCheckbox(opts:checkBoxOpt, parent?:GameObj) {
-	let checkBox = (parent || ROOT).add([
+	let checkBox = (parent || getTreeRoot()).add([
 		sprite("checkbox", {
 			anim: "off"
 		}),
@@ -99,7 +98,7 @@ export function addCheckbox(opts:checkBoxOpt, parent?:GameObj) {
 	if (opts.title) {
 		opts.titleSize = opts.titleSize | defaultTextSize
 		
-		let title = (parent || ROOT).add([
+		let title = (parent || getTreeRoot()).add([
 			text(opts.title, {
 				size: opts.titleSize
 			}),
@@ -231,7 +230,7 @@ export function addVolumeControl(position:Vec2, parent:GameObj) {
 }
 
 export function addScorePerTimeCounter(position:Vec2, parent:GameObj) {
-	parent = parent || ROOT
+	parent = parent || getTreeRoot()
 	
 	const winParent = parent.parent as WindowGameObj
 

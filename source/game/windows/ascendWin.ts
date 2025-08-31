@@ -3,7 +3,6 @@ import { GameState, scoreManager } from "../../gamestate"
 import { startAscending } from "../ascension/ascension"
 import { bop, formatNumber, formatNumberSimple } from "../utils"
 import { waver } from "../plugins/wave"
-import { ROOT } from "../../main"
 import { hoverController } from "../../hoverManaging"
 
 let objectsPositions = {
@@ -342,7 +341,7 @@ export function ascendWinContent(winParent:GameObj) {
 		manaParticles.onEnd(() => manaParticles.destroy())
 	}
 
-	const manaGainedCheck = ROOT.on("manaGained", () => {
+	const manaGainedCheck = getTreeRoot().on("manaGained", () => {
 		tween(2, 1, 0.15, (p) => manaStar.scale.y = p, easings.easeOutQuad)
 		manaParticles(manaStar.worldPos())
 	})

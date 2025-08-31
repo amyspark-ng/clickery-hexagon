@@ -1,0 +1,37 @@
+{
+    "applicationId": "amyspark.clickery",
+    "version": "1.2.3",
+    "defaultMode": "window",
+    "documentRoot": "/public/",
+    "url": "/",
+    "enableServer": true,
+    "enableNativeAPI": true,
+    "nativeAllowList": [
+        "app.*"
+    ],
+    "modes": {
+        "window": {
+            "title": "Clickery Hexagon",
+            "width": 1024,
+            "height": 576,
+            "minWidth": 512,
+            "minHeight": 288,
+            "icon": "/public/icon.png"
+        }
+    },
+    "cli": {
+        "binaryName": "ClickeryHexagon",
+        "resourcesPath": "/public/",
+        "extensionsPath": "/extensions/",
+        "binaryVersion": "6.1.0",
+        "clientVersion": "6.1.0",
+        "frontendLibrary": {
+            "patchFile": "/index.html",
+            "devUrl": "http://localhost:8000",
+            "projectPath": "/",
+            "initCommand": "npm install",
+            "devCommand": "npm run dev",
+            "buildCommand": "npm run build"
+        }
+    }
+}

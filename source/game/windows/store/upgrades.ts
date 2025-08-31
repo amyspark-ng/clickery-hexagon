@@ -1,5 +1,4 @@
 import { GameState, scoreManager } from "../../../gamestate";
-import { ROOT } from "../../../main";
 import { playSfx, sfxHandlers } from "../../../sound";
 import { addTooltip } from "../../additives";
 import { hoverController } from "../../../hoverManaging";
@@ -148,7 +147,7 @@ export function addUpgrades(elementParent:ReturnType<typeof addStoreElement>) {
 					}
 					
 					scoreManager.subTweenScore(this.price)
-					ROOT.trigger("buy", { element: "upgrade", upgradeId: this.upgradeId, price: this.price })
+					getTreeRoot().trigger("buy", { element: "upgrade", upgradeId: this.upgradeId, price: this.price })
 					this.trigger("buy")
 				},
 

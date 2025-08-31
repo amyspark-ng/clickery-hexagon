@@ -5,7 +5,6 @@ import { addConfetti } from '.././plugins/confetti';
 import { addUpgrades, upgradeInfo } from '../windows/store/upgrades';
 import { songs, songsListened } from '../windows/musicWindow';
 import { isWindowUnlocked, unlockableWindows, unlockWindow } from './windowUnlocks';
-import { ROOT } from '../../main';
 import ng from 'newgrounds.js';
 import { ngEnabled } from '../../newgrounds';
 import { playSfx } from '../../sound';
@@ -638,7 +637,7 @@ export function unlockAchievement(id:string) {
 			addConfetti({ pos: mousePos() })
 		}
 
-		ROOT.trigger("achivementUnlock", id)
+		getTreeRoot().trigger("achivementUnlock", id)
 	})
 
 	if (ngEnabled == true) {

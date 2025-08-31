@@ -1,25 +1,16 @@
 import kaplay, { KAPLAYOpt } from "kaplay";
 import "kaplay/global";
 
+export let DEBUG = false
+export let enableNg = true
+
 import { drawSeriousLoadScreen, loadEverything } from "./loader.ts"
 import { addBackground, addMouse, gameBg } from "./game/additives.ts";
 import { volumeManager } from "./sound.ts";
-import { connectToNewgrounds, ngUser, onLogIn, setNgUser } from "./newgrounds.ts";
+import { connectToNewgrounds, onLogIn } from "./newgrounds.ts";
 import ng from "newgrounds.js";
-import { runInTauri } from "./game/utils.ts";
-import { GameState } from "./gamestate.ts";
 import { windowsDefinition } from "./game/windows/windows-api/windowManaging.ts";
-import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow'
-import { webviewWindow } from "@tauri-apps/api";
-
-export let appWindow: webviewWindow.WebviewWindow = null
-runInTauri(() => appWindow = getCurrentWebviewWindow())
-
-console.log(`appWindow: ` + appWindow)
-
-export let DEBUG = false
-export let enableNg = true
-export const GAME_VERSION = "1.2.3"
+import { GAME_VERSION, GameState } from "./gamestate.ts";
 
 let kaplayOpts = {
 	width: 1024,
@@ -38,15 +29,9 @@ let kaplayOpts = {
 	tagsAsComponents: true,
 } as KAPLAYOpt
 
-runInTauri(() => {
-	kaplayOpts.stretch = true;
-	kaplayOpts.letterbox = true
-})
-
 export const k = kaplay(kaplayOpts as KAPLAYOpt);
 console.log("Game's version: " + GAME_VERSION)
 
-export let ROOT = getTreeRoot()
 setBackground(BLACK)
 setCursor("none")
 
@@ -85,18 +70,18 @@ onLoad(() => {
 	
 		wait(1, () => {
 			drawEvent.cancel()
-			ROOT.trigger("rungame")
+			getTreeRoot().trigger("rungame")
 		})
 	}
 	
 	else {
 		// consoleManager()
 		wait(0.05, () => {
-			ROOT.trigger("rungame")
+			getTreeRoot().trigger("rungame")
 		})
 	}
 	
-	ROOT.on("rungame", async () => {
+	getTreeRoot().on("rungame", async () => {
 		GameState.loadFromStorage()
 		volume(GameState.settings.volume)
 		addMouse()

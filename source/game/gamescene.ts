@@ -1,22 +1,22 @@
-import { GameState, scoreManager } from "../gamestate.ts"
+import { GAME_VERSION, GameState, scoreManager } from "../gamestate.ts"
 import { addHexagon, hexagon } from "./hexagon.ts"
 import { buildingsText, scoreText, spsText, uiCounters } from "./uicounters.ts"
-import { coolSetFullscreen, debugFunctions, formatNumber, formatTime, randomPos, runInTauri, saveColorToColor, toggleTheFullscreen } from "./utils.ts"
+import { coolSetFullscreen, debugFunctions, formatNumber, formatTime, randomPos, saveColorToColor, toggleTheFullscreen } from "./utils.ts"
 import { addToast, gameBg, mouse } from "./additives.ts"
 import { musicHandler, playMusic, playSfx, stopAllSounds } from "../sound.ts"
 import { songs } from "./windows/musicWindow.ts"
-import { appWindow, DEBUG, GAME_VERSION, ROOT } from "../main.ts"
+import { DEBUG } from "../main.ts"
 import { allPowerupsInfo, Powerup_NaturalSpawnManager, Powerup_RemovalTimeManager, spawnPowerup } from "./powerups.ts"
 import { checkForUnlockable, isAchievementUnlocked, unlockAchievement } from "./unlockables/achievements.ts"
 import { ascension } from "./ascension/ascension.ts"
 import { folderObj, addFolderObj } from "./windows/windows-api/folderObj.ts"
 import { curDraggin } from "./plugins/drag.ts"
-import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 import { ngEnabled, postEverything } from "../newgrounds.ts"
 import { drawDumbOutline } from "./plugins/drawThings.ts"
 import { allObjWindows } from "./windows/windows-api/windowManaging.ts"
 import ng from "newgrounds.js"
 import { hoverManaging } from "../hoverManaging.ts"
+import { CHANGELOG } from "../loader.ts"
 
 let panderitoLetters = "panderito".split("")
 export let panderitoIndex = 0
@@ -282,9 +282,7 @@ export const gamescene = () => scene("gamescene", async () => {
 	checkForUnlockable()
 	hoverManaging();
 
-	ROOT.on("gamestart", async () => {
-		runInTauri(() => appWindow.setTitle("Clickery Hexagon"))
-		
+	getTreeRoot().on("gamestart", async () => {
 		// wait 60 seconds
 		wait(60, () => {
 			loop(120, () => {
@@ -298,7 +296,7 @@ export const gamescene = () => scene("gamescene", async () => {
 		})
 	
 		if (!GameState.hasUnlockedPowerups) {
-			ROOT.on("powerupunlock", () => {
+			getTreeRoot().on("powerupunlock", () => {
 				allPowerupsInfo.canSpawnPowerups = true
 			})
 		}
@@ -355,15 +353,14 @@ export const gamescene = () => scene("gamescene", async () => {
 			GameState.saveVersion = String(GameState.saveVersion)
 		}
 
-		// // changelog
+		// changelog
 		if (saveVersionToNumber(GameState.saveVersion) < saveVersionToNumber(GAME_VERSION)) {
-			let changelogInfo = await (await fetch("https://raw.githubusercontent.com/amyspark-ng/clickery-hexagon/refs/heads/main/CHANGELOG.md")).text()
 			let data = ""
 			let startingIndex = 0
 			let endingIndex = 0
 
-			for (let i = 0; i < changelogInfo.split("\n").length; i++) {
-				const line = changelogInfo.split("\n")[i].trim()
+			for (let i = 0; i < CHANGELOG.split("\n").length; i++) {
+				const line = CHANGELOG.split("\n")[i].trim()
 				if (line.startsWith("## ") && line.endsWith(`${GAME_VERSION}`)) {
 					startingIndex = i
 					// debug.log("found the starting line at " + i + " it says: " + line)
@@ -375,7 +372,7 @@ export const gamescene = () => scene("gamescene", async () => {
 				}
 			}
 
-			data = changelogInfo.split("\n").splice(startingIndex, endingIndex - startingIndex).join("\n")
+			data = CHANGELOG.split("\n").splice(startingIndex, endingIndex - startingIndex).join("\n")
 			addToast({ icon: "welcomeBackIcon", title: "New update!", body: data, type: "welcome" })
 		}
 	})
@@ -412,7 +409,7 @@ export const gamescene = () => scene("gamescene", async () => {
 		if (GameState.scoreAllTime >= scoreManager.scoreYouGetNextManaAt()) {
 			GameState.ascension.mana++
 			GameState.ascension.manaAllTime++
-			ROOT.trigger("manaGained")
+			getTreeRoot().trigger("manaGained")
 		}
 
 		// auto loop stuff
@@ -491,7 +488,7 @@ export const gamescene = () => scene("gamescene", async () => {
 	}, false);
 	
 	document.getElementById("kanva").addEventListener("fullscreenchange", () => {
-		ROOT.trigger("checkFullscreen")
+		getTreeRoot().trigger("checkFullscreen")
 	})
 	
 	let introAnimations = {
@@ -566,7 +563,7 @@ export const gamescene = () => scene("gamescene", async () => {
 	
 		wait(0.5, () => {
 			hexagon.interactable = true
-			ROOT.trigger("gamestart")
+			getTreeRoot().trigger("gamestart")
 		})
 	}
 	
@@ -616,91 +613,91 @@ export const gamescene = () => scene("gamescene", async () => {
 						introAnimations.intro_folderObj()
 						hasStartedGame = true;
 						folderObj.interactable = true
-						ROOT.trigger("gamestart")
+						getTreeRoot().trigger("gamestart")
 					break;
 				}
 			})
 		})
 	}
 	
-	ROOT.on("buy", (info) => {
+	getTreeRoot().on("buy", (info) => {
 		checkForUnlockable()
 	})
 
-	runInTauri(() => {
-		ROOT.on("scoreGained", () => {
-			appWindow.setTitle(`Clickery Hexagon - ${formatNumber(Math.round(GameState.score))} score`)
-		})
+	// runInDesktop(() => {
+	// 	getTreeRoot().on("scoreGained", () => {
+	// 		appWindow.setTitle(`Clickery Hexagon - ${formatNumber(Math.round(GameState.score))} score`)
+	// 	})
 
-		ROOT.on("scoreDecreased", () => {
-			appWindow.setTitle(`Clickery Hexagon - ${formatNumber(Math.round(GameState.score))} score`)
-		})
+	// 	getTreeRoot().on("scoreDecreased", () => {
+	// 		appWindow.setTitle(`Clickery Hexagon - ${formatNumber(Math.round(GameState.score))} score`)
+	// 	})
 
-		// # make it exitable
+	// 	// # make it exitable
 		
-		// from 0 to 5 i guess being seconds	
-		let exitDesire = 0
-		let desireToOpacity = 0
-		let phrase = "" 
+	// 	// from 0 to 5 i guess being seconds	
+	// 	let exitDesire = 0
+	// 	let desireToOpacity = 0
+	// 	let phrase = "" 
 		
-		const goodbyephrases = [
-			"don't go :(",
-			":(",
-			"fine i don't care",
-			"the most difficult part of programming this game\nwas programming a button to leave\nbecause im no good with goobyes"
-		]
+	// 	const goodbyephrases = [
+	// 		"don't go :(",
+	// 		":(",
+	// 		"fine i don't care",
+	// 		"the most difficult part of programming this game\nwas programming a button to leave\nbecause im no good with goobyes"
+	// 	]
 		
-		const backagainphrases = [
-			"good, i missed you",
-			":)",
-			"i knew it",
-			"i knew you'd come back!"
-		]
+	// 	const backagainphrases = [
+	// 		"good, i missed you",
+	// 		":)",
+	// 		"i knew it",
+	// 		"i knew you'd come back!"
+	// 	]
 
-		let drawing = add([layer("mouse"), z(mouse.z + 1)])
-		drawing.onUpdate(() => {
-			let mapped = map(exitDesire, 0, 1.2, 0, 1)
-			desireToOpacity = lerp(desireToOpacity, mapped, 0.1)
-		})
-		drawing.onDraw(() => {
-			drawRect({
-				width: width(),
-				height: height(),
-				fixed: true,
-				pos: vec2(center()),
-				color: BLACK,
-				anchor: "center",
-				opacity: desireToOpacity,
-			})
+	// 	let drawing = add([layer("mouse"), z(mouse.z + 1)])
+	// 	drawing.onUpdate(() => {
+	// 		let mapped = map(exitDesire, 0, 1.2, 0, 1)
+	// 		desireToOpacity = lerp(desireToOpacity, mapped, 0.1)
+	// 	})
+	// 	drawing.onDraw(() => {
+	// 		drawRect({
+	// 			width: width(),
+	// 			height: height(),
+	// 			fixed: true,
+	// 			pos: vec2(center()),
+	// 			color: BLACK,
+	// 			anchor: "center",
+	// 			opacity: desireToOpacity,
+	// 		})
 
-			drawText({
-				text: phrase,
-				fixed: true,
-				size: 30,
-				pos: vec2(center()),
-				color: WHITE,
-				align: "center",
-				anchor: "center",
-				opacity: desireToOpacity,
-			})
-		})
+	// 		drawText({
+	// 			text: phrase,
+	// 			fixed: true,
+	// 			size: 30,
+	// 			pos: vec2(center()),
+	// 			color: WHITE,
+	// 			align: "center",
+	// 			anchor: "center",
+	// 			opacity: desireToOpacity,
+	// 		})
+	// 	})
 
-		onKeyPress("escape", () => phrase = choose(goodbyephrases))
+	// 	onKeyPress("escape", () => phrase = choose(goodbyephrases))
 
-		onKeyDown("escape", () => {
-			exitDesire += dt()
-			if (exitDesire >= 1.2) {
-				appWindow.close()
-				quit()
-				phrase = choose(["goodbye...", "AAAAAAAAAAAAAAAAAAAAAAAA", "...", "i hate you"])
-			}
-		})
+	// 	onKeyDown("escape", () => {
+	// 		exitDesire += dt()
+	// 		if (exitDesire >= 1.2) {
+	// 			appWindow.close()
+	// 			quit()
+	// 			phrase = choose(["goodbye...", "AAAAAAAAAAAAAAAAAAAAAAAA", "...", "i hate you"])
+	// 		}
+	// 	})
 
-		onKeyRelease("escape", () => {
-			phrase = choose(backagainphrases)
-			exitDesire = 0
-		})
-	})
+	// 	onKeyRelease("escape", () => {
+	// 		phrase = choose(backagainphrases)
+	// 		exitDesire = 0
+	// 	})
+	// })
 
 	ng.autoPing(5000)
 

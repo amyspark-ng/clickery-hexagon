@@ -1,5 +1,4 @@
 import { GameObj, Vec2 } from "kaplay"
-import { ROOT } from "../../../main"
 import { curDraggin, drag, setCurDraggin } from "../../plugins/drag"
 import { blendColors, bop } from "../../utils"
 import { playSfx } from "../../../sound"
@@ -49,7 +48,7 @@ interface sliderInterface {
 }
 
 export function addSlider(opts: sliderOpts) : sliderInterface {
-	opts.parent = opts.parent || ROOT
+	opts.parent = opts.parent || getTreeRoot()
 
 	let value = opts.value
 	let previousValue = value
@@ -182,7 +181,7 @@ export function playSliderSound(value:number) {
 }
 
 export function addDefaultButton(position: Vec2, parent: GameObj, sliders: sliderInterface[], defaultValues: number[]) {
-	parent = parent || ROOT
+	parent = parent || getTreeRoot()
 	
 	let winParent = parent.parent;
 
@@ -212,7 +211,7 @@ export function addDefaultButton(position: Vec2, parent: GameObj, sliders: slide
 
 // the parent holds the color it should change  to
 export function addRandomButton(position: Vec2, parent: GameObj, sliders: sliderInterface[]) {
-	parent = parent || ROOT
+	parent = parent || getTreeRoot()
 	
 	let winParent = parent.parent;
 
@@ -243,7 +242,7 @@ export function addRandomButton(position: Vec2, parent: GameObj, sliders: slider
 }
 
 export function addNumbers(position: Vec2, parent: GameObj, objSaveColor: saveColor) {
-	parent = parent || ROOT
+	parent = parent || getTreeRoot()
 
 	let numberStyles = {}
 	

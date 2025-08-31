@@ -1,9 +1,9 @@
 import { GameObj } from "kaplay";
 import { GameState } from "../../../gamestate";
-import { ROOT } from "../../../main";
 import { addTooltip } from "../../additives";
 import { addStoreElement, storeElementsInfo } from "./storeElements";
 import { addUpgrades, isUpgradeBought } from "./upgrades";
+import { WindowGameObj } from "../windows-api/windowManaging";
 
 export let storeElements:any = [];
 
@@ -19,7 +19,7 @@ let clickersElement:any;
 let cursorsElement:any;
 let powerupsElement:any;
 
-export function storeWinContent(winParent:GameObj) {
+export function storeWinContent(winParent:WindowGameObj) {
 	// clickers
 	clickersElement = addStoreElement(winParent, { type: "clickersElement", pos: vec2(0, -128) })
 	addUpgrades(clickersElement)
@@ -62,7 +62,7 @@ export function storeWinContent(winParent:GameObj) {
 					z: winParent.z
 				})
 	
-				let buyClickersEvent = ROOT.on("buy", (data) => {
+				let buyClickersEvent = getTreeRoot().on("buy", (data) => {
 					if (data.type == "clickers") {
 						tooltip.end()
 						buyClickersEvent.cancel()
@@ -79,7 +79,7 @@ export function storeWinContent(winParent:GameObj) {
 					z: winParent.z
 				})
 	
-				let buyCursorsEvent = ROOT.on("buy", (data) => {
+				let buyCursorsEvent = getTreeRoot().on("buy", (data) => {
 					if (data.type == "cursors") {
 						tooltip.end()
 						buyCursorsEvent.cancel()
@@ -96,7 +96,7 @@ export function storeWinContent(winParent:GameObj) {
 					z: winParent.z
 				})
 		
-				let unlockPowerupsEvent = ROOT.on("powerupunlock", () => {
+				let unlockPowerupsEvent = getTreeRoot().on("powerupunlock", () => {
 					tooltip.end()
 					unlockPowerupsEvent.cancel()
 				})
@@ -111,7 +111,7 @@ export function storeWinContent(winParent:GameObj) {
 					z: winParent.z
 				})
 		
-				let buyFirstUpgradeCheck = ROOT.on("buy", (data) => {
+				let buyFirstUpgradeCheck = getTreeRoot().on("buy", (data) => {
 					if (data.element == "upgrade" && data.id == "k_0") {
 						tooltip.end()
 						buyFirstUpgradeCheck.cancel()

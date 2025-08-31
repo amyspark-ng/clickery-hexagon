@@ -2,12 +2,12 @@ import { GameObj, Vec2 } from "kaplay"
 import { getPrice, getVariable, setVariable } from "../utils"
 import { GameState } from "../../gamestate"
 import { addLeaveButton, ascension, leaveButtonSpawnAnim } from "./ascension"
-import { ROOT } from "../../main"
 import { playSfx } from "../../sound"
 import { windowKey } from "../windows/windows-api/windowManaging"
 import { isWindowUnlocked, unlockWindow } from "../unlockables/windowUnlocks"
 import { talk } from "./dialogues"
 import { hoverController } from "../../hoverManaging"
+import { k } from "../../main"
 
 let cardsInfo = {
 	"clickersCard": { 
@@ -155,7 +155,7 @@ function addCard(cardType:string | card, position: Vec2) {
 					let oldType = this.type // get it before it changes
 					flipCard(card, cardTypes()[this.typeIdx - 2])
 
-					let endascensioncheck = ROOT.on("endAscension", () => {
+					let endascensioncheck = getTreeRoot().on("endAscension", () => {
 						wait(1, () => {
 							unlockWindow(oldType.replace("Card", "Win") as windowKey)
 						})
@@ -192,7 +192,7 @@ function addCard(cardType:string | card, position: Vec2) {
 
 				subMana(this.price)
 				playSfx("kaching", { detune: rand(-50, 50) })
-				if (ascension.canLeave == false) {ascension.canLeave = true; ROOT.trigger("canLeaveAscension")}
+				if (ascension.canLeave == false) {ascension.canLeave = true; getTreeRoot().trigger("canLeaveAscension")}
 			},
 
 			startHover() {

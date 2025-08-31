@@ -1,7 +1,6 @@
 import { GameObj } from "kaplay";
 import { GameState } from "../../../gamestate"
-import { ROOT, appWindow } from "../../../main";
-import { runInTauri, toggleTheFullscreen } from "../../utils";
+import { toggleTheFullscreen } from "../../utils";
 import { addCheckbox, addDeleteSaveButton, addMinigame, addSaveButton, addScorePerTimeCounter, addVolumeControl } from "./settingsWinElements"
 
 let volumeControlBG:GameObj;
@@ -40,7 +39,7 @@ export function settingsWinContent(winParent:GameObj) {
 		title: "Fullscreen"
 	}, generalOptionsBG)
 
-	let checkForFullscreen = ROOT.on("checkFullscreen", () => {
+	let checkForFullscreen = getTreeRoot().on("checkFullscreen", () => {
 		if (isFullscreen()) fullscreenCheckbox.turnOn()
 		else fullscreenCheckbox.turnOff()
 		GameState.settings.fullscreen = isFullscreen()
@@ -76,5 +75,5 @@ export function settingsWinContent(winParent:GameObj) {
 		checkForFullscreen.cancel()
 	})
 
-	ROOT.trigger("checkFullscreen")
+	getTreeRoot().trigger("checkFullscreen")
 }

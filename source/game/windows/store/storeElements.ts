@@ -1,7 +1,6 @@
 import { GameObj, Vec2 } from "kaplay"
 import { GameState, scoreManager } from "../../../gamestate"
 import { playSfx } from "../../../sound"
-import { ROOT } from "../../../main"
 import { bop, formatNumber, getPrice, getRandomDirection, getVariable, percentage, randomPos } from "../../utils"
 import { addTooltip } from "../../additives"
 import { allPowerupsInfo, powerupTypes, spawnPowerup } from "../../powerups"
@@ -232,7 +231,7 @@ function lockedPowerupStoreElement(winParent:WindowGameObj) {
 			let index = storeElements.indexOf(copyOfOld)
 			if (index > -1) storeElements[index] = newElement 
 			
-			ROOT.trigger("powerupunlock")
+			getTreeRoot().trigger("powerupunlock")
 			scoreManager.subTweenScore(unlockPrice)
 		},
 	}
@@ -307,7 +306,7 @@ export function addStoreElement(winParent:WindowGameObj, opts:storeElementOpt) {
 					addSmoke(winParent, this)
 				}
 
-				ROOT.trigger("buy", { element: "storeElement", type: opts.type == "clickersElement" ? "clickers" : "cursors", price: this.price })
+				getTreeRoot().trigger("buy", { element: "storeElement", type: opts.type == "clickersElement" ? "clickers" : "cursors", price: this.price })
 			
 				if (opts.type == "powerupsElement") {
 					spawnPowerup({

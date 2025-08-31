@@ -1,6 +1,5 @@
 // # this code is such a mess im sorry
 import { GameState, scoreManager } from "../../gamestate";
-import { ROOT } from "../../main"
 import { hexagon } from "../hexagon"
 import { hexagonIntro } from "../gamescene";
 import { folderObj } from "../windows/windows-api/folderObj";
@@ -14,6 +13,7 @@ import { addTooltip, mouse, tooltipInfo } from "../additives";
 import { GameObj, KEventController } from "kaplay";
 import { formatNumberSimple } from "../utils";
 import { hoverController } from "../../hoverManaging";
+import { k } from "../../main";
 
 export let ascension = {
 	ascending: false,
@@ -74,7 +74,7 @@ export function startAscending() {
 	ascension.ascending = true
 	allPowerupsInfo.canSpawnPowerups = false
 
-	ROOT.trigger("ascension", { score: GameState.score, scoreThisRun: GameState.scoreThisRun })
+	getTreeRoot().trigger("ascension", { score: GameState.score, scoreThisRun: GameState.scoreThisRun })
 	
 	hexagon.interactable = false
 	folderObj.interactable = false
@@ -162,7 +162,7 @@ export function startAscending() {
 				let endAscensionChecker:KEventController
 				wait(0.1, () => {
 					cancelDialogueChecker = dialogue.box.on("talk", () => {sfx.stop(); cancelDialogueChecker.cancel()})
-					endAscensionChecker = ROOT.on("endAscension", () => {sfx.stop(); endAscensionChecker.cancel()})
+					endAscensionChecker = getTreeRoot().on("endAscension", () => {sfx.stop(); endAscensionChecker.cancel()})
 				})
 			}
 			
@@ -173,7 +173,7 @@ export function startAscending() {
 				let endAscensionChecker:KEventController
 				wait(0.1, () => {
 					cancelDialogueChecker = dialogue.box.on("talk", () => {sfx.stop(); cancelDialogueChecker.cancel()})
-					endAscensionChecker = ROOT.on("endAscension", () => {sfx.stop(); endAscensionChecker.cancel()})
+					endAscensionChecker = getTreeRoot().on("endAscension", () => {sfx.stop(); endAscensionChecker.cancel()})
 				})
 			}
 		})
@@ -204,7 +204,7 @@ export function endAscension() {
 	GameState.stats.timesAscended++
 	folderObj.interactable = true
 	hexagon.interactable = true
-	ROOT.trigger("endAscension")
+	getTreeRoot().trigger("endAscension")
 	allPowerupsInfo.canSpawnPowerups = true
 	ascension.ascending = false
 

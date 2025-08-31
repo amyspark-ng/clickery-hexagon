@@ -1,16 +1,13 @@
-import { Color, GameObj, ScaleComp, Vec2 } from "kaplay";
+import { Color, GameObj, Vec2 } from "kaplay";
 import { _GameState, GameState, saveColor, scoreManager } from "../gamestate";
 import { addToast, mouse } from "./additives";
 import { autoLoopTime, cam, triggerGnome } from "./gamescene";
 import { hexagon } from "./hexagon";
-import { achievements, getAchievement, isAchievementUnlocked, lockAchievement, unlockAchievement } from "./unlockables/achievements";
-import { allObjWindows, openWindow } from "./windows/windows-api/windowManaging";
-import { allPowerupsInfo, powerupTypes, spawnPowerup } from "./powerups";
+import { achievements, getAchievement, lockAchievement, unlockAchievement } from "./unlockables/achievements";
+import { openWindow } from "./windows/windows-api/windowManaging";
+import { allPowerupsInfo, spawnPowerup } from "./powerups";
 import { playSfx } from "../sound";
-import { ascension } from "./ascension/ascension";
 import { unlockWindow } from "./unlockables/windowUnlocks";
-import { mageDialogues } from "./ascension/dialogues";
-import { appWindow, DEBUG } from "../main";
 
 // definetely not stack overflow
 // dots are always for thousands, leave it like this
@@ -530,19 +527,9 @@ export function debugFunctions() {
 	})
 }
 
-/**
- * This function is used to run a function that will only run if you're on Tauri (desktop)
- */
-export function runInTauri(func: () => void): void {
-	if ("__TAURI_INTERNALS__" in window) {
-		func();
-	}
-}
-
 export function toggleTheFullscreen(newFullscreen?:boolean) {
 	newFullscreen = newFullscreen ?? !GameState.settings.fullscreen
 	GameState.settings.fullscreen = newFullscreen
 	setFullscreen(GameState.settings.fullscreen)
-	runInTauri(() => appWindow.setFullscreen(GameState.settings.fullscreen))
 	return GameState.settings.fullscreen;
 }

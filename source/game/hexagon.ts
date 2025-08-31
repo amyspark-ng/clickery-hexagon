@@ -8,7 +8,6 @@ import { addPlusScoreText, getClicksFromCombo, increaseCombo, maxComboAnim, star
 import { addConfetti } from "./plugins/confetti.js";
 import { cam } from "./gamescene.ts";
 import { checkForUnlockable, isAchievementUnlocked, unlockAchievement } from "./unlockables/achievements.ts";
-import { ROOT } from "../main.ts";
 import { mouse } from "./additives.ts";
 import { isWindowUnlocked } from "./unlockables/windowUnlocks.ts";
 import { hoverController } from "../hoverManaging.ts";
@@ -497,7 +496,7 @@ function createHexagon() {
 		}
 	})
 
-	ROOT.on("scoreGained", (amount) => {
+	getTreeRoot().on("scoreGained", (amount) => {
 		checkForUnlockable()
 	})
 

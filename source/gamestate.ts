@@ -2,9 +2,10 @@ import ng from "newgrounds.js"
 import { clickVars } from "./game/hexagon"
 import { powerupTypes } from "./game/powerups"
 import { percentage, saveAnim } from "./game/utils"
-import { GAME_VERSION, ROOT } from "./main"
 import { ngEnabled, ngUser } from "./newgrounds"
 import { musicHandler, stopAllSounds } from "./sound"
+
+export const GAME_VERSION = "1.2.3"
 
 export function deepMergeSaves(oldSave:_GameState, newSave:_GameState) : _GameState {
     const result:any = { ...oldSave }; // Start with a shallow copy of the old save
@@ -228,22 +229,22 @@ class _scoreManager {
 		GameState.score += amount
 		GameState.scoreThisRun += amount
 		GameState.scoreAllTime += amount
-		ROOT.trigger("scoreGained", amount)
+		getTreeRoot().trigger("scoreGained", amount)
 	}
 
 	// used usually when buying
 	subTweenScore(amount:number) {
 		// GameState.score -= amount
-		ROOT.trigger("scoreDecreased", amount)
+		getTreeRoot().trigger("scoreDecreased", amount)
 		tween(GameState.score, GameState.score - amount, 0.32, (p) => GameState.score = p, easings.easeOutExpo).onEnd(() => {
-			ROOT.trigger("scoreDecreased", amount)
+			getTreeRoot().trigger("scoreDecreased", amount)
 		})
 	}
 
 	addTweenScore(amount:number) {
-		ROOT.trigger("scoreIncreased", amount)
+		getTreeRoot().trigger("scoreIncreased", amount)
 		tween(GameState.score, GameState.score + amount, 0.32, (p) => GameState.score = p, easings.easeOutExpo).onEnd(() => {
-			ROOT.trigger("scoreIncreased", amount)
+			getTreeRoot().trigger("scoreIncreased", amount)
 		})
 		GameState.scoreThisRun += amount
 		GameState.scoreAllTime += amount

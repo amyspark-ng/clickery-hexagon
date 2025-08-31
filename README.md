@@ -5,6 +5,8 @@ Clicker/Idle game where you click an hexagon to make virtual numbers go up until
 
 Made in [KAPLAY](https://kaplayjs.com)
 
+You can read the changelog in: [here](/assets/CHANGELOG.md)
+
 ## CREDITS:
 - [AmySparK](https://amyspark-ng.github.io) - Code
 - [DevkyRD](https://twitter.com/devkyRD) - Art & Design

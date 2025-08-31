@@ -2,7 +2,6 @@ import { bop, getPositionOfSide, swap } from "../../utils.ts";
 import { mouse } from "../../additives.ts";
 import { drag, curDraggin, setCurDraggin } from "../.././plugins/drag.ts";
 import { playSfx } from "../../../sound.ts";
-import { ROOT } from "../../../main.ts";
 import { folderObj } from "./folderObj.ts";
 
 // window contents
@@ -312,7 +311,7 @@ export function openWindow(windowKey:windowKey) {
 		drawShadowEvent.cancel()
 	})
 
-	ROOT.trigger("winOpen", windowKey as windowKey)
+	getTreeRoot().trigger("winOpen", windowKey as windowKey)
 
 	return windowObj;
 }

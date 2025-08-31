@@ -3,29 +3,20 @@
   "description": "A simple clicker game",
   "type": "module",
   "scripts": {
-    "dev": "nodemon --exec esbuild --bundle source/main.ts --sourcemap --outfile=public/game.js --servedir=./public",
-    "build": "esbuild --bundle source/main.ts --outfile=public/game.js",
-    "desktop:dev": "tauri dev",
-    "desktop:build": "tauri build",
-    "android:dev": "tauri android dev",
-    "android:build": "tauri android build",
-    "tauri": "tauri",
-    "old:dev": "esbuild --bundle source/main.ts --sourcemap --outfile=public/game.js --servedir=./public"
-  },
-  "nodemonConfig": {
-    "ignore": [
-      "public/*"
-    ]
+    "dev": "vite",
+    "build": "vite build",
+    "check": "tsc --noEmit"
   },
   "dependencies": {
-    "@tauri-apps/api": "2.0.0-rc.4",
-    "@tauri-apps/plugin-fs": "2.0.0-rc.2",
     "kaplay": "3001.0.0",
     "newgrounds.js": "^4.1.1"
   },
   "devDependencies": {
-    "@tauri-apps/cli": "2.0.2",
-    "esbuild": "^0.20.2",
-    "nodemon": "^3.1.7"
+    "dprint": "^0.50.0",
+    "esbuild": "^0.25.5",
+    "terser": "^5.32.0",
+    "typescript": "^5.6.2",
+    "vite": "^7.1.3",
+    "vite-plugin-singlefile": "^2.0.2"
   }
 }
