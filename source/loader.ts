@@ -100,28 +100,27 @@ else onLoading((progress) => drawSeriousLoadScreen(progress));
 // load changelog
 load(
 	new Promise(async (resolve, reject) => {
-		CHANGELOG = await (await fetch("assets/CHANGELOG.md")).text();
+		CHANGELOG = await (await fetch("CHANGELOG.md")).text();
 		resolve(CHANGELOG);
 	}),
 );
 
-loadFont("emulogic", "assets/emulogic.ttf", {
+loadFont("emulogic", "emulogic.ttf", {
 	outline: 10,
 	filter: "linear",
 });
 
-loadFont("lambdao", "assets/Lambda-Regular.ttf", {
+loadFont("lambdao", "Lambda-Regular.ttf", {
 	outline: 5,
 	filter: "linear",
 });
 
-loadFont("lambda", "assets/Lambda-Regular.ttf", {
+loadFont("lambda", "Lambda-Regular.ttf", {
 	filter: "linear",
 });
 
 loadBean();
 
-loadRoot("assets/");
 loadSprite("devky", "devky.png");
 loadSprite("hexagon", "sprites/hexagon.png");
 
