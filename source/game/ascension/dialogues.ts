@@ -4,32 +4,32 @@ import { ascension } from "./ascension";
 import { playSfx } from "../../sound";
 import { isClickeryBirthday } from "../../globals";
 
-const defaultTalkingSpeed = 0.025
-const someVowels = ["a", "e", "o", "i"] 
+const defaultTalkingSpeed = 0.025;
+const someVowels = ["a", "e", "o", "i"];
 
 class Dialogue {
 	/**
-	 * The key of the dialogue (back1, back2, etc) 
+	 * The key of the dialogue (back1, back2, etc)
 	 */
-	key:string;
+	key: string;
 	/**
 	 * The text of the dialogue
 	 */
-	text:string;
+	text: string;
 	/**
 	 * The speed of the dialogue
 	 */
-	speed?:number;
+	speed?: number;
 	/**
 	 * Wheter the dialogue is a random one that has no continuing or if it's something like tutorial
 	 */
 	extra?: boolean;
 
-	constructor(key:string, text:string, extra?:boolean, speed?:number) {
-		this.key = key
-		this.text = text
-		this.extra = extra || false
-		this.speed = speed || defaultTalkingSpeed // 1 is extremly slow remember that
+	constructor(key: string, text: string, extra?: boolean, speed?: number) {
+		this.key = key;
+		this.text = text;
+		this.extra = extra || false;
+		this.speed = speed || defaultTalkingSpeed; // 1 is extremly slow remember that
 	}
 }
 
@@ -51,68 +51,68 @@ export const mageDialogues = [
 	new Dialogue("eye5", "How would YOU like your eye getting clicked", true),
 	new Dialogue("eye6", "...", true),
 	new Dialogue("eye7", "Ok", true),
-	
+
 	new Dialogue("hex1", "No backsies", true),
 	new Dialogue("hex2", "Mine now", true),
 	new Dialogue("hex3", "I want to play with it :(", true),
 	new Dialogue("hex4", "I'm not giving this back", true),
 	new Dialogue("hex5", "Pick a card", true),
 	new Dialogue("hex6", "Stop it", true),
-	
+
 	new Dialogue("back1", "Welcome back...", true),
 	new Dialogue("back2", "Here again?", true),
 	new Dialogue("back2", "Not busy it seems", true),
 	new Dialogue("back3", "Really putting in the work, huh?", true),
 	new Dialogue("back4", "Another one", true),
-	
+
 	new Dialogue("fun1", "Fun fact: Hexagons have 6 (six) sides", true),
 	new Dialogue("fun2", "Welcome to fortnite", true),
 	new Dialogue("fun3", "Cold, so cold...", true),
 	new Dialogue("fun4", "Find my obituaries", true),
 	new Dialogue("fun5", `"Gimmicking" your hexagon?`, true),
 	new Dialogue("fun6", "Tasty hexa-gone, none for you", true),
-	
+
 	new Dialogue("fun7", "Gotta click them all", true),
 	new Dialogue("fun8", "Hum... Hum...", true, 0.1),
 	new Dialogue("fun9", "Y U M M E R S", true, 0.1),
-]
+];
 
 if (isClickeryBirthday) {
 	mageDialogues.push(...[
 		new Dialogue("fun10", "I found this cool hat on the ground", true),
 		new Dialogue("fun11", "Want some cake?", true),
 		new Dialogue("fun12", "I got the sense i've been trapped here for a long time", true, 0.05),
-	])
+	]);
 }
 
-export const yummersKey = mageDialogues.find(dialogue => dialogue.text == "Y U M M E R S").key
-export const humKey = mageDialogues.find(dialogue => dialogue.text == "Hum... Hum...").key
+export const yummersKey = mageDialogues.find(dialogue => dialogue.text == "Y U M M E R S").key;
+export const humKey = mageDialogues.find(dialogue => dialogue.text == "Hum... Hum...").key;
 
-export function getDialogue(key:string) : Dialogue {
-	return mageDialogues[mageDialogues.indexOf(mageDialogues.filter(dialogue => dialogue.key === key)[0])]
+export function getDialogue(key: string): Dialogue {
+	return mageDialogues[mageDialogues.indexOf(mageDialogues.filter(dialogue => dialogue.key === key)[0])];
 }
 
-type dialogueType = "tutorial" | "eye" | "hex" | "back" | "fun"
+type dialogueType = "tutorial" | "eye" | "hex" | "back" | "fun";
 
 /**
  * Gets a random
  * @param generalType eg: tutorial, eye, hex
- * @returns A random dialogue corresponding to the key 
+ * @returns A random dialogue corresponding to the key
  */
-export function getRandomDialogue(generalType:dialogueType) : Dialogue {
-	const arrayOfDialoguesWithThatType = mageDialogues.filter(dialogue => dialogue.key.includes(generalType))
-	return getRandomElementDifferentFrom(arrayOfDialoguesWithThatType, ascension.currentDialoguekey)
+export function getRandomDialogue(generalType: dialogueType): Dialogue {
+	const arrayOfDialoguesWithThatType = mageDialogues.filter(dialogue => dialogue.key.includes(generalType));
+	return getRandomElementDifferentFrom(arrayOfDialoguesWithThatType, ascension.currentDialoguekey);
 }
 
 export function startDialoguing() {
-	dialogue = add([])
-	dialogue.box = addDialogueBox()
-	dialogue.textBox = addDialogueText()
+	dialogue = add([]);
+	dialogue.box = addDialogueBox();
+	dialogue.textBox = addDialogueText();
 }
 
 function playerReadAction() {
-	if (dialogue.textBox.text != currentlySaying) skipTalk()
-	else continueDialogue(ascension.currentDialoguekey)
+	if (dialogue.textBox.text != currentlySaying) skipTalk();
+	else continueDialogue(ascension.currentDialoguekey);
 }
 
 function addDialogueBox() {
@@ -128,35 +128,34 @@ function addDialogueBox() {
 		"textbox",
 		{
 			defaultPos: vec2(623, 144),
-		}
-	])
+		},
+	]);
 
 	box.on("talk", (speaker) => {
 		if (speaker == "card") {
-			box.use(sprite("hoverDialogue"))
-			tween(box.defaultPos.y + 10, box.defaultPos.y, 0.25, (p) => box.pos.y = p, easings.easeOutQuint)
+			box.use(sprite("hoverDialogue"));
+			tween(box.defaultPos.y + 10, box.defaultPos.y, 0.25, (p) => box.pos.y = p, easings.easeOutQuint);
 		}
-		
 		else if (speaker == "mage") {
-			box.use(sprite("dialogue"))
-			tween(box.defaultPos.x - 10, box.defaultPos.x, 0.25, (p) => box.pos.x = p, easings.easeOutQuint)
+			box.use(sprite("dialogue"));
+			tween(box.defaultPos.x - 10, box.defaultPos.x, 0.25, (p) => box.pos.x = p, easings.easeOutQuint);
 		}
 
-		tween(0.75, 1, 0.25, (p) => box.scale.x = p, easings.easeOutQuint)
-	})
+		tween(0.75, 1, 0.25, (p) => box.scale.x = p, easings.easeOutQuint);
+	});
 
 	box.onClick(() => {
-		playerReadAction()
-	})
+		playerReadAction();
+	});
 
 	box.onKeyPress(["space", "enter"], () => {
-		playerReadAction()
-	})
+		playerReadAction();
+	});
 
-	tween(0.5, 1, 0.25, (p) => box.scale.x = p, easings.easeOutQuint)
-	tween(0, 1, 0.25, (p) => box.opacity = p, easings.easeOutQuint)
+	tween(0.5, 1, 0.25, (p) => box.scale.x = p, easings.easeOutQuint);
+	tween(0, 1, 0.25, (p) => box.opacity = p, easings.easeOutQuint);
 
-	return box
+	return box;
 }
 
 function addDialogueText() {
@@ -179,42 +178,42 @@ function addDialogueText() {
 		z(dialogue.box.z + 1),
 		"textbox",
 		"boxText",
-	])
+	]);
 
-	return textBox
+	return textBox;
 }
 
-let activeLetterWaits = []
-let currentlySaying = ""
+let activeLetterWaits = [];
+let currentlySaying = "";
 
-export let dialogue:GameObj;
+export let dialogue: GameObj;
 
 /**
  * Holds the current onEnd function, when you talk and set a new onEnd it gets modified
  */
-let currentOnEnd = () => {}
+let currentOnEnd = () => {};
 
-export function talk(speaker:"mage" | "card", thingToSay:string, speed?:number, onEnd?:() => void) {
-	if (!onEnd) currentOnEnd = () => {}
-	else currentOnEnd = onEnd
+export function talk(speaker: "mage" | "card", thingToSay: string, speed?: number, onEnd?: () => void) {
+	if (!onEnd) currentOnEnd = () => {};
+	else currentOnEnd = onEnd;
 
-	dialogue.box.trigger("talk", speaker, thingToSay)
+	dialogue.box.trigger("talk", speaker, thingToSay);
 
-	speaker = speaker || "card"
-	thingToSay = thingToSay || "No dialogue, missing a dialogue here"
-	speed = speed || 0.025
-	
-	if (currentlySaying == thingToSay) speed /= 2
-	currentlySaying = thingToSay
+	speaker = speaker || "card";
+	thingToSay = thingToSay || "No dialogue, missing a dialogue here";
+	speed = speed || 0.025;
+
+	if (currentlySaying == thingToSay) speed /= 2;
+	currentlySaying = thingToSay;
 
 	activeLetterWaits.forEach(waitCall => waitCall.cancel());
 	activeLetterWaits = [];
-	dialogue.textBox.text = ""
+	dialogue.textBox.text = "";
 
-	let currentDelay = 0
+	let currentDelay = 0;
 	Array.from(thingToSay).forEach((letter, index) => {
 		let delay = speed;
-		if (letter === ',' || letter === "_") {
+		if (letter === "," || letter === "_") {
 			delay = speed * 5; // Adjust the multiplier as needed for commas and spaces
 		}
 
@@ -226,22 +225,22 @@ export function talk(speaker:"mage" | "card", thingToSay:string, speed?:number, 
 
 			if (speaker == "mage") {
 				if (!(thingToSay == "Y U M M E R S" || thingToSay == "Hum... Hum...")) {
-					const vowel = chance(0.5) ? choose(someVowels) : "e"
-					playSfx(`mage_${vowel}`, { detune: rand(-150, 150) }); 
+					const vowel = chance(0.5) ? choose(someVowels) : "e";
+					playSfx(`mage_${vowel}`, { detune: rand(-150, 150) });
 				}
 			}
-			
+
 			if (index == thingToSay.length - 1) {
 				// i have to search in magedialogues for thingToSay and get its key
 
-				let dialogueKey:string = undefined
+				let dialogueKey: string = undefined;
 				mageDialogues.forEach(dialogue => {
-					if (dialogue.text == thingToSay) dialogueKey = dialogue.key
-				})
-				if (dialogueKey == undefined) dialogueKey = null
+					if (dialogue.text == thingToSay) dialogueKey = dialogue.key;
+				});
+				if (dialogueKey == undefined) dialogueKey = null;
 
-				dialogue.box.trigger("dialogueEnd", dialogueKey)
-				currentOnEnd()
+				dialogue.box.trigger("dialogueEnd", dialogueKey);
+				currentOnEnd();
 			}
 		});
 
@@ -253,60 +252,58 @@ export function talk(speaker:"mage" | "card", thingToSay:string, speed?:number, 
  * Will get a new dialogue based on the one you pass
  * @param dialogueKey The dialogueType with the number (the key) eg: "tutorial4"
  */
-function continueDialogue(dialogueKey:string) {
+function continueDialogue(dialogueKey: string) {
 	// this is the original dialogue, the one it's coming from
 	let currentDialogue = getDialogue(dialogueKey);
 
 	/**
 	 * Is the new dialogue, the one that will be played, the continued one
 	 */
-	let thePlayedNewDialogue:Dialogue = null;
+	let thePlayedNewDialogue: Dialogue = null;
 
 	if (currentDialogue.extra == true) {
-		let dialogueType = removeNumbersOfString(dialogueKey)
-		let newRandDialogue = getRandomDialogue(dialogueType as dialogueType)
+		let dialogueType = removeNumbersOfString(dialogueKey);
+		let newRandDialogue = getRandomDialogue(dialogueType as dialogueType);
 
 		if (currentDialogue.key.includes("back")) {
 			// you already welcomed, move on
-			dialogueType = "fun"
-			newRandDialogue = getRandomDialogue(dialogueType as dialogueType)
+			dialogueType = "fun";
+			newRandDialogue = getRandomDialogue(dialogueType as dialogueType);
 		}
-		
-		thePlayedNewDialogue = newRandDialogue
-		ascension.currentDialoguekey = thePlayedNewDialogue.key
-	}
 
+		thePlayedNewDialogue = newRandDialogue;
+		ascension.currentDialoguekey = thePlayedNewDialogue.key;
+	}
 	// serious dialogue
 	else {
-		let tutorialDialoguesKeys = mageDialogues.map(dialogue => dialogue.key).filter(key => key.includes("tutorial"))
-		let index = tutorialDialoguesKeys.findIndex(key => key == dialogueKey)
-		let nextDialogueKey = tutorialDialoguesKeys[index + 1]
+		let tutorialDialoguesKeys = mageDialogues.map(dialogue => dialogue.key).filter(key => key.includes("tutorial"));
+		let index = tutorialDialoguesKeys.findIndex(key => key == dialogueKey);
+		let nextDialogueKey = tutorialDialoguesKeys[index + 1];
 
 		if (nextDialogueKey != undefined) {
-			thePlayedNewDialogue = getDialogue(nextDialogueKey)
-			ascension.currentDialoguekey = thePlayedNewDialogue.key
+			thePlayedNewDialogue = getDialogue(nextDialogueKey);
+			ascension.currentDialoguekey = thePlayedNewDialogue.key;
 		}
-
 		// the continuated dialogue is over, play a random one
 		else {
 			// are extra but no specific ones like the eye, hex or back
-			let extraDialogueKeys = mageDialogues.map(dialogue => dialogue.key).filter(key => key.includes("fun"))
-			let nextDialogueKey = getRandomElementDifferentFrom(extraDialogueKeys,  ascension.currentDialoguekey) 
-			
-			thePlayedNewDialogue = getDialogue(nextDialogueKey)
-			ascension.currentDialoguekey = thePlayedNewDialogue.key
+			let extraDialogueKeys = mageDialogues.map(dialogue => dialogue.key).filter(key => key.includes("fun"));
+			let nextDialogueKey = getRandomElementDifferentFrom(extraDialogueKeys, ascension.currentDialoguekey);
+
+			thePlayedNewDialogue = getDialogue(nextDialogueKey);
+			ascension.currentDialoguekey = thePlayedNewDialogue.key;
 		}
 	}
 
-	talk("mage", thePlayedNewDialogue.text, thePlayedNewDialogue.speed)
+	talk("mage", thePlayedNewDialogue.text, thePlayedNewDialogue.speed);
 }
 
 function skipTalk() {
 	activeLetterWaits.forEach(waitCall => waitCall.cancel());
-	dialogue.textBox.text = currentlySaying
-	tween(dialogue.box.defaultPos.y + 10, dialogue.box.defaultPos.y, 0.25, (p) => dialogue.box.pos.y = p, easings.easeOutQuint)
-	tween(dialogue.box.defaultPos.x + 10, dialogue.box.defaultPos.x, 0.25, (p) => dialogue.box.pos.x = p, easings.easeOutQuint)
-	
-	currentOnEnd()
-	dialogue.box.trigger("dialogueEnd", ascension.currentDialoguekey)
+	dialogue.textBox.text = currentlySaying;
+	tween(dialogue.box.defaultPos.y + 10, dialogue.box.defaultPos.y, 0.25, (p) => dialogue.box.pos.y = p, easings.easeOutQuint);
+	tween(dialogue.box.defaultPos.x + 10, dialogue.box.defaultPos.x, 0.25, (p) => dialogue.box.pos.x = p, easings.easeOutQuint);
+
+	currentOnEnd();
+	dialogue.box.trigger("dialogueEnd", ascension.currentDialoguekey);
 }

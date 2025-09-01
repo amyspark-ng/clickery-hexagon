@@ -1,26 +1,26 @@
 import { OpacityComp, SpriteComp, Vec2 } from "kaplay";
-import { playSfx } from "../sound"
-import { cam } from "./gamescene"
-import { COMBO_MINCLICKS, COMBO_MAX, COMBO_MAXCLICKS, clickVars } from "./hexagon"
+import { playSfx } from "../sound";
+import { cam } from "./gamescene";
+import { clickVars, COMBO_MAX, COMBO_MAXCLICKS, COMBO_MINCLICKS } from "./hexagon";
 import { scoreText, spsText } from "./uicounters";
 import { blendColors, formatNumber, insertAtStart, randomPos } from "./utils";
 import { spawnPowerup } from "./powerups";
 import { GameState, scoreManager } from "../gamestate";
 
-export function getClicksFromCombo(level:number) {
-	return Math.round(map(level, 2, COMBO_MAX, COMBO_MINCLICKS, COMBO_MAXCLICKS))
+export function getClicksFromCombo(level: number) {
+	return Math.round(map(level, 2, COMBO_MAX, COMBO_MINCLICKS, COMBO_MAXCLICKS));
 }
 
-export function getComboFromClicks(clicks:number) {
-	return Math.round(map(clicks, COMBO_MINCLICKS, COMBO_MAXCLICKS, 2, COMBO_MAX))
+export function getComboFromClicks(clicks: number) {
+	return Math.round(map(clicks, COMBO_MINCLICKS, COMBO_MAXCLICKS, 2, COMBO_MAX));
 }
 
 export let comboBarContent;
-export let maxContentWidth = 0
+export let maxContentWidth = 0;
 
 export function addComboBar() {
-	let targetPos = vec2(0, scoreText.height / 2 + scoreText.height / 4 - 6)
-	
+	let targetPos = vec2(0, scoreText.height / 2 + scoreText.height / 4 - 6);
+
 	let barFrame = scoreText.add([
 		rect(scoreText.width, scoreText.height / 4, { fill: false, radius: 5 }),
 		pos(targetPos.x, scoreText.y),
@@ -33,14 +33,14 @@ export function addComboBar() {
 		"comboBar",
 		{
 			update() {
-				this.width = lerp(this.width, scoreText.width, 0.25)
-				maxContentWidth = this.width
-			}
-		}
-	])
+				this.width = lerp(this.width, scoreText.width, 0.25);
+				maxContentWidth = this.width;
+			},
+		},
+	]);
 
-	barFrame.fadeIn(0.5)
-	tween(barFrame.pos.y, targetPos.y, 0.5, (p) => barFrame.pos.y = p, easings.easeOutQuint)
+	barFrame.fadeIn(0.5);
+	tween(barFrame.pos.y, targetPos.y, 0.5, (p) => barFrame.pos.y = p, easings.easeOutQuint);
 
 	let barFrameBg = scoreText.onDraw(() => {
 		drawRect({
@@ -51,12 +51,12 @@ export function addComboBar() {
 			opacity: barFrame.opacity * 0.28,
 			radius: 5,
 			color: BLACK,
-		})
-	})
+		});
+	});
 
 	barFrame.onDestroy(() => {
-		barFrameBg.cancel()
-	})
+		barFrameBg.cancel();
+	});
 
 	comboBarContent = scoreText.add([
 		rect(0, barFrame.height, { radius: 5 }),
@@ -70,53 +70,52 @@ export function addComboBar() {
 		{
 			update() {
 				if (!clickVars.constantlyClicking) {
-					if (clickVars.consecutiveClicks > 0) clickVars.consecutiveClicks -= 0.75
-					scoreManager.combo = getComboFromClicks(clickVars.consecutiveClicks)
-					if (this.width < maxContentWidth / 2) clickVars.maxedCombo = false
+					if (clickVars.consecutiveClicks > 0) clickVars.consecutiveClicks -= 0.75;
+					scoreManager.combo = getComboFromClicks(clickVars.consecutiveClicks);
+					if (this.width < maxContentWidth / 2) clickVars.maxedCombo = false;
 				}
-
 				else {
-					clickVars.consecutiveClicks = Math.round(clickVars.consecutiveClicks)
+					clickVars.consecutiveClicks = Math.round(clickVars.consecutiveClicks);
 				}
 
-				let mappedWidth = map(clickVars.consecutiveClicks, COMBO_MINCLICKS, COMBO_MAXCLICKS, 0, maxContentWidth)
-				this.width = lerp(this.width, mappedWidth, 0.25)
-				this.width = clamp(this.width, 0, maxContentWidth - 2)
-				
+				let mappedWidth = map(clickVars.consecutiveClicks, COMBO_MINCLICKS, COMBO_MAXCLICKS, 0, maxContentWidth);
+				this.width = lerp(this.width, mappedWidth, 0.25);
+				this.width = clamp(this.width, 0, maxContentWidth - 2);
+
 				// # player "gave up"
 				if (this.width == 0 && !clickVars.constantlyClicking && clickVars.comboDropped == false) {
-					dropCombo()
+					dropCombo();
 				}
 
-				let blendFactor = map(scoreManager.combo, 1, COMBO_MAX, 0, 1)
+				let blendFactor = map(scoreManager.combo, 1, COMBO_MAX, 0, 1);
 				this.color = blendColors(
 					WHITE,
 					hsl2rgb((time() * 0.2 * 0.1) % 1, 1.5, 0.8),
-					blendFactor
-				)
+					blendFactor,
+				);
 
-				this.pos.x = barFrame.pos.x - barFrame.width / 2
-				this.pos.y = barFrame.pos.y
-			}
-		}
-	])
-	comboBarContent.fadeIn(0.25)
+				this.pos.x = barFrame.pos.x - barFrame.width / 2;
+				this.pos.y = barFrame.pos.y;
+			},
+		},
+	]);
+	comboBarContent.fadeIn(0.25);
 
 	// when combo starts the spsText y pos should change to accomodate it
-	tween(spsText.pos.y, spsText.barYPos, 0.5, (p) => spsText.pos.y = p, easings.easeOutQuint)
+	tween(spsText.pos.y, spsText.barYPos, 0.5, (p) => spsText.pos.y = p, easings.easeOutQuint);
 
 	return barFrame;
 }
 
 type plusScoreOpts = {
-	pos: Vec2,
-	value:number,
-	cursorRelated:boolean,
-}
-export function addPlusScoreText(opts:plusScoreOpts) {
-	let size:number[];
-	if (!opts.cursorRelated) size = [40, 50]
-	else size = [32.5, 40]
+	pos: Vec2;
+	value: number;
+	cursorRelated: boolean;
+};
+export function addPlusScoreText(opts: plusScoreOpts) {
+	let size: number[];
+	if (!opts.cursorRelated) size = [40, 50];
+	else size = [32.5, 40];
 	let textBlendFactor = 0;
 
 	let plusScoreText = add([
@@ -126,17 +125,17 @@ export function addPlusScoreText(opts:plusScoreOpts) {
 			styles: {
 				"small": {
 					scale: vec2(0.8),
-					pos: vec2(0, 4)
+					pos: vec2(0, 4),
 				},
 				"combo": (idx) => ({
 					color: blendColors(
 						WHITE,
 						hsl2rgb((time() * 0.2 + idx * 0.1) % 1, 0.7, 0.8),
-						textBlendFactor
+						textBlendFactor,
 					),
 					pos: vec2(0, wave(-4, 4, time() * 6 + idx * 0.5)),
-				})
-			}
+				}),
+			},
 		}),
 		opacity(1),
 		pos(opts.pos),
@@ -149,26 +148,26 @@ export function addPlusScoreText(opts:plusScoreOpts) {
 		"plusScoreText",
 		{
 			update() {
-				if (opts.cursorRelated) return
-				textBlendFactor = map(scoreManager.combo, 1, COMBO_MAX, 0, 1)
-			}
-		}
-	])
+				if (opts.cursorRelated) return;
+				textBlendFactor = map(scoreManager.combo, 1, COMBO_MAX, 0, 1);
+			},
+		},
+	]);
 
-	plusScoreText.text = `+${formatNumber(opts.value)}`
+	plusScoreText.text = `+${formatNumber(opts.value)}`;
 	if (scoreManager.combo > 1 && !opts.cursorRelated) {
 		function addStyleToText(str: string, tag: string) {
 			// if the str is something like "hello world" and the tag is something like "combo"
 			// then it should return something like "[combo]hello world[/combo]"
 			return insertAtStart(str, `[${tag}]`) + `[/${tag}]`;
 		}
-		
-		plusScoreText.text = addStyleToText(plusScoreText.text, "combo")
+
+		plusScoreText.text = addStyleToText(plusScoreText.text, "combo");
 		// if (scoreManager.combo > 1) plusScoreText.text += `x${Math.floor(scoreManager.combo)}`
 	}
-	
-	plusScoreText.pos.x = opts.pos.x + 2
-	plusScoreText.pos.y = opts.pos.y - 18
+
+	plusScoreText.pos.x = opts.pos.x + 2;
+	plusScoreText.pos.y = opts.pos.y - 18;
 
 	// animate plusscoretext
 	tween(
@@ -192,13 +191,13 @@ export function addPlusScoreText(opts:plusScoreOpts) {
 			(p) => plusScoreText.opacity = p,
 		);
 	});
-	
+
 	wait(0.25, () => {
 		destroy(plusScoreText);
 	});
 
-	if (plusScoreText.pos.x > opts.pos.x) plusScoreText.anchor = "left"
-	else plusScoreText.anchor = "right"
+	if (plusScoreText.pos.x > opts.pos.x) plusScoreText.anchor = "left";
+	else plusScoreText.anchor = "right";
 
 	if (scoreManager.combo > 1 && !opts.cursorRelated) {
 		// let totalScore = plusScoreText.add([
@@ -223,7 +222,7 @@ export function addPlusScoreText(opts:plusScoreOpts) {
 }
 
 export function increaseComboText() {
-	let blendFactor = 0
+	let blendFactor = 0;
 	let incComboText = add([
 		text(`[combo]x${scoreManager.combo}[/combo]`, {
 			font: "lambdao",
@@ -235,10 +234,10 @@ export function increaseComboText() {
 					color: blendColors(
 						WHITE,
 						hsl2rgb((time() * 0.2 + idx * 0.1) % 1, 0.7, 0.8),
-						blendFactor
+						blendFactor,
 					),
-				})
-			}
+				}),
+			},
 		}),
 		pos(mousePos().x, mousePos().y - 80),
 		scale(),
@@ -247,24 +246,24 @@ export function increaseComboText() {
 		color(),
 		{
 			update() {
-				this.pos.y -= 0.5
-				blendFactor = map(scoreManager.combo, 0, COMBO_MAX, 0, 1)
-			}
-		}
-	])
+				this.pos.y -= 0.5;
+				blendFactor = map(scoreManager.combo, 0, COMBO_MAX, 0, 1);
+			},
+		},
+	]);
 
-	let timeToDie = 2
+	let timeToDie = 2;
 	tween(0.5, 1, 0.1, (p) => incComboText.opacity = p, easings.easeOutQuint).onEnd(() => {
-		tween(incComboText.opacity, 0, timeToDie, (p) => incComboText.opacity = p, easings.easeOutQuint)
+		tween(incComboText.opacity, 0, timeToDie, (p) => incComboText.opacity = p, easings.easeOutQuint);
 		wait(timeToDie, () => {
-			destroy(incComboText)
-		})
-	})
+			destroy(incComboText);
+		});
+	});
 }
 
 export function maxComboAnim() {
-	let blendFactor = 0
-	let words = ["MAX COMBO", "MAX COMBO!!", "YOO-HOO!!!", "YEEEOUCH!!", "FINISH IT"]
+	let blendFactor = 0;
+	let words = ["MAX COMBO", "MAX COMBO!!", "YOO-HOO!!!", "YEEEOUCH!!", "FINISH IT"];
 	let maxComboText = add([
 		text(`[combo]${choose(words)}[/combo]`, {
 			font: "lambdao",
@@ -276,72 +275,72 @@ export function maxComboAnim() {
 					color: blendColors(
 						WHITE,
 						hsl2rgb((time() * 0.2 + idx * 0.1) % 1, 0.7, 0.8),
-						blendFactor
+						blendFactor,
 					),
-				})
-			}
+				}),
+			},
 		}),
 		pos(vec2(mousePos().x, mousePos().y - 65)),
 		layer("ui"),
 		color(),
 		scale(),
 		opacity(),
-		anchor("center"),		
+		anchor("center"),
 		timer(),
 		{
 			update() {
-				this.pos.y -= 1
+				this.pos.y -= 1;
 
-				blendFactor = 1
+				blendFactor = 1;
 				// if (time() % 0.25 > (0.1 / 2)) blendFactor = 1
 				// else blendFactor = 0
-			}
-		}
-	])
+			},
+		},
+	]);
 
-	let timeToDie = 2
-	maxComboText.tween(vec2(0.5), vec2(1), 0.1, (p) => maxComboText.scale = p, easings.easeOutQuad)
+	let timeToDie = 2;
+	maxComboText.tween(vec2(0.5), vec2(1), 0.1, (p) => maxComboText.scale = p, easings.easeOutQuad);
 	maxComboText.tween(0.5, 1, 0.1, (p) => maxComboText.opacity = p, easings.easeOutQuint).onEnd(() => {
-		maxComboText.tween(maxComboText.opacity, 0, timeToDie, (p) => maxComboText.opacity = p, easings.easeOutQuint)
+		maxComboText.tween(maxComboText.opacity, 0, timeToDie, (p) => maxComboText.opacity = p, easings.easeOutQuint);
 		maxComboText.wait(timeToDie, () => {
-			destroy(maxComboText)
-		})
-	})
+			destroy(maxComboText);
+		});
+	});
 
 	if (GameState.hasUnlockedPowerups == true && chance(0.2)) {
 		spawnPowerup({
 			type: "awesome",
 			pos: randomPos(),
 			natural: true,
-		})
+		});
 	}
 }
 
 export function increaseCombo() {
-	scoreManager.combo = getComboFromClicks(clickVars.consecutiveClicks)
-	playSfx("combo", {detune: scoreManager.combo > 1 ? 100 * scoreManager.combo : 0 })
+	scoreManager.combo = getComboFromClicks(clickVars.consecutiveClicks);
+	playSfx("combo", { detune: scoreManager.combo > 1 ? 100 * scoreManager.combo : 0 });
 	tween(cam.zoom, 0.95, 0.25 / 2, (p) => cam.zoom = p, easings.easeOutQuint).onEnd(() => {
-		tween(cam.zoom, 1, 0.25, (p) => cam.zoom = p, easings.easeOutQuint)
-	})
-	if (scoreManager.combo != COMBO_MAX) increaseComboText()
+		tween(cam.zoom, 1, 0.25, (p) => cam.zoom = p, easings.easeOutQuint);
+	});
+	if (scoreManager.combo != COMBO_MAX) increaseComboText();
 }
 
 export function startCombo() {
-	increaseCombo()
-	
-	clickVars.comboDropped = false
-	addComboBar()
-	tween(-10, 0, 0.5, (p) => cam.rotation = p, easings.easeOutQuint)
+	increaseCombo();
+
+	clickVars.comboDropped = false;
+	addComboBar();
+	tween(-10, 0, 0.5, (p) => cam.rotation = p, easings.easeOutQuint);
 }
 
 export function dropCombo() {
-	clickVars.comboDropped = true
-	clickVars.consecutiveClicks = 0
+	clickVars.comboDropped = true;
+	clickVars.consecutiveClicks = 0;
 
 	get("comboBar", { recursive: true }).forEach(comboBar => {
 		comboBar.fadeOut(0.25).onEnd(() => {
-			comboBar.destroy()
-			tween(spsText.pos.y, spsText.defaultYPos, 0.5, (p) => spsText.pos.y = p, easings.easeOutQuint)
-		})
-	})
+			comboBar.destroy();
+			tween(spsText.pos.y, spsText.defaultYPos, 0.5, (p) => spsText.pos.y = p, easings.easeOutQuint);
+		});
+	});
 }

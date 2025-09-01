@@ -7,7 +7,7 @@ import { playSfx } from "../../sound";
 import { ngEnabled } from "../../newgrounds";
 import ng from "newgrounds.js";
 import { GameState } from "../../gamestate";
-import * as env from "../../env.json"
+import * as env from "../../env.json";
 import { hoverController } from "../../hoverManaging";
 import { DEBUG } from "../../globals";
 
@@ -43,7 +43,7 @@ export function medalsWinContent(winParent: GameObj) {
 		anchor("top"),
 	]);
 
-	addScrollBar(medalsContainer, 3)
+	addScrollBar(medalsContainer, 3);
 	// Add all medals
 	addAllMedals();
 
@@ -53,14 +53,14 @@ export function medalsWinContent(winParent: GameObj) {
 	});
 
 	winParent.onKeyPress(["up", "left"], () => {
-		if (!winParent.active) return
-		scroll("up")
-	})
+		if (!winParent.active) return;
+		scroll("up");
+	});
 
 	winParent.onKeyPress(["down", "right"], () => {
-		if (!winParent.active) return
-		scroll("down")
-	})
+		if (!winParent.active) return;
+		scroll("down");
+	});
 
 	// Add cleanup logic when the window is closed
 	winParent.on("close", clearMedals);
@@ -87,7 +87,8 @@ function addAllMedals() {
 		if (medalIndex < achievements.length) {
 			const achievementId = achievements[medalIndex].id;
 			addMedal({ row: row, column: 1 }, achievementId);
-		} else {
+		}
+		else {
 			console.warn(`No achievement available for row ${row}, column 1`);
 		}
 	}
@@ -99,7 +100,7 @@ function addAllMedals() {
 }
 
 // Add a medal to the display
-function addMedal(gridPosition: { row: number, column: number }, medal_ID: string, position?: { x: number; y: number }) {
+function addMedal(gridPosition: { row: number; column: number; }, medal_ID: string, position?: { x: number; y: number; }) {
 	if (!medalsContainer) {
 		console.error("medalsContainer is not defined in addMedal");
 		return;
@@ -116,7 +117,8 @@ function addMedal(gridPosition: { row: number, column: number }, medal_ID: strin
 	const medalObj = medalsContainer.add(createMedalObject(gridPosition, medal_ID));
 	if (position) {
 		medalObj.pos = vec2(position.x, position.y);
-	} else {
+	}
+	else {
 		medalObj.pos = getPositionInWindow(gridPosition.row, gridPosition.column);
 	}
 	medalObj.achievementIdx = achievements.findIndex(a => a.id === medal_ID);
@@ -128,12 +130,13 @@ function addMedal(gridPosition: { row: number, column: number }, medal_ID: strin
 }
 
 // Create medal
-function createMedalObject(gridPosition: { row: number, column: number }, medal_ID: string) {
+function createMedalObject(gridPosition: { row: number; column: number; }, medal_ID: string) {
 	return [
 		sprite("medalsUnknown"),
 		pos(getPositionInWindow(gridPosition.row, gridPosition.column)),
 		anchor("center"),
-		layer("windows"), ,
+		layer("windows"),
+		,
 		area(),
 		hoverController(),
 		color(),
@@ -145,102 +148,98 @@ function createMedalObject(gridPosition: { row: number, column: number }, medal_
 			column: gridPosition.column,
 			add() {
 				if (this.achievementId == "extra.theSlot") {
-					return; 
+					return;
 				}
 
-				this.use("ignorepoint")
+				this.use("ignorepoint");
 			},
-			
+
 			update() {
 				updateMedalState(this);
 			},
-		}
+		},
 	];
 }
 
 // Update medal state
-function updateMedalState(medalObj:GameObj) {
+function updateMedalState(medalObj: GameObj) {
 	if (!medalsContainer) {
 		console.error("medalsContainer is not defined in updateMedalState");
 		return;
 	}
 	const theAchievement = getAchievement(medalObj.achievementId);
-	const medalSprite = "medals_" + theAchievement.id
+	const medalSprite = "medals_" + theAchievement.id;
 
-	// is unlocked 
+	// is unlocked
 	if (isAchievementUnlocked(medalObj.achievementId)) {
-		if (medalObj.sprite != medalSprite) medalObj.sprite = medalSprite
-		if (medalObj.color != WHITE) medalObj.color = WHITE		
+		if (medalObj.sprite != medalSprite) medalObj.sprite = medalSprite;
+		if (medalObj.color != WHITE) medalObj.color = WHITE;
 		// manages master medal
-		if (medalObj.achievementId == "extra.ALL" && medalObj.getCurAnim() == null) medalObj.play("master")
-		medalObj.opacity = 1
+		if (medalObj.achievementId == "extra.ALL" && medalObj.getCurAnim() == null) medalObj.play("master");
+		medalObj.opacity = 1;
 	}
-	
 	else {
 		manageLockedMedalApp(medalObj, theAchievement);
 	}
 }
 
 /**
-* Updates the color and sprite of the medal when it's locked 
-* @param medalObj The medal object to update
-* @param theAchievement The achievement associated with the medal
-*/
-function manageLockedMedalApp(medalObj:GameObj, theAchievement:AchievementInterface) {
+ * Updates the color and sprite of the medal when it's locked
+ * @param medalObj The medal object to update
+ * @param theAchievement The achievement associated with the medal
+ */
+function manageLockedMedalApp(medalObj: GameObj, theAchievement: AchievementInterface) {
 	const PURPLE = blendColors(RED, BLUE, 0.5);
-	
+
 	if (theAchievement.id === "extra.theSlot" && medalObj.sprite !== "medalsUnknown_tap") {
 		medalObj.sprite = "medalsUnknown_tap";
 	}
-
 	else if (theAchievement.id != "extra.theSlot" && medalObj.sprite != "medalsUnknown") {
-		medalObj.sprite = "medalsUnknown"
+		medalObj.sprite = "medalsUnknown";
 	}
 
-	if (theAchievement.id == "extra.ALL") medalObj.color = hsl2rgb((time() * 0.2 + 0 * 0.1) % 1, 0.6, 0.6)
-	
+	if (theAchievement.id == "extra.ALL") medalObj.color = hsl2rgb((time() * 0.2 + 0 * 0.1) % 1, 0.6, 0.6);
 	else {
 		if (theAchievement.visibleCondition != null) {
 			if (theAchievement.visibleCondition() == true) {
-				if (theAchievement.rare == true) medalObj.color = YELLOW
-				else medalObj.color = RED
+				if (theAchievement.rare == true) medalObj.color = YELLOW;
+				else medalObj.color = RED;
 			}
-
 			else {
-				medalObj.color = PURPLE
+				medalObj.color = PURPLE;
 			}
 		}
-
 		else {
-			if (theAchievement.rare == true) medalObj.color = YELLOW
-			else medalObj.color = RED
+			if (theAchievement.rare == true) medalObj.color = YELLOW;
+			else medalObj.color = RED;
 		}
 	}
 
-	medalObj.opacity = 0.5
+	medalObj.opacity = 0.5;
 }
 
 // Handle medal click
-function handleMedalClick(medalObj:GameObj) {
+function handleMedalClick(medalObj: GameObj) {
 	if (medalObj.achievementId === "extra.theSlot" && !isAchievementUnlocked(medalObj.achievementId)) {
 		unlockAchievement(medalObj.achievementId);
 	}
 }
 
 // Handle medal hover
-function handleMedalHover(medalObj:GameObj) {
+function handleMedalHover(medalObj: GameObj) {
 	const theAchievement = getAchievement(medalObj.achievementId);
 	let title = formatTooltipText(theAchievement.title, 50);
 	let description = formatTooltipText(theAchievement.description, 50);
 	let flavorText = theAchievement.flavorText;
-	
-	title = `[title]${title}[/title]`
+
+	title = `[title]${title}[/title]`;
 	if (!isAchievementUnlocked(theAchievement.id)) {
 		if (theAchievement.visibleCondition && !theAchievement.visibleCondition()) {
 			title = "???";
 			description = "This achievement is secret\nFor now...";
 			flavorText = "";
-		} else {
+		}
+		else {
 			title = "???";
 			description = theAchievement.description;
 			flavorText = "";
@@ -249,15 +248,15 @@ function handleMedalHover(medalObj:GameObj) {
 	const tooltip = addTooltip(medalObj, {
 		text: `${title}\n${description}${flavorText.length < 50 ? `. ${flavorText}` : ""}`,
 		direction: "down",
-		lerpValue: 0.5
+		lerpValue: 0.5,
 	});
 	tooltip.tooltipText.align = "center";
 	medalObj.tooltip = tooltip;
 }
 
 // drawDumbOutline
-function handleMedalDraw(medalObj:GameObj, drawOutline: boolean) {
-	if (drawOutline == false) return
+function handleMedalDraw(medalObj: GameObj, drawOutline: boolean) {
+	if (drawOutline == false) return;
 	drawRect({
 		anchor: medalObj.anchor,
 		width: medalObj.width,
@@ -266,9 +265,9 @@ function handleMedalDraw(medalObj:GameObj, drawOutline: boolean) {
 		fill: false,
 		outline: {
 			width: 3,
-			color: BLACK
-		}
-	})
+			color: BLACK,
+		},
+	});
 }
 
 // Format text for tooltip
@@ -277,7 +276,7 @@ function formatTooltipText(text: string, maxLength: number) {
 }
 
 // Handle hover end
-function handleMedalHoverEnd(medalObj:GameObj) {
+function handleMedalHoverEnd(medalObj: GameObj) {
 	if (medalObj.tooltip) {
 		medalObj.tooltip.end();
 	}
@@ -291,8 +290,10 @@ function scroll(direction: "up" | "down") {
 	}
 	const medals = medalsContainer.get("medal").filter(medal => medal !== undefined);
 	const sortedMedals = medals.sort((a, b) => a.achievementIdx - b.achievementIdx);
-	if ((direction === "down" && sortedMedals[sortedMedals.length - 1]?.achievementIdx === achievements.length - 1) ||
-		(direction === "up" && sortedMedals[0]?.achievementIdx === 0)) return;
+	if (
+		(direction === "down" && sortedMedals[sortedMedals.length - 1]?.achievementIdx === achievements.length - 1)
+		|| (direction === "up" && sortedMedals[0]?.achievementIdx === 0)
+	) return;
 
 	const isScrollingDown = direction === "down";
 	const rowChange = isScrollingDown ? -1 : 1;
@@ -304,7 +305,8 @@ function scroll(direction: "up" | "down") {
 			if ((isScrollingDown && medal.row === 1) || (!isScrollingDown && medal.row === totalRows)) {
 				medalMap.delete(medal.achievementId);
 				medal.destroy();
-			} else {
+			}
+			else {
 				medal.row += rowChange;
 				medal.pos.y += yOffset;
 			}
@@ -316,7 +318,7 @@ function scroll(direction: "up" | "down") {
 
 	const nextAchievements = achievements.slice(
 		firstOrLastIdx + (isScrollingDown ? 1 : -totalColumns),
-		firstOrLastIdx + (isScrollingDown ? 1 : -totalColumns) + totalColumns
+		firstOrLastIdx + (isScrollingDown ? 1 : -totalColumns) + totalColumns,
 	);
 
 	nextAchievements.forEach((achievement, index) => {
@@ -325,7 +327,7 @@ function scroll(direction: "up" | "down") {
 	});
 }
 
-function addScrollBar(medalsContainer:GameObj, totalScrolls = 3) {
+function addScrollBar(medalsContainer: GameObj, totalScrolls = 3) {
 	if (!medalsContainer) {
 		console.error("medalsContainer is not defined in addScrollBar");
 		return;
@@ -356,40 +358,40 @@ function addScrollBar(medalsContainer:GameObj, totalScrolls = 3) {
 		"elevator",
 	]);
 
-	let isDragging = false
+	let isDragging = false;
 
 	elevator.onHover(() => {
 		if (isDragging == false) {
 			tween(elevator.opacity, 1, 0.15, (p) => elevator.opacity = p, easings.easeOutQuad);
 		}
-	})
+	});
 
 	elevator.onHoverEnd(() => {
 		if (isDragging == false) {
 			tween(elevator.opacity, 0.5, 0.15, (p) => elevator.opacity = p, easings.easeOutQuad);
 		}
-	})
+	});
 
 	let currentScroll = 0;
-	let hasCheckedLastScroll = false
+	let hasCheckedLastScroll = false;
 
 	/**
-	 * Increases elevator y position by scrollStep based on total scrolls 
+	 * Increases elevator y position by scrollStep based on total scrolls
 	 * @param scrollStep between -1 and 1
 	 */
-	function updateElevator(scrollStep:number) {
+	function updateElevator(scrollStep: number) {
 		currentScroll = Math.max(0, Math.min(currentScroll + scrollStep, totalScrolls));
 		const elevatorY = (currentScroll / totalScrolls) * (scrollBarHeight - elevatorHeight);
 		elevatorYPos = elevatorY;
-	
+
 		// add goober devky
 		if (currentScroll == totalScrolls && medalsContainer.get("goober").length == 0 && hasCheckedLastScroll == false) {
 			if (!chance(0.4)) {
-				hasCheckedLastScroll = true
-				return
+				hasCheckedLastScroll = true;
+				return;
 			}
-			const lastAchievement = medalsContainer.get("medal").filter(medal => medal.row == totalRows && medal.column == totalColumns - 1)[0] 
-			const thePosition = getPositionInWindow(lastAchievement.row, lastAchievement.column + 1)
+			const lastAchievement = medalsContainer.get("medal").filter(medal => medal.row == totalRows && medal.column == totalColumns - 1)[0];
+			const thePosition = getPositionInWindow(lastAchievement.row, lastAchievement.column + 1);
 			let goober = medalsContainer.add([
 				sprite("devkyGoober"),
 				pos(thePosition.x, thePosition.y + 30),
@@ -398,55 +400,59 @@ function addScrollBar(medalsContainer:GameObj, totalScrolls = 3) {
 				scale(),
 				hoverController(),
 				"goober",
-			])
+			]);
 
 			goober.onClick(() => {
 				if (ngEnabled == true) {
 					if (GameState.stats.hasDevkyGoobered == false) {
-						GameState.stats.hasDevkyGoobered = true
-						ng.unlockMedal(env.DEVKY_MEDAL_ID)
+						GameState.stats.hasDevkyGoobered = true;
+						ng.unlockMedal(env.DEVKY_MEDAL_ID);
 					}
 				}
-				
-				tween(rand(0.7, 0.9), 1, 0.15, (p) => goober.scale.y = p)
-				playSfx("squeak", { detune: rand(-100, 100) })
-			})
 
-			goober.width = 60
-			goober.height = 60
+				tween(rand(0.7, 0.9), 1, 0.15, (p) => goober.scale.y = p);
+				playSfx("squeak", { detune: rand(-100, 100) });
+			});
+
+			goober.width = 60;
+			goober.height = 60;
 		}
-
 		else {
-			if (currentScroll == totalScrolls) return
-			hasCheckedLastScroll = false
-			if (medalsContainer.get("goober").length > 0) medalsContainer.get("goober")[0].destroy()
+			if (currentScroll == totalScrolls) return;
+			hasCheckedLastScroll = false;
+			if (medalsContainer.get("goober").length > 0) medalsContainer.get("goober")[0].destroy();
 		}
 	}
 
 	medalsContainer.onScroll((delta) => {
-		if (isDragging == true) return
+		if (isDragging == true) return;
 		if (delta.y > 0) {
 			updateElevator(1);
-		} else if (delta.y < 0) {
+		}
+		else if (delta.y < 0) {
 			updateElevator(-1);
 		}
 	});
 
-	medalsContainer.onKeyPress(["down", "right"], () => { updateElevator(1) })
-	medalsContainer.onKeyPress(["left", "up"], () => { updateElevator(-1) })
+	medalsContainer.onKeyPress(["down", "right"], () => {
+		updateElevator(1);
+	});
+	medalsContainer.onKeyPress(["left", "up"], () => {
+		updateElevator(-1);
+	});
 
 	elevator.onClick(() => {
 		if (elevator.isHovering()) {
-			isDragging = true
+			isDragging = true;
 			// only doing it so it counts as it's there something being dragged
-			setCurDraggin(elevator)
+			setCurDraggin(elevator);
 		}
-	})
+	});
 
 	elevator.onMouseRelease("left", () => {
 		if (isDragging == true) {
-			isDragging = false
-			setCurDraggin(null)
+			isDragging = false;
+			setCurDraggin(null);
 		}
 	});
 
@@ -454,19 +460,18 @@ function addScrollBar(medalsContainer:GameObj, totalScrolls = 3) {
 		if (isDragging == true) {
 			// Update the current scroll based on the new elevator position
 			currentScroll = Math.round((elevatorYPos / (scrollBarHeight - elevatorHeight)) * totalScrolls);
-		
+
 			if (mousePos().y > elevator.worldPos().y + elevator.height / 2) {
-				updateElevator(1)
+				updateElevator(1);
 				scroll("down");
 			}
-
 			else if (mousePos().y < elevator.worldPos().y - elevator.height / 2) {
-				updateElevator(-1)
-				scroll("up")
+				updateElevator(-1);
+				scroll("up");
 			}
 		}
 
-		elevator.pos.y = lerp(elevator.pos.y, elevatorYPos, 0.5)
+		elevator.pos.y = lerp(elevator.pos.y, elevatorYPos, 0.5);
 		elevator.pos.y = clamp(elevator.pos.y, 0, scrollBarHeight - elevatorHeight);
 	});
 }

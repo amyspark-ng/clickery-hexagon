@@ -10,46 +10,48 @@ import { addGridButton } from "../windows/extraWin";
 
 export let unlockableWindows = {
 	"storeWin": {
-		condition: () => GameState.scoreAllTime >= 25
+		condition: () => GameState.scoreAllTime >= 25,
 	},
 	"settingsWin": {
-		condition: () => GameState.scoreAllTime >= 50
+		condition: () => GameState.scoreAllTime >= 50,
 	},
 	"statsWin": {
-		condition: () => GameState.scoreAllTime >= 60
+		condition: () => GameState.scoreAllTime >= 60,
 	},
 	// they're unlocked at the same time lol!
 	"extraWin": {
-		condition: () => GameState.scoreAllTime >= 150
+		condition: () => GameState.scoreAllTime >= 150,
 	},
 	"musicWin": {
-		condition: () => GameState.scoreAllTime >= 150
+		condition: () => GameState.scoreAllTime >= 150,
 	},
 	"medalsWin": {
-		condition: () => GameState.scoreAllTime >= 105
+		condition: () => GameState.scoreAllTime >= 105,
 	},
 	"creditsWin": {
-		condition: () => GameState.scoreAllTime >= 200
+		condition: () => GameState.scoreAllTime >= 200,
 	},
 	"leaderboardsWin": {
-		condition: () => GameState.scoreAllTime >= 1_100_000
+		condition: () => GameState.scoreAllTime >= 1_100_000,
 	},
 	"ascendWin": {
-		condition: () => GameState.scoreAllTime >= scoreManager.ascensionConstant
+		condition: () => GameState.scoreAllTime >= scoreManager.ascensionConstant,
 	},
-}
+};
 
-export function isWindowUnlocked(windowName:windowKey) {
-	return GameState.unlockedWindows.includes(windowName)
+export function isWindowUnlocked(windowName: windowKey) {
+	return GameState.unlockedWindows.includes(windowName);
 }
 
 export function destroyExclamation(obj) {
 	obj?.get("exclamation")?.forEach(element => {
-		element?.fadeOut(0.1).onEnd(() => { destroy(element) })
+		element?.fadeOut(0.1).onEnd(() => {
+			destroy(element);
+		});
 	});
 }
 
-export function addExclamation(obj:any) {
+export function addExclamation(obj: any) {
 	// there's no exclamation
 	if (obj.get("exclamation").length == 0) {
 		let exclamation = obj.add([
@@ -63,84 +65,80 @@ export function addExclamation(obj:any) {
 			{
 				times: 0,
 				update() {
-					if (obj.opacity != null) this.opacity = obj.opacity
-				}
-			}
-		])
-	
-		tween(-obj.height, -obj.height / 2, 0.32, (p) => exclamation.pos.y = p, easings.easeOutBack).onEnd(() => {
-			exclamation.startWave()
-		})
-		tween(0.5, 1, 0.32, (p) => exclamation.opacity = p, easings.easeOutQuad)
-	}
+					if (obj.opacity != null) this.opacity = obj.opacity;
+				},
+			},
+		]);
 
+		tween(-obj.height, -obj.height / 2, 0.32, (p) => exclamation.pos.y = p, easings.easeOutBack).onEnd(() => {
+			exclamation.startWave();
+		});
+		tween(0.5, 1, 0.32, (p) => exclamation.opacity = p, easings.easeOutQuad);
+	}
 	else {
-		let exclamation = obj.get("exclamation")[0]
-		bop(exclamation)
+		let exclamation = obj.get("exclamation")[0];
+		bop(exclamation);
 	}
 }
 
-export function unlockWindow(windowJustUnlocked:windowKey) {
+export function unlockWindow(windowJustUnlocked: windowKey) {
 	// does the actual stuff
-	GameState.unlockedWindows.push(windowJustUnlocked)
-	playSfx("windowUnlocked")
-	
+	GameState.unlockedWindows.push(windowJustUnlocked);
+	playSfx("windowUnlocked");
+
 	if (GameState.taskbar.length < 4 || windowJustUnlocked == "extraWin") {
-		GameState.taskbar.push(windowJustUnlocked)
+		GameState.taskbar.push(windowJustUnlocked);
 	}
 
-	GameState.taskbar = sortedTaskbar()
+	GameState.taskbar = sortedTaskbar();
 
 	// else {
-		// i got a 'Too much recursion!' crash here, got pretty scared :(
-		// if (GameState.unlockedWindows.includes("extraWin") == false) {
-		// 	unlockWindow("extraWin")
-		// 	GameState.taskbar.push("extraWin")
-		// }
+	// i got a 'Too much recursion!' crash here, got pretty scared :(
+	// if (GameState.unlockedWindows.includes("extraWin") == false) {
+	// 	unlockWindow("extraWin")
+	// 	GameState.taskbar.push("extraWin")
+	// }
 	// }
 
 	// if the folderObj is folded
 	if (folded == true) {
-		addExclamation(folderObj)
+		addExclamation(folderObj);
 
 		let unfoldCheckEvent = folderObj.on("unfold", () => {
-			destroyExclamation(folderObj)
+			destroyExclamation(folderObj);
 
 			// is on taskbar
 			if (GameState.taskbar.includes(windowJustUnlocked)) {
-				let newlyUnlockedBtn = get("minibutton").filter(btn => btn.windowKey == windowJustUnlocked)[0]
-				if (newlyUnlockedBtn) addExclamation(newlyUnlockedBtn)
+				let newlyUnlockedBtn = get("minibutton").filter(btn => btn.windowKey == windowJustUnlocked)[0];
+				if (newlyUnlockedBtn) addExclamation(newlyUnlockedBtn);
 			}
-
 			// it went to extraa win
 			else if (GameState.taskbar.includes(windowJustUnlocked) == false) {
-				let extraWinBtn = get("minibutton").filter(btn => btn.windowKey == "extraWin")[0]
-				if (extraWinBtn) addExclamation(extraWinBtn)
+				let extraWinBtn = get("minibutton").filter(btn => btn.windowKey == "extraWin")[0];
+				if (extraWinBtn) addExclamation(extraWinBtn);
 			}
 
-			unfoldCheckEvent.cancel()
-		})
+			unfoldCheckEvent.cancel();
+		});
 	}
-
 	// if the folderobj is unfolded
 	else if (folded == false) {
 		if (GameState.taskbar.includes(windowJustUnlocked)) {
 			// index in taskbar of the new button
-			let newIndex = GameState.taskbar.indexOf(windowJustUnlocked)
-			
+			let newIndex = GameState.taskbar.indexOf(windowJustUnlocked);
+
 			let btnForNewWindow = addMinibutton({
 				windowKey: windowJustUnlocked,
 				taskbarIndex: newIndex,
 				initialPosition: folderObj.pos,
-			})
+			});
 
-			addExclamation(btnForNewWindow)
+			addExclamation(btnForNewWindow);
 		}
-
 		else {
-			let extraWinBtn = get("minibutton").filter(btn => btn.windowKey == "extraWin")[0]
-			addExclamation(extraWinBtn)
-			// if the window goes to the extra window but the extra win hasn't been unlocked yet 
+			let extraWinBtn = get("minibutton").filter(btn => btn.windowKey == "extraWin")[0];
+			addExclamation(extraWinBtn);
+			// if the window goes to the extra window but the extra win hasn't been unlocked yet
 			// we're oging to have trouble
 			// i just unlock extra win before musicwin and hope that fixes everything
 		}
@@ -150,20 +148,18 @@ export function unlockWindow(windowJustUnlocked:windowKey) {
 	// if is not open i have to wait until then
 	if (GameState.taskbar.includes(windowJustUnlocked) == false) {
 		if (isWindowOpen("extraWin")) {
-			let gridBtn = addGridButton(windowJustUnlocked)
-			addExclamation(gridBtn)
+			let gridBtn = addGridButton(windowJustUnlocked);
+			addExclamation(gridBtn);
 		}
-
 		else {
 			let extraWinOpenCheck = getTreeRoot().on("winOpen", (windowOpened) => {
 				if (windowOpened == "extraWin") {
-					let gridMinibtn = get("gridMiniButton", { recursive: true }).filter((btn) => btn.windowKey == windowJustUnlocked)[0]
-					addExclamation(gridMinibtn)
-	
-					extraWinOpenCheck.cancel()
+					let gridMinibtn = get("gridMiniButton", { recursive: true }).filter((btn) => btn.windowKey == windowJustUnlocked)[0];
+					addExclamation(gridMinibtn);
+
+					extraWinOpenCheck.cancel();
 				}
-			})
+			});
 		}
-		
 	}
-}	
+}

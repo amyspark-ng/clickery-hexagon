@@ -3,8 +3,7 @@ import { hexagon } from "../../hexagon";
 import { WindowGameObj } from "../windows-api/windowManaging";
 import { addDefaultButton, addNumbers, addRandomButton, addSlider, playSliderSound } from "./colorWindowElements";
 
-export function hexColorWinContent(winParent:WindowGameObj) {
-	
+export function hexColorWinContent(winParent: WindowGameObj) {
 	let redslider = addSlider({
 		parent: winParent,
 		pos: vec2(-180, -66),
@@ -12,11 +11,11 @@ export function hexColorWinContent(winParent:WindowGameObj) {
 		range: [0, 255],
 		color: "red",
 		onValueChange: (value) => {
-			hexagon.color.r = value
-			GameState.settings.hexColor.r = value
-			playSliderSound(value)
-		}
-	})
+			hexagon.color.r = value;
+			GameState.settings.hexColor.r = value;
+			playSliderSound(value);
+		},
+	});
 
 	let greenslider = addSlider({
 		parent: winParent,
@@ -25,11 +24,11 @@ export function hexColorWinContent(winParent:WindowGameObj) {
 		range: [0, 255],
 		color: "green",
 		onValueChange: (value) => {
-			hexagon.color.g = value
-			GameState.settings.hexColor.g = value
-			playSliderSound(value)
-		}
-	})
+			hexagon.color.g = value;
+			GameState.settings.hexColor.g = value;
+			playSliderSound(value);
+		},
+	});
 
 	let blueslider = addSlider({
 		parent: winParent,
@@ -38,31 +37,31 @@ export function hexColorWinContent(winParent:WindowGameObj) {
 		range: [0, 255],
 		color: "blue",
 		onValueChange: (value) => {
-			hexagon.color.b = value
-			GameState.settings.hexColor.b = value
-			playSliderSound(value)
-		}
-	})
+			hexagon.color.b = value;
+			GameState.settings.hexColor.b = value;
+			playSliderSound(value);
+		},
+	});
 
-	let sliders = [redslider, greenslider, blueslider]
+	let sliders = [redslider, greenslider, blueslider];
 
 	// buttons
 	let controlBar = winParent.add([
-		rect(winParent.width - 40, 60, { radius: 10}),
+		rect(winParent.width - 40, 60, { radius: 10 }),
 		anchor("top"),
 		pos(0, 70),
 		color(BLACK),
 		opacity(0.25),
-	])
-	
-	let defaultButton = addDefaultButton(vec2(-135, 29), controlBar, sliders, [255, 255 ,255])
-	let randomButton = addRandomButton(vec2(-66, 29), controlBar, sliders)
-	let rgbaNumbers = addNumbers(vec2(-18, 29), controlBar, GameState.settings.hexColor)
+	]);
+
+	let defaultButton = addDefaultButton(vec2(-135, 29), controlBar, sliders, [255, 255, 255]);
+	let randomButton = addRandomButton(vec2(-66, 29), controlBar, sliders);
+	let rgbaNumbers = addNumbers(vec2(-18, 29), controlBar, GameState.settings.hexColor);
 
 	// setting the color and other stuff
 	winParent.onUpdate(() => {
-		winParent.color = hexagon.color.lighten(50)
-	})
+		winParent.color = hexagon.color.lighten(50);
+	});
 
 	// winParent.onDraw(() => {
 	// 	drawSprite({

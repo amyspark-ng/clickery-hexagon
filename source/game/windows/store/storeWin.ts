@@ -5,52 +5,52 @@ import { addStoreElement, storeElementsInfo } from "./storeElements";
 import { addUpgrades, isUpgradeBought } from "./upgrades";
 import { WindowGameObj } from "../windows-api/windowManaging";
 
-export let storeElements:any = [];
+export let storeElements: any = [];
 
 // used to determine the cool game juice
 export let storePitchJuice = {
 	hasBoughtRecently: false,
 	timeSinceBought: 0,
 	storeTune: 0,
-}
+};
 
-export let isHoveringUpgrade:boolean;
-let clickersElement:any;
-let cursorsElement:any;
-let powerupsElement:any;
+export let isHoveringUpgrade: boolean;
+let clickersElement: any;
+let cursorsElement: any;
+let powerupsElement: any;
 
-export function storeWinContent(winParent:WindowGameObj) {
+export function storeWinContent(winParent: WindowGameObj) {
 	// clickers
-	clickersElement = addStoreElement(winParent, { type: "clickersElement", pos: vec2(0, -128) })
-	addUpgrades(clickersElement)
-	
+	clickersElement = addStoreElement(winParent, { type: "clickersElement", pos: vec2(0, -128) });
+	addUpgrades(clickersElement);
+
 	// cursors
-	cursorsElement = addStoreElement(winParent, { type: "cursorsElement", pos: vec2(0, (clickersElement.pos.y + clickersElement.height) + 15) })
-	addUpgrades(cursorsElement)
-	
+	cursorsElement = addStoreElement(winParent, { type: "cursorsElement", pos: vec2(0, (clickersElement.pos.y + clickersElement.height) + 15) });
+	addUpgrades(cursorsElement);
+
 	// powerups
-	powerupsElement = addStoreElement(winParent, { type: "powerupsElement", pos: vec2(0, (cursorsElement.pos.y + cursorsElement.height) + 15) })
+	powerupsElement = addStoreElement(winParent, { type: "powerupsElement", pos: vec2(0, (cursorsElement.pos.y + cursorsElement.height) + 15) });
 
 	// save them
-	storeElements = [clickersElement, cursorsElement, powerupsElement]
+	storeElements = [clickersElement, cursorsElement, powerupsElement];
 
-	let firstUpgrade = clickersElement.get("upgrade").filter(upgrade => upgrade.upgradeId == "k_0")[0]
+	let firstUpgrade = clickersElement.get("upgrade").filter(upgrade => upgrade.upgradeId == "k_0")[0];
 
 	// determines store pitch
 	winParent.onUpdate(() => {
-		if (!winParent.is("window")) return
-		
+		if (!winParent.is("window")) return;
+
 		if (storePitchJuice.timeSinceBought < 1) {
-			storePitchJuice.timeSinceBought += dt()
+			storePitchJuice.timeSinceBought += dt();
 
 			if (storePitchJuice.timeSinceBought > 0.25) {
-				storePitchJuice.hasBoughtRecently = false
-				storePitchJuice.storeTune = 0
+				storePitchJuice.hasBoughtRecently = false;
+				storePitchJuice.storeTune = 0;
 			}
 		}
 
-		isHoveringUpgrade = get("upgrade", { recursive: true }).some((upgrade) => upgrade.isHovering())
-	
+		isHoveringUpgrade = get("upgrade", { recursive: true }).some((upgrade) => upgrade.isHovering());
+
 		// tutorial stuff
 		if (GameState.stats.timesAscended < 1) {
 			const clickersTutorialTooltip = () => {
@@ -59,48 +59,48 @@ export function storeWinContent(winParent:WindowGameObj) {
 					direction: "right",
 					type: "tutorialClickers",
 					layer: winParent.layer,
-					z: winParent.z
-				})
-	
+					z: winParent.z,
+				});
+
 				let buyClickersEvent = getTreeRoot().on("buy", (data) => {
 					if (data.type == "clickers") {
-						tooltip.end()
-						buyClickersEvent.cancel()
+						tooltip.end();
+						buyClickersEvent.cancel();
 					}
-				})
-			}
-	
+				});
+			};
+
 			const cursorsTutorialTooltip = () => {
 				let tooltip = addTooltip(cursorsElement, {
 					text: "← You can buy these to\nautomatically get score!",
 					direction: "right",
 					type: "tutorialCursors",
 					layer: winParent.layer,
-					z: winParent.z
-				})
-	
+					z: winParent.z,
+				});
+
 				let buyCursorsEvent = getTreeRoot().on("buy", (data) => {
 					if (data.type == "cursors") {
-						tooltip.end()
-						buyCursorsEvent.cancel()
+						tooltip.end();
+						buyCursorsEvent.cancel();
 					}
-				})
-			}
-	
+				});
+			};
+
 			const powerupsTutorialTooltip = () => {
 				let tooltip = addTooltip(powerupsElement, {
 					text: "← Power-ups give you a small help!\nFor a time limit.",
 					direction: "right",
 					type: "tutorialPowerups",
 					layer: winParent.layer,
-					z: winParent.z
-				})
-		
+					z: winParent.z,
+				});
+
 				let unlockPowerupsEvent = getTreeRoot().on("powerupunlock", () => {
-					tooltip.end()
-					unlockPowerupsEvent.cancel()
-				})
-			}
+					tooltip.end();
+					unlockPowerupsEvent.cancel();
+				});
+			};
 
 			const upgradesTutorialTooltip = () => {
 				let tooltip = addTooltip(firstUpgrade, {
@@ -108,63 +108,63 @@ export function storeWinContent(winParent:WindowGameObj) {
 					direction: "right",
 					type: "tutorialUpgrades",
 					layer: winParent.layer,
-					z: winParent.z
-				})
-		
+					z: winParent.z,
+				});
+
 				let buyFirstUpgradeCheck = getTreeRoot().on("buy", (data) => {
 					if (data.element == "upgrade" && data.id == "k_0") {
-						tooltip.end()
-						buyFirstUpgradeCheck.cancel()
+						tooltip.end();
+						buyFirstUpgradeCheck.cancel();
 					}
-				})
-			}
-	
-			const getTooltip = (type:string) => {
-				return get("tooltip", { recursive: true }).filter(tooltip => tooltip.is("text") == false && tooltip.type == type)
-			}
-	
+				});
+			};
+
+			const getTooltip = (type: string) => {
+				return get("tooltip", { recursive: true }).filter(tooltip => tooltip.is("text") == false && tooltip.type == type);
+			};
+
 			// EVENT THAT CHECKS FOR THE STUFF
 			if (GameState.clickers == 1 && GameState.score >= storeElementsInfo.clickersElement.basePrice) {
 				if (getTooltip("tutorialClickers").length == 0) {
-					clickersTutorialTooltip()
+					clickersTutorialTooltip();
 				}
 			}
-			
+
 			if (GameState.cursors == 0 && GameState.score >= storeElementsInfo.cursorsElement.basePrice) {
 				if (getTooltip("tutorialCursors").length == 0) {
-					cursorsTutorialTooltip()
+					cursorsTutorialTooltip();
 				}
 			}
-	
+
 			if (GameState.hasUnlockedPowerups == false && GameState.score >= storeElementsInfo.powerupsElement.unlockPrice) {
 				if (getTooltip("tutorialPowerups").length == 0) {
-					powerupsTutorialTooltip()
+					powerupsTutorialTooltip();
 				}
 			}
 
 			if (!isUpgradeBought("k_0") && GameState.score >= firstUpgrade.price) {
 				if (getTooltip("tutorialUpgrades").length == 0) {
-					upgradesTutorialTooltip()
+					upgradesTutorialTooltip();
 				}
 			}
 		}
-	})
+	});
 
 	winParent.on("close", () => {
 		winParent.get("*", { recursive: true }).forEach(element => {
-			if (element.endHover) element.endHover()
+			if (element.endHover) element.endHover();
 		});
-		
+
 		// i am going insane
-		let tooltips = get("tooltip").filter(tooltip => tooltip.type != undefined)
-		tooltips = tooltips.filter(obj => obj.type.includes("tutorial") || obj.type.includes("price") || obj.type.includes("store"))
+		let tooltips = get("tooltip").filter(tooltip => tooltip.type != undefined);
+		tooltips = tooltips.filter(obj => obj.type.includes("tutorial") || obj.type.includes("price") || obj.type.includes("store"));
 		tooltips.forEach((tooltip) => {
-			tooltip.end()
-		})
-	})
+			tooltip.end();
+		});
+	});
 
 	// lol!
 	if (chance(0.01)) {
-		winParent.sprite = "stroeWin"
+		winParent.sprite = "stroeWin";
 	}
 }

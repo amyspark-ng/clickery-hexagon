@@ -1,103 +1,103 @@
-import { GameState, scoreManager } from '../../gamestate';
-import { windowKey } from '../windows/windows-api/windowManaging';
-import { addToast } from '../additives';
-import { addConfetti } from '.././plugins/confetti';
-import { addUpgrades, upgradeInfo } from '../windows/store/upgrades';
-import { songs, songsListened } from '../windows/musicWindow';
-import { isWindowUnlocked, unlockableWindows, unlockWindow } from './windowUnlocks';
-import ng from 'newgrounds.js';
-import { ngEnabled } from '../../newgrounds';
-import { playSfx } from '../../sound';
-import { drawDumbOutline } from '../plugins/drawThings';
+import { GameState, scoreManager } from "../../gamestate";
+import { windowKey } from "../windows/windows-api/windowManaging";
+import { addToast } from "../additives";
+import { addConfetti } from ".././plugins/confetti";
+import { addUpgrades, upgradeInfo } from "../windows/store/upgrades";
+import { songs, songsListened } from "../windows/musicWindow";
+import { isWindowUnlocked, unlockableWindows, unlockWindow } from "./windowUnlocks";
+import ng from "newgrounds.js";
+import { ngEnabled } from "../../newgrounds";
+import { playSfx } from "../../sound";
+import { drawDumbOutline } from "../plugins/drawThings";
 
 export interface AchievementInterface {
 	/**
 	 * The id the achievement will have, (eg: score.100)
 	 */
-	id: string,
+	id: string;
 	/**
 	 * The id the achievement has on newgrounds
 	 * (remember to pass it as a number don't mess it up this time)
-	*/
-	ngId: number,
+	 */
+	ngId: number;
 	/**
 	 * The name/funny pun the achievement will have
 	 * (eg: the achievement is get 100 score, 'It starts...')
 	 */
-	title: string,
+	title: string;
 	/**
 	 * The actual thing you have to do to get this achievement in readable string form
 	 */
-	description: string,
+	description: string;
 	/**
 	 * Might be another funny title pun
 	 */
-	flavorText?: string,
+	flavorText?: string;
 	/**
-	 *  Wheter the achievement is RARE, the question mark will be yellow in that case 
+	 *  Wheter the achievement is RARE, the question mark will be yellow in that case
 	 */
-	rare?: boolean,
+	rare?: boolean;
 	/**
 	 * This means the achievement is secret!
 	 * It will only show its description and title when unlocked
 	 * Otherwise the question mark in the medals window will be tinted purple
-	* @returns Wheter the condition for it it's true or false, if it's true it means it's no longer secret
+	 * @returns Wheter the condition for it it's true or false, if it's true it means it's no longer secret
 	 */
 	visibleCondition?: () => boolean;
 	/**
 	 * The unlockCondition in "code", if it doesn't have one it has to be unlocked manuall by doing unlockAchievement()
 	 * @returns Wheter the condition for it it's true or false
 	 */
-	unlockCondition?: () => boolean,
+	unlockCondition?: () => boolean;
 	/**
 	 * How much time (in seconds) after the achievement was unlocked for
 	 * The toast to appear
-	*/
-	timeAfter?: number,
+	 */
+	timeAfter?: number;
 	/**
 	 * How long will the toast be for before dissapearing
 	 */
-	readingTime?: number,
+	readingTime?: number;
 }
 
-interface Achievement extends AchievementInterface { }
+interface Achievement extends AchievementInterface {}
 class Achievement {
-    constructor(opts:AchievementInterface) {
-		this.id = opts.id
-		this.ngId = opts.ngId
+	constructor(opts: AchievementInterface) {
+		this.id = opts.id;
+		this.ngId = opts.ngId;
 
-		this.title = opts.title
-		this.description = opts.description
-		this.flavorText = opts.flavorText || ""
-		this.rare = opts.rare || false
-		this.timeAfter = opts.timeAfter || 0
-		this.readingTime = opts.readingTime || 3
-		this.unlockCondition = opts.unlockCondition || null
-		this.visibleCondition = opts.visibleCondition || null
+		this.title = opts.title;
+		this.description = opts.description;
+		this.flavorText = opts.flavorText || "";
+		this.rare = opts.rare || false;
+		this.timeAfter = opts.timeAfter || 0;
+		this.readingTime = opts.readingTime || 3;
+		this.unlockCondition = opts.unlockCondition || null;
+		this.visibleCondition = opts.visibleCondition || null;
 	}
 }
 
 export let fullUpgradeValues = {
 	clicks: () => {
-		let sum = 0
+		let sum = 0;
 		Object.keys(upgradeInfo).forEach(key => {
 			if (key.includes("k_")) {
-				sum += upgradeInfo[key].value
+				sum += upgradeInfo[key].value;
 			}
 		});
 		return sum;
 	},
 	cursors: () => {
-		let sum = 0
+		let sum = 0;
 		Object.keys(upgradeInfo).forEach(key => {
 			// if the key includes C_ (is a cursor) and the freq is null (is not a frequency upgrade)
 			if (key.includes("c_") && upgradeInfo[key].freq == null) {
-				sum += upgradeInfo[key].value
+				sum += upgradeInfo[key].value;
 			}
 		});
 		return sum;
-	}
-}
+	},
+};
 
 const hamiltonSong = `Here's hamilton!\nHow does a bastard, orphan, son of a whore
 And a Scotsman, dropped in the middle of a forgotten spot
@@ -112,7 +112,7 @@ And every day while slaves were being slaughtered and carted away
 Across the waves, he struggled and kept his guard up
 Inside, he was longing for something to be a part of
 The brother was ready to beg, steal, borrow, or bar-
-Wait, i got lazy.`
+Wait, i got lazy.`;
 
 export let achievements = [
 	// #region SCORE ACHIEVEMENTS =====================
@@ -190,9 +190,11 @@ export let achievements = [
 
 	new Achievement({
 		id: "score.750_000",
-		title: "Did you know there's no actual limit to how long these names can be? I specifically spent a lot of time working on them so they can be as LONG as i want them to be and they will do their best to look good",
+		title:
+			"Did you know there's no actual limit to how long these names can be? I specifically spent a lot of time working on them so they can be as LONG as i want them to be and they will do their best to look good",
 		description: `Get 750.000 score`,
-		flavorText: "I'm not too sure how well it supports long descriptions, i can't really be bothered to test it, i'm pretty close to the deadline of this game coming out so i'd like not to dwell in those dark functions...",
+		flavorText:
+			"I'm not too sure how well it supports long descriptions, i can't really be bothered to test it, i'm pretty close to the deadline of this game coming out so i'd like not to dwell in those dark functions...",
 		readingTime: 10,
 		ngId: 80384,
 		unlockCondition: () => GameState.scoreAllTime >= 750_000,
@@ -224,7 +226,8 @@ export let achievements = [
 
 	new Achievement({
 		id: "score.100_million",
-		title: "Clickery Hexagon forever and forever a 100 years clickery Hexagon, all day long forever, forever a hundred times, over and over clickery Hexagon adventures dot com",
+		title:
+			"Clickery Hexagon forever and forever a 100 years clickery Hexagon, all day long forever, forever a hundred times, over and over clickery Hexagon adventures dot com",
 		description: "Get 100 million of score",
 		ngId: 80385,
 		unlockCondition: () => GameState.scoreAllTime >= 100_000_000,
@@ -327,7 +330,7 @@ export let achievements = [
 		ngId: 80450,
 		unlockCondition: () => GameState.clickers >= 50,
 	}),
-	
+
 	// ### CURSORS
 	new Achievement({
 		id: "cursors.10",
@@ -374,7 +377,7 @@ export let achievements = [
 		ngId: 80455,
 		unlockCondition: () => GameState.cursors >= 50,
 	}),
-	//#endregion CLICKERS/CURSORS ACHIEVEMENTS =================
+	// #endregion CLICKERS/CURSORS ACHIEVEMENTS =================
 
 	new Achievement({
 		id: "store.allUpgrades",
@@ -444,7 +447,7 @@ export let achievements = [
 		title: "Oh. So you've met him?",
 		description: "Ascend for the first time",
 		ngId: 80462,
-		visibleCondition: () => GameState.stats.timesAscended >= 1
+		visibleCondition: () => GameState.stats.timesAscended >= 1,
 	}),
 
 	new Achievement({
@@ -472,7 +475,9 @@ export let achievements = [
 		flavorText: "Wooimabouttomakeanameformyselfhere",
 		description: "Buy 10 cards",
 		ngId: 80465,
-		unlockCondition: () => (GameState.ascension.clickPercentagesBought + GameState.ascension.cursorsPercentagesBought + GameState.ascension.powerupPowersBought + GameState.ascension.critPowersBought) >= 10,
+		unlockCondition: () =>
+			(GameState.ascension.clickPercentagesBought + GameState.ascension.cursorsPercentagesBought + GameState.ascension.powerupPowersBought
+				+ GameState.ascension.critPowersBought) >= 10,
 		visibleCondition: () => isAchievementUnlocked("ascension.times_1"),
 	}),
 	// #endregion ASCENSION ACHIEVEMENTS =====================
@@ -484,7 +489,7 @@ export let achievements = [
 		flavorText: "Score flowing underground",
 		description: "Click 1000 times",
 		ngId: 80466,
-		unlockCondition: () => GameState.stats.timesClicked >= 1000
+		unlockCondition: () => GameState.stats.timesClicked >= 1000,
 	}),
 
 	new Achievement({
@@ -527,7 +532,7 @@ export let achievements = [
 		title: "Music lover",
 		description: "Listen to all the songs at least once",
 		ngId: 80471,
-		unlockCondition: () => songsListened.length == Object.keys(songs).length
+		unlockCondition: () => songsListened.length == Object.keys(songs).length,
 	}),
 
 	// inflation was the original name, it was pretty good i think
@@ -544,7 +549,7 @@ export let achievements = [
 		description: "Play for 15 minutes",
 		flavorText: "Thanks for playing!",
 		ngId: 80473,
-		unlockCondition: () => GameState.stats.totalTimePlayed >= 60 * 15
+		unlockCondition: () => GameState.stats.totalTimePlayed >= 60 * 15,
 	}),
 
 	// #endregion EXTRA ACHIEVEMENTS =====================
@@ -554,54 +559,53 @@ export let achievements = [
 		flavorText: "You're the master now",
 		description: "Complete all achievements",
 		ngId: 80474,
-		unlockCondition: () => GameState.unlockedAchievements.length == achievements.length - 1
+		unlockCondition: () => GameState.unlockedAchievements.length == achievements.length - 1,
 	}),
-] as Achievement[]
+] as Achievement[];
 
-export function getAchievement(achievementId:string) {
-	if (!achievements.map(achievement => achievement.id).includes(achievementId)) throw new Error(`Achievement: ${achievementId} does not exist`)
-	return achievements.filter(achievementObject => achievementObject.id == achievementId)[0]
+export function getAchievement(achievementId: string) {
+	if (!achievements.map(achievement => achievement.id).includes(achievementId)) throw new Error(`Achievement: ${achievementId} does not exist`);
+	return achievements.filter(achievementObject => achievementObject.id == achievementId)[0];
 }
 
-export function isAchievementUnlocked(achievementName:string) {
-	return GameState.unlockedAchievements.includes(achievementName)
+export function isAchievementUnlocked(achievementName: string) {
+	return GameState.unlockedAchievements.includes(achievementName);
 }
 
 export let achievementsInfo = {
 	ids: achievements.map(achievement => achievement.id),
 	objects: achievements.map(achievement => achievement),
-}
+};
 
 // the ones that don't have a unlockCondition is because they're unlocked at rare cases
 export function checkForUnlockable() {
 	achievements.forEach(achievement => {
 		if (achievement.unlockCondition != null && !isAchievementUnlocked(achievement.id)) {
 			if (achievement.unlockCondition()) {
-				unlockAchievement(achievement.id)
+				unlockAchievement(achievement.id);
 			}
-
 			else {
-				lockAchievement(achievement.id)
+				lockAchievement(achievement.id);
 			}
 		}
-	})
+	});
 
 	// checks for windows
 	Object.keys(unlockableWindows).forEach(window => {
 		if (!isWindowUnlocked(window as windowKey)) {
 			if (unlockableWindows[window].condition()) {
-				unlockWindow(window as windowKey)
+				unlockWindow(window as windowKey);
 			}
 		}
-	})
+	});
 }
 
-export function unlockAchievement(id:string) {
-	if (isAchievementUnlocked(id)) return
-	if (!achievements.map(achievement => achievement.id).includes(id)) throw new Error(`Achievement: ${id} does not exist`)
-	GameState.unlockedAchievements.push(id)
-	
-	const theAchievement = getAchievement(id)
+export function unlockAchievement(id: string) {
+	if (isAchievementUnlocked(id)) return;
+	if (!achievements.map(achievement => achievement.id).includes(id)) throw new Error(`Achievement: ${id} does not exist`);
+	GameState.unlockedAchievements.push(id);
+
+	const theAchievement = getAchievement(id);
 	wait(theAchievement.timeAfter || 0, () => {
 		addToast({
 			icon: `medals_${theAchievement.id}`,
@@ -610,8 +614,8 @@ export function unlockAchievement(id:string) {
 			duration: theAchievement.readingTime,
 			type: "achievement",
 			whenAdded: (toastObj, icon) => {
-				playSfx("unlockachievement", { detune: toastObj.index * 100 })
-			
+				playSfx("unlockachievement", { detune: toastObj.index * 100 });
+
 				if (theAchievement.id != "extra.theSlot") {
 					icon.onDraw(() => {
 						drawRect({
@@ -623,30 +627,30 @@ export function unlockAchievement(id:string) {
 							fixed: true,
 							outline: {
 								width: 3,
-								color: BLACK
-							}
-						})
-					})
-	
-					if (theAchievement.id == "extra.ALL") icon.play("master")
+								color: BLACK,
+							},
+						});
+					});
+
+					if (theAchievement.id == "extra.ALL") icon.play("master");
 				}
 			},
-		})
+		});
 
 		if (id == "allachievements") {
-			addConfetti({ pos: mousePos() })
+			addConfetti({ pos: mousePos() });
 		}
 
-		getTreeRoot().trigger("achivementUnlock", id)
-	})
+		getTreeRoot().trigger("achivementUnlock", id);
+	});
 
 	if (ngEnabled == true) {
-		if (theAchievement.ngId) ng.unlockMedal(theAchievement.ngId)
-		console.log("NG: Medal unlocked: " + theAchievement.id)
+		if (theAchievement.ngId) ng.unlockMedal(theAchievement.ngId);
+		console.log("NG: Medal unlocked: " + theAchievement.id);
 	}
 }
 
-export function lockAchievement(id:string) {
-	if (GameState.unlockedAchievements.includes(id)) GameState.unlockedAchievements = GameState.unlockedAchievements.filter(achievement => achievement != id)
+export function lockAchievement(id: string) {
+	if (GameState.unlockedAchievements.includes(id)) GameState.unlockedAchievements = GameState.unlockedAchievements.filter(achievement => achievement != id);
 	// can't remov from newgrounds sorry
 }

@@ -1,37 +1,37 @@
 // # Update code by MF / the other stuff by amyspark-ng
 
-import { Comp } from "kaplay"
+import { Comp } from "kaplay";
 
 // A custom component for waving - it is TS for this waveCompOpt
 type WaveCompOpt = {
-	wave_tweenSpeed?: number,
-	wave_startTweenSpeed?: number,
-	wave_endTweenSpeed?: number,
-	minAmplitude?: number,
-	maxAmplitude?: number,
-	wave_speed?: number,
-}
+	wave_tweenSpeed?: number;
+	wave_startTweenSpeed?: number;
+	wave_endTweenSpeed?: number;
+	minAmplitude?: number;
+	maxAmplitude?: number;
+	wave_speed?: number;
+};
 
 export interface WaverComp extends Comp {
-	amplitude: number,
-	wave_tweenSpeed: number,
-	wave_startTweenSpeed: number,
-	wave_endTweenSpeed: number,
-	minAmplitude: number,
-	maxAmplitude: number,
-	wave_verPosition: number,
-	wave_speed: number,
-	isWaving: boolean
+	amplitude: number;
+	wave_tweenSpeed: number;
+	wave_startTweenSpeed: number;
+	wave_endTweenSpeed: number;
+	minAmplitude: number;
+	maxAmplitude: number;
+	wave_verPosition: number;
+	wave_speed: number;
+	isWaving: boolean;
 	startWave(): void;
 	stopWave(): void;
 }
 
-export function waver(WaveCompOpt?: WaveCompOpt) : WaverComp {
+export function waver(WaveCompOpt?: WaveCompOpt): WaverComp {
 	return {
 		// Name of the component
 		id: "wave",
 		// This component requires the "pos" component to work
-		require: [ "pos" ],
+		require: ["pos"],
 		amplitude: 0,
 		wave_tweenSpeed: WaveCompOpt?.wave_tweenSpeed || 0.32,
 		wave_startTweenSpeed: WaveCompOpt?.wave_tweenSpeed || 0.32,
@@ -42,26 +42,26 @@ export function waver(WaveCompOpt?: WaveCompOpt) : WaverComp {
 		wave_speed: WaveCompOpt?.wave_speed || 1,
 		isWaving: false,
 		add() {
-			this.wave_verPosition = this.pos.y
+			this.wave_verPosition = this.pos.y;
 		},
 		startWave() {
-			if (this.isWaving) return
-			this.trigger("waveStart")
-			tween(this.minAmplitude, this.maxAmplitude, this.wave_tweenSpeed, v => this.amplitude = v)
-			this.isWaving = true
+			if (this.isWaving) return;
+			this.trigger("waveStart");
+			tween(this.minAmplitude, this.maxAmplitude, this.wave_tweenSpeed, v => this.amplitude = v);
+			this.isWaving = true;
 		},
 		stopWave() {
-			if (!this.isWaving) return
-			this.trigger("waveStop")
-			tween(this.amplitude, this.minAmplitude, this.wave_tweenSpeed, v => this.amplitude = v)
-			tween(this.pos.y, this.wave_verPosition, this.wave_tweenSpeed, v => this.pos.y = v)
-			this.isWaving = false
+			if (!this.isWaving) return;
+			this.trigger("waveStop");
+			tween(this.amplitude, this.minAmplitude, this.wave_tweenSpeed, v => this.amplitude = v);
+			tween(this.pos.y, this.wave_verPosition, this.wave_tweenSpeed, v => this.pos.y = v);
+			this.isWaving = false;
 		},
 		// "update" is a lifecycle method gets called every frame the obj is in scene
 		update() {
-			if (!this.isWaving) return
-			const t = time() * this.wave_speed
-			this.pos.y = this.wave_verPosition + this.amplitude * Math.cos(t * this.wave_speed)
+			if (!this.isWaving) return;
+			const t = time() * this.wave_speed;
+			this.pos.y = this.wave_verPosition + this.amplitude * Math.cos(t * this.wave_speed);
 		},
-	}
+	};
 }

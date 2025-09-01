@@ -6,9 +6,9 @@ import { getRandomDialogue, mageDialogues, talk } from "./dialogues";
 import { isClickeryBirthday } from "../../globals";
 
 export function addMage() {
-	let mageClothColor = rgb(0, 51, 102)
-	
-	let mage:GameObj<PosComp | WaverComp | OpacityComp>;
+	let mageClothColor = rgb(0, 51, 102);
+
+	let mage: GameObj<PosComp | WaverComp | OpacityComp>;
 
 	mage = add([
 		pos(-17, 154),
@@ -19,14 +19,14 @@ export function addMage() {
 		anchor("center"),
 		"mage",
 	]);
-	mage.startWave()
+	mage.startWave();
 
 	let mage_body = mage.add([
 		pos(),
 		sprite("mage_body"),
 		z(2),
 		"mage_body",
-	])
+	]);
 
 	let mage_body_lightning = mage.add([
 		pos(),
@@ -34,7 +34,7 @@ export function addMage() {
 		z(3),
 		opacity(0.25),
 		"mage_lightning",
-	])
+	]);
 
 	let mage_cursors = mage.add([
 		pos(0, -7),
@@ -43,8 +43,8 @@ export function addMage() {
 		waver({ wave_speed: 1, maxAmplitude: 5 }),
 		opacity(1),
 		color(WHITE.darken(50)),
-	])
-	mage_cursors.startWave()
+	]);
+	mage_cursors.startWave();
 
 	let mage_eye = mage.add([
 		pos(117, 120),
@@ -55,23 +55,23 @@ export function addMage() {
 			timeToBlinkAgain: 8,
 			timeUntilBlink: 8,
 			update() {
-				this.timeToBlinkAgain -= dt()
+				this.timeToBlinkAgain -= dt();
 				if (this.timeToBlinkAgain < 0) {
-					this.timeToBlinkAgain = rand(5, 8)
-					this.timeToBlinkAgain = this.timeToBlinkAgain
-					if (chance(0.75)) this.play("blink")
+					this.timeToBlinkAgain = rand(5, 8);
+					this.timeToBlinkAgain = this.timeToBlinkAgain;
+					if (chance(0.75)) this.play("blink");
 				}
-			}
-		}
-	])
+			},
+		},
+	]);
 
 	mage_eye.onClick(() => {
-		if (GameState.stats.timesAscended < 1) return
-		let randomDialogue = getRandomDialogue("eye") 
-		talk("mage", randomDialogue.text, randomDialogue.speed)
-		
-		mage_eye.play("blink")
-	})
+		if (GameState.stats.timesAscended < 1) return;
+		let randomDialogue = getRandomDialogue("eye");
+		talk("mage", randomDialogue.text, randomDialogue.speed);
+
+		mage_eye.play("blink");
+	});
 
 	let mage_toparm = mage.add([
 		pos(0, 0),
@@ -79,10 +79,10 @@ export function addMage() {
 		z(1),
 		{
 			update() {
-				this.angle = wave(-0.5, 0.5, time())
-			}
-		}			
-	])
+				this.angle = wave(-0.5, 0.5, time());
+			},
+		},
+	]);
 
 	let mage_toparm_lightning = mage.add([
 		pos(0, 0),
@@ -92,10 +92,10 @@ export function addMage() {
 		"mage_lightning",
 		{
 			update() {
-				this.angle = wave(-0.5, 0.5, time())
-			}
-		}			
-	])
+				this.angle = wave(-0.5, 0.5, time());
+			},
+		},
+	]);
 
 	let mage_botarm = mage.add([
 		pos(5, 240),
@@ -104,10 +104,10 @@ export function addMage() {
 		anchor("left"),
 		{
 			update() {
-				this.angle = wave(-1, 1, time())
-			}
-		}			
-	])
+				this.angle = wave(-1, 1, time());
+			},
+		},
+	]);
 
 	let mage_botarm_lightning = mage.add([
 		pos(5, 240),
@@ -118,13 +118,13 @@ export function addMage() {
 		"mage_lightning",
 		{
 			update() {
-				this.angle = wave(-1, 1, time())
-			}
-		}			
-	])
+				this.angle = wave(-1, 1, time());
+			},
+		},
+	]);
 
 	let mage_hexagon = mage.add([
-		pos(GameState.settings.panderitoMode ? vec2(231, 250): vec2(231, 244)),
+		pos(GameState.settings.panderitoMode ? vec2(231, 250) : vec2(231, 244)),
 		sprite(GameState.settings.panderitoMode ? "panderito" : "hexagon"),
 		scale(0.35),
 		waver({ wave_speed: 1, maxAmplitude: 10 }),
@@ -136,32 +136,34 @@ export function addMage() {
 		"hexagon",
 		{
 			update() {
-				this.angle += 0.02
-			}
-		}
-	])
+				this.angle += 0.02;
+			},
+		},
+	]);
 
 	mage_hexagon.onClick(() => {
-		if (GameState.stats.timesAscended < 1) return
-		let randomDialogue = getRandomDialogue("hex") 
-		talk("mage", randomDialogue.text, randomDialogue.speed)
-		
-		bop(mage_hexagon, 0.01)
-	})
+		if (GameState.stats.timesAscended < 1) return;
+		let randomDialogue = getRandomDialogue("hex");
+		talk("mage", randomDialogue.text, randomDialogue.speed);
 
-	// runs thorugh every object with mage_lightning object and attaches an 
+		bop(mage_hexagon, 0.01);
+	});
+
+	// runs thorugh every object with mage_lightning object and attaches an
 	// onupdate that does the color stuff
-	mage.get("mage_lightning").forEach(o => o.onUpdate(() => { 
-		o.color = mage_hexagon.color
-	}))
+	mage.get("mage_lightning").forEach(o =>
+		o.onUpdate(() => {
+			o.color = mage_hexagon.color;
+		})
+	);
 
 	if (isClickeryBirthday) {
 		mage_body.add([
 			sprite("partyhat"),
 			pos(5, -8),
 			rotate(5),
-			scale(0.75)
-		])
+			scale(0.75),
+		]);
 
 		mage.add([
 			sprite("partycake"),
@@ -172,10 +174,10 @@ export function addMage() {
 			scale(0.75),
 			{
 				update() {
-					this.angle = wave(-5, 5, time())
-				}
-			}
-		])
+					this.angle = wave(-5, 5, time());
+				},
+			},
+		]);
 	}
 
 	return mage;

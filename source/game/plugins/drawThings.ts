@@ -1,19 +1,19 @@
-import { Color, GameObj, KEventController } from "kaplay"
+import { Color, GameObj, KEventController } from "kaplay";
 
 /**
- * Draws a damn shadow 
+ * Draws a damn shadow
  */
 export function drawDamnShadow(xSpacing: number, ySpacing: number, theOpacity: number) {
-	let drawEvent:KEventController;
+	let drawEvent: KEventController;
 
 	return {
 		id: "damnShadow",
 		require: ["anchor"],
 		disableShadow: false,
-		
+
 		add() {
 			let drawingShadow = () => {
-				if (this.disableShadow == true) return
+				if (this.disableShadow == true) return;
 				if (this.is("sprite")) {
 					drawSprite({
 						sprite: this.sprite,
@@ -24,9 +24,8 @@ export function drawDamnShadow(xSpacing: number, ySpacing: number, theOpacity: n
 						anchor: this.anchor,
 						scale: this.scale,
 						angle: this.angle,
-					})
+					});
 				}
-
 				else if (this.is("text")) {
 					drawText({
 						text: this.text,
@@ -40,9 +39,8 @@ export function drawDamnShadow(xSpacing: number, ySpacing: number, theOpacity: n
 						anchor: this.anchor,
 						scale: this.scale,
 						angle: this.angle,
-					})
+					});
 				}
-
 				else if (this.is("rect")) {
 					drawRect({
 						width: this.width,
@@ -55,37 +53,41 @@ export function drawDamnShadow(xSpacing: number, ySpacing: number, theOpacity: n
 						anchor: this.anchor,
 						scale: this.scale,
 						angle: this.angle,
-					})
+					});
 				}
-			}
+			};
 
-			drawEvent = this.parent.onDraw(drawingShadow)
+			drawEvent = this.parent.onDraw(drawingShadow);
 		},
 
 		destroy() {
-			drawEvent.cancel()
-			drawEvent = null
-		}
-	}
+			drawEvent.cancel();
+			drawEvent = null;
+		},
+	};
 }
 
 /**
- * Draws a dumb outline 
+ * Draws a dumb outline
  */
-export function drawDumbOutline(theWidth:number, coloring:Color, theParent?:GameObj) : { changeDumbOutlineWidth(width:number):void, get dumbOutlineWidth():number, add():void, destroy():void } {
-	let drawEvent:KEventController;
-	
+export function drawDumbOutline(
+	theWidth: number,
+	coloring: Color,
+	theParent?: GameObj,
+): { changeDumbOutlineWidth(width: number): void; get dumbOutlineWidth(): number; add(): void; destroy(): void; } {
+	let drawEvent: KEventController;
+
 	return {
-		changeDumbOutlineWidth(newWidth:number) {
-			theWidth = newWidth
+		changeDumbOutlineWidth(newWidth: number) {
+			theWidth = newWidth;
 		},
-		
+
 		get dumbOutlineWidth() {
 			return theWidth;
 		},
-		
+
 		add() {
-			theParent = theParent ?? this.parent
+			theParent = theParent ?? this.parent;
 			drawEvent = theParent.onDraw(() => {
 				drawRect({
 					pos: this.screenPos(),
@@ -96,16 +98,16 @@ export function drawDumbOutline(theWidth:number, coloring:Color, theParent?:Game
 					anchor: this.anchor || "topleft",
 					outline: {
 						width: theWidth,
-						color: coloring
+						color: coloring,
 					},
-					fixed: this.fixed
-				})
-			})
+					fixed: this.fixed,
+				});
+			});
 		},
 
 		destroy() {
 			drawEvent.cancel();
 			drawEvent = null;
-		}
-	}
+		},
+	};
 }

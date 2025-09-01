@@ -1,4 +1,4 @@
-import { TextCompOpt, Vec2 } from "kaplay"
+import { TextCompOpt, Vec2 } from "kaplay";
 import { waver } from "./plugins/wave";
 import { playSfx } from "../sound";
 import { GameState, scoreManager } from "../gamestate";
@@ -36,13 +36,13 @@ class Powerup {
 	color?: [number, number, number];
 
 	// DON'T DELETE SPRITE!!!!!! needed for powerup logs
-	constructor(sprite:string, maxTime: number, chance: number, color?: [number, number, number], runningTime?:number, multiplier?:number) {
+	constructor(sprite: string, maxTime: number, chance: number, color?: [number, number, number], runningTime?: number, multiplier?: number) {
 		this.sprite = sprite;
 		this.maxTime = maxTime;
 		this.chance = chance;
-		this.color = color || [255, 255, 255]
-		this.runningTime = runningTime || 0
-		this.multiplier = multiplier || 1
+		this.color = color || [255, 255, 255];
+		this.runningTime = runningTime || 0;
+		this.multiplier = multiplier || 1;
 	}
 }
 
@@ -71,7 +71,7 @@ export const powerupTypes = {
 	 * Is just silly, very silly
 	 */
 	"blab": new Powerup("panderito", 20, 0.15, [214, 154, 51]),
-}
+};
 
 const blabPhrases = [
 	"Test powerup",
@@ -99,26 +99,26 @@ const blabPhrases = [
 	"Did you know?\nYou can press Shift + R to restart the game's scene",
 	"Did you know?\nYou can press Shift + C to save your game",
 	"Did you know?\nYou can press F2 to remove all toasts/logs",
-]
+];
 
 export type powerupName = keyof typeof powerupTypes | "random";
 
 type powerupOpt = {
 	type: powerupName;
-	pos?: Vec2,
-	multiplier?: number,
-	time?: number,
-	natural?: boolean,
+	pos?: Vec2;
+	multiplier?: number;
+	time?: number;
+	natural?: boolean;
+};
+
+let timerSpacing = 70;
+function getTimerXPos(index: number): number {
+	let initialPos = vec2(width() + timerSpacing / 2);
+	return getPosInGrid(initialPos, 0, -index - 1, vec2(timerSpacing, 0)).x;
 }
 
-let timerSpacing = 70
-function getTimerXPos(index:number) : number {
-	let initialPos = vec2(width() + timerSpacing / 2)
-	return getPosInGrid(initialPos, 0, -index - 1, vec2(timerSpacing, 0)).x
-}
-
-function addTimer(type:powerupName) {
-	const powerupColor = arrToColor(powerupTypes[type].color)
+function addTimer(type: powerupName) {
+	const powerupColor = arrToColor(powerupTypes[type].color);
 
 	let timerSprite = add([
 		sprite(`${type}Powerup`),
@@ -138,78 +138,78 @@ function addTimer(type:powerupName) {
 			index: get("putimer").length,
 			updateTime() {
 				tween(vec2(1), vec2(1.1), 0.32, (p) => this.scale = p, easings.easeOutQuint).onEnd(() => {
-					tween(this.scale, vec2(1), 0.32, (p) => this.scale = p, easings.easeOutQuint)
-				})
-				tween(powerupColor, WHITE, 1, (p) => timerSprite.color = p, easings.easeOutQuint)
+					tween(this.scale, vec2(1), 0.32, (p) => this.scale = p, easings.easeOutQuint);
+				});
+				tween(powerupColor, WHITE, 1, (p) => timerSprite.color = p, easings.easeOutQuint);
 			},
 			end() {
 				this.tags.forEach(tag => this.unuse(tag));
-				tween(this.pos.y, this.pos.y - 40, 0.32, (p) => this.pos.y = p, easings.easeOutQuint)
+				tween(this.pos.y, this.pos.y - 40, 0.32, (p) => this.pos.y = p, easings.easeOutQuint);
 				tween(1, 0, 0.32, (p) => this.opacity = p, easings.easeOutQuint).onEnd(() => {
-					destroy(this)
-				})
-				
+					destroy(this);
+				});
+
 				// gets all timers that have an index greater than the current one (the ones to the left)
 				get("putimer").filter(pt => pt.index > this.index).forEach(element => {
 					// decreases the index (moves it to the right)
-					element.index--
+					element.index--;
 					// moves them accordingly
-					tween(element.pos.x, getTimerXPos(element.index), 0.32, (p) => element.pos.x = p, easings.easeOutQuint)
+					tween(element.pos.x, getTimerXPos(element.index), 0.32, (p) => element.pos.x = p, easings.easeOutQuint);
 				});
 				// # holy shit im a genius
 			},
-		}
-	])
+		},
+	]);
 
-	timerSprite.angle = -10
-	timerSprite.width = timerSpacing + 5
-	timerSprite.height = timerSpacing + 5
-	timerSprite.pos.x = width() + timerSpacing
-	
+	timerSprite.angle = -10;
+	timerSprite.width = timerSpacing + 5;
+	timerSprite.height = timerSpacing + 5;
+	timerSprite.pos.x = width() + timerSpacing;
+
 	let tooltip = addTooltip(timerSprite, {
 		text: "",
 		direction: "down",
 		layer: "ui",
 		z: timerSprite.z - 1,
-	})
-	
+	});
+
 	tween(timerSprite.pos.x, getTimerXPos(timerSprite.index), 0.32, (p) => timerSprite.pos.x = p, easings.easeOutBack).onEnd(() => {
-		tween(timerSprite.angle, 0, 0.32, (p) => timerSprite.angle = p, easings.easeOutQuint)
-	})
-	tween(powerupColor, WHITE, 1, (p) => timerSprite.color = p, easings.easeOutQuint)
-	tween(30, 40, 0.32, (p) => timerSprite.pos.y = p, easings.easeOutQuint)
-	tween(90, 0, 0.32, (p) => timerSprite.angle = p, easings.easeOutQuint)
+		tween(timerSprite.angle, 0, 0.32, (p) => timerSprite.angle = p, easings.easeOutQuint);
+	});
+	tween(powerupColor, WHITE, 1, (p) => timerSprite.color = p, easings.easeOutQuint);
+	tween(30, 40, 0.32, (p) => timerSprite.pos.y = p, easings.easeOutQuint);
+	tween(90, 0, 0.32, (p) => timerSprite.angle = p, easings.easeOutQuint);
 
 	timerSprite.onUpdate(() => {
-		tooltip.changePos(vec2(timerSprite.pos.x, (timerSprite.pos.y + timerSprite.height / 2) + 5))
-		tooltip.tooltipBg.opacity = timerSprite.opacity
-		tooltip.tooltipText.opacity = timerSprite.opacity
-		
-		if (powerupTypes[type].removalTime == null) return
-		tooltip.tooltipText.text = `${powerupTypes[type].removalTime.toFixed(0)}s` 
-	})
+		tooltip.changePos(vec2(timerSprite.pos.x, (timerSprite.pos.y + timerSprite.height / 2) + 5));
+		tooltip.tooltipBg.opacity = timerSprite.opacity;
+		tooltip.tooltipText.opacity = timerSprite.opacity;
+
+		if (powerupTypes[type].removalTime == null) return;
+		tooltip.tooltipText.text = `${powerupTypes[type].removalTime.toFixed(0)}s`;
+	});
 
 	timerSprite.onClick(() => {
 		if (get(`poweruplog_${type}`).length == 0) {
-			bop(timerSprite)
-			addPowerupLog(type)
+			bop(timerSprite);
+			addPowerupLog(type);
 		}
-	})
+	});
 
-	let maxTime = powerupTypes[type].removalTime
+	let maxTime = powerupTypes[type].removalTime;
 }
 
-export function addPowerupLog(powerupType:powerupName) {
-	function getPosForPowerupLog(index:number) {
-		return getPosInGrid(vec2(center().x, height() - 100), -index, 0, vec2(300, 100))
+export function addPowerupLog(powerupType: powerupName) {
+	function getPosForPowerupLog(index: number) {
+		return getPosInGrid(vec2(center().x, height() - 100), -index, 0, vec2(300, 100));
 	}
-	
-	let powerupTime = powerupTypes[powerupType].removalTime
-	let textInText = ""
 
-	if (powerupType == "blab") textInText = choose(blabPhrases)
+	let powerupTime = powerupTypes[powerupType].removalTime;
+	let textInText = "";
 
-	const bgOpacity = 0.95
+	if (powerupType == "blab") textInText = choose(blabPhrases);
+
+	const bgOpacity = 0.95;
 	let bg = add([
 		rect(0, 0, { radius: 0 }),
 		pos(center().x, height() - 100),
@@ -220,9 +220,9 @@ export function addPowerupLog(powerupType:powerupName) {
 		z(1),
 		"poweruplog",
 		`poweruplog_${powerupType}`,
-	])
+	]);
 
-	let textInBgOpts = { size: 25, align: "center", width: 300 }
+	let textInBgOpts = { size: 25, align: "center", width: 300 };
 	let textInBg = bg.add([
 		text("", textInBgOpts as TextCompOpt),
 		pos(0, 0),
@@ -231,30 +231,32 @@ export function addPowerupLog(powerupType:powerupName) {
 		opacity(),
 		{
 			update() {
-				if (powerupTypes[powerupType].removalTime == null) {powerupTime = 0; return}
-				powerupTime = Math.round(parseFloat(powerupTypes[powerupType].removalTime.toFixed(1)))
-				
-				let stringPowerupTime = formatTime(powerupTime, true)
-				let powerupMultiplier = powerupTypes[powerupType].multiplier
+				if (powerupTypes[powerupType].removalTime == null) {
+					powerupTime = 0;
+					return;
+				}
+				powerupTime = Math.round(parseFloat(powerupTypes[powerupType].removalTime.toFixed(1)));
 
-				if (powerupType == "clicks") textInText = `Click production increased x${powerupMultiplier} for ${stringPowerupTime}`
-				else if (powerupType == "cursors") textInText = `Cursors production increased x${powerupMultiplier} for ${stringPowerupTime}`
+				let stringPowerupTime = formatTime(powerupTime, true);
+				let powerupMultiplier = powerupTypes[powerupType].multiplier;
+
+				if (powerupType == "clicks") textInText = `Click production increased x${powerupMultiplier} for ${stringPowerupTime}`;
+				else if (powerupType == "cursors") textInText = `Cursors production increased x${powerupMultiplier} for ${stringPowerupTime}`;
 				else if (powerupType == "time") {
-					textInText = `+${formatNumber(Math.round(scoreManager.autoScorePerSecond()) * powerupTime)}, the score you would have gained in ${stringPowerupTime}`
+					textInText = `+${formatNumber(Math.round(scoreManager.autoScorePerSecond()) * powerupTime)}, the score you would have gained in ${stringPowerupTime}`;
 				}
-				else if (powerupType == "awesome") textInText = `Score production increased by x${powerupMultiplier} for ${stringPowerupTime}, AWESOME!!`
+				else if (powerupType == "awesome") textInText = `Score production increased by x${powerupMultiplier} for ${stringPowerupTime}, AWESOME!!`;
 				else if (powerupType == "store") {
-					const discount = 100 - Math.round(powerupMultiplier * 100)
-					textInText = `Store prices have a discount of ${discount}% for ${stringPowerupTime}, get em' now!`
+					const discount = 100 - Math.round(powerupMultiplier * 100);
+					textInText = `Store prices have a discount of ${discount}% for ${stringPowerupTime}, get em' now!`;
 				}
-				else if (powerupType == "blab") textInText = textInText
-				
+				else if (powerupType == "blab") textInText = textInText;
 				else throw new Error("powerup type doesn't exist");
 
-				this.text = textInText
-			}
-		}
-	])
+				this.text = textInText;
+			},
+		},
+	]);
 
 	let icon = bg.add([
 		sprite("white_noise"),
@@ -263,72 +265,72 @@ export function addPowerupLog(powerupType:powerupName) {
 		opacity(),
 		{
 			update() {
-				this.opacity = bg.opacity
-			}
-		}
-	])
+				this.opacity = bg.opacity;
+			},
+		},
+	]);
 
-	parseAnimation(icon, powerupTypes[powerupType].sprite)
-	icon.width = 35
-	icon.height = 35
+	parseAnimation(icon, powerupTypes[powerupType].sprite);
+	icon.width = 35;
+	icon.height = 35;
 
-	let index = get("poweruplog").length - 1
-	let destinedPos = getPosForPowerupLog(index)
+	let index = get("poweruplog").length - 1;
+	let destinedPos = getPosForPowerupLog(index);
 
 	bg.onUpdate(() => {
-		let radius = 5
-		let textWidth = textInBg.width + icon.width * 2
-		let textHeight = formatText({ text: textInText, ...textInBgOpts as TextCompOpt }).height + 15
-		if (textHeight < 50) textHeight = 50
-		
-		bg.height = lerp(bg.height, textHeight, 0.5)
-		bg.width = lerp(bg.width, textWidth, 0.5)
-		// bg.radius = lerp(bg.radius, radius, 0.5)
-	})
+		let radius = 5;
+		let textWidth = textInBg.width + icon.width * 2;
+		let textHeight = formatText({ text: textInText, ...textInBgOpts as TextCompOpt }).height + 15;
+		if (textHeight < 50) textHeight = 50;
 
-	tween(0, bgOpacity, 0.5, (p) => bg.opacity = p, easings.easeOutQuad)
-	tween(height() + bg.height, destinedPos.y, 0.5, (p) => bg.pos.y = p, easings.easeOutQuad)
+		bg.height = lerp(bg.height, textHeight, 0.5);
+		bg.width = lerp(bg.width, textWidth, 0.5);
+		// bg.radius = lerp(bg.radius, radius, 0.5)
+	});
+
+	tween(0, bgOpacity, 0.5, (p) => bg.opacity = p, easings.easeOutQuad);
+	tween(height() + bg.height, destinedPos.y, 0.5, (p) => bg.pos.y = p, easings.easeOutQuad);
 
 	wait(3.5, () => {
-		tween(bg.pos.y, bg.pos.y - bg.height, 0.5, (p) => bg.pos.y = p, easings.easeOutQuad)
-		bg.fadeOut(0.5).onEnd(() => destroy(bg))
-		tween(textInBg.opacity, 0, 0.5, (p) => textInBg.opacity = p, easings.easeOutQuad)
-		bg.unuse("poweruplog")
-	})
+		tween(bg.pos.y, bg.pos.y - bg.height, 0.5, (p) => bg.pos.y = p, easings.easeOutQuad);
+		bg.fadeOut(0.5).onEnd(() => destroy(bg));
+		tween(textInBg.opacity, 0, 0.5, (p) => textInBg.opacity = p, easings.easeOutQuad);
+		bg.unuse("poweruplog");
+	});
 }
 
 export let allPowerupsInfo = {
 	isHoveringAPowerup: false,
 	canSpawnPowerups: false,
-}
+};
 
-export function spawnPowerup(opts?:powerupOpt) {
-	if (allPowerupsInfo.canSpawnPowerups == false) return
-	if (opts == undefined) opts = {} as powerupOpt 
+export function spawnPowerup(opts?: powerupOpt) {
+	if (allPowerupsInfo.canSpawnPowerups == false) return;
+	if (opts == undefined) opts = {} as powerupOpt;
 
-	function getRandomPowerup() : powerupName {
+	function getRandomPowerup(): powerupName {
 		// this doesn't include random of course
-		let list = Object.keys(powerupTypes)
-		
-		if (Math.round(scoreManager.autoScorePerSecond()) < 1 || GameState.cursors < 1) list.splice(list.indexOf("time"), 1)
-		if (opts.natural == false) list.splice(list.indexOf("blab"), 1)
+		let list = Object.keys(powerupTypes);
 
-		let element = choose(list) as powerupName
-		if (chance(0.2) && opts.natural == true) element = "blab"
-		
+		if (Math.round(scoreManager.autoScorePerSecond()) < 1 || GameState.cursors < 1) list.splice(list.indexOf("time"), 1);
+		if (opts.natural == false) list.splice(list.indexOf("blab"), 1);
+
+		let element = choose(list) as powerupName;
+		if (chance(0.2) && opts.natural == true) element = "blab";
+
 		return element;
 	}
 
-	opts.type = opts.type
-	if (opts.type == "random") opts.type = getRandomPowerup()
-	const powerupColor = arrToColor(powerupTypes[opts.type].color)
+	opts.type = opts.type;
+	if (opts.type == "random") opts.type = getRandomPowerup();
+	const powerupColor = arrToColor(powerupTypes[opts.type].color);
 	// was struggling because this returned undefined but then i realized it's because the type was random lol!
 
-	opts.pos = opts.pos || randomPos()
+	opts.pos = opts.pos || randomPos();
 
-	const hoverScale = vec2(1.1)
+	const hoverScale = vec2(1.1);
 
-	let dead = false
+	let dead = false;
 	let powerupObj = add([
 		sprite(`${opts.type}Powerup`),
 		pos(opts.pos),
@@ -348,36 +350,39 @@ export function spawnPowerup(opts?:powerupOpt) {
 		{
 			type: opts.type,
 			update() {
-				this.angle = wave(-1, 1, time() * 3)
+				this.angle = wave(-1, 1, time() * 3);
 			},
 			startHover() {
-				tween(this.scale, hoverScale, 0.15, (p) => this.scale = p, easings.easeOutCubic)
+				tween(this.scale, hoverScale, 0.15, (p) => this.scale = p, easings.easeOutCubic);
 			},
 			endHover() {
-				tween(this.scale, vec2(1), 0.15, (p) => this.scale = p, easings.easeOutCubic)
+				tween(this.scale, vec2(1), 0.15, (p) => this.scale = p, easings.easeOutCubic);
 			},
 			dissapear() {
 				this.loop(0.1, () => {
-					let maxOpacity = 1
+					let maxOpacity = 1;
 
-					if (this.opacity == maxOpacity) {this.opacity = 0; maxOpacity -= 0.1}
-					else if (this.opacity == 0) this.opacity = maxOpacity
-				})
+					if (this.opacity == maxOpacity) {
+						this.opacity = 0;
+						maxOpacity -= 0.1;
+					}
+					else if (this.opacity == 0) this.opacity = maxOpacity;
+				});
 				this.wait(1, () => {
-					this.area.scale = vec2(0)
-					tween(this.opacity, 0, 0.15, (p) => this.opacity = p).onEnd(() => this.destroy())
-				})
+					this.area.scale = vec2(0);
+					tween(this.opacity, 0, 0.15, (p) => this.opacity = p).onEnd(() => this.destroy());
+				});
 			},
 			clickAnim() {
-				dead = true
-				this.area.scale = vec2(0)
-				tween(this.scale, hoverScale, 0.15, (p) => this.scale = p, easings.easeOutCubic)
+				dead = true;
+				this.area.scale = vec2(0);
+				tween(this.scale, hoverScale, 0.15, (p) => this.scale = p, easings.easeOutCubic);
 				tween(this.opacity, 0, 0.15, (p) => this.opacity = p, easings.easeOutCubic).onEnd(() => {
-					destroy(this)
-				})
-				
+					destroy(this);
+				});
+
 				// little blink shadow
-				let maxOpacity = 0.5
+				let maxOpacity = 0.5;
 				let blink = add([
 					sprite(this.type + "Powerup"),
 					pos(this.pos),
@@ -388,107 +393,103 @@ export function spawnPowerup(opts?:powerupOpt) {
 					layer("powerups"),
 					z(this.z - 1),
 					timer(),
-				])
+				]);
 
 				blink.onUpdate(() => {
-					blink.scale = this.scale
-					blink.width = this.width
-					blink.height = this.height
-					blink.pos.y -= 0.5
-				})
+					blink.scale = this.scale;
+					blink.width = this.width;
+					blink.height = this.height;
+					blink.pos.y -= 0.5;
+				});
 
-				let timeToLeave = 0.75
-				tween(blink.color, powerupColor, timeToLeave, (p) => blink.color = p, easings.easeOutBack)
-				tween(blink.opacity, 0, timeToLeave, (p) => blink.opacity = p, easings.easeOutBack)
+				let timeToLeave = 0.75;
+				tween(blink.color, powerupColor, timeToLeave, (p) => blink.color = p, easings.easeOutBack);
+				tween(blink.opacity, 0, timeToLeave, (p) => blink.opacity = p, easings.easeOutBack);
 				blink.wait(timeToLeave, () => {
-					destroy(blink)
+					destroy(blink);
 					// was going to add a second shimmer but got lazy
-				})
+				});
 			},
 			click() {
-				this.clickAnim()
-				playSfx("powerup", { detune: rand(-35, 35) })
-				checkForUnlockable()
-				GameState.stats.powerupsClicked++
+				this.clickAnim();
+				playSfx("powerup", { detune: rand(-35, 35) });
+				checkForUnlockable();
+				GameState.stats.powerupsClicked++;
 
 				// # multipliers
-				let multiplier = 0
-				let time = 0
+				let multiplier = 0;
+				let time = 0;
 
 				// getAdditive
 				if (opts.multiplier == null) {
 					if (opts.type == "clicks" || opts.type == "cursors") {
-						time += opts.time ?? randi(15, 30)
-						multiplier = rand(1.5, 3) * GameState.powerupPower
+						time += opts.time ?? randi(15, 30);
+						multiplier = rand(1.5, 3) * GameState.powerupPower;
 					}
-					
 					// op powerups
 					else if (opts.type == "awesome") {
-						time += opts.time ?? randi(10, 15)
-						multiplier = randi(4, 8) * GameState.powerupPower
+						time += opts.time ?? randi(10, 15);
+						multiplier = randi(4, 8) * GameState.powerupPower;
 					}
-
 					else if (opts.type == "store") {
-						time += opts.time ?? randi(10, 15)
-						multiplier = rand(0.85, 0.9) / GameState.powerupPower
+						time += opts.time ?? randi(10, 15);
+						multiplier = rand(0.85, 0.9) / GameState.powerupPower;
 					}
-
 					// patience
 					else if (opts.type == "time") {
-						multiplier = 1
-						time += opts.time ?? rand(30, 60) * GameState.powerupPower
-						scoreManager.addTweenScore(scoreManager.scorePerSecond() * time)
+						multiplier = 1;
+						time += opts.time ?? rand(30, 60) * GameState.powerupPower;
+						scoreManager.addTweenScore(scoreManager.scorePerSecond() * time);
 					}
-
 					// lol!
 					else if (opts.type == "blab") {
-						multiplier = 1
-						time = 1
-						scoreManager.addScore(1)
+						multiplier = 1;
+						time = 1;
+						scoreManager.addScore(1);
 					}
 				}
 
 				if (opts.type == "clicks" || opts.type == "cursors" || opts.type == "store" || opts.type == "awesome") {
 					// if there's already a timer don't add a new one!
-					let checkTimer = get(`${opts.type}_putimer`)[0] 
-					if (checkTimer) checkTimer.updateTime()
-					else addTimer(opts.type) 
+					let checkTimer = get(`${opts.type}_putimer`)[0];
+					if (checkTimer) checkTimer.updateTime();
+					else addTimer(opts.type);
 				}
 
-				multiplier = parseFloat(multiplier.toFixed(1))
+				multiplier = parseFloat(multiplier.toFixed(1));
 
-				powerupTypes[opts.type].multiplier = multiplier
-				powerupTypes[opts.type].removalTime = time
-				
-				addPowerupLog(opts.type)
-			}
-		}
-	])
+				powerupTypes[opts.type].multiplier = multiplier;
+				powerupTypes[opts.type].removalTime = time;
+
+				addPowerupLog(opts.type);
+			},
+		},
+	]);
 
 	// other stuff
-	powerupObj.startWave()
+	powerupObj.startWave();
 
 	// spawn anim
-	tween(vec2(hoverScale).sub(0.4), hoverScale, 0.25, (p) => powerupObj.scale = p, easings.easeOutBack)
-	tween(0, 1, 0.2, (p) => powerupObj.opacity = p, easings.easeOutBack)
+	tween(vec2(hoverScale).sub(0.4), hoverScale, 0.25, (p) => powerupObj.scale = p, easings.easeOutBack);
+	tween(0, 1, 0.2, (p) => powerupObj.opacity = p, easings.easeOutBack);
 
 	// events
 	powerupObj.onHover(() => {
-		powerupObj.startHover()
-	})
+		powerupObj.startHover();
+	});
 
 	powerupObj.onHoverEnd(() => {
-		powerupObj.endHover()
-	})
+		powerupObj.endHover();
+	});
 
 	powerupObj.onClick(() => {
 		if (dead == true) return;
-		powerupObj.click()
-	})
+		powerupObj.click();
+	});
 
 	powerupObj.wait(20, () => {
-		powerupObj.dissapear()
-	})
+		powerupObj.dissapear();
+	});
 
 	powerupObj.loop(0.5, () => {
 		let shimmer = add([
@@ -513,12 +514,12 @@ export function spawnPowerup(opts?:powerupOpt) {
 				rate: 0,
 				direction: 90,
 				spread: 20,
-			})
-		])
+			}),
+		]);
 
-		shimmer.emit(randi(2, 4))
-		shimmer.onEnd(() => shimmer.destroy())
-	})
+		shimmer.emit(randi(2, 4));
+		shimmer.onEnd(() => shimmer.destroy());
+	});
 }
 
 /**
@@ -527,12 +528,12 @@ export function spawnPowerup(opts?:powerupOpt) {
 export function Powerup_RemovalTimeManager() {
 	for (const powerup in powerupTypes) {
 		if (powerupTypes[powerup].removalTime != null) {
-			if (powerup != "time") powerupTypes[powerup].removalTime -= dt()
-			
+			if (powerup != "time") powerupTypes[powerup].removalTime -= dt();
+
 			if (powerupTypes[powerup].removalTime < 0) {
-				powerupTypes[powerup].removalTime = null
-				get(`${powerup}_putimer`)?.forEach(timer => timer.end())
-				powerupTypes[powerup].multiplier = 1
+				powerupTypes[powerup].removalTime = null;
+				get(`${powerup}_putimer`)?.forEach(timer => timer.end());
+				powerupTypes[powerup].multiplier = 1;
 			}
 		}
 	}
@@ -540,7 +541,7 @@ export function Powerup_RemovalTimeManager() {
 	// this runs on update, it's fine putting isHoveringAPowerup behaviour here
 	if ((get("powerup").length > 0)) {
 		// use isHovering and not isBeingHovered because powerups are on top of everything
-		allPowerupsInfo.isHoveringAPowerup = get("powerup").some((powerup) => powerup.isHovering())
+		allPowerupsInfo.isHoveringAPowerup = get("powerup").some((powerup) => powerup.isHovering());
 	}
 }
 
@@ -549,16 +550,16 @@ export function Powerup_RemovalTimeManager() {
  */
 export function Powerup_NaturalSpawnManager() {
 	for (let powerup in powerupTypes) {
-		powerupTypes[powerup].runningTime += dt()
+		powerupTypes[powerup].runningTime += dt();
 
 		if (powerupTypes[powerup].runningTime > powerupTypes[powerup].maxTime) {
-			powerupTypes[powerup].runningTime = 0
+			powerupTypes[powerup].runningTime = 0;
 
 			if (chance(powerupTypes[powerup].chance)) {
-				powerupTypes[powerup].maxTime += rand(-5, 5)
+				powerupTypes[powerup].maxTime += rand(-5, 5);
 				spawnPowerup({
 					type: powerup as powerupName,
-				})
+				});
 			}
 		}
 	}

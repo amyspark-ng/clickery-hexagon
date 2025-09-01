@@ -3,9 +3,9 @@ import { getPosInGrid } from "./game/utils.ts";
 import { SpriteAtlasData } from "kaplay";
 
 /** String with raw changelog data */
-export let CHANGELOG = ""
+export let CHANGELOG = "";
 
-export function drawSeriousLoadScreen(progress:number, op = 1) {
+export function drawSeriousLoadScreen(progress: number, op = 1) {
 	function drawHexagon(opts = {
 		pos: center(),
 		scale: vec2(1),
@@ -15,24 +15,24 @@ export function drawSeriousLoadScreen(progress:number, op = 1) {
 		const centerX = 0;
 		const centerY = 0;
 		const radius = 100;
-	
+
 		const pts = [];
 		const colors = [];
-	
+
 		for (let i = 0; i < 6; i++) {
 			const angle = Math.PI / 3 * i;
 			const x = centerX + radius * Math.cos(angle);
 			const y = centerY + radius * Math.sin(angle);
 			pts.push(vec2(x, y));
-	
+
 			// Generate colors for each vertex
 			colors.push(rgb(
 				Math.floor(Math.random() * 128 + 128),
 				Math.floor(Math.random() * 128 + 128),
-				Math.floor(Math.random() * 128 + 128)
+				Math.floor(Math.random() * 128 + 128),
 			));
 		}
-	
+
 		drawPolygon({
 			pos: opts.pos,
 			opacity: opts.opacity,
@@ -41,19 +41,19 @@ export function drawSeriousLoadScreen(progress:number, op = 1) {
 			pts: pts,
 		});
 	}
-	
+
 	drawRect({
 		width: width(),
 		height: height(),
 		color: BLACK,
-	})
+	});
 
 	drawHexagon({
 		pos: vec2(963, 495),
 		opacity: op,
 		scale: vec2(wave(-0.5, 0.5, time() * 3), 0.5),
 		color: WHITE,
-	})
+	});
 
 	drawText({
 		text: `LOADING ${Math.round(progress * 100)}%`,
@@ -62,68 +62,70 @@ export function drawSeriousLoadScreen(progress:number, op = 1) {
 		anchor: "right",
 		pos: vec2(899, 525),
 		opacity: op,
-	})
+	});
 
 	// bar
 	drawRect({
-		width: map(progress, 0, 1, 5, width() - 5), 
+		width: map(progress, 0, 1, 5, width() - 5),
 		radius: 2.5,
 		height: 10,
 		anchor: "left",
 		pos: vec2(5, height() - 10),
 		opacity: op,
-	})
+	});
 }
 
-function drawDevkyLoadScreen(progress:number) {
+function drawDevkyLoadScreen(progress: number) {
 	drawRect({
 		width: width(),
 		height: height(),
 		color: BLACK,
-	})
-	
+	});
+
 	drawSprite({
 		sprite: "devky",
 		anchor: "topleft",
 		pos: vec2(),
 		width: map(progress, 0, 1, 0, width()),
 		height: height(),
-	})
+	});
 }
 
 // Sprite atlas were made with this awesome website
 // https://www.finalparsec.com/tools/sprite_sheet_maker
-// 20% of getting devky's funny loading screen 
-if (chance(0.2)) onLoading((progress) => drawDevkyLoadScreen(progress))
-else onLoading((progress) => drawSeriousLoadScreen(progress))
+// 20% of getting devky's funny loading screen
+if (chance(0.2)) onLoading((progress) => drawDevkyLoadScreen(progress));
+else onLoading((progress) => drawSeriousLoadScreen(progress));
 
 // load changelog
-load(new Promise(async (resolve, reject) => {
-	CHANGELOG = await (await fetch("assets/CHANGELOG.md")).text()
-	resolve(CHANGELOG)
-}))
+load(
+	new Promise(async (resolve, reject) => {
+		CHANGELOG = await (await fetch("assets/CHANGELOG.md")).text();
+		resolve(CHANGELOG);
+	}),
+);
 
 loadFont("emulogic", "assets/emulogic.ttf", {
 	outline: 10,
-	filter: "linear"
-})
+	filter: "linear",
+});
 
 loadFont("lambdao", "assets/Lambda-Regular.ttf", {
 	outline: 5,
-	filter: "linear"
-})
+	filter: "linear",
+});
 
 loadFont("lambda", "assets/Lambda-Regular.ttf", {
-	filter: "linear"
-})
+	filter: "linear",
+});
 
-loadBean()
+loadBean();
 
-loadRoot("assets/")
-loadSprite("devky", "devky.png")
-loadSprite("hexagon", "sprites/hexagon.png")
+loadRoot("assets/");
+loadSprite("devky", "devky.png");
+loadSprite("hexagon", "sprites/hexagon.png");
 
-//#region SPRITES
+// #region SPRITES
 // cursors
 loadSprite("cursors", "sprites/cursors.png", {
 	sliceX: 5,
@@ -134,7 +136,7 @@ loadSprite("cursors", "sprites/cursors.png", {
 		grab: 2,
 		wait: 3,
 		check: 4,
-	}, 
+	},
 });
 
 loadSpriteAtlas("sprites/cursors.png", {
@@ -143,11 +145,11 @@ loadSpriteAtlas("sprites/cursors.png", {
 		y: 0,
 		width: 48,
 		height: 48,
-	}
-})
+	},
+});
 
-loadSprite("saveIcon", "sprites/saveIcon.png")
-loadSprite("welcomeBackIcon", "sprites/welcomeBackIcon.png")
+loadSprite("saveIcon", "sprites/saveIcon.png");
+loadSprite("welcomeBackIcon", "sprites/welcomeBackIcon.png");
 
 loadSpriteAtlas("sprites/powerUps.png", {
 	"clicksPowerup": {
@@ -186,24 +188,24 @@ loadSpriteAtlas("sprites/powerUps.png", {
 		width: 140,
 		height: 140,
 	},
-})
+});
 
-loadSprite("part_star", "sprites/part_star.png")
-loadSprite("panderito", "sprites/panderito.png")
-loadSprite("smallpanderito", "sprites/smallpanderito.png")
-loadSprite("folderObj", "sprites/folderObj.png")
+loadSprite("part_star", "sprites/part_star.png");
+loadSprite("panderito", "sprites/panderito.png");
+loadSprite("smallpanderito", "sprites/smallpanderito.png");
+loadSprite("folderObj", "sprites/folderObj.png");
 loadSprite("speakers", "sprites/speakers.png", {
 	sliceX: 2,
 	sliceY: 1,
 	anims: {
 		mute: 0,
 		sound: 1,
-	}
-})
+	},
+});
 
-//#region Windows
-loadSprite("dumbTestWin", "sprites/windows/dumbTestWin.png")
-loadSprite("xButton", "sprites/windows/xButton.png")
+// #region Windows
+loadSprite("dumbTestWin", "sprites/windows/dumbTestWin.png");
+loadSprite("xButton", "sprites/windows/xButton.png");
 loadSpriteAtlas("sprites/windows/winMinibuttons.png", {
 	"icon_about": {
 		width: 140,
@@ -215,7 +217,7 @@ loadSpriteAtlas("sprites/windows/winMinibuttons.png", {
 		anims: {
 			default: 0,
 			hover: 1,
-		}
+		},
 	},
 	"icon_medals": {
 		width: 140,
@@ -227,7 +229,7 @@ loadSpriteAtlas("sprites/windows/winMinibuttons.png", {
 		anims: {
 			default: 0,
 			hover: 1,
-		}
+		},
 	},
 	"icon_ascend": {
 		width: 140,
@@ -239,7 +241,7 @@ loadSpriteAtlas("sprites/windows/winMinibuttons.png", {
 		anims: {
 			default: 0,
 			hover: 1,
-		}
+		},
 	},
 	"icon_settings": {
 		width: 140,
@@ -251,7 +253,7 @@ loadSpriteAtlas("sprites/windows/winMinibuttons.png", {
 		anims: {
 			default: 0,
 			hover: 1,
-		}
+		},
 	},
 	"icon_leaderboards": {
 		width: 140,
@@ -263,7 +265,7 @@ loadSpriteAtlas("sprites/windows/winMinibuttons.png", {
 		anims: {
 			default: 0,
 			hover: 1,
-		}
+		},
 	},
 	"icon_music": {
 		width: 140,
@@ -275,7 +277,7 @@ loadSpriteAtlas("sprites/windows/winMinibuttons.png", {
 		anims: {
 			default: 0,
 			hover: 1,
-		}
+		},
 	},
 	"icon_stats": {
 		width: 140,
@@ -287,7 +289,7 @@ loadSpriteAtlas("sprites/windows/winMinibuttons.png", {
 		anims: {
 			default: 0,
 			hover: 1,
-		}
+		},
 	},
 	"icon_store": {
 		width: 140,
@@ -299,7 +301,7 @@ loadSpriteAtlas("sprites/windows/winMinibuttons.png", {
 		anims: {
 			default: 0,
 			hover: 1,
-		}
+		},
 	},
 	"icon_bgColor": {
 		width: 140,
@@ -311,7 +313,7 @@ loadSpriteAtlas("sprites/windows/winMinibuttons.png", {
 		anims: {
 			default: 0,
 			hover: 1,
-		}
+		},
 	},
 	"icon_hexColor": {
 		width: 140,
@@ -323,7 +325,7 @@ loadSpriteAtlas("sprites/windows/winMinibuttons.png", {
 		anims: {
 			default: 0,
 			hover: 1,
-		}
+		},
 	},
 	"icon_credits": {
 		width: 140,
@@ -335,7 +337,7 @@ loadSpriteAtlas("sprites/windows/winMinibuttons.png", {
 		anims: {
 			default: 0,
 			hover: 1,
-		}
+		},
 	},
 	"white_noise": {
 		width: 140,
@@ -355,49 +357,49 @@ loadSpriteAtlas("sprites/windows/winMinibuttons.png", {
 			open_hover: 1,
 			shut_default: 2,
 			shut_hover: 3,
-		}
+		},
 	},
-})
+});
 
-//#region Store
-loadSprite("storeWin", "sprites/windows/storeWin/storeWin.png")
-loadSprite("stroeWin", "sprites/windows/storeWin/stroeWin.png")
+// #region Store
+loadSprite("storeWin", "sprites/windows/storeWin/storeWin.png");
+loadSprite("stroeWin", "sprites/windows/storeWin/stroeWin.png");
 loadSpriteAtlas("sprites/windows/storeWin/storeElements.png", {
 	"clickersElement": {
 		sliceX: 2,
 		x: 0,
 		y: 254,
-		width: 349*2,
+		width: 349 * 2,
 		height: 127,
 		anims: {
 			"up": 0,
 			"down": 1,
-		}
+		},
 	},
 	"cursorsElement": {
 		sliceX: 2,
 		x: 0,
 		y: 0,
-		width: 349*2,
+		width: 349 * 2,
 		height: 127,
 		anims: {
 			"up": 0,
 			"down": 1,
-		}
+		},
 	},
 	"powerupsElement": {
 		sliceX: 3,
 		x: 0,
 		y: 127,
-		width: 349*3,
+		width: 349 * 3,
 		height: 127,
 		anims: {
 			"up": 0,
 			"down": 1,
-		}
+		},
 	},
-})
-loadSprite("chains", "sprites/windows/storeWin/chains.png")
+});
+loadSprite("chains", "sprites/windows/storeWin/chains.png");
 loadSprite("smoke", "sprites/windows/storeWin/smoke.png", {
 	sliceX: 3,
 	anims: {
@@ -405,17 +407,17 @@ loadSprite("smoke", "sprites/windows/storeWin/smoke.png", {
 			from: 0,
 			to: 2,
 			loop: true,
-		}
-	}
-})
-loadSprite("upgrade", "sprites/windows/storeWin/upgrade.png")
-loadSprite("upgradelock", "sprites/windows/storeWin/upgradelock.png")
+		},
+	},
+});
+loadSprite("upgrade", "sprites/windows/storeWin/upgrade.png");
+loadSprite("upgradelock", "sprites/windows/storeWin/upgradelock.png");
 
-//#endregion Store
+// #endregion Store
 
-//#region Music
-loadSprite("musicWin", "sprites/windows/musicWin/musicWin.png")
-loadSprite("musicDisc", "sprites/windows/musicWin/musicDisc.png")
+// #region Music
+loadSprite("musicWin", "sprites/windows/musicWin/musicWin.png");
+loadSprite("musicDisc", "sprites/windows/musicWin/musicDisc.png");
 loadSprite("musicWinButtons", "sprites/windows/musicWin/musicWinButtons.png", {
 	sliceX: 4,
 	sliceY: 1,
@@ -424,9 +426,9 @@ loadSprite("musicWinButtons", "sprites/windows/musicWin/musicWinButtons.png", {
 		"play": 1,
 		"back": 2,
 		"skip": 3,
-	}
-})
-loadSprite("mutedButton", "sprites/windows/musicWin/mutedButton.png")
+	},
+});
+loadSprite("mutedButton", "sprites/windows/musicWin/mutedButton.png");
 loadSprite("mageDance", "sprites/windows/musicWin/mageDance.png", {
 	sliceX: 4,
 	sliceY: 1,
@@ -434,12 +436,12 @@ loadSprite("mageDance", "sprites/windows/musicWin/mageDance.png", {
 		"dance": {
 			from: 0,
 			to: 3,
-			loop: true
-		}
-	}
-})
+			loop: true,
+		},
+	},
+});
 
-//#endregion
+// #endregion
 
 // #region Settings
 loadSpriteAtlas("sprites/windows/settingsWin/settingsVolbars.png", {
@@ -465,9 +467,9 @@ loadSpriteAtlas("sprites/windows/settingsWin/settingsVolbars.png", {
 		"anims": {
 			on: 1,
 			off: 0,
-		}
-	}
-})
+		},
+	},
+});
 loadSpriteAtlas("sprites/windows/settingsWin/settingsCheckbox.png", {
 	"checkbox": {
 		"x": 0,
@@ -478,7 +480,7 @@ loadSpriteAtlas("sprites/windows/settingsWin/settingsCheckbox.png", {
 		"anims": {
 			"on": 1,
 			"off": 0,
-		}
+		},
 	},
 	"tick": {
 		"x": 90,
@@ -486,58 +488,57 @@ loadSpriteAtlas("sprites/windows/settingsWin/settingsCheckbox.png", {
 		"width": 60,
 		"height": 54,
 	},
-})
+});
 
-loadSprite("settingsWin", "sprites/windows/settingsWin/settingsWin.png")
+loadSprite("settingsWin", "sprites/windows/settingsWin/settingsWin.png");
 
-loadSprite("settingsArrow", "sprites/windows/settingsWin/settingsArrow.png")
-loadSprite("settingsDottedHex", "sprites/windows/settingsWin/settingsDottedHex.png")
-loadSprite("settingsHex", "sprites/windows/settingsWin/settingsHex.png")
-loadSprite("settingsFloppy", "sprites/windows/settingsWin/settingsFloppy.png")
-loadSprite("settingsTrashcan", "sprites/windows/settingsWin/settingsTrashcan.png")
+loadSprite("settingsArrow", "sprites/windows/settingsWin/settingsArrow.png");
+loadSprite("settingsDottedHex", "sprites/windows/settingsWin/settingsDottedHex.png");
+loadSprite("settingsHex", "sprites/windows/settingsWin/settingsHex.png");
+loadSprite("settingsFloppy", "sprites/windows/settingsWin/settingsFloppy.png");
+loadSprite("settingsTrashcan", "sprites/windows/settingsWin/settingsTrashcan.png");
 
-//#endregion Settings
+// #endregion Settings
 
-loadSprite("medalsUnknown", "sprites/windows/medalsWin/medalsUnknown.png")
-loadSprite("medalsUnknown_tap", "sprites/windows/medalsWin/medalsUnknown_tap.png")
+loadSprite("medalsUnknown", "sprites/windows/medalsWin/medalsUnknown.png");
+loadSprite("medalsUnknown_tap", "sprites/windows/medalsWin/medalsUnknown_tap.png");
 
-let medalSprites = {} as SpriteAtlasData
-let availableAchievements = achievements.slice(0, 48)
+let medalSprites = {} as SpriteAtlasData;
+let availableAchievements = achievements.slice(0, 48);
 
-let column = -1
-let row = 0
+let column = -1;
+let row = 0;
 
-let spacing = vec2(60)
+let spacing = vec2(60);
 
 availableAchievements.map(achievement => achievement.id).forEach((achievementId, index) => {
 	if (column == 19) {
-		column = 0
-		row++
+		column = 0;
+		row++;
 	}
-
 	else {
-		column++
+		column++;
 	}
 
-	let position = getPosInGrid(vec2(0, 0), row, column, spacing)
+	let position = getPosInGrid(vec2(0, 0), row, column, spacing);
 
 	medalSprites[`medals_${achievementId}`] = {
 		"x": position.x,
 		"y": position.y,
 		"width": spacing.x,
 		"height": spacing.y,
-	}
-})
+	};
+});
 
-const gooberPos = getPosInGrid(vec2(0, 0), 2, 8, vec2(60))
+const gooberPos = getPosInGrid(vec2(0, 0), 2, 8, vec2(60));
 medalSprites["devkyGoober"] = {
 	x: gooberPos.x,
 	y: gooberPos.y,
 	width: 60,
 	height: 60,
-}
+};
 
-loadSpriteAtlas("sprites/windows/medalsWin/medalsMedals.png", medalSprites)
+loadSpriteAtlas("sprites/windows/medalsWin/medalsMedals.png", medalSprites);
 loadSprite("medals_extra.ALL", "sprites/windows/medalsWin/masterMedal.png", {
 	sliceX: 24,
 	sliceY: 2,
@@ -546,29 +547,29 @@ loadSprite("medals_extra.ALL", "sprites/windows/medalsWin/masterMedal.png", {
 			from: 0,
 			to: 47,
 			loop: true,
-		}
+		},
 	},
-})
-loadSprite("medalsWin", "sprites/windows/medalsWin/medalsWin.png")
-loadSprite("medalsBg", "sprites/windows/medalsWin/medalsBg.png")
+});
+loadSprite("medalsWin", "sprites/windows/medalsWin/medalsWin.png");
+loadSprite("medalsBg", "sprites/windows/medalsWin/medalsBg.png");
 
-//#region Other ones huh
-loadSprite("hexColorWin", "sprites/windows/colorWin/hexColorWin.png")
-loadSprite("bgColorWin", "sprites/windows/colorWin/bgColorWin.png")
+// #region Other ones huh
+loadSprite("hexColorWin", "sprites/windows/colorWin/hexColorWin.png");
+loadSprite("bgColorWin", "sprites/windows/colorWin/bgColorWin.png");
 
-loadSprite("hexColorHandle", "sprites/windows/colorWin/hexColorHandle.png")
-loadSprite("defaultButton", "sprites/windows/colorWin/defaultButton.png")
-loadSprite("randomButton", "sprites/windows/colorWin/randomButton.png")
+loadSprite("hexColorHandle", "sprites/windows/colorWin/hexColorHandle.png");
+loadSprite("defaultButton", "sprites/windows/colorWin/defaultButton.png");
+loadSprite("randomButton", "sprites/windows/colorWin/randomButton.png");
 
-loadSprite("extraWin", "sprites/windows/extraWin/extraWin.png")
+loadSprite("extraWin", "sprites/windows/extraWin/extraWin.png");
 
-loadSprite("statsWin", "sprites/windows/statsWin/statsWin.png")
-loadSprite("statIcons1", "sprites/windows/statsWin/statIcons1.png")
-loadSprite("statIcons2", "sprites/windows/statsWin/statIcons2.png")
-loadSprite("statIcons3", "sprites/windows/statsWin/statIcons3.png")
+loadSprite("statsWin", "sprites/windows/statsWin/statsWin.png");
+loadSprite("statIcons1", "sprites/windows/statsWin/statIcons1.png");
+loadSprite("statIcons2", "sprites/windows/statsWin/statIcons2.png");
+loadSprite("statIcons3", "sprites/windows/statsWin/statIcons3.png");
 
-loadSprite("leaderboardsWin", "sprites/windows/leaderboardsWin/leaderboardsWin.png")
-loadSprite("leaderboardsHeader", "sprites/windows/leaderboardsWin/leaderboardsHeader.png")
+loadSprite("leaderboardsWin", "sprites/windows/leaderboardsWin/leaderboardsWin.png");
+loadSprite("leaderboardsHeader", "sprites/windows/leaderboardsWin/leaderboardsHeader.png");
 loadSpriteAtlas("sprites/windows/leaderboardsWin/leaderboardsScoreButtons.png", {
 	"leaderboardsScoreAllTime": {
 		"x": 0,
@@ -588,7 +589,7 @@ loadSpriteAtlas("sprites/windows/leaderboardsWin/leaderboardsScoreButtons.png", 
 		"width": 124,
 		"height": 40,
 	},
-})
+});
 loadSpriteAtlas("sprites/windows/leaderboardsWin/leaderboardsTimeButtons.png", {
 	"leaderboardsW": {
 		"x": 0,
@@ -608,34 +609,34 @@ loadSpriteAtlas("sprites/windows/leaderboardsWin/leaderboardsTimeButtons.png", {
 		"width": 40,
 		"height": 40,
 	},
-})
+});
 
-loadSprite("creditsWin", "sprites/windows/creditsWin/creditsWin.png")
-loadSprite("creditsHeart", "sprites/windows/creditsWin/creditsHeart.png")
+loadSprite("creditsWin", "sprites/windows/creditsWin/creditsWin.png");
+loadSprite("creditsHeart", "sprites/windows/creditsWin/creditsHeart.png");
 
-loadSprite("creditsCode", "sprites/windows/creditsWin/creditsCode.png")
-loadSprite("creditsArt", "sprites/windows/creditsWin/creditsArt.png")
-loadSprite("creditsDesign", "sprites/windows/creditsWin/creditsDesign.png")
-loadSprite("creditsShader", "sprites/windows/creditsWin/creditsShader.png")
-loadSprite("creditsPlaytest", "sprites/windows/creditsWin/creditsPlaytest.png")
-loadSprite("creditsDesktop", "sprites/windows/creditsWin/creditsDesktop.png")
-//#endregion
+loadSprite("creditsCode", "sprites/windows/creditsWin/creditsCode.png");
+loadSprite("creditsArt", "sprites/windows/creditsWin/creditsArt.png");
+loadSprite("creditsDesign", "sprites/windows/creditsWin/creditsDesign.png");
+loadSprite("creditsShader", "sprites/windows/creditsWin/creditsShader.png");
+loadSprite("creditsPlaytest", "sprites/windows/creditsWin/creditsPlaytest.png");
+loadSprite("creditsDesktop", "sprites/windows/creditsWin/creditsDesktop.png");
+// #endregion
 
-//#endregion
+// #endregion
 
-// #region clickerius hernelius  
+// #region clickerius hernelius
 loadSpriteAtlas("sprites/ascendscene/hexAgony.png", {
 	"mage_body": {
 		"x": 1000,
 		"y": 0,
 		"width": 500,
-		"height": 500, 
+		"height": 500,
 	},
 	"mage_body_lightning": {
 		"x": 0,
 		"y": 500,
 		"width": 500,
-		"height": 500, 
+		"height": 500,
 	},
 	"mage_botarm": {
 		"x": 500,
@@ -665,9 +666,9 @@ loadSpriteAtlas("sprites/ascendscene/hexAgony.png", {
 		"x": 500,
 		"y": 500,
 		"width": 500,
-		"height": 500, 
+		"height": 500,
 	},
-})
+});
 loadSprite("mage_eye", "sprites/ascendscene/eye.png", {
 	sliceX: 4,
 	sliceY: 1,
@@ -676,18 +677,18 @@ loadSprite("mage_eye", "sprites/ascendscene/eye.png", {
 			from: 1,
 			to: 3,
 		},
-	}
-})
-loadSprite("dialogue", "sprites/ascendscene/dialogue.png")
-loadSprite("hoverDialogue", "sprites/ascendscene/emptyDialogue.png")
+	},
+});
+loadSprite("dialogue", "sprites/ascendscene/dialogue.png");
+loadSprite("hoverDialogue", "sprites/ascendscene/emptyDialogue.png");
 loadSprite("eye_translate", "sprites/ascendscene/translate.png", {
 	sliceX: 4,
 	sliceY: 1,
 	anims: {
 		"woke": 3,
 		"dumb": 1,
-	}
-})
+	},
+});
 
 loadSpriteAtlas("sprites/ascendscene/cards.png", {
 	// 22 between each card
@@ -727,43 +728,43 @@ loadSpriteAtlas("sprites/ascendscene/cards.png", {
 		"width": 123,
 		"height": 169,
 	},
-})
-loadSprite("partyhat", "sprites/ascendscene/partyhat.png")
-loadSprite("partycake", "sprites/ascendscene/cake.png")
-loadSprite("backcard", "sprites/ascendscene/backcard.png")
-loadSprite("leaveButton", "sprites/ascendscene/leaveButton.png")
+});
+loadSprite("partyhat", "sprites/ascendscene/partyhat.png");
+loadSprite("partycake", "sprites/ascendscene/cake.png");
+loadSprite("backcard", "sprites/ascendscene/backcard.png");
+loadSprite("leaveButton", "sprites/ascendscene/leaveButton.png");
 
-loadSprite("ascendWin", "sprites/windows/ascendWin/ascendWin.png")
-loadSprite("winMage_body", "sprites/windows/ascendWin/winMage_body.png")
-loadSprite("winMage_eye", "sprites/windows/ascendWin/winMage_eye.png")
-loadSprite("winMage_cursors", "sprites/windows/ascendWin/winMage_cursors.png")
-loadSprite("winMage_vignette", "sprites/windows/ascendWin/winMage_vignette.png")
+loadSprite("ascendWin", "sprites/windows/ascendWin/ascendWin.png");
+loadSprite("winMage_body", "sprites/windows/ascendWin/winMage_body.png");
+loadSprite("winMage_eye", "sprites/windows/ascendWin/winMage_eye.png");
+loadSprite("winMage_cursors", "sprites/windows/ascendWin/winMage_cursors.png");
+loadSprite("winMage_vignette", "sprites/windows/ascendWin/winMage_vignette.png");
 
-loadSprite("manaCounterTri", "sprites/windows/ascendWin/manaCounterTri.png")
-loadSprite("ascendBottomPolygon", "sprites/windows/ascendWin/ascendBottomPolygon.png")
-loadSprite("ascendBar", "sprites/windows/ascendWin/ascendBar.png")
-loadSprite("ascendManaStar", "sprites/windows/ascendWin/ascendManaStar.png")
+loadSprite("manaCounterTri", "sprites/windows/ascendWin/manaCounterTri.png");
+loadSprite("ascendBottomPolygon", "sprites/windows/ascendWin/ascendBottomPolygon.png");
+loadSprite("ascendBar", "sprites/windows/ascendWin/ascendBar.png");
+loadSprite("ascendManaStar", "sprites/windows/ascendWin/ascendManaStar.png");
 loadSprite("ascendButtonEyes", "sprites/windows/ascendWin/ascendButtonEyes.png", {
 	sliceX: 2,
 	sliceY: 1,
 	anims: {
 		"woke": 0,
-		"dumb": 1
-	}
-})
-loadSprite("ascendButtonScroll", "sprites/windows/ascendWin/ascendButtonScroll.png")
+		"dumb": 1,
+	},
+});
+loadSprite("ascendButtonScroll", "sprites/windows/ascendWin/ascendButtonScroll.png");
 
-loadSprite("gnome", "sprites/gnome.png")
+loadSprite("gnome", "sprites/gnome.png");
 loadSprite("pinch", "sprites/pinch.png", {
 	anims: {
 		pinching: {
 			from: 0,
 			to: 3,
-		}
+		},
 	},
 	sliceX: 4,
 	sliceY: 1,
-})
+});
 
 loadSpriteAtlas("sprites/newgroundsButtons.png", {
 	"newgroundsSignInButton": {
@@ -778,85 +779,88 @@ loadSpriteAtlas("sprites/newgroundsButtons.png", {
 		"width": 200,
 		"height": 100,
 	},
-})
+});
 
-loadSprite("newgroundsPopup", "sprites/newgroundsPopup.png")
-//#endregion
-//#endregion SPRITES
+loadSprite("newgroundsPopup", "sprites/newgroundsPopup.png");
+// #endregion
+// #endregion SPRITES
 
 // #region SOUNDS
-//#region hexagon-intro
-loadSound("biglight", "sounds/sfx/hexagon-intro/biglight.ogg")
-loadSound("ominus", "sounds/sfx/hexagon-intro/ominus.ogg")
+// #region hexagon-intro
+loadSound("biglight", "sounds/sfx/hexagon-intro/biglight.ogg");
+loadSound("ominus", "sounds/sfx/hexagon-intro/ominus.ogg");
 
-loadSound("clickPress", "sounds/sfx/hexagon-intro/clickPress.ogg")
-loadSound("clickRelease", "sounds/sfx/hexagon-intro/clickRelease.ogg")
-loadSound("powerup", "sounds/sfx/hexagon-intro/powerup.ogg")
-loadSound("fullcombo", "sounds/sfx/hexagon-intro/fullcombo.ogg")
-loadSound("combo", "sounds/sfx/hexagon-intro/combo.ogg")
-loadSound("punch", "sounds/sfx/hexagon-intro/punch.ogg")
-//#endregion hexagon-intro
+loadSound("clickPress", "sounds/sfx/hexagon-intro/clickPress.ogg");
+loadSound("clickRelease", "sounds/sfx/hexagon-intro/clickRelease.ogg");
+loadSound("powerup", "sounds/sfx/hexagon-intro/powerup.ogg");
+loadSound("fullcombo", "sounds/sfx/hexagon-intro/fullcombo.ogg");
+loadSound("combo", "sounds/sfx/hexagon-intro/combo.ogg");
+loadSound("punch", "sounds/sfx/hexagon-intro/punch.ogg");
+// #endregion hexagon-intro
 
-//#region ascension
-loadSound("mage_a", "sounds/sfx/ascension/mage_a.ogg")
-loadSound("mage_e", "sounds/sfx/ascension/mage_e.ogg")
-loadSound("mage_o", "sounds/sfx/ascension/mage_o.ogg")
-loadSound("mage_i", "sounds/sfx/ascension/mage_i.ogg")
+// #region ascension
+loadSound("mage_a", "sounds/sfx/ascension/mage_a.ogg");
+loadSound("mage_e", "sounds/sfx/ascension/mage_e.ogg");
+loadSound("mage_o", "sounds/sfx/ascension/mage_o.ogg");
+loadSound("mage_i", "sounds/sfx/ascension/mage_i.ogg");
 
-loadSound("mage_yummers", "sounds/sfx/ascension/mage_yummers.ogg")
-loadSound("mage_huntressHum", "sounds/sfx/ascension/mage_huntressHum.ogg")
-loadSound("onecard", "sounds/sfx/ascension/onecard.mp3")
-loadSound("allcards", "sounds/sfx/ascension/allcards.ogg")
-//#endregion ascension
+loadSound("mage_yummers", "sounds/sfx/ascension/mage_yummers.ogg");
+loadSound("mage_huntressHum", "sounds/sfx/ascension/mage_huntressHum.ogg");
+loadSound("onecard", "sounds/sfx/ascension/onecard.mp3");
+loadSound("allcards", "sounds/sfx/ascension/allcards.ogg");
+// #endregion ascension
 
-//#region ui
-loadSound("unlockachievement", "sounds/sfx/ui/unlockachievement.ogg")
-loadSound("gamesaved", "sounds/sfx/ui/gamesaved.ogg")
-loadSound("clickButton", "sounds/sfx/ui/clickButton.ogg")
-loadSound("kaching", "sounds/sfx/ui/kaching.ogg")
-loadSound("unhoverhex", "sounds/sfx/ui/unhoverhex.ogg")
-loadSound("volumeChange", "sounds/sfx/ui/volumeChange.ogg")
-//#endregion ui
+// #region ui
+loadSound("unlockachievement", "sounds/sfx/ui/unlockachievement.ogg");
+loadSound("gamesaved", "sounds/sfx/ui/gamesaved.ogg");
+loadSound("clickButton", "sounds/sfx/ui/clickButton.ogg");
+loadSound("kaching", "sounds/sfx/ui/kaching.ogg");
+loadSound("unhoverhex", "sounds/sfx/ui/unhoverhex.ogg");
+loadSound("volumeChange", "sounds/sfx/ui/volumeChange.ogg");
+// #endregion ui
 
-//#region window
-loadSound("fold", "sounds/sfx/window/fold.ogg")
-loadSound("hoverMiniButton", "sounds/sfx/window/hoverMiniButton.ogg")
-loadSound("plap", "sounds/sfx/window/plap.ogg")
-loadSound("plop", "sounds/sfx/window/plop.ogg")
-loadSound("windowUnlocked", "sounds/sfx/window/windowUnlocked.ogg")
-loadSound("openWin", "sounds/sfx/window/openWin.ogg")
-loadSound("closeWin", "sounds/sfx/window/closeWin.ogg")
-loadSound("progress", "sounds/sfx/window/progress.ogg")
-loadSound("wrong", "sounds/sfx/window/wrong.ogg")
-loadSound("chainwrong", "sounds/sfx/window/chainwrong.ogg")
-loadSound("chainbreak", "sounds/sfx/window/chainbreak.ogg")
-//#endregion window
+// #region window
+loadSound("fold", "sounds/sfx/window/fold.ogg");
+loadSound("hoverMiniButton", "sounds/sfx/window/hoverMiniButton.ogg");
+loadSound("plap", "sounds/sfx/window/plap.ogg");
+loadSound("plop", "sounds/sfx/window/plop.ogg");
+loadSound("windowUnlocked", "sounds/sfx/window/windowUnlocked.ogg");
+loadSound("openWin", "sounds/sfx/window/openWin.ogg");
+loadSound("closeWin", "sounds/sfx/window/closeWin.ogg");
+loadSound("progress", "sounds/sfx/window/progress.ogg");
+loadSound("wrong", "sounds/sfx/window/wrong.ogg");
+loadSound("chainwrong", "sounds/sfx/window/chainwrong.ogg");
+loadSound("chainbreak", "sounds/sfx/window/chainbreak.ogg");
+// #endregion window
 
-loadSound("partyhorn", "sounds/sfx/partyhorn.ogg")
-loadSound("gnome", "sounds/sfx/gnome.ogg")
-loadSound("squeak", "sounds/sfx/squeak.ogg")
+loadSound("partyhorn", "sounds/sfx/partyhorn.ogg");
+loadSound("gnome", "sounds/sfx/gnome.ogg");
+loadSound("squeak", "sounds/sfx/squeak.ogg");
 
 // music
 // don't load as music because then it won't play when the game loads
 // only done on debug to make the game load quicker since im not listening the music really
-loadSound("clicker.wav", "sounds/music/clicker.ogg")
-loadSound("menu.wav", "sounds/music/menu.ogg")
-loadSound("whatttt.wav", "sounds/music/whatttt.ogg")
-loadSound("simple.wav", "sounds/music/simple.ogg")
-loadSound("jazz.wav", "sounds/music/jazz.ogg")
-loadSound("sweet.wav", "sounds/music/sweet.ogg")
-loadSound("ok_instrumental", "sounds/music/ok_instrumental.ogg")
-loadSound("magic", "sounds/music/magic.ogg")
-loadSound("watchout", "sounds/music/watchout.ogg")
-loadSound("catnip", "sounds/music/catnip.ogg")
-loadSound("project_23", "sounds/music/project_23.ogg")
+loadSound("clicker.wav", "sounds/music/clicker.ogg");
+loadSound("menu.wav", "sounds/music/menu.ogg");
+loadSound("whatttt.wav", "sounds/music/whatttt.ogg");
+loadSound("simple.wav", "sounds/music/simple.ogg");
+loadSound("jazz.wav", "sounds/music/jazz.ogg");
+loadSound("sweet.wav", "sounds/music/sweet.ogg");
+loadSound("ok_instrumental", "sounds/music/ok_instrumental.ogg");
+loadSound("magic", "sounds/music/magic.ogg");
+loadSound("watchout", "sounds/music/watchout.ogg");
+loadSound("catnip", "sounds/music/catnip.ogg");
+loadSound("project_23", "sounds/music/project_23.ogg");
 
-//#endregion MUSIC
+// #endregion MUSIC
 
 // #region OTHER STUFF
 
 // made by MF
-loadShader("checkeredBg", null, `
+loadShader(
+	"checkeredBg",
+	null,
+	`
 uniform float u_time;
 uniform vec3 u_color1;
 uniform vec3 u_color2;
@@ -878,10 +882,14 @@ vec4 frag(vec2 pos, vec2 uv, vec4 color, sampler2D tex) {
 	vec4 col2 = vec4(u_color2 / 255.0, 1.0);
 	return (isEven) ? col1 : col2;
 }
-`)
+`,
+);
 
 // made by MF
-loadShader("saturate", null, `
+loadShader(
+	"saturate",
+	null,
+	`
 	uniform float saturation;
 	uniform vec2 u_pos;
 	uniform vec2 u_size;
@@ -892,19 +900,24 @@ loadShader("saturate", null, `
 		vec4 col = vec4(saturationColor/255.0, 1);
 		return (c + vec4(mix(vec3(0), vec3(1), saturation), 0)) * col;
 	}
-`)
+`,
+);
 
 // made by MF
-loadShader("grayscale", null, `
+loadShader(
+	"grayscale",
+	null,
+	`
 	vec4 frag(vec2 pos, vec2 uv, vec4 color, sampler2D tex) {
 		vec4 c = def_frag();
 		return vec4(vec3(dot(c.rgb, vec3(0.2125, 0.7154, 0.0721))), c.a);
 	}
-`)
+`,
+);
 
 import "./game/gamescene.ts";
 import "./game/scenes/focuscene.ts";
-import "./game/scenes/ngScene.ts"
+import "./game/scenes/ngScene.ts";
 
 import { addBackground, addMouse, gameBg } from "./game/additives.ts";
 import { volumeManager } from "./sound.ts";
@@ -915,43 +928,42 @@ import { GameState } from "./gamestate.ts";
 import { DEBUG, enableNg } from "./globals.ts";
 
 onLoad(() => {
-	volumeManager()
-	addBackground()
-	connectToNewgrounds()
-	
-	windowsDefinition()
+	volumeManager();
+	addBackground();
+	connectToNewgrounds();
 
-	gameBg.movAngle = -5
-	gameBg.color = BLACK
-	gameBg.colorA = 0.9
+	windowsDefinition();
+
+	gameBg.movAngle = -5;
+	gameBg.color = BLACK;
+	gameBg.colorA = 0.9;
 
 	if (!DEBUG) {
-		let opacity = 1
-		tween(opacity, 0, 1, (p) => opacity = p, easings.linear)
-	
+		let opacity = 1;
+		tween(opacity, 0, 1, (p) => opacity = p, easings.linear);
+
 		let drawEvent = onDraw(() => {
-			drawSeriousLoadScreen(1, opacity)
-		})
-	
+			drawSeriousLoadScreen(1, opacity);
+		});
+
 		wait(1, () => {
-			drawEvent.cancel()
-			getTreeRoot().trigger("rungame")
-		})
+			drawEvent.cancel();
+			getTreeRoot().trigger("rungame");
+		});
 	}
-	
 	else {
 		// consoleManager()
 		wait(0.05, () => {
-			getTreeRoot().trigger("rungame")
-		})
+			getTreeRoot().trigger("rungame");
+		});
 	}
-	
-	getTreeRoot().on("rungame", async () => {
-		GameState.loadFromStorage()
-		volume(GameState.settings.volume)
-		addMouse()
 
-		if (isFocused()) go("focuscene")
+	getTreeRoot().on("rungame", async () => {
+		GameState.loadFromStorage();
+		volume(GameState.settings.volume);
+		addMouse();
+
+		if (isFocused()) go("focuscene");
 		else {
 			if (enableNg == true) {
 				let loadingEvent = onDraw(() => {
@@ -962,21 +974,19 @@ onLoad(() => {
 						anchor: "center",
 						pos: center(),
 					});
-				})
-			
-				if (!await ng.isLoggedIn()) go("ngScene")
-				
-				// is logged, jarvis set ngUser and enableNg, YOU'RE SO STUPID! 
+				});
+
+				if (!await ng.isLoggedIn()) go("ngScene");
+				// is logged, jarvis set ngUser and enableNg, YOU'RE SO STUPID!
 				else {
-					const session = await ng.getSession()
-					onLogIn(session)
-					go("gamescene")
+					const session = await ng.getSession();
+					onLogIn(session);
+					go("gamescene");
 				}
 				// gets cancelled after the await is finished
-				loadingEvent.cancel()
+				loadingEvent.cancel();
 			}
-
-			else go("gamescene")
+			else go("gamescene");
 		}
-	})
-})
+	});
+});

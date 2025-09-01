@@ -1,13 +1,13 @@
-import { GameObj, PosComp, RectComp, SpriteComp, TextComp, Vec2 } from "kaplay"
-import { GameState } from "../gamestate"
-import { hexagon } from "./hexagon"
-import { blendColors, saveColorToColor } from "./utils"
-import { manageWindow } from "./windows/windows-api/windowManaging"
-import { isWindowUnlocked } from "./unlockables/windowUnlocks"
-import { DragComp } from "./plugins/drag"
-import { AreaComp } from "kaplay"
+import { GameObj, PosComp, RectComp, SpriteComp, TextComp, Vec2 } from "kaplay";
+import { GameState } from "../gamestate";
+import { hexagon } from "./hexagon";
+import { blendColors, saveColorToColor } from "./utils";
+import { manageWindow } from "./windows/windows-api/windowManaging";
+import { isWindowUnlocked } from "./unlockables/windowUnlocks";
+import { DragComp } from "./plugins/drag";
+import { AreaComp } from "kaplay";
 
-export let gameBg:GameObj;
+export let gameBg: GameObj;
 export function addBackground() {
 	gameBg = add([
 		rect(width(), height()),
@@ -25,18 +25,18 @@ export function addBackground() {
 			col2D: rgb(190, 190, 190),
 			colorA: GameState.settings.bgColor.a,
 			update() {
-				if (getSceneName() != "gamescene") return
-				if (!isWindowUnlocked("bgColorWin")) return
+				if (getSceneName() != "gamescene") return;
+				if (!isWindowUnlocked("bgColorWin")) return;
 
 				if (isMousePressed("right")) {
 					// doesn't check for hovering this because you will always be hovering it lol
 					if (!hexagon?.isHovering() && !get("folderObj")[0]?.isHovering() && !get("minibutton")[0]?.isHovering() && !get("window")[0]?.isHovering()) {
-						manageWindow("bgColorWin")
+						manageWindow("bgColorWin");
 					}
 				}
-			}
-		}
-	])
+			},
+		},
+	]);
 
 	gameBg.use(shader("checkeredBg", () => ({
 		"u_time": time() / 10,
@@ -45,11 +45,11 @@ export function addBackground() {
 		"u_speed": vec2(-1, 2).scale(gameBg.speed),
 		"u_angle": gameBg.movAngle,
 		"u_scale": gameBg.uScale,
-		"u_aspect": width() / height()
-	})))
+		"u_aspect": width() / height(),
+	})));
 }
 
-export let mouse:GameObj;
+export let mouse: GameObj;
 export function addMouse() {
 	mouse = add([
 		sprite("cursors"),
@@ -65,74 +65,74 @@ export function addMouse() {
 			speed: 5000, // 5000 is the optimal for actual mouse movement
 			grabbing: false,
 			update() {
-				const allHoverObjs = get("hover", { recursive: true })
+				const allHoverObjs = get("hover", { recursive: true });
 
-				allHoverObjs.forEach((hoverObj:GameObj<DragComp | AreaComp>) => {
+				allHoverObjs.forEach((hoverObj: GameObj<DragComp | AreaComp>) => {
 					if (!hoverObj.isHovering()) {
-						if (hoverObj.dragging) this.play("grab")
+						if (hoverObj.dragging) this.play("grab");
 						else {
-							if (allHoverObjs.some((otherObj) => otherObj.isHovering())) return
-							else this.play("cursor")
+							if (allHoverObjs.some((otherObj) => otherObj.isHovering())) return;
+							else this.play("cursor");
 						}
 					}
-
 					// this runs when the obj is being hovered
 					else {
 						if (isMouseDown("left")) {
 							if (hoverObj.is("ignorepoint") && !hoverObj.dragging || hoverObj.is("ignoregrab")) return;
-							this.play("grab")
+							this.play("grab");
 						}
-
 						else {
-							if (!hoverObj.is("ignorepoint")) this.play("point")
-							else this.play("cursor")
+							if (!hoverObj.is("ignorepoint")) this.play("point");
+							else this.play("cursor");
 						}
 					}
-				})
-				
-				this.pos = lerp(this.pos, mousePos(), 0.9)
-			}
-		}
-	])
+				});
+
+				this.pos = lerp(this.pos, mousePos(), 0.9);
+			},
+		},
+	]);
 
 	return mouse;
-} 
+}
 
 const initialYPosition = 50;
 
 export type toastOpts = {
-	title: string,
-	body: string,
-	icon: string,
-	duration?: number,
-	type?: string,
+	title: string;
+	body: string;
+	icon: string;
+	duration?: number;
+	type?: string;
 	/**
 	 * Will run when the toast is actually added
 	 */
-	whenAdded?:(toastObj:GameObj, icon:GameObj) => void;
-}
+	whenAdded?: (toastObj: GameObj, icon: GameObj) => void;
+};
 
-type ToastIconObj = GameObj<SpriteComp>
-type ToastTitleObj = GameObj<TextComp>
-type ToastBodyObj = GameObj<TextComp>
-type ToastObj = GameObj<RectComp | PosComp | { 
-	index: number,
-	type: toastOpts["type"],
-	icon: ToastIconObj,
-	title: ToastTitleObj,
-	body: ToastBodyObj
-	getPosition(): Vec2
-	setPosition(newPos: Vec2): Vec2
-	close(): void;
-}>
+type ToastIconObj = GameObj<SpriteComp>;
+type ToastTitleObj = GameObj<TextComp>;
+type ToastBodyObj = GameObj<TextComp>;
+type ToastObj = GameObj<
+	RectComp | PosComp | {
+		index: number;
+		type: toastOpts["type"];
+		icon: ToastIconObj;
+		title: ToastTitleObj;
+		body: ToastBodyObj;
+		getPosition(): Vec2;
+		setPosition(newPos: Vec2): Vec2;
+		close(): void;
+	}
+>;
 
-let allToasts:GameObj[] = []
-export function addToast(opts:toastOpts) : ToastObj {
-	opts = opts || {} as toastOpts
+let allToasts: GameObj[] = [];
+export function addToast(opts: toastOpts): ToastObj {
+	opts = opts || {} as toastOpts;
 
-	let toasts = get("toast", { recursive: true }) as any[]
-	
-	function getAvailableIndex(toasts:GameObj[]) {
+	let toasts = get("toast", { recursive: true }) as any[];
+
+	function getAvailableIndex(toasts: GameObj[]) {
 		let occupiedIndices = toasts.map(log => log.index);
 		for (let i = 0; i < Infinity; i++) {
 			if (!occupiedIndices.includes(i)) {
@@ -148,10 +148,10 @@ export function addToast(opts:toastOpts) : ToastObj {
 		yOffset += toasts[i].height + 10; // Add spacing between
 	}
 
-	const LERP_VALUE = 0.1
+	const LERP_VALUE = 0.1;
 	let toastPosition = vec2();
-	toastPosition.x = -200
-	toastPosition.y = yOffset
+	toastPosition.x = -200;
+	toastPosition.y = yOffset;
 
 	let toastBg = add([
 		rect(0, 0, { radius: [0, 10, 10, 0] as any }),
@@ -172,19 +172,19 @@ export function addToast(opts:toastOpts) : ToastObj {
 			body: null,
 
 			getPosition() {
-				return toastPosition
+				return toastPosition;
 			},
-			setPosition(posi:Vec2) {
-				toastPosition = posi
+			setPosition(posi: Vec2) {
+				toastPosition = posi;
 			},
 			close() {
-				this.unuse("toast")
-				
-				toastPosition.x = -this.width
+				this.unuse("toast");
+
+				toastPosition.x = -this.width;
 				wait(1.5).onEnd(() => {
-					this.trigger("closed")
-					this.destroy()
-				})
+					this.trigger("closed");
+					this.destroy();
+				});
 			},
 
 			update() {
@@ -203,7 +203,7 @@ export function addToast(opts:toastOpts) : ToastObj {
 			opacity: 0.5,
 			fixed: toastBg.is("fixed") ?? true,
 			color: BLACK,
-		})
+		});
 	});
 
 	toastBg.height = opts.icon ? 80 : 100;
@@ -219,14 +219,14 @@ export function addToast(opts:toastOpts) : ToastObj {
 			update() {
 				this.pos.x = toastBg.pos.x - toastBg.width / 2 + 50;
 				this.pos.y = toastBg.pos.y + toastBg.height / 2;
-			}
-		}
+			},
+		},
 	]);
 
-	icon.sprite = opts.icon
+	icon.sprite = opts.icon;
 
-	if (icon.width >= 70) icon.width = 60
-	if (icon.height >= 70) icon.height = 60
+	if (icon.width >= 70) icon.width = 60;
+	if (icon.height >= 70) icon.height = 60;
 
 	let titleText = add([
 		text(opts.title, {
@@ -244,8 +244,8 @@ export function addToast(opts:toastOpts) : ToastObj {
 			update() {
 				this.pos.x = icon.pos.x + icon.width / 2 + 10;
 				this.pos.y = toastBg.pos.y + 5;
-			}
-		}
+			},
+		},
 	]);
 
 	let bodyText = add([
@@ -264,18 +264,18 @@ export function addToast(opts:toastOpts) : ToastObj {
 			update() {
 				this.pos.x = titleText.pos.x;
 				this.pos.y = titleText.pos.y + titleText.height;
-			}
-		}
+			},
+		},
 	]);
 
 	toastBg.width = icon.width + 20;
 	toastBg.height = icon.height + 20;
 
-	let titleTextWidth = formatText({ text: titleText.text, size: titleText.textSize }).width
-	let bodyTextWidth = formatText({ text: bodyText.text, size: bodyText.textSize }).width
+	let titleTextWidth = formatText({ text: titleText.text, size: titleText.textSize }).width;
+	let bodyTextWidth = formatText({ text: bodyText.text, size: bodyText.textSize }).width;
 
-	titleTextWidth = clamp(titleTextWidth, 0, 500)
-	bodyTextWidth = clamp(bodyTextWidth, 0, 500)
+	titleTextWidth = clamp(titleTextWidth, 0, 500);
+	bodyTextWidth = clamp(bodyTextWidth, 0, 500);
 
 	if (titleTextWidth > bodyTextWidth) toastBg.width += titleTextWidth + 25;
 	else if (bodyTextWidth > titleTextWidth) toastBg.width += bodyTextWidth + 25;
@@ -286,9 +286,9 @@ export function addToast(opts:toastOpts) : ToastObj {
 	else if (bodyText.height > titleText.height) toastBg.height += bodyText.height - titleText.height + 15;
 	else if (bodyText.height == titleText.height) toastBg.height = titleText.height + bodyText.height + 15;
 
-	toastPosition.x = toastBg.width / 2
-	
-	if (opts.whenAdded) opts.whenAdded(toastBg, icon)
+	toastPosition.x = toastBg.width / 2;
+
+	if (opts.whenAdded) opts.whenAdded(toastBg, icon);
 
 	toastBg.wait(opts.duration ?? 3, () => {
 		toastBg.close();
@@ -296,79 +296,79 @@ export function addToast(opts:toastOpts) : ToastObj {
 
 	toastBg.onDestroy(() => {
 		drawToastShadow.cancel();
-		icon.destroy()
+		icon.destroy();
 		titleText.destroy();
 		bodyText.destroy();
 	});
 
-	const Ycenter = toastBg.pos.y + toastBg.height * 0.5
+	const Ycenter = toastBg.pos.y + toastBg.height * 0.5;
 
 	if (Ycenter >= height()) {
 		// move it to a proper position
-		const newYPos = height() - toastBg.height - 10
-		toastBg.setPosition(vec2(toastBg.getPosition().x, newYPos))
-		
+		const newYPos = height() - toastBg.height - 10;
+		toastBg.setPosition(vec2(toastBg.getPosition().x, newYPos));
+
 		// move the other ones up
-		const allTosts = get("toast") as any
+		const allTosts = get("toast") as any;
 		allTosts.filter(toast => toast != toastBg).forEach((toast) => {
-			const newYPos = toast.getPosition().y - toastBg.height - 10
-			toast.setPosition(vec2(toast.getPosition().x, newYPos))
-		})
+			const newYPos = toast.getPosition().y - toastBg.height - 10;
+			toast.setPosition(vec2(toast.getPosition().x, newYPos));
+		});
 	}
 
-	if (Ycenter < -10) toastBg.close()
+	if (Ycenter < -10) toastBg.close();
 
-	toastBg.icon = icon
-	toastBg.title = titleText
-	toastBg.body = bodyText
+	toastBg.icon = icon;
+	toastBg.title = titleText;
+	toastBg.body = bodyText;
 
 	return toastBg;
 }
 
 type tooltipOpts = {
-	text:string;
-	direction?: "up" | "down" | "left" | "right",
+	text: string;
+	direction?: "up" | "down" | "left" | "right";
 	/**
 	 * How smooth the tooltip will be
 	 */
-	lerpValue?:number,
-	textSize?:number,
-	type?:string,
-	layer?:string,
-	position?: Vec2,
-	z?:number,
-}
+	lerpValue?: number;
+	textSize?: number;
+	type?: string;
+	layer?: string;
+	position?: Vec2;
+	z?: number;
+};
 
-export type tooltipInfo = { 
-	tooltipBg:any,
-	tooltipText:any,
-	type: string,
-	end: () => void,
-	changePos: (newPos: Vec2) => void,
-}
+export type tooltipInfo = {
+	tooltipBg: any;
+	tooltipText: any;
+	type: string;
+	end: () => void;
+	changePos: (newPos: Vec2) => void;
+};
 
 /**
  * Adds a tooltip to an object and pushes itself to a tooltips array
- * @returns An object that contains the bg, text and an end() function 
+ * @returns An object that contains the bg, text and an end() function
  */
-export function addTooltip(obj:GameObj, opts?:tooltipOpts) : tooltipInfo {
-	if (opts == undefined) opts = {} as tooltipOpts 
+export function addTooltip(obj: GameObj, opts?: tooltipOpts): tooltipInfo {
+	if (opts == undefined) opts = {} as tooltipOpts;
 	opts.direction = opts.direction ?? "up";
 	opts.lerpValue = opts.lerpValue ?? 1;
 	opts.textSize = opts.textSize ?? 20;
 
-	opts.layer = opts.layer ?? "windows"
+	opts.layer = opts.layer ?? "windows";
 	// if a z was put, use it, if not, if obj has z, do obj.z + 1, if not use 10
-	opts.z = opts.z ?? obj.z ? obj.z + 1 : 10
+	opts.z = opts.z ?? obj.z ? obj.z + 1 : 10;
 
 	let sizeOfText = { x: 0, y: 0 };
 
-	let offset = 10
-	let bgPos = vec2(obj.worldPos().x, obj.worldPos().y)
+	let offset = 10;
+	let bgPos = vec2(obj.worldPos().x, obj.worldPos().y);
 	let padding = 10;
 
-	let ending = false
-	let theOpacity = 0.95
+	let ending = false;
+	let theOpacity = 0.95;
 
 	let tooltipBg = add([
 		rect(sizeOfText.x, sizeOfText.y, { radius: 5 }),
@@ -388,44 +388,43 @@ export function addTooltip(obj:GameObj, opts?:tooltipOpts) : tooltipInfo {
 					if (!opts.position) {
 						switch (opts.direction) {
 							case "up":
-								bgPos.y = (obj.worldPos().y - obj.height / 2) - offset
-								bgPos.x = obj.worldPos().x
-							break;
-					
+								bgPos.y = (obj.worldPos().y - obj.height / 2) - offset;
+								bgPos.x = obj.worldPos().x;
+								break;
+
 							case "down":
-								bgPos.y = (obj.worldPos().y + obj.height / 2) + offset
-								bgPos.x = obj.worldPos().x
-							break;
-					
+								bgPos.y = (obj.worldPos().y + obj.height / 2) + offset;
+								bgPos.x = obj.worldPos().x;
+								break;
+
 							case "left":
-								this.anchor = "right"	
-								bgPos.x = (obj.worldPos().x - obj.width / 2) - offset
-								bgPos.y = obj.worldPos().y
-							break;
-					
+								this.anchor = "right";
+								bgPos.x = (obj.worldPos().x - obj.width / 2) - offset;
+								bgPos.y = obj.worldPos().y;
+								break;
+
 							case "right":
-								this.anchor = "left"	
-								bgPos.x = (obj.worldPos().x + obj.width / 2) + offset
-								bgPos.y = obj.worldPos().y
-							break;
+								this.anchor = "left";
+								bgPos.x = (obj.worldPos().x + obj.width / 2) + offset;
+								bgPos.y = obj.worldPos().y;
+								break;
 						}
 					}
-
 					else {
-						bgPos = opts.position
-					} 
+						bgPos = opts.position;
+					}
 				}
-				
-				this.width = lerp(this.width, sizeOfText.x + padding, opts.lerpValue)
-				this.height = lerp(this.height, sizeOfText.y + padding, opts.lerpValue)
 
-				this.pos.x = lerp(this.pos.x, bgPos.x, opts.lerpValue)
-				this.pos.y = lerp(this.pos.y, bgPos.y, opts.lerpValue)
+				this.width = lerp(this.width, sizeOfText.x + padding, opts.lerpValue);
+				this.height = lerp(this.height, sizeOfText.y + padding, opts.lerpValue);
 
-				this.opacity = lerp(this.opacity, theOpacity, opts.lerpValue)
+				this.pos.x = lerp(this.pos.x, bgPos.x, opts.lerpValue);
+				this.pos.y = lerp(this.pos.y, bgPos.y, opts.lerpValue);
+
+				this.opacity = lerp(this.opacity, theOpacity, opts.lerpValue);
 			},
-		}
-	])
+		},
+	]);
 
 	let tooltipText = add([
 		text(opts.text, {
@@ -440,8 +439,8 @@ export function addTooltip(obj:GameObj, opts?:tooltipOpts) : tooltipInfo {
 				},
 				"title": {
 					scale: vec2(1.1),
-				}
-			}
+				},
+			},
 		}),
 		color(WHITE),
 		anchor(tooltipBg.anchor),
@@ -453,58 +452,58 @@ export function addTooltip(obj:GameObj, opts?:tooltipOpts) : tooltipInfo {
 		{
 			bg: tooltipBg,
 			update() {
-				sizeOfText.x = formatText({ text: tooltipText.text, size: tooltipText.textSize }).width
-				sizeOfText.y = formatText({ text: tooltipText.text, size: tooltipText.textSize }).height
-			
-				this.anchor = tooltipBg.anchor
-				this.layer = tooltipBg.layer
-				this.z = tooltipBg.z
-				let xPos:number;
+				sizeOfText.x = formatText({ text: tooltipText.text, size: tooltipText.textSize }).width;
+				sizeOfText.y = formatText({ text: tooltipText.text, size: tooltipText.textSize }).height;
 
-				if (opts.direction == "right") xPos = tooltipBg.pos.x + padding / 2
-				else if (opts.direction == "left") xPos = tooltipBg.pos.x - padding / 2
-				else xPos = tooltipBg.pos.x
+				this.anchor = tooltipBg.anchor;
+				this.layer = tooltipBg.layer;
+				this.z = tooltipBg.z;
+				let xPos: number;
 
-				this.pos.x = xPos
-				this.pos.y = tooltipBg.pos.y
-			
-				this.opacity = lerp(this.opacity, theOpacity > 0 ? 1 : theOpacity, opts.lerpValue)
-			}
-		}
-	])
+				if (opts.direction == "right") xPos = tooltipBg.pos.x + padding / 2;
+				else if (opts.direction == "left") xPos = tooltipBg.pos.x - padding / 2;
+				else xPos = tooltipBg.pos.x;
 
-	function end() : void {
-		ending = true
-		theOpacity = 0
-		bgPos = obj.worldPos()
+				this.pos.x = xPos;
+				this.pos.y = tooltipBg.pos.y;
+
+				this.opacity = lerp(this.opacity, theOpacity > 0 ? 1 : theOpacity, opts.lerpValue);
+			},
+		},
+	]);
+
+	function end(): void {
+		ending = true;
+		theOpacity = 0;
+		bgPos = obj.worldPos();
 
 		wait(1 - opts.lerpValue, () => {
-			destroy(tooltipBg)
-			destroy(tooltipText)
-		})
+			destroy(tooltipBg);
+			destroy(tooltipText);
+		});
 
-		obj.tooltip = null
+		obj.tooltip = null;
 	}
 
-	function changePos(newPos:Vec2) : void {
-		opts.position = newPos
+	function changePos(newPos: Vec2): void {
+		opts.position = newPos;
 	}
 
-	let tooltipinfo = { 
+	let tooltipinfo = {
 		tooltipBg,
 		tooltipText,
 		type: opts.type,
 		end: end,
-		changePos: changePos
-	} as tooltipInfo
-	
-	if (obj.tooltip == null) obj.tooltip = tooltipinfo
+		changePos: changePos,
+	} as tooltipInfo;
+
+	if (obj.tooltip == null) obj.tooltip = tooltipinfo;
 
 	obj.onDestroy(() => {
-		end()
-	})
+		end();
+	});
 
-	tooltipBg.end = end
+	tooltipBg.end = end;
 
-	return tooltipinfo
+	return tooltipinfo;
 }
