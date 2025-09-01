@@ -1,10 +1,9 @@
 import ng from "newgrounds.js"
 import { gameBg } from "../additives"
-import { enableNg } from "../../main"
 import { onLogIn } from "../../newgrounds"
+import { enableNg } from "../../globals"
 
-export function focuscene() {
-	return scene("focuscene", () => {
+	scene("focuscene", () => {
 		tween(1, 0.95, 0.25, (p) => gameBg.colorA = p, easings.linear)
 
 		// // if debug ignore the focus scene and just go to the game
@@ -51,4 +50,3 @@ export function focuscene() {
 			}
 		})
 	})	
-}

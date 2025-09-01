@@ -1,5 +1,7 @@
 // # Update code by MF / the other stuff by amyspark-ng
 
+import { Comp } from "kaplay"
+
 // A custom component for waving - it is TS for this waveCompOpt
 type WaveCompOpt = {
 	wave_tweenSpeed?: number,
@@ -10,7 +12,21 @@ type WaveCompOpt = {
 	wave_speed?: number,
 }
 
-export function waver(WaveCompOpt?: WaveCompOpt) {
+export interface WaverComp extends Comp {
+	amplitude: number,
+	wave_tweenSpeed: number,
+	wave_startTweenSpeed: number,
+	wave_endTweenSpeed: number,
+	minAmplitude: number,
+	maxAmplitude: number,
+	wave_verPosition: number,
+	wave_speed: number,
+	isWaving: boolean
+	startWave(): void;
+	stopWave(): void;
+}
+
+export function waver(WaveCompOpt?: WaveCompOpt) : WaverComp {
 	return {
 		// Name of the component
 		id: "wave",

@@ -109,7 +109,7 @@ export function unlockWindow(windowJustUnlocked:windowKey) {
 			// is on taskbar
 			if (GameState.taskbar.includes(windowJustUnlocked)) {
 				let newlyUnlockedBtn = get("minibutton").filter(btn => btn.windowKey == windowJustUnlocked)[0]
-				addExclamation(newlyUnlockedBtn)
+				if (newlyUnlockedBtn) addExclamation(newlyUnlockedBtn)
 			}
 
 			// it went to extraa win

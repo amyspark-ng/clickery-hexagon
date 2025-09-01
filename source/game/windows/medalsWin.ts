@@ -1,5 +1,4 @@
 import { ColorComp, GameObj, OpacityComp, SpriteComp } from "kaplay";
-import { DEBUG } from "../../main";
 import { addTooltip, mouse } from "../additives";
 import { AchievementInterface, achievements, getAchievement, isAchievementUnlocked, unlockAchievement } from "../unlockables/achievements";
 import { blendColors, getPositionOfSide } from "../utils";
@@ -10,6 +9,7 @@ import ng from "newgrounds.js";
 import { GameState } from "../../gamestate";
 import * as env from "../../env.json"
 import { hoverController } from "../../hoverManaging";
+import { DEBUG } from "../../globals";
 
 // Constants
 const totalColumns = 5;

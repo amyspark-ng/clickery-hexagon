@@ -4,8 +4,7 @@ import { powerupTypes } from "./game/powerups"
 import { percentage, saveAnim } from "./game/utils"
 import { ngEnabled, ngUser } from "./newgrounds"
 import { musicHandler, stopAllSounds } from "./sound"
-
-export const GAME_VERSION = "1.2.3"
+import { clickeringYears, GAME_VERSION, isClickeryBirthday } from "./globals"
 
 export function deepMergeSaves(oldSave:_GameState, newSave:_GameState) : _GameState {
     const result:any = { ...oldSave }; // Start with a shallow copy of the old save
@@ -185,10 +184,11 @@ class _scoreManager {
 		const countingCombo = countingPowerups * this.combo
 		const countingCards = countingCombo + percentage(countingCombo, GameState.clickPercentage)
 		const countingManaAT = countingCards + percentage(countingCards, GameState.ascension.manaAllTime)
-		
+		const countingYears = countingManaAT + (isClickeryBirthday ? percentage(countingManaAT, clickeringYears) : 0)
+
 		includeCrits = includeCrits ?? false
-		if (includeCrits) return Math.round(countingManaAT * GameState.critPower)
-		else return Math.round(countingManaAT) 
+		if (includeCrits) return Math.round(countingYears * GameState.critPower)
+		else return Math.round(countingYears) 
 	}
 
 	// score per cursor click (not including powerups or percentages)

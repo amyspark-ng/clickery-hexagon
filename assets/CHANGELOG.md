@@ -1,5 +1,12 @@
 # CLICKERY HEXAGON CHANGELOG
 
+## 1.3.0
+- Reworked the project structure a bit (shouldn't affect performance)
+- Removed desktop support (very sorry)
+
+FEATURES:
+- Added a special bonus on birthdays :)
+
 ## 1.2.3
 - Wrong color on the locked powerup element
 - Crash when opening the color windows related to draggings

@@ -1,12 +1,14 @@
+import { GameObj, OpacityComp, PosComp } from "kaplay";
 import { GameState } from "../../gamestate";
-import { waver } from "../plugins/wave";
+import { waver, WaverComp } from "../plugins/wave";
 import { bop } from "../utils";
 import { getRandomDialogue, mageDialogues, talk } from "./dialogues";
+import { isClickeryBirthday } from "../../globals";
 
 export function addMage() {
 	let mageClothColor = rgb(0, 51, 102)
 	
-	let mage:any;
+	let mage:GameObj<PosComp | WaverComp | OpacityComp>;
 
 	mage = add([
 		pos(-17, 154),
@@ -152,6 +154,29 @@ export function addMage() {
 	mage.get("mage_lightning").forEach(o => o.onUpdate(() => { 
 		o.color = mage_hexagon.color
 	}))
+
+	if (isClickeryBirthday) {
+		mage_body.add([
+			sprite("partyhat"),
+			pos(5, -8),
+			rotate(5),
+			scale(0.75)
+		])
+
+		mage.add([
+			sprite("partycake"),
+			pos(435, 175),
+			rotate(),
+			waver(),
+			anchor("center"),
+			scale(0.75),
+			{
+				update() {
+					this.angle = wave(-5, 5, time())
+				}
+			}
+		])
+	}
 
 	return mage;
 }

@@ -11,7 +11,7 @@ import { checkForUnlockable, isAchievementUnlocked, unlockAchievement } from "./
 import { mouse } from "./additives.ts";
 import { isWindowUnlocked } from "./unlockables/windowUnlocks.ts";
 import { hoverController } from "../hoverManaging.ts";
-import { AreaCompOpt } from "kaplay";
+import { AreaCompOpt, GameObj } from "kaplay";
 
 export let clickVars = {
 	clicksPerSecond: 0, // to properly calculate sps
@@ -62,6 +62,7 @@ function createHexagon() {
 		layer("hexagon"),
 		"hexagon",
 		{
+			partyHat: null as GameObj,
 			interactable: true,
 			isBeingClicked: false,
 			isBeingFakeClicked: false,
@@ -462,12 +463,14 @@ function createHexagon() {
 			hexagon.sprite = "panderito"
 			hexagon.area.shape = panderitoArea.shape
 			hexagon.area.offset = panderitoArea.offset
+			if (hexagon.partyHat) {
+				hexagon.partyHat
+			}
 		}
 	})
 
 	hexagon.on("startAnimEnd", () => {
 		hexagon.use(waver({ maxAmplitude: 5, wave_speed: 1 }))
-		// hexagon.startWave()
 	})
 
 	hexagon.onClick(() => {

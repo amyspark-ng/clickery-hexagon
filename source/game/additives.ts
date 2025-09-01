@@ -1,8 +1,8 @@
-import { Color, GameObj, Vec2 } from "kaplay"
+import { GameObj, PosComp, RectComp, SpriteComp, TextComp, Vec2 } from "kaplay"
 import { GameState } from "../gamestate"
 import { hexagon } from "./hexagon"
 import { blendColors, saveColorToColor } from "./utils"
-import { allObjWindows, manageWindow } from "./windows/windows-api/windowManaging"
+import { manageWindow } from "./windows/windows-api/windowManaging"
 import { isWindowUnlocked } from "./unlockables/windowUnlocks"
 import { DragComp } from "./plugins/drag"
 import { AreaComp } from "kaplay"
@@ -112,8 +112,22 @@ export type toastOpts = {
 	whenAdded?:(toastObj:GameObj, icon:GameObj) => void;
 }
 
+type ToastIconObj = GameObj<SpriteComp>
+type ToastTitleObj = GameObj<TextComp>
+type ToastBodyObj = GameObj<TextComp>
+type ToastObj = GameObj<RectComp | PosComp | { 
+	index: number,
+	type: toastOpts["type"],
+	icon: ToastIconObj,
+	title: ToastTitleObj,
+	body: ToastBodyObj
+	getPosition(): Vec2
+	setPosition(newPos: Vec2): Vec2
+	close(): void;
+}>
+
 let allToasts:GameObj[] = []
-export function addToast(opts:toastOpts) {
+export function addToast(opts:toastOpts) : ToastObj {
 	opts = opts || {} as toastOpts
 
 	let toasts = get("toast", { recursive: true }) as any[]
@@ -153,7 +167,7 @@ export function addToast(opts:toastOpts) {
 			index: idx,
 			type: opts.type,
 
-			icon: null,
+			icon: null as typeof icon,
 			title: null,
 			body: null,
 

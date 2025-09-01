@@ -1,12 +1,10 @@
 import ng, { User } from "newgrounds.js";
 import * as env from "./env.json"
 import { _GameState, deepMergeSaves, GameState } from "./gamestate";
-import { positionSetter } from "./game/plugins/positionSetter";
 import { bop } from "./game/utils";
 import { gameBg } from "./game/additives";
 import { Session } from "newgrounds.js/dist/first";
-import { AchievementInterface, achievements, getAchievement, isAchievementUnlocked, unlockAchievement } from "./game/unlockables/achievements";
-import { Medal } from "newgrounds.js/dist/first";
+import { achievements, getAchievement } from "./game/unlockables/achievements";
 
 /** Wheter ng should work or not */
 export let ngEnabled:boolean;

@@ -7,7 +7,6 @@ import { windowKey } from "../windows/windows-api/windowManaging"
 import { isWindowUnlocked, unlockWindow } from "../unlockables/windowUnlocks"
 import { talk } from "./dialogues"
 import { hoverController } from "../../hoverManaging"
-import { k } from "../../main"
 
 let cardsInfo = {
 	"clickersCard": { 

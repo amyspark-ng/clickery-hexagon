@@ -13,7 +13,6 @@ import { addTooltip, mouse, tooltipInfo } from "../additives";
 import { GameObj, KEventController } from "kaplay";
 import { formatNumberSimple } from "../utils";
 import { hoverController } from "../../hoverManaging";
-import { k } from "../../main";
 
 export let ascension = {
 	ascending: false,
@@ -85,6 +84,7 @@ export function startAscending() {
 	})
 
 	tween(hexagon.opacity, 0, 0.35, (p) => hexagon.opacity = p, easings.easeOutCubic)
+	tween(hexagon.partyHat.opacity, 0, 0.35, (p) => hexagon.partyHat.opacity = p, easings.easeOutCubic)
 
 	let blackBg = add([
 		rect(width(), height()),

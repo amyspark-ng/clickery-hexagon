@@ -2,6 +2,7 @@ import { GameObj } from "kaplay";
 import { getRandomElementDifferentFrom, removeNumbersOfString } from "../utils";
 import { ascension } from "./ascension";
 import { playSfx } from "../../sound";
+import { isClickeryBirthday } from "../../globals";
 
 const defaultTalkingSpeed = 0.025
 const someVowels = ["a", "e", "o", "i"] 
@@ -75,6 +76,14 @@ export const mageDialogues = [
 	new Dialogue("fun8", "Hum... Hum...", true, 0.1),
 	new Dialogue("fun9", "Y U M M E R S", true, 0.1),
 ]
+
+if (isClickeryBirthday) {
+	mageDialogues.push(...[
+		new Dialogue("fun10", "I found this cool hat on the ground", true),
+		new Dialogue("fun11", "Want some cake?", true),
+		new Dialogue("fun12", "I got the sense i've been trapped here for a long time", true, 0.05),
+	])
+}
 
 export const yummersKey = mageDialogues.find(dialogue => dialogue.text == "Y U M M E R S").key
 export const humKey = mageDialogues.find(dialogue => dialogue.text == "Hum... Hum...").key

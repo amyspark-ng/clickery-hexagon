@@ -1,22 +1,21 @@
-import { GAME_VERSION, GameState, scoreManager } from "../gamestate.ts"
+import { GameState, scoreManager } from "../gamestate.ts"
 import { addHexagon, hexagon } from "./hexagon.ts"
 import { buildingsText, scoreText, spsText, uiCounters } from "./uicounters.ts"
-import { coolSetFullscreen, debugFunctions, formatNumber, formatTime, randomPos, saveColorToColor, toggleTheFullscreen } from "./utils.ts"
+import { convertToOrdinal, coolSetFullscreen, debugFunctions, formatNumber, formatTime, randomPos, saveColorToColor, toggleTheFullscreen } from "./utils.ts"
 import { addToast, gameBg, mouse } from "./additives.ts"
 import { musicHandler, playMusic, playSfx, stopAllSounds } from "../sound.ts"
 import { songs } from "./windows/musicWindow.ts"
-import { DEBUG } from "../main.ts"
 import { allPowerupsInfo, Powerup_NaturalSpawnManager, Powerup_RemovalTimeManager, spawnPowerup } from "./powerups.ts"
 import { checkForUnlockable, isAchievementUnlocked, unlockAchievement } from "./unlockables/achievements.ts"
 import { ascension } from "./ascension/ascension.ts"
 import { folderObj, addFolderObj } from "./windows/windows-api/folderObj.ts"
 import { curDraggin } from "./plugins/drag.ts"
 import { ngEnabled, postEverything } from "../newgrounds.ts"
-import { drawDumbOutline } from "./plugins/drawThings.ts"
-import { allObjWindows } from "./windows/windows-api/windowManaging.ts"
 import ng from "newgrounds.js"
 import { hoverManaging } from "../hoverManaging.ts"
 import { CHANGELOG } from "../loader.ts"
+import { addConfetti } from "./plugins/confetti.ts"
+import { clickeringYears, DEBUG, GAME_VERSION, isClickeryBirthday } from "../globals.ts"
 
 let panderitoLetters = "panderito".split("")
 export let panderitoIndex = 0
@@ -263,7 +262,7 @@ export function triggerGnome() {
 export let hexagonIntro:() => void;
 export let hasStartedGame:boolean;
 
-export const gamescene = () => scene("gamescene", async () => {
+scene("gamescene", async () => {
 	hasStartedGame = GameState.scoreAllTime > 1
 	ascension.ascending = false
 	allPowerupsInfo.isHoveringAPowerup = false
@@ -372,8 +371,10 @@ export const gamescene = () => scene("gamescene", async () => {
 				}
 			}
 
-			data = CHANGELOG.split("\n").splice(startingIndex, endingIndex - startingIndex).join("\n")
-			addToast({ icon: "welcomeBackIcon", title: "New update!", body: data, type: "welcome" })
+			wait(isClickeryBirthday ? 5.5 : 0, () => {
+				data = CHANGELOG.split("\n").splice(startingIndex, endingIndex - startingIndex).join("\n")
+				addToast({ icon: "welcomeBackIcon", title: "New update!", body: data, type: "welcome", duration: 4 })
+			})
 		}
 	})
 	
@@ -522,6 +523,7 @@ export const gamescene = () => scene("gamescene", async () => {
 				hexagon.trigger("startAnimEnd")
 			})
 			tween(0.25, 1, 1, (p) => hexagon.opacity = p, easings.easeOutQuad)
+			if (hexagon.partyHat) tween(0.25, 1, 1, (p) => hexagon.partyHat.opacity = p, easings.easeOutQuad)
 		},
 		intro_gameBg() {
 			tween(BLACK, saveColorToColor(GameState.settings.bgColor), 0.5, (p) => gameBg.color = p, easings.easeOutQuad)
@@ -556,6 +558,7 @@ export const gamescene = () => scene("gamescene", async () => {
 	if (GameState.settings.fullscreen == true) coolSetFullscreen(true)
 	if (!isFullscreen()) GameState.settings.fullscreen = false
 
+	// this only runs once you already started the game (ominus has already happened first time)
 	if (hasStartedGame) {
 		Object.values(introAnimations).filter(animation => !animation.name.includes("hopes")).forEach((animation) => {
 			animation() // animations take 0.5 seconds
@@ -565,6 +568,38 @@ export const gamescene = () => scene("gamescene", async () => {
 			hexagon.interactable = true
 			getTreeRoot().trigger("gamestart")
 		})
+
+		// do birthday stuff <:)
+		if (isClickeryBirthday) {
+			const partyHat = hexagon.add([
+				sprite("partyhat"),
+				pos(-1000, -1000),
+				scale(0.5),
+				opacity(1),
+				anchor("center"),
+				rotate(-5),
+			])
+			hexagon.partyHat = partyHat
+			partyHat.onUpdate(() => {
+				const partyHatPos = GameState.settings.panderitoMode ? vec2(-25, -230) : vec2(-125, -185)
+				const partyHatAngle = GameState.settings.panderitoMode ? 5 : -5
+				partyHat.pos = lerp(partyHat.pos, partyHatPos, 0.25)
+				partyHat.angle = lerp(partyHat.angle, partyHatAngle, 0.25)
+			})
+			
+			addConfetti({pos: center()})
+			addConfetti({pos: center()})
+
+			playSfx("partyhorn", { detune: rand(-50, 50) })
+			wait(0.5, () => {
+				addToast({
+					title: "HAPPY BIRTHDAY!!",
+					body: `It's clickery's ${convertToOrdinal(clickeringYears)} birthday! for today you'll get +${clickeringYears}% score, enjoy :)`,
+					icon: "partycake",
+					duration: 5,
+				})
+			})
+		}
 	}
 	
 	else {
