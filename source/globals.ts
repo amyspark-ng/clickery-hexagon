@@ -1,6 +1,6 @@
 export let DEBUG = false;
 export let enableNg = true;
-export const GAME_VERSION = "1.3.0";
+export const GAME_VERSION = "1.3.1";
 
 const todayDate = new Date();
 const clickeryBirthday = new Date();

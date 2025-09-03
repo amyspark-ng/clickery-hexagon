@@ -12,7 +12,7 @@ export default defineConfig(async ({ mode }) => ({
 		hmr: false,
 		port: 8000,
 	},
-	publicDir: false,
+	publicDir: "assets/",
 	assetsInclude: [],
 	build: {
 		minify: "terser",

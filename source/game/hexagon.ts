@@ -462,9 +462,6 @@ function createHexagon() {
 			hexagon.sprite = "panderito";
 			hexagon.area.shape = panderitoArea.shape;
 			hexagon.area.offset = panderitoArea.offset;
-			if (hexagon.partyHat) {
-				hexagon.partyHat;
-			}
 		}
 	});
 

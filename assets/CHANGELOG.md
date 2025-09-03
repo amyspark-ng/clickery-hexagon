@@ -1,5 +1,8 @@
 # CLICKERY HEXAGON CHANGELOG
 
+## 1.3.1
+- Fixed a crash when ascending (opacity of partyHat was null)
+
 ## 1.3.0
 - Reworked the project structure a bit (shouldn't affect performance)
 - Removed desktop support (very sorry)

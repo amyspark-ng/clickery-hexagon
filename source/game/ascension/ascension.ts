@@ -84,7 +84,9 @@ export function startAscending() {
 	});
 
 	tween(hexagon.opacity, 0, 0.35, (p) => hexagon.opacity = p, easings.easeOutCubic);
-	tween(hexagon.partyHat.opacity, 0, 0.35, (p) => hexagon.partyHat.opacity = p, easings.easeOutCubic);
+	if (hexagon.partyHat) {
+		tween(hexagon.partyHat.opacity, 0, 0.35, (p) => hexagon.partyHat.opacity = p, easings.easeOutCubic);
+	}
 
 	let blackBg = add([
 		rect(width(), height()),
